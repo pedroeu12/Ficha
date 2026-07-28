@@ -1,0 +1,99 @@
+package com.pedroeu.ficha.ui.creation
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.model.CharClass
+import com.pedroeu.ficha.ui.components.SectionHeader
+import com.pedroeu.ficha.ui.components.SelectableCard
+
+@Composable
+fun ClassStep(state: CreationState, viewModel: CreationViewModel) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            Text(
+                text = "Your class is what you do in the world: how you fight, what magic you wield, and what you're trained in. You'll pick its options on the next step.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        items(ClassData.ALL, key = { it.id }) { charClass ->
+            SelectableCard(
+                title = charClass.name,
+                subtitle = charClass.summary,
+                selected = state.classId == charClass.id,
+                onClick = { viewModel.selectClass(charClass.id) },
+                trailingLabel = "d${charClass.hitDie} Hit Die • " +
+                    charClass.primaryAbility.joinToString("/") { it.abbreviation },
+                expandedContent = { ClassDetails(charClass) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ClassDetails(charClass: CharClass) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+        SectionHeader("Level 1 Features")
+        charClass.level1Features.forEach { feature ->
+            Column {
+                Text(
+                    text = feature.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = feature.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        SectionHeader("Proficiencies")
+        LabeledLine("Saving Throws", charClass.savingThrows.joinToString { it.fullName })
+        LabeledLine(
+            "Armor",
+            charClass.armorProficiencies.takeIf { it.isNotEmpty() }?.joinToString() ?: "None",
+        )
+        LabeledLine("Weapons", charClass.weaponProficiencies.joinToString())
+        if (charClass.toolProficiencies.isNotEmpty()) {
+            LabeledLine("Tools", charClass.toolProficiencies.joinToString())
+        }
+    }
+}
+
+@Composable
+private fun LabeledLine(label: String, value: String) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}

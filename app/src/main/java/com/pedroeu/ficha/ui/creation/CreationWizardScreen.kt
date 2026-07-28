@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -97,6 +98,7 @@ fun CreationWizardScreen(
                 },
             )
         },
+        containerColor = Color.Transparent,
     ) { padding ->
         AnimatedContent(
             targetState = state.step,
@@ -120,6 +122,7 @@ fun CreationWizardScreen(
                 CreationStep.CLASS -> ClassStep(state, viewModel)
                 CreationStep.CLASS_CHOICES -> ClassChoicesStep(state, viewModel)
                 CreationStep.BACKGROUND -> BackgroundStep(state, viewModel)
+                CreationStep.ORIGIN_CHOICES -> OriginChoicesStep(state, viewModel)
                 CreationStep.ABILITIES -> AbilitiesStep(state, viewModel)
                 CreationStep.DETAILS -> DetailsStep(state, viewModel)
             }
@@ -206,6 +209,7 @@ private fun hintFor(state: CreationState): String = when {
         CreationStep.CLASS -> "Pick a class"
         CreationStep.CLASS_CHOICES -> "Complete every option below"
         CreationStep.BACKGROUND -> "Pick an origin and assign its ability bonuses"
+        CreationStep.ORIGIN_CHOICES -> "Resolve every grant your origin left open"
         CreationStep.ABILITIES -> "Assign all six ability scores"
         CreationStep.DETAILS -> "Give your character a name"
     }

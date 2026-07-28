@@ -1,4 +1,5 @@
 <resources>
-    <color name="ficha_primary_dark">#4A0E0E</color>
-    <color name="ic_launcher_background">#7F1D1D</color>
+    <color name="parchment_page">#F4E8D0</color>
+    <color name="crimson_deep">#6B2020</color>
+    <color name="ic_launcher_background">#6B2020</color>
 </resources>

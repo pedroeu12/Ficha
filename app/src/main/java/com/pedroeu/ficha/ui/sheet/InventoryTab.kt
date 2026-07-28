@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,8 +15,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -34,13 +37,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.pedroeu.ficha.data.content.ItemCatalog
+import com.pedroeu.ficha.data.model.InventoryItem
+import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.SectionHeader
 
 @Composable
-fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel) {
-    var newItemName by remember { mutableStateOf("") }
+fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
+    var detailItem by remember { mutableStateOf<InventoryItem?>(null) }
+    var showAddSheet by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -50,87 +57,164 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel) {
         item { CoinsCard(character.coins, viewModel::setCoins) }
 
         item {
-            SectionHeader("Equipment", trailing = "${character.inventory.size} items")
+            SectionHeader(
+                "Equipment",
+                trailing = "${character.inventory.size} items • " +
+                    "${CharacterCalculations.carriedWeight(character).toInt()} lb",
+            )
         }
 
         item {
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            Button(
+                onClick = { showAddSheet = true },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                OutlinedTextField(
-                    value = newItemName,
-                    onValueChange = { newItemName = it },
-                    label = { Text("Add an item") },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.weight(1f),
-                )
-                IconButton(
-                    onClick = {
-                        viewModel.addInventoryItem(newItemName, 1)
-                        newItemName = ""
-                    },
-                    enabled = newItemName.isNotBlank(),
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Add item",
-                        tint = MaterialTheme.colorScheme.secondary,
-                    )
-                }
+                Icon(Icons.Default.Add, contentDescription = null)
+                Text("  Add an item", style = MaterialTheme.typography.labelLarge)
             }
         }
 
         itemsIndexed(character.inventory) { index, item ->
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
+            InventoryRow(
+                item = item,
+                editMode = editMode,
+                onOpen = { detailItem = item },
+                onToggleEquipped = { viewModel.toggleEquipped(index) },
+                onRemove = { viewModel.removeInventoryItem(index) },
+                onQuantityChange = { viewModel.setInventoryQuantity(index, it) },
+            )
+        }
+
+        if (character.inventory.isEmpty()) {
+            item {
+                Text(
+                    text = "Nothing carried yet. Add gear from the rulebook, or write in your own.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+
+    detailItem?.let { item ->
+        ItemDetailSheet(item = item, onDismiss = { detailItem = null })
+    }
+
+    if (showAddSheet) {
+        AddItemSheet(
+            onDismiss = { showAddSheet = false },
+            onAdd = { newItem ->
+                viewModel.addInventoryItem(newItem)
+                showAddSheet = false
+            },
+        )
+    }
+}
+
+@Composable
+private fun InventoryRow(
+    item: InventoryItem,
+    editMode: Boolean,
+    onOpen: () -> Unit,
+    onToggleEquipped: () -> Unit,
+    onRemove: () -> Unit,
+    onQuantityChange: (Int) -> Unit,
+) {
+    val equippable = item.armorDefId != null || item.weaponDefId != null
+    val catalogEntry = remember(item.name, item.weaponDefId, item.armorDefId) {
+        ItemCatalog.resolve(item)
+    }
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) {
+        Column {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onOpen)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
+                if (equippable) {
+                    Checkbox(
+                        checked = item.equipped,
+                        onCheckedChange = { onToggleEquipped() },
+                    )
+                } else {
+                    Spacer(Modifier.width(12.dp))
+                }
+                Column(
                     Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                        .weight(1f)
+                        .padding(
+                            start = if (equippable) 0.dp else 12.dp,
+                            top = 8.dp,
+                            bottom = 8.dp,
+                        ),
                 ) {
-                    val equippable = item.armorDefId != null || item.weaponDefId != null
-                    if (equippable) {
-                        Checkbox(
-                            checked = item.equipped,
-                            onCheckedChange = { viewModel.toggleEquipped(index) },
-                        )
-                    } else {
-                        Spacer(Modifier.width(12.dp))
-                    }
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .padding(start = if (equippable) 0.dp else 12.dp, top = 8.dp, bottom = 8.dp),
-                    ) {
-                        Text(
-                            text = if (item.quantity > 1) "${item.name} ×${item.quantity}" else item.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        if (equippable) {
-                            Text(
-                                text = if (item.equipped) "Equipped" else "Carried",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (item.equipped) MaterialTheme.colorScheme.secondary
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    IconButton(onClick = { viewModel.removeInventoryItem(index) }) {
+                    Text(
+                        text = if (item.quantity > 1) "${item.name} ×${item.quantity}" else item.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = buildString {
+                            if (equippable) {
+                                append(if (item.equipped) "Equipped" else "Carried")
+                            }
+                            catalogEntry?.let {
+                                if (isNotEmpty()) append(" • ")
+                                append(it.category)
+                            }
+                        }.ifBlank { "Tap for details" },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (item.equipped) MaterialTheme.colorScheme.secondary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Open ${item.name}",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (editMode) {
+                    IconButton(onClick = onRemove) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Remove ${item.name}",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+                }
+            }
+
+            if (editMode) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 12.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "Quantity",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedTextField(
+                        value = item.quantity.toString(),
+                        onValueChange = { text ->
+                            onQuantityChange(text.filter { it.isDigit() }.take(3).toIntOrNull() ?: 1)
+                        },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.width(96.dp),
+                    )
                 }
             }
         }

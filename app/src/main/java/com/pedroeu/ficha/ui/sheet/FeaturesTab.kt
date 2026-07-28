@@ -17,7 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.SectionHeader
@@ -27,6 +29,9 @@ fun FeaturesTab(character: PlayerCharacter) {
     val species = SpeciesData.byId(character.speciesId)
     val charClass = ClassData.byId(character.classId)
     val lineage = species?.lineageOptions?.find { it.id == character.lineageId }
+
+    val progression = ProgressionData.forClass(character.classId)
+    val subclass = character.subclassId?.let { SubclassData.byId(it) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -47,6 +52,45 @@ fun FeaturesTab(character: PlayerCharacter) {
                             if (option != null) {
                                 FeatureEntry("${choice.label}: ${option.name}", option.description)
                             }
+                        }
+
+                    // Everything gained from level 2 onward, in the order it was earned.
+                    progression?.features
+                        ?.filter { it.level in 2..character.level }
+                        ?.sortedBy { it.level }
+                        ?.forEach { feature ->
+                            FeatureEntry(
+                                "Level ${feature.level} — ${feature.name}",
+                                feature.description,
+                            )
+                        }
+                }
+            }
+        }
+
+        if (subclass != null) {
+            item {
+                FeatureCard("Subclass — ${subclass.name}") {
+                    Text(
+                        text = subclass.summary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    if (subclass.isPlaytest) {
+                        Text(
+                            text = "Playtest material — ${subclass.source}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    subclass.features
+                        .filter { it.level <= character.level }
+                        .sortedBy { it.level }
+                        .forEach { feature ->
+                            FeatureEntry(
+                                "Level ${feature.level} — ${feature.name}",
+                                feature.description,
+                            )
                         }
                 }
             }

@@ -1,7 +1,9 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
+    <!-- Parchment window background so launch never flashes white before Compose draws. -->
     <style name="Theme.Ficha" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/ficha_primary_dark</item>
-        <item name="android:navigationBarColor">#000000</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowBackground">@color/parchment_page</item>
+        <item name="android:colorBackground">@color/parchment_page</item>
+        <item name="android:statusBarColor">@color/crimson_deep</item>
+        <item name="android:navigationBarColor">@color/parchment_page</item>
     </style>
 </resources>

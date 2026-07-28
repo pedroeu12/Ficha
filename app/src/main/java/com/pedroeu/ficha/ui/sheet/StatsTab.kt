@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +29,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,71 +41,177 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.SectionHeader
+import com.pedroeu.ficha.ui.components.StatEditDialog
 
 @Composable
-fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel) {
+fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
     val scores = CharacterCalculations.finalAbilityScores(character)
-    val pb = CharacterCalculations.proficiencyBonus(character.level)
+    val pb = CharacterCalculations.proficiencyBonus(character)
+
+    // Which stat, if any, currently has its editor open.
+    var editingStat by remember { mutableStateOf<OverridableStat?>(null) }
+    var editingAbility by remember { mutableStateOf<Ability?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item { VitalsRow(character, viewModel) }
-        item { HitPointsCard(character, viewModel) }
+        item { VitalsRow(character, viewModel, editMode) { editingStat = it } }
+        item { HitPointsCard(character, viewModel, editMode) { editingStat = it } }
         item { DeathSavesCard(character, viewModel) }
 
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                SectionHeader("Ability Scores", trailing = "Proficiency +$pb")
+                SectionHeader(
+                    "Ability Scores",
+                    trailing = "Proficiency ${CharacterCalculations.formatModifier(pb)}",
+                )
                 Ability.ALL.forEach { ability ->
                     AbilityCard(
+                        character = character,
                         ability = ability,
                         score = scores[ability] ?: 10,
                         saveBonus = CharacterCalculations.savingThrowBonus(character, ability),
                         saveProficient = CharacterCalculations.isSavingThrowProficient(character, ability),
+                        editMode = editMode,
+                        onEditScore = { editingAbility = ability },
+                        onToggleSaveProficiency = { viewModel.toggleSaveProficiency(ability) },
                     )
                 }
             }
         }
     }
+
+    editingStat?.let { stat ->
+        val rulesValue = rulesValueFor(character, stat)
+        StatEditDialog(
+            title = stat.label,
+            rulesValue = rulesValue,
+            currentBonus = character.statBonuses[stat.name],
+            currentOverride = character.statOverrides[stat.name],
+            onDismiss = { editingStat = null },
+            onConfirm = { bonus, override ->
+                viewModel.setStatBonus(stat, bonus)
+                viewModel.setStatOverride(stat, override)
+                editingStat = null
+            },
+        )
+    }
+
+    editingAbility?.let { ability ->
+        val base = character.baseAbilityScores[ability.name] ?: 10
+        val background = character.backgroundAbilityBonuses[ability.name] ?: 0
+        val improvements = character.abilityScoreImprovements[ability.name] ?: 0
+        StatEditDialog(
+            title = ability.fullName,
+            rulesValue = base + background + improvements,
+            currentBonus = character.abilityScoreBonuses[ability.name],
+            currentOverride = character.abilityScoreOverrides[ability.name],
+            onDismiss = { editingAbility = null },
+            onConfirm = { bonus, override ->
+                viewModel.setAbilityBonus(ability, bonus)
+                viewModel.setAbilityScore(ability, override)
+                editingAbility = null
+            },
+            supportingText = "Base $base, origin +$background, improvements +$improvements.",
+        )
+    }
+}
+
+/** The value the rules alone produce, ignoring any bonus or override already stored. */
+private fun rulesValueFor(character: PlayerCharacter, stat: OverridableStat): Int {
+    val stripped = character.copy(statOverrides = emptyMap(), statBonuses = emptyMap())
+    return when (stat) {
+        OverridableStat.MAX_HIT_POINTS -> CharacterCalculations.maxHitPoints(stripped)
+        OverridableStat.ARMOR_CLASS -> CharacterCalculations.armorClass(stripped)
+        OverridableStat.INITIATIVE -> CharacterCalculations.initiative(stripped)
+        OverridableStat.SPEED -> CharacterCalculations.speed(stripped)
+        OverridableStat.PROFICIENCY_BONUS -> CharacterCalculations.proficiencyBonus(stripped)
+        OverridableStat.PASSIVE_PERCEPTION -> CharacterCalculations.passivePerception(stripped)
+        OverridableStat.SPELL_SAVE_DC -> CharacterCalculations.spellSaveDc(stripped) ?: 0
+        OverridableStat.SPELL_ATTACK_BONUS -> CharacterCalculations.spellAttackBonus(stripped) ?: 0
+        OverridableStat.MAX_PREPARED_SPELLS -> CharacterCalculations.maxPreparedSpells(stripped)
+        OverridableStat.CANTRIPS_KNOWN -> CharacterCalculations.maxCantripsKnown(stripped)
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun VitalsRow(character: PlayerCharacter, viewModel: SheetViewModel) {
+private fun VitalsRow(
+    character: PlayerCharacter,
+    viewModel: SheetViewModel,
+    editMode: Boolean,
+    onEdit: (OverridableStat) -> Unit,
+) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        StatTile("Armor Class", "${CharacterCalculations.armorClass(character)}")
         StatTile(
-            "Initiative",
-            CharacterCalculations.formatModifier(CharacterCalculations.initiative(character)),
+            label = "Armor Class",
+            value = "${CharacterCalculations.armorClass(character)}",
+            adjusted = character.isAdjusted(OverridableStat.ARMOR_CLASS),
+            editMode = editMode,
+            onClick = { onEdit(OverridableStat.ARMOR_CLASS) },
         )
-        StatTile("Speed", "${CharacterCalculations.speed(character)} ft")
-        StatTile("Size", CharacterCalculations.size(character))
-        StatTile("Passive Perception", "${CharacterCalculations.passivePerception(character)}")
         StatTile(
-            "Proficiency",
-            CharacterCalculations.formatModifier(
-                CharacterCalculations.proficiencyBonus(character.level)
+            label = "Initiative",
+            value = CharacterCalculations.formatModifier(CharacterCalculations.initiative(character)),
+            adjusted = character.isAdjusted(OverridableStat.INITIATIVE),
+            editMode = editMode,
+            onClick = { onEdit(OverridableStat.INITIATIVE) },
+        )
+        StatTile(
+            label = "Speed",
+            value = "${CharacterCalculations.speed(character)} ft",
+            adjusted = character.isAdjusted(OverridableStat.SPEED),
+            editMode = editMode,
+            onClick = { onEdit(OverridableStat.SPEED) },
+        )
+        StatTile(label = "Size", value = CharacterCalculations.size(character))
+        StatTile(
+            label = "Passive Perception",
+            value = "${CharacterCalculations.passivePerception(character)}",
+            adjusted = character.isAdjusted(OverridableStat.PASSIVE_PERCEPTION),
+            editMode = editMode,
+            onClick = { onEdit(OverridableStat.PASSIVE_PERCEPTION) },
+        )
+        StatTile(
+            label = "Proficiency",
+            value = CharacterCalculations.formatModifier(
+                CharacterCalculations.proficiencyBonus(character)
             ),
+            adjusted = character.isAdjusted(OverridableStat.PROFICIENCY_BONUS),
+            editMode = editMode,
+            onClick = { onEdit(OverridableStat.PROFICIENCY_BONUS) },
         )
         InspirationTile(character.heroicInspiration, viewModel::toggleHeroicInspiration)
     }
 }
 
+private fun PlayerCharacter.isAdjusted(stat: OverridableStat): Boolean =
+    statOverrides.containsKey(stat.name) || statBonuses.containsKey(stat.name)
+
 @Composable
-private fun StatTile(label: String, value: String) {
+private fun StatTile(
+    label: String,
+    value: String,
+    adjusted: Boolean = false,
+    editMode: Boolean = false,
+    onClick: (() -> Unit)? = null,
+) {
+    val clickable = editMode && onClick != null
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.width(108.dp),
+        modifier = Modifier
+            .width(108.dp)
+            .then(if (clickable) Modifier.clickable { onClick!!() } else Modifier),
     ) {
         Column(
             Modifier
@@ -108,18 +219,38 @@ private fun StatTile(label: String, value: String) {
                 .padding(vertical = 12.dp, horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (adjusted) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.secondary,
+                )
+                if (clickable) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Edit $label",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .size(14.dp),
+                    )
+                }
+            }
             Text(
                 text = label.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
+            if (adjusted) {
+                Text(
+                    text = "adjusted",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }
@@ -161,7 +292,12 @@ private fun InspirationTile(active: Boolean, onToggle: () -> Unit) {
 }
 
 @Composable
-private fun HitPointsCard(character: PlayerCharacter, viewModel: SheetViewModel) {
+private fun HitPointsCard(
+    character: PlayerCharacter,
+    viewModel: SheetViewModel,
+    editMode: Boolean,
+    onEdit: (OverridableStat) -> Unit,
+) {
     val max = CharacterCalculations.maxHitPoints(character)
     val hitDie = CharacterCalculations.hitDie(character)
 
@@ -170,7 +306,10 @@ private fun HitPointsCard(character: PlayerCharacter, viewModel: SheetViewModel)
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionHeader("Hit Points", trailing = "Hit Dice: ${character.level - character.hitDiceSpent}/${character.level} d$hitDie")
+            SectionHeader(
+                "Hit Points",
+                trailing = "Hit Dice: ${character.level - character.hitDiceSpent}/${character.level} d$hitDie",
+            )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
@@ -180,11 +319,23 @@ private fun HitPointsCard(character: PlayerCharacter, viewModel: SheetViewModel)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.error.copy(alpha = 0.15f)),
                 ) {
-                    Icon(Icons.Default.Remove, contentDescription = "Take 1 damage", tint = MaterialTheme.colorScheme.error)
+                    Icon(
+                        Icons.Default.Remove,
+                        contentDescription = "Take 1 damage",
+                        tint = MaterialTheme.colorScheme.error,
+                    )
                 }
 
                 Column(
-                    Modifier.weight(1f),
+                    Modifier
+                        .weight(1f)
+                        .then(
+                            if (editMode) {
+                                Modifier.clickable { onEdit(OverridableStat.MAX_HIT_POINTS) }
+                            } else {
+                                Modifier
+                            }
+                        ),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
@@ -200,6 +351,13 @@ private fun HitPointsCard(character: PlayerCharacter, viewModel: SheetViewModel)
                             color = MaterialTheme.colorScheme.secondary,
                         )
                     }
+                    if (editMode) {
+                        Text(
+                            text = "Tap to change max HP",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
 
                 IconButton(
@@ -209,7 +367,11 @@ private fun HitPointsCard(character: PlayerCharacter, viewModel: SheetViewModel)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)),
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Heal 1", tint = MaterialTheme.colorScheme.secondary)
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Heal 1",
+                        tint = MaterialTheme.colorScheme.secondary,
+                    )
                 }
             }
 
@@ -361,16 +523,23 @@ private fun DeathSaveRow(
 
 @Composable
 private fun AbilityCard(
+    character: PlayerCharacter,
     ability: Ability,
     score: Int,
     saveBonus: Int,
     saveProficient: Boolean,
+    editMode: Boolean,
+    onEditScore: () -> Unit,
+    onToggleSaveProficiency: () -> Unit,
 ) {
     val mod = CharacterCalculations.modifier(score)
+    val adjusted = character.abilityScoreOverrides.containsKey(ability.name) ||
+        character.abilityScoreBonuses.containsKey(ability.name)
 
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = if (editMode) Modifier.clickable { onEditScore() } else Modifier,
     ) {
         Row(
             Modifier
@@ -386,7 +555,8 @@ private fun AbilityCard(
                     text = CharacterCalculations.formatModifier(mod),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = if (adjusted) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.secondary,
                 )
                 Text(
                     text = "$score",
@@ -395,17 +565,48 @@ private fun AbilityCard(
                 )
             }
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = ability.fullName,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = ability.fullName,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    if (editMode) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit ${ability.fullName}",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .padding(start = 6.dp)
+                                .size(14.dp),
+                        )
+                    }
+                }
                 Text(
                     text = "Saving Throw ${CharacterCalculations.formatModifier(saveBonus)}" +
                         if (saveProficient) " (proficient)" else "",
                     style = MaterialTheme.typography.bodySmall,
                     color = if (saveProficient) MaterialTheme.colorScheme.secondary
                     else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (editMode) {
+                // A filled pip means proficient; tapping toggles it independently of the class.
+                Box(
+                    Modifier
+                        .size(22.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (saveProficient) MaterialTheme.colorScheme.secondary
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        .border(
+                            1.dp,
+                            if (saveProficient) MaterialTheme.colorScheme.secondary
+                            else MaterialTheme.colorScheme.outlineVariant,
+                            CircleShape,
+                        )
+                        .clickable(onClick = onToggleSaveProficiency),
                 )
             }
         }

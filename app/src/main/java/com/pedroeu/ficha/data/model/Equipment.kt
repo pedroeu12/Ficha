@@ -11,6 +11,9 @@ data class ArmorDef(
     val maxDexBonus: Int?,
     val strRequirement: Int = 0,
     val stealthDisadvantage: Boolean = false,
+    val costGp: Double = 0.0,
+    val weightLb: Double = 0.0,
+    val description: String = "",
 )
 
 data class WeaponDef(
@@ -22,6 +25,22 @@ data class WeaponDef(
     val isRanged: Boolean = false,
     /** True if Dex may be used instead of Str for attack/damage (finesse or ranged). */
     val usesDexOption: Boolean = false,
+    /** The weapon's mastery property in the 2024 rules, e.g. "Vex" or "Topple". */
+    val mastery: String = "",
+    val costGp: Double = 0.0,
+    val weightLb: Double = 0.0,
+    val range: String = "",
+    val description: String = "",
+)
+
+/** Gear that is neither armor nor a weapon: packs, tools, consumables, and sundries. */
+data class GearDef(
+    val id: String,
+    val name: String,
+    val category: String,
+    val costGp: Double = 0.0,
+    val weightLb: Double = 0.0,
+    val description: String = "",
 )
 
 /** A starting kit of gear granted by a class, resolved at character creation. */

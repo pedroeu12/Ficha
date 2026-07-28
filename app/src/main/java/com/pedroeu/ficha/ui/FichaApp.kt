@@ -9,13 +9,16 @@ import androidx.navigation.navArgument
 import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.ui.creation.CreationWizardScreen
 import com.pedroeu.ficha.ui.home.HomeScreen
+import com.pedroeu.ficha.ui.levelup.LevelUpScreen
 import com.pedroeu.ficha.ui.sheet.CharacterSheetScreen
 
 object Routes {
     const val HOME = "home"
     const val CREATE = "create"
     const val SHEET = "sheet"
+    const val LEVEL_UP = "levelup"
     fun sheet(id: String) = "$SHEET/$id"
+    fun levelUp(id: String) = "$LEVEL_UP/$id"
 }
 
 @Composable
@@ -50,6 +53,19 @@ fun FichaApp(repository: CharacterRepository) {
                 characterId = characterId,
                 repository = repository,
                 onBack = { navController.popBackStack() },
+                onLevelUp = { navController.navigate(Routes.levelUp(characterId)) },
+            )
+        }
+        composable(
+            route = "${Routes.LEVEL_UP}/{characterId}",
+            arguments = listOf(navArgument("characterId") { type = NavType.StringType }),
+        ) { entry ->
+            val characterId = entry.arguments?.getString("characterId").orEmpty()
+            LevelUpScreen(
+                characterId = characterId,
+                repository = repository,
+                onExit = { navController.popBackStack() },
+                onFinished = { navController.popBackStack() },
             )
         }
     }

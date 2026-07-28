@@ -4,10 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pedroeu.ficha.data.CharacterRepository
+import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.InventoryItem
+import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.domain.DeathSaves
+import com.pedroeu.ficha.domain.KnownSpell
+import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,10 +26,25 @@ class SheetViewModel(
     private val _character = MutableStateFlow<PlayerCharacter?>(null)
     val character: StateFlow<PlayerCharacter?> = _character.asStateFlow()
 
+    /** When true the sheet swaps calculated displays for editable controls. */
+    private val _editMode = MutableStateFlow(false)
+    val editMode: StateFlow<Boolean> = _editMode.asStateFlow()
+
     init {
         viewModelScope.launch {
             _character.value = repository.getById(characterId)
         }
+    }
+
+    /** Reloads from storage, so returning from the level-up flow shows the new numbers. */
+    fun refresh() {
+        viewModelScope.launch {
+            _character.value = repository.getById(characterId)
+        }
+    }
+
+    fun toggleEditMode() {
+        _editMode.value = !_editMode.value
     }
 
     private fun update(transform: (PlayerCharacter) -> PlayerCharacter) {
@@ -34,6 +53,8 @@ class SheetViewModel(
         _character.value = updated
         viewModelScope.launch { repository.save(updated) }
     }
+
+    // ------------------------------------------------------------------ Play tracking
 
     fun adjustHitPoints(delta: Int) = update { character ->
         val max = CharacterCalculations.maxHitPoints(character)
@@ -47,6 +68,12 @@ class SheetViewModel(
         } else {
             character.copy(currentHitPoints = (character.currentHitPoints + delta).coerceIn(0, max))
         }
+    }
+
+    fun setCurrentHitPoints(value: Int) = update { character ->
+        character.copy(
+            currentHitPoints = value.coerceIn(0, CharacterCalculations.maxHitPoints(character))
+        )
     }
 
     fun setTemporaryHitPoints(value: Int) = update {
@@ -70,6 +97,12 @@ class SheetViewModel(
         it.copy(heroicInspiration = !it.heroicInspiration)
     }
 
+    fun setExperiencePoints(value: Int) = update {
+        it.copy(experiencePoints = value.coerceAtLeast(0))
+    }
+
+    // ------------------------------------------------------------------ Inventory
+
     fun toggleEquipped(index: Int) = update { character ->
         val items = character.inventory.toMutableList()
         val item = items.getOrNull(index) ?: return@update character
@@ -77,11 +110,23 @@ class SheetViewModel(
         character.copy(inventory = items)
     }
 
+    fun addInventoryItem(item: InventoryItem) = update { character ->
+        if (item.name.isBlank()) return@update character
+        character.copy(inventory = character.inventory + item)
+    }
+
     fun addInventoryItem(name: String, quantity: Int) = update { character ->
         if (name.isBlank()) return@update character
         character.copy(
             inventory = character.inventory + InventoryItem(name = name.trim(), quantity = quantity)
         )
+    }
+
+    fun setInventoryQuantity(index: Int, quantity: Int) = update { character ->
+        val items = character.inventory.toMutableList()
+        val item = items.getOrNull(index) ?: return@update character
+        if (quantity <= 0) items.removeAt(index) else items[index] = item.copy(quantity = quantity)
+        character.copy(inventory = items)
     }
 
     fun removeInventoryItem(index: Int) = update { character ->
@@ -93,11 +138,183 @@ class SheetViewModel(
 
     fun setCoins(coins: Coins) = update { it.copy(coins = coins) }
 
+    // ------------------------------------------------------------------ Spells
+
     fun setSpellSlotsExpended(level: Int, expended: Int) = update { character ->
         character.copy(
             spellSlotsExpended = character.spellSlotsExpended + (level.toString() to expended.coerceAtLeast(0))
         )
     }
+
+    fun setSpellSlotTotal(level: Int, total: Int) = update { character ->
+        character.copy(
+            spellSlotOverrides = character.spellSlotOverrides +
+                (level.toString() to total.coerceIn(0, 20))
+        )
+    }
+
+    fun clearSpellSlotOverrides() = update { it.copy(spellSlotOverrides = emptyMap()) }
+
+    fun toggleSpellPrepared(spellId: String) = update { character ->
+        character.copy(
+            knownSpells = character.knownSpells.map { spell ->
+                if (spell.id == spellId) spell.copy(prepared = !spell.prepared) else spell
+            }
+        )
+    }
+
+    fun addSpell(spell: KnownSpell) = update { character ->
+        if (character.knownSpells.any { it.id == spell.id }) return@update character
+        character.copy(knownSpells = character.knownSpells + spell)
+    }
+
+    fun removeSpell(spellId: String) = update { character ->
+        character.copy(knownSpells = character.knownSpells.filterNot { it.id == spellId })
+    }
+
+    // ------------------------------------------------------------------ Edit Mode
+
+    fun toggleSkillProficiency(skill: Skill) = update { character ->
+        val proficient = character.skillProficiencies.contains(skill.name)
+        character.copy(
+            skillProficiencies = if (proficient) {
+                character.skillProficiencies - skill.name
+            } else {
+                character.skillProficiencies + skill.name
+            },
+            // Expertise without proficiency is meaningless, so it comes off together.
+            skillExpertise = if (proficient) {
+                character.skillExpertise - skill.name
+            } else {
+                character.skillExpertise
+            },
+        )
+    }
+
+    fun toggleSkillExpertise(skill: Skill) = update { character ->
+        val expert = character.skillExpertise.contains(skill.name)
+        character.copy(
+            skillExpertise = if (expert) {
+                character.skillExpertise - skill.name
+            } else {
+                character.skillExpertise + skill.name
+            },
+            // Granting expertise implies proficiency.
+            skillProficiencies = if (expert) {
+                character.skillProficiencies
+            } else {
+                character.skillProficiencies + skill.name
+            },
+        )
+    }
+
+    fun setSkillBonus(skill: Skill, bonus: Int?) = update { character ->
+        character.copy(
+            skillBonuses = if (bonus == null || bonus == 0) {
+                character.skillBonuses - skill.name
+            } else {
+                character.skillBonuses + (skill.name to bonus)
+            }
+        )
+    }
+
+    fun setSkillOverride(skill: Skill, total: Int?) = update { character ->
+        character.copy(
+            skillOverrides = if (total == null) {
+                character.skillOverrides - skill.name
+            } else {
+                character.skillOverrides + (skill.name to total)
+            }
+        )
+    }
+
+    fun toggleSaveProficiency(ability: Ability) = update { character ->
+        val current = CharacterCalculations.isSavingThrowProficient(character, ability)
+        character.copy(
+            saveProficiencyOverrides = character.saveProficiencyOverrides + (ability.name to !current)
+        )
+    }
+
+    fun setSaveBonus(ability: Ability, bonus: Int?) = update { character ->
+        character.copy(
+            saveBonuses = if (bonus == null || bonus == 0) {
+                character.saveBonuses - ability.name
+            } else {
+                character.saveBonuses + (ability.name to bonus)
+            }
+        )
+    }
+
+    fun setAbilityScore(ability: Ability, score: Int?) = update { character ->
+        character.copy(
+            abilityScoreOverrides = if (score == null) {
+                character.abilityScoreOverrides - ability.name
+            } else {
+                character.abilityScoreOverrides + (ability.name to score.coerceIn(1, 30))
+            }
+        )
+    }
+
+    fun setAbilityBonus(ability: Ability, bonus: Int?) = update { character ->
+        character.copy(
+            abilityScoreBonuses = if (bonus == null || bonus == 0) {
+                character.abilityScoreBonuses - ability.name
+            } else {
+                character.abilityScoreBonuses + (ability.name to bonus)
+            }
+        )
+    }
+
+    fun setStatOverride(stat: OverridableStat, value: Int?) = update { character ->
+        character.copy(
+            statOverrides = if (value == null) {
+                character.statOverrides - stat.name
+            } else {
+                character.statOverrides + (stat.name to value)
+            }
+        )
+    }
+
+    fun setStatBonus(stat: OverridableStat, value: Int?) = update { character ->
+        character.copy(
+            statBonuses = if (value == null || value == 0) {
+                character.statBonuses - stat.name
+            } else {
+                character.statBonuses + (stat.name to value)
+            }
+        )
+    }
+
+    fun addToolProficiency(name: String) = update { character ->
+        if (name.isBlank()) return@update character
+        character.copy(
+            toolProficiencies = (character.toolProficiencies + name.trim()).distinct()
+        )
+    }
+
+    fun removeToolProficiency(name: String) = update { character ->
+        character.copy(toolProficiencies = character.toolProficiencies - name)
+    }
+
+    fun setLevel(level: Int) = update { it.copy(level = level.coerceIn(1, 20)) }
+
+    /** Drops every manual adjustment, returning the sheet to what the rules say. */
+    fun clearAllOverrides() = update { character ->
+        character.copy(
+            abilityScoreOverrides = emptyMap(),
+            abilityScoreBonuses = emptyMap(),
+            skillBonuses = emptyMap(),
+            skillOverrides = emptyMap(),
+            saveProficiencyOverrides = emptyMap(),
+            saveBonuses = emptyMap(),
+            saveOverrides = emptyMap(),
+            statOverrides = emptyMap(),
+            statBonuses = emptyMap(),
+            spellSlotOverrides = emptyMap(),
+        )
+    }
+
+    // ------------------------------------------------------------------ Notes
 
     fun setNotes(value: String) = update { it.copy(notes = value) }
     fun setAppearance(value: String) = update { it.copy(appearance = value) }

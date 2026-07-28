@@ -1,0 +1,437 @@
+package com.pedroeu.ficha.data.content
+
+import com.pedroeu.ficha.data.model.CasterType
+import com.pedroeu.ficha.data.model.ClassFeature
+import com.pedroeu.ficha.data.model.ClassProgression
+import com.pedroeu.ficha.data.model.Choice
+import com.pedroeu.ficha.data.model.ChoiceKind
+import com.pedroeu.ficha.data.model.ChoiceOption
+import com.pedroeu.ficha.data.model.ChoiceOptions
+import com.pedroeu.ficha.data.model.Skill
+
+/**
+ * Level 1-20 tables for every class: features gained, ability score improvements, subclass
+ * timing, cantrips known, and prepared spell counts. Spell slots come from
+ * [com.pedroeu.ficha.data.model.SpellSlotTables] via the class's caster type.
+ */
+object ProgressionData {
+
+    /** Ability Score Improvement levels shared by most classes. */
+    private val STANDARD_ASI = setOf(4, 8, 12, 16)
+
+    private fun feature(level: Int, name: String, description: String, vararg choices: Choice) =
+        ClassFeature(level, name, description, choices.toList())
+
+    // Full casters share this prepared-spell curve in the 2024 rules.
+    private val FULL_CASTER_PREPARED = listOf(
+        4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 16, 17, 17, 18, 18, 19, 20, 21, 22,
+    )
+    private val HALF_CASTER_PREPARED = listOf(
+        2, 3, 4, 5, 6, 6, 7, 7, 9, 9, 10, 10, 11, 11, 12, 12, 14, 14, 15, 15,
+    )
+    private val WARLOCK_KNOWN = listOf(
+        2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15,
+    )
+
+    private val METAMAGIC_OPTIONS = listOf(
+        ChoiceOption("careful", "Careful Spell", "Protect chosen creatures from your area spells."),
+        ChoiceOption("distant", "Distant Spell", "Double a spell's range, or make a touch spell reach 30 feet."),
+        ChoiceOption("empowered", "Empowered Spell", "Reroll a number of damage dice up to your Charisma modifier."),
+        ChoiceOption("extended", "Extended Spell", "Double a spell's duration, to a maximum of 24 hours."),
+        ChoiceOption("heightened", "Heightened Spell", "One target has Disadvantage on its save against the spell."),
+        ChoiceOption("quickened", "Quickened Spell", "Cast a 1-action spell as a Bonus Action."),
+        ChoiceOption("seeking", "Seeking Spell", "Reroll a missed spell attack roll."),
+        ChoiceOption("subtle", "Subtle Spell", "Cast without Verbal, Somatic, or Material components."),
+        ChoiceOption("transmuted", "Transmuted Spell", "Change a spell's damage type."),
+        ChoiceOption("twinned", "Twinned Spell", "Target a second creature with a single-target spell."),
+    )
+
+    private fun metamagicChoice(id: String, count: Int, level: Int) = Choice(
+        id = id,
+        label = "Metamagic",
+        prompt = "Choose $count Metamagic option${if (count == 1) "" else "s"}.",
+        count = count,
+        kind = ChoiceKind.OPTION,
+        options = METAMAGIC_OPTIONS,
+        source = "Level $level",
+    )
+
+    private val FIGHTING_STYLE_OPTIONS = listOf(
+        ChoiceOption("archery", "Archery", "+2 to attack rolls with ranged weapons."),
+        ChoiceOption("blind_fighting", "Blind Fighting", "Blindsight with a range of 10 feet."),
+        ChoiceOption("defense", "Defense", "+1 AC while wearing armor."),
+        ChoiceOption("dueling", "Dueling", "+2 damage when wielding a melee weapon in one hand and no other weapon."),
+        ChoiceOption("great_weapon", "Great Weapon Fighting", "Treat a 1 or 2 on a two-handed weapon's damage die as a 3."),
+        ChoiceOption("interception", "Interception", "Reduce damage to a nearby creature as a Reaction."),
+        ChoiceOption("protection", "Protection", "Impose Disadvantage on an attack against a creature next to you."),
+        ChoiceOption("thrown_weapon", "Thrown Weapon Fighting", "+2 damage with thrown weapons, and draw them as part of the attack."),
+        ChoiceOption("two_weapon", "Two-Weapon Fighting", "Add your ability modifier to the off-hand attack's damage."),
+        ChoiceOption("unarmed", "Unarmed Fighting", "Your Unarmed Strike deals 1d6 damage, or 1d8 with no weapon or shield."),
+    )
+
+    private fun fightingStyleChoice(level: Int, id: String = "fighting_style") = Choice(
+        id = id,
+        label = "Fighting Style",
+        prompt = "Choose a Fighting Style feat.",
+        count = 1,
+        kind = ChoiceKind.OPTION,
+        options = FIGHTING_STYLE_OPTIONS,
+        source = "Level $level",
+    )
+
+    private fun expertiseChoice(level: Int, id: String, count: Int = 2) = Choice(
+        id = id,
+        label = "Expertise",
+        prompt = "Choose $count skill proficiencies to double your proficiency bonus with.",
+        count = count,
+        kind = ChoiceKind.EXPERTISE,
+        options = ChoiceOptions.fromSkills(Skill.ALL),
+        source = "Level $level",
+    )
+
+    val ALL: List<ClassProgression> = listOf(
+
+        // ------------------------------------------------------------------ Barbarian
+        ClassProgression(
+            classId = "barbarian",
+            casterType = CasterType.NONE,
+            subclassLevel = 3,
+            subclassLabel = "Barbarian Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Rage", "Enter a Rage as a Bonus Action for bonus damage, Resistance to Bludgeoning, Piercing, and Slashing damage, and Advantage on Strength checks and saves."),
+                feature(1, "Unarmored Defense", "While not wearing armor, your AC equals 10 + your Dexterity modifier + your Constitution modifier."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(2, "Danger Sense", "You have Advantage on Dexterity saving throws unless you have the Incapacitated condition."),
+                feature(2, "Reckless Attack", "Attack recklessly to gain Advantage on Strength-based melee attacks, at the cost of Advantage for attacks against you."),
+                feature(3, "Primal Knowledge", "You gain proficiency in another skill of your choice from the Barbarian list, and can make certain checks using Strength while raging.",
+                    Choice("primal_knowledge", "Primal Knowledge", "Choose one more Barbarian skill proficiency.", 1, ChoiceKind.SKILL,
+                        ChoiceOptions.fromSkills(listOf(Skill.ANIMAL_HANDLING, Skill.ATHLETICS, Skill.INTIMIDATION, Skill.NATURE, Skill.PERCEPTION, Skill.SURVIVAL)), "Level 3")),
+                feature(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action."),
+                feature(5, "Fast Movement", "Your Speed increases by 10 feet while you aren't wearing Heavy armor."),
+                feature(7, "Feral Instinct", "You have Advantage on Initiative rolls."),
+                feature(7, "Instinctive Pounce", "When you enter your Rage, you can move up to half your Speed as part of that Bonus Action."),
+                feature(9, "Brutal Strike", "When you use Reckless Attack, you can forgo Advantage to deal an extra 1d10 damage and apply a Forceful or Hamstring effect."),
+                feature(11, "Relentless Rage", "When you drop to 0 hit points while raging, you can make a DC 10 Constitution save to drop to 1 hit point instead."),
+                feature(13, "Improved Brutal Strike", "You gain two more Brutal Strike options: Staggering Blow and Sundering Blow."),
+                feature(15, "Persistent Rage", "When you roll Initiative, your Rage ends early only if you choose to end it, and it lasts up to 10 minutes."),
+                feature(17, "Improved Brutal Strike", "Your Brutal Strike damage increases to 2d10, and you gain the Disorienting Blow and Staggering Blow options."),
+                feature(18, "Indomitable Might", "If your total for a Strength check is less than your Strength score, use the score instead."),
+                feature(20, "Primal Champion", "Your Strength and Constitution scores increase by 4, to a maximum of 25."),
+            ),
+        ),
+
+        // ------------------------------------------------------------------ Bard
+        ClassProgression(
+            classId = "bard",
+            casterType = CasterType.FULL,
+            subclassLevel = 3,
+            subclassLabel = "Bard Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Bardic Inspiration", "As a Bonus Action, give a creature a Bardic Inspiration die (d6) to add to a d20 Test or damage roll."),
+                feature(1, "Spellcasting", "You cast Bard spells using Charisma, preparing them from the Bard spell list."),
+                feature(2, "Expertise", "Choose two skill proficiencies to double your proficiency bonus with.",
+                    expertiseChoice(2, "bard_expertise_2")),
+                feature(2, "Jack of All Trades", "Add half your Proficiency Bonus to any ability check that doesn't already use it."),
+                feature(5, "Font of Inspiration", "You regain all expended Bardic Inspiration uses on a Short or Long Rest, and can spend one to fuel certain features."),
+                feature(7, "Countercharm", "As a Reaction when you or a nearby ally fails a save against being Charmed or Frightened, you can let them reroll."),
+                feature(9, "Expertise", "Choose two more skill proficiencies to double your proficiency bonus with.",
+                    expertiseChoice(9, "bard_expertise_9")),
+                feature(10, "Magical Secrets", "When you gain Bard levels, you can choose your prepared spells from the Bard, Cleric, Druid, and Wizard lists."),
+                feature(18, "Superior Inspiration", "When you roll Initiative, you regain expended uses of Bardic Inspiration until you have two."),
+                feature(20, "Words of Creation", "You always have Power Word Heal and Power Word Kill prepared, and can target a second creature with them."),
+            ),
+            cantripsKnown = mapOf(1 to 2, 4 to 3, 10 to 4),
+            preparedSpells = FULL_CASTER_PREPARED,
+        ),
+
+        // ------------------------------------------------------------------ Cleric
+        ClassProgression(
+            classId = "cleric",
+            casterType = CasterType.FULL,
+            subclassLevel = 3,
+            subclassLabel = "Cleric Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Spellcasting", "You cast Cleric spells using Wisdom, preparing them from the whole Cleric spell list."),
+                feature(1, "Divine Order", "Choose the role your divine calling takes.",
+                    Choice("divine_order", "Divine Order", "Choose your Divine Order.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("protector", "Protector", "Gain training with Martial weapons and Heavy armor."),
+                        ChoiceOption("thaumaturge", "Thaumaturge", "Learn an extra Cleric cantrip and add your Wisdom modifier to Arcana and Religion checks."),
+                    ), "Level 1")),
+                feature(2, "Channel Divinity", "Channel divine energy to fuel Divine Spark or Turn Undead, regaining uses on a Short or Long Rest."),
+                feature(5, "Sear Undead", "When you use Turn Undead, you also deal Radiant damage equal to a roll of your Wisdom modifier in d8s."),
+                feature(7, "Blessed Strikes", "Choose Divine Strike or Potent Spellcasting to add damage to your attacks or cantrips.",
+                    Choice("blessed_strikes", "Blessed Strikes", "Choose how your divine power sharpens your attacks.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("divine_strike", "Divine Strike", "Once per turn, a weapon hit deals an extra 1d8 Necrotic or Radiant damage."),
+                        ChoiceOption("potent_spellcasting", "Potent Spellcasting", "Add your Wisdom modifier to the damage of your Cleric cantrips."),
+                    ), "Level 7")),
+                feature(10, "Divine Intervention", "As a Magic action, call on your deity to cast any Cleric spell of level 5 or lower without components."),
+                feature(14, "Improved Blessed Strikes", "Your Blessed Strikes option grows stronger, dealing an extra die or granting Temporary Hit Points."),
+                feature(20, "Greater Divine Intervention", "You can call on Wish once when you use Divine Intervention."),
+            ),
+            cantripsKnown = mapOf(1 to 3, 4 to 4, 10 to 5),
+            preparedSpells = FULL_CASTER_PREPARED,
+        ),
+
+        // ------------------------------------------------------------------ Druid
+        ClassProgression(
+            classId = "druid",
+            casterType = CasterType.FULL,
+            subclassLevel = 3,
+            subclassLabel = "Druid Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Spellcasting", "You cast Druid spells using Wisdom, preparing them from the whole Druid spell list."),
+                feature(1, "Druidic", "You know Druidic, the secret language of Druids, and can use it to leave hidden messages."),
+                feature(1, "Primal Order", "Choose how you channel the natural world.",
+                    Choice("primal_order", "Primal Order", "Choose your Primal Order.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("magician", "Magician", "Learn an extra Druid cantrip and add your Wisdom modifier to Arcana and Nature checks."),
+                        ChoiceOption("warden", "Warden", "Gain training with Martial weapons and Medium armor."),
+                    ), "Level 1")),
+                feature(2, "Wild Shape", "As a Bonus Action, transform into a Beast you know, twice per Short or Long Rest."),
+                feature(2, "Wild Companion", "Expend a Wild Shape use to cast Find Familiar without material components, summoning a Fey spirit."),
+                feature(5, "Wild Resurgence", "Once per turn you can convert a spell slot into a Wild Shape use, or a Wild Shape use into a level 1 spell slot."),
+                feature(7, "Elemental Fury", "Choose Potent Spellcasting or Primal Strike to sharpen your magic or your attacks.",
+                    Choice("elemental_fury", "Elemental Fury", "Choose how your primal power expresses itself.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("potent_spellcasting", "Potent Spellcasting", "Add your Wisdom modifier to the damage of your Druid cantrips."),
+                        ChoiceOption("primal_strike", "Primal Strike", "Once per turn, your attacks deal an extra 1d8 elemental damage."),
+                    ), "Level 7")),
+                feature(15, "Improved Elemental Fury", "Your Elemental Fury option improves, extending cantrip range or increasing the extra damage to 2d8."),
+                feature(18, "Beast Spells", "You can cast Druid spells in any Wild Shape form."),
+                feature(20, "Archdruid", "Your Wild Shape uses are effectively unlimited, and you can convert Wild Shape uses into spell slots."),
+            ),
+            cantripsKnown = mapOf(1 to 2, 4 to 3, 10 to 4),
+            preparedSpells = FULL_CASTER_PREPARED,
+        ),
+
+        // ------------------------------------------------------------------ Fighter
+        ClassProgression(
+            classId = "fighter",
+            casterType = CasterType.NONE,
+            subclassLevel = 3,
+            subclassLabel = "Fighter Subclass",
+            asiLevels = setOf(4, 6, 8, 12, 14, 16),
+            features = listOf(
+                feature(1, "Fighting Style", "You gain a Fighting Style feat of your choice.",
+                    fightingStyleChoice(1)),
+                feature(1, "Second Wind", "As a Bonus Action, regain 1d10 + your Fighter level hit points, twice per Short or Long Rest."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of three kinds of weapons you are proficient with."),
+                feature(2, "Action Surge", "Take one additional action on your turn, once per Short or Long Rest."),
+                feature(2, "Tactical Mind", "When you fail an ability check, spend a use of Second Wind to add 1d10 to the roll."),
+                feature(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action."),
+                feature(5, "Tactical Shift", "When you activate Second Wind, you can move up to half your Speed without provoking Opportunity Attacks."),
+                feature(9, "Indomitable", "Reroll a failed saving throw with a bonus equal to your Fighter level, once per Long Rest."),
+                feature(9, "Tactical Master", "When you attack with a weapon whose mastery you can use, you can replace it with Push, Sap, or Slow."),
+                feature(11, "Two Extra Attacks", "You can attack three times whenever you take the Attack action."),
+                feature(13, "Indomitable (two uses)", "You can use Indomitable twice per Long Rest."),
+                feature(13, "Studied Attacks", "When you miss a creature with an attack, you have Advantage on your next attack against it."),
+                feature(17, "Action Surge (two uses)", "You can use Action Surge twice per rest, but only once per turn."),
+                feature(17, "Indomitable (three uses)", "You can use Indomitable three times per Long Rest."),
+                feature(20, "Three Extra Attacks", "You can attack four times whenever you take the Attack action."),
+            ),
+        ),
+
+        // ------------------------------------------------------------------ Monk
+        ClassProgression(
+            classId = "monk",
+            casterType = CasterType.NONE,
+            subclassLevel = 3,
+            subclassLabel = "Monk Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Martial Arts", "Your Unarmed Strikes and Monk weapons use Dexterity and deal 1d6 damage, and you can make an extra Unarmed Strike as a Bonus Action."),
+                feature(1, "Unarmored Defense", "While wearing no armor or shield, your AC equals 10 + your Dexterity modifier + your Wisdom modifier."),
+                feature(2, "Monk's Focus", "You gain Focus Points to fuel Flurry of Blows, Patient Defense, and Step of the Wind."),
+                feature(2, "Unarmored Movement", "Your Speed increases by 10 feet while you wear no armor or shield."),
+                feature(2, "Uncanny Metabolism", "When you roll Initiative, regain all Focus Points and hit points equal to a Martial Arts die roll plus your Monk level."),
+                feature(3, "Deflect Attacks", "As a Reaction, reduce damage from an attack by 1d10 + your Dexterity modifier + your Monk level."),
+                feature(4, "Slow Fall", "As a Reaction when you fall, reduce the falling damage by five times your Monk level."),
+                feature(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action."),
+                feature(5, "Stunning Strike", "Once per turn, spend a Focus Point to force a Constitution save or leave the target Stunned."),
+                feature(6, "Empowered Strikes", "Your Unarmed Strikes can deal Force damage instead of their normal type."),
+                feature(7, "Evasion", "On a Dexterity save for half damage, you take none on a success and half on a failure."),
+                feature(9, "Acrobatic Movement", "While unarmored, you gain the ability to move along vertical surfaces and across liquids."),
+                feature(10, "Heightened Focus", "Flurry of Blows, Patient Defense, and Step of the Wind each gain an improved effect."),
+                feature(10, "Self-Restoration", "At the end of each turn you can end one condition on yourself, and you no longer suffer Exhaustion from lack of food or water."),
+                feature(13, "Deflect Energy", "Deflect Attacks now works against any damage type."),
+                feature(14, "Disciplined Survivor", "You gain proficiency in all saving throws, and can spend a Focus Point to reroll a failed save."),
+                feature(15, "Perfect Focus", "When you roll Initiative with fewer than 4 Focus Points, you regain enough to have 4."),
+                feature(18, "Superior Defense", "At the start of your turn, spend 3 Focus Points for Resistance to all damage except Force for 1 minute."),
+                feature(20, "Body and Mind", "Your Dexterity and Wisdom scores increase by 4, to a maximum of 25."),
+            ),
+        ),
+
+        // ------------------------------------------------------------------ Paladin
+        ClassProgression(
+            classId = "paladin",
+            casterType = CasterType.HALF,
+            subclassLevel = 3,
+            subclassLabel = "Paladin Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Lay On Hands", "You have a pool of healing equal to five times your Paladin level that you can spend as a Bonus Action."),
+                feature(1, "Spellcasting", "You cast Paladin spells using Charisma, preparing them from the Paladin spell list."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(2, "Fighting Style", "You gain a Fighting Style feat of your choice.",
+                    fightingStyleChoice(2)),
+                feature(2, "Paladin's Smite", "You always have Divine Smite prepared, and can cast it once per Long Rest without a slot."),
+                feature(3, "Channel Divinity", "You can channel divine energy to fuel Divine Sense and your subclass's Channel Divinity options."),
+                feature(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action."),
+                feature(5, "Faithful Steed", "You always have Find Steed prepared and can cast it once per Long Rest without a slot."),
+                feature(6, "Aura of Protection", "You and allies within 10 feet add your Charisma modifier to saving throws."),
+                feature(9, "Abjure Foes", "As a Magic action, spend a Channel Divinity use to leave nearby foes Frightened and unable to act freely."),
+                feature(10, "Aura of Courage", "You and allies within 10 feet are immune to the Frightened condition."),
+                feature(11, "Radiant Strikes", "Your attacks deal an extra 1d8 Radiant damage."),
+                feature(14, "Restoring Touch", "When you use Lay On Hands, you can also end a condition affecting the creature."),
+                feature(18, "Aura Expansion", "Your auras extend to 30 feet."),
+            ),
+            cantripsKnown = emptyMap(),
+            preparedSpells = HALF_CASTER_PREPARED,
+        ),
+
+        // ------------------------------------------------------------------ Ranger
+        ClassProgression(
+            classId = "ranger",
+            casterType = CasterType.HALF,
+            subclassLevel = 3,
+            subclassLabel = "Ranger Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Spellcasting", "You cast Ranger spells using Wisdom, preparing them from the Ranger spell list."),
+                feature(1, "Favored Enemy", "You always have Hunter's Mark prepared and can cast it a number of times per Long Rest without a slot."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(2, "Deft Explorer", "You gain Expertise in one skill you are proficient with and learn two languages.",
+                    expertiseChoice(2, "ranger_expertise_2", count = 1)),
+                feature(2, "Fighting Style", "You gain a Fighting Style feat of your choice.",
+                    fightingStyleChoice(2)),
+                feature(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action."),
+                feature(6, "Roving", "Your Speed increases by 10 feet and you gain a Climb Speed and Swim Speed equal to your Speed."),
+                feature(9, "Expertise", "Choose two more skill proficiencies to double your proficiency bonus with.",
+                    expertiseChoice(9, "ranger_expertise_9")),
+                feature(10, "Tireless", "As a Magic action, give yourself Temporary Hit Points, and your Exhaustion decreases on a Short Rest."),
+                feature(13, "Relentless Hunter", "Taking damage can't break your Concentration on Hunter's Mark."),
+                feature(14, "Nature's Veil", "As a Bonus Action, become Invisible until the end of your next turn."),
+                feature(17, "Precise Hunter", "You have Advantage on attack rolls against the creature marked by your Hunter's Mark."),
+                feature(18, "Feral Senses", "You gain Blindsight with a range of 30 feet."),
+                feature(20, "Foe Slayer", "Your Hunter's Mark damage die becomes a d10."),
+            ),
+            preparedSpells = HALF_CASTER_PREPARED,
+        ),
+
+        // ------------------------------------------------------------------ Rogue
+        ClassProgression(
+            classId = "rogue",
+            casterType = CasterType.NONE,
+            subclassLevel = 3,
+            subclassLabel = "Rogue Subclass",
+            asiLevels = setOf(4, 8, 10, 12, 16),
+            features = listOf(
+                feature(1, "Expertise", "Choose two skill proficiencies to double your proficiency bonus with.",
+                    expertiseChoice(1, "rogue_expertise_1")),
+                feature(1, "Sneak Attack", "Once per turn, deal an extra 1d6 damage to a target you have Advantage against or that is next to an ally."),
+                feature(1, "Thieves' Cant", "You know a secret mix of dialect, jargon, and code that hides messages in ordinary conversation."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(2, "Cunning Action", "You can take the Dash, Disengage, or Hide action as a Bonus Action."),
+                feature(3, "Steady Aim", "As a Bonus Action, give yourself Advantage on your next attack this turn if you haven't moved."),
+                feature(5, "Cunning Strike", "When you deal Sneak Attack damage, trade dice for effects such as Poison, Trip, or Withdraw."),
+                feature(5, "Uncanny Dodge", "As a Reaction, halve the damage of an attack that hits you."),
+                feature(6, "Expertise", "Choose two more skill proficiencies to double your proficiency bonus with.",
+                    expertiseChoice(6, "rogue_expertise_6")),
+                feature(7, "Evasion", "On a Dexterity save for half damage, you take none on a success and half on a failure."),
+                feature(7, "Reliable Talent", "Treat a d20 roll of 9 or lower as a 10 for ability checks using your proficiencies."),
+                feature(11, "Improved Cunning Strike", "You can use up to two Cunning Strike effects at once."),
+                feature(14, "Devious Strikes", "You gain the Daze, Knock Out, and Obscure Cunning Strike options."),
+                feature(15, "Slippery Mind", "You gain proficiency in Wisdom and Charisma saving throws."),
+                feature(18, "Elusive", "No attack roll has Advantage against you unless you have the Incapacitated condition."),
+                feature(20, "Stroke of Luck", "Once per Short or Long Rest, turn a miss into a hit or a failed check into a 20."),
+            ),
+        ),
+
+        // ------------------------------------------------------------------ Sorcerer
+        ClassProgression(
+            classId = "sorcerer",
+            casterType = CasterType.FULL,
+            subclassLevel = 3,
+            subclassLabel = "Sorcerer Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Spellcasting", "You cast Sorcerer spells using Charisma, preparing them from the Sorcerer spell list."),
+                feature(1, "Innate Sorcery", "As a Bonus Action, gain +1 to your spell save DC and Advantage on Sorcerer spell attacks for 1 minute."),
+                feature(2, "Font of Magic", "You gain Sorcery Points and can convert them into spell slots, or slots into points."),
+                feature(2, "Metamagic", "Choose two Metamagic options to bend your spells.",
+                    metamagicChoice("metamagic_2", 2, 2)),
+                feature(5, "Sorcerous Restoration", "When you finish a Short Rest, regain Sorcery Points equal to half your Sorcerer level."),
+                feature(7, "Sorcery Incarnate", "While Innate Sorcery is active, you can use two Metamagic options on a single spell."),
+                feature(10, "Metamagic", "Choose two more Metamagic options.",
+                    metamagicChoice("metamagic_10", 2, 10)),
+                feature(17, "Metamagic", "Choose two more Metamagic options.",
+                    metamagicChoice("metamagic_17", 2, 17)),
+                feature(20, "Arcane Apotheosis", "While Innate Sorcery is active, one Metamagic option each turn costs no Sorcery Points."),
+            ),
+            cantripsKnown = mapOf(1 to 4, 4 to 5, 10 to 6),
+            preparedSpells = listOf(
+                2, 4, 6, 7, 9, 10, 11, 12, 14, 15, 16, 16, 17, 17, 18, 18, 19, 20, 21, 22,
+            ),
+        ),
+
+        // ------------------------------------------------------------------ Warlock
+        ClassProgression(
+            classId = "warlock",
+            casterType = CasterType.PACT,
+            subclassLevel = 3,
+            subclassLabel = "Warlock Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Pact Magic", "You cast Warlock spells using Charisma. Your slots are always at the highest level you can cast and return on a Short Rest."),
+                feature(1, "Eldritch Invocations", "Choose Eldritch Invocations that grant passive and active magical powers.",
+                    Choice("invocations_1", "Eldritch Invocations", "Choose 1 Eldritch Invocation.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("agonizing_blast", "Agonizing Blast", "Add your Charisma modifier to one cantrip's damage."),
+                        ChoiceOption("armor_of_shadows", "Armor of Shadows", "Cast Mage Armor on yourself at will."),
+                        ChoiceOption("devils_sight", "Devil's Sight", "You see normally in magical and nonmagical darkness to 120 feet."),
+                        ChoiceOption("eldritch_mind", "Eldritch Mind", "Advantage on Constitution saves to maintain Concentration."),
+                        ChoiceOption("mask_of_many_faces", "Mask of Many Faces", "Cast Disguise Self at will."),
+                        ChoiceOption("pact_blade", "Pact of the Blade", "Conjure a magical weapon that uses Charisma for its attacks."),
+                        ChoiceOption("pact_chain", "Pact of the Chain", "Cast Find Familiar and gain more exotic familiar forms."),
+                        ChoiceOption("pact_tome", "Pact of the Tome", "Gain a Book of Shadows granting extra cantrips and rituals."),
+                    ), "Level 1")),
+                feature(2, "Magical Cunning", "Once per Long Rest, spend 1 minute to regain expended Pact Magic spell slots."),
+                feature(9, "Contact Patron", "You always have Contact Other Plane prepared and can cast it once per Long Rest to reach your patron."),
+                feature(11, "Mystic Arcanum (Level 6)", "Choose a level 6 spell you can cast once per Long Rest without a slot."),
+                feature(13, "Mystic Arcanum (Level 7)", "Choose a level 7 spell you can cast once per Long Rest without a slot."),
+                feature(15, "Mystic Arcanum (Level 8)", "Choose a level 8 spell you can cast once per Long Rest without a slot."),
+                feature(17, "Mystic Arcanum (Level 9)", "Choose a level 9 spell you can cast once per Long Rest without a slot."),
+                feature(20, "Eldritch Master", "You can use Magical Cunning twice per Long Rest."),
+            ),
+            cantripsKnown = mapOf(1 to 2, 4 to 3, 10 to 4),
+            preparedSpells = WARLOCK_KNOWN,
+        ),
+
+        // ------------------------------------------------------------------ Wizard
+        ClassProgression(
+            classId = "wizard",
+            casterType = CasterType.FULL,
+            subclassLevel = 3,
+            subclassLabel = "Wizard Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Spellcasting", "You cast Wizard spells using Intelligence, preparing them from your spellbook."),
+                feature(1, "Ritual Adept", "You can cast any ritual spell in your spellbook without expending a spell slot."),
+                feature(1, "Arcane Recovery", "Once per day on a Short Rest, recover expended spell slots totalling half your Wizard level."),
+                feature(2, "Scholar", "You gain Expertise in one Arcana, History, Investigation, Medicine, Nature, or Religion proficiency.",
+                    Choice("scholar", "Scholar", "Choose one skill to gain Expertise in.", 1, ChoiceKind.EXPERTISE,
+                        ChoiceOptions.fromSkills(listOf(Skill.ARCANA, Skill.HISTORY, Skill.INVESTIGATION, Skill.MEDICINE, Skill.NATURE, Skill.RELIGION)), "Level 2")),
+                feature(5, "Memorize Spell", "On a Short Rest, swap one prepared Wizard spell for another from your spellbook."),
+                feature(18, "Spell Mastery", "Choose a level 1 and a level 2 spell in your spellbook that you can cast at will."),
+                feature(20, "Signature Spells", "Choose two level 3 spells that are always prepared and castable once each per Short Rest without a slot."),
+            ),
+            cantripsKnown = mapOf(1 to 3, 4 to 4, 10 to 5),
+            preparedSpells = FULL_CASTER_PREPARED,
+        ),
+    )
+
+    private val byIdMap: Map<String, ClassProgression> = ALL.associateBy { it.classId }
+
+    fun forClass(classId: String): ClassProgression? = byIdMap[classId]
+}

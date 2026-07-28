@@ -2,8 +2,11 @@ package com.pedroeu.ficha.ui.creation
 
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.Choice
+import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.domain.AbilityScoreGeneration
@@ -20,6 +23,7 @@ enum class CreationStep(val title: String, val shortLabel: String) {
     CLASS("Choose a Class", "Class"),
     CLASS_CHOICES("Class Options", "Options"),
     BACKGROUND("Choose an Origin", "Origin"),
+    ORIGIN_CHOICES("Origin Options", "Grants"),
     ABILITIES("Ability Scores", "Abilities"),
     DETAILS("Name & Details", "Details");
 
@@ -46,6 +50,9 @@ data class CreationState(
     /** Ability -> +2 or +1 granted by the background. */
     val backgroundBonuses: Map<Ability, Int> = emptyMap(),
 
+    /** Choice.id -> selected option ids for every "of your choice" grant. */
+    val originSelections: Map<String, List<String>> = emptyMap(),
+
     val scoreMethod: ScoreMethod = ScoreMethod.STANDARD_ARRAY,
     /** Ability -> assigned score for array/roll methods; null means unassigned. */
     val assignedScores: Map<Ability, Int?> = Ability.ALL.associateWith { null },
@@ -70,8 +77,26 @@ data class CreationState(
             background?.skillProficiencies?.let { addAll(it) }
         }
 
+    /** Every "of your choice" grant still outstanding, derived from the picks made so far. */
+    val originChoices: List<Choice>
+        get() = OriginChoices.all(
+            speciesId = speciesId,
+            lineageId = lineageId,
+            classId = classId,
+            classSelections = classSelections,
+            backgroundId = backgroundId,
+        )
+
+    /** Skills picked through an origin choice, such as the Skilled feat. */
+    private val originSkillChoices: Set<Skill>
+        get() = originChoices
+            .filter { it.kind == ChoiceKind.SKILL }
+            .flatMap { originSelections[it.id].orEmpty() }
+            .mapNotNull { id -> Skill.ALL.find { it.name == id } }
+            .toSet()
+
     val allSkillProficiencies: Set<Skill>
-        get() = grantedSkills + classSkillChoices
+        get() = grantedSkills + classSkillChoices + originSkillChoices
 
     /** True when every decision on the current step has been made. */
     val canAdvance: Boolean
@@ -80,9 +105,13 @@ data class CreationState(
             CreationStep.CLASS -> classId != null
             CreationStep.CLASS_CHOICES -> classChoicesValid()
             CreationStep.BACKGROUND -> backgroundValid()
+            CreationStep.ORIGIN_CHOICES -> originChoicesValid()
             CreationStep.ABILITIES -> abilitiesValid()
             CreationStep.DETAILS -> name.isNotBlank()
         }
+
+    private fun originChoicesValid(): Boolean =
+        originChoices.all { choice -> originSelections[choice.id]?.size == choice.count }
 
     private fun speciesValid(): Boolean {
         val s = species ?: return false

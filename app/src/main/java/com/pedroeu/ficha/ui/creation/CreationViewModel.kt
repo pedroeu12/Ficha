@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.content.EquipmentData
+import com.pedroeu.ficha.data.content.SpellData
+import com.pedroeu.ficha.data.content.ToolData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.Skill
@@ -102,7 +105,29 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
 
     fun selectBackground(id: String) = _state.update { current ->
         if (current.backgroundId == id) current
-        else current.copy(backgroundId = id, backgroundBonuses = emptyMap())
+        else current.copy(
+            backgroundId = id,
+            backgroundBonuses = emptyMap(),
+            // The old background's feat and tool picks no longer apply.
+            originSelections = current.originSelections.filterKeys {
+                !it.startsWith("background:") && !it.startsWith("feat:")
+            },
+        )
+    }
+
+    /**
+     * Toggles one option inside an origin choice. At the limit the oldest pick is dropped so
+     * tapping always does something visible rather than silently failing.
+     */
+    fun toggleOriginChoice(choiceId: String, optionId: String, max: Int) = _state.update { current ->
+        val selected = current.originSelections[choiceId].orEmpty()
+        val next = when {
+            selected.contains(optionId) -> selected - optionId
+            selected.size < max -> selected + optionId
+            max == 1 -> listOf(optionId)
+            else -> selected.drop(1) + optionId
+        }
+        current.copy(originSelections = current.originSelections + (choiceId to next))
     }
 
     fun setBonusSpread(spread: BonusSpread) = _state.update { current ->
@@ -193,9 +218,10 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
     private fun buildCharacter(state: CreationState): PlayerCharacter {
         val charClass = state.charClass
         val background = state.background
+        val className = charClass?.name.orEmpty()
         val now = System.currentTimeMillis()
 
-        val spells = charClass?.choices
+        val classSpells = charClass?.choices
             ?.filterIsInstance<ClassChoice.CantripChoice>()
             ?.flatMap { choice ->
                 val picked = state.classSelections[choice.id].orEmpty()
@@ -206,14 +232,47 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
                         level = stub.level,
                         school = stub.school,
                         description = stub.description,
+                        source = className,
                     )
                 }
             }.orEmpty()
 
+        // Spells picked through an origin choice: Magic Initiate, a High Elf's cantrip,
+        // a Thaumaturge's extra cantrip, and so on.
+        val originSpells = state.originChoices
+            .filter { it.kind == ChoiceKind.SPELL }
+            .flatMap { choice ->
+                state.originSelections[choice.id].orEmpty().mapNotNull { spellId ->
+                    SpellData.byId(spellId)?.let { spell ->
+                        KnownSpell(
+                            id = spell.id,
+                            name = spell.name,
+                            level = spell.level,
+                            school = spell.school,
+                            description = spell.description,
+                            source = choice.source,
+                        )
+                    }
+                }
+            }
+
+        val spells = (classSpells + originSpells).distinctBy { it.id }
+
+        val originTools = state.originChoices
+            .filter { it.kind == ChoiceKind.TOOL }
+            .flatMap { state.originSelections[it.id].orEmpty() }
+
+        // A background whose tool entry named a group is replaced by the specific pick.
+        val backgroundToolIsOpenEnded = background?.toolProficiency
+            ?.let { ToolData.optionsForOpenEndedTool(it) != null } == true
+
         val toolProficiencies = buildList {
-            charClass?.toolProficiencies?.let { addAll(it) }
-            background?.toolProficiency?.let { add(it) }
-        }
+            charClass?.toolProficiencies
+                ?.filterNot { it.contains("of your choice", ignoreCase = true) }
+                ?.let { addAll(it) }
+            if (background != null && !backgroundToolIsOpenEnded) add(background.toolProficiency)
+            addAll(originTools)
+        }.distinct()
 
         val character = PlayerCharacter(
             id = UUID.randomUUID().toString(),
@@ -228,7 +287,10 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             skillProficiencies = state.allSkillProficiencies.map { it.name }.toSet(),
             skillExpertise = state.expertiseChoices.map { it.name }.toSet(),
             toolProficiencies = toolProficiencies,
+            armorTraining = charClass?.armorProficiencies.orEmpty(),
+            weaponProficiencies = charClass?.weaponProficiencies.orEmpty(),
             classChoiceSelections = state.classSelections,
+            originChoiceSelections = state.originSelections,
             featIds = listOfNotNull(background?.featId),
             knownSpells = spells,
             inventory = buildInventory(state),

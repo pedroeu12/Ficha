@@ -74,8 +74,10 @@ jobs:
 
           The home screen shows **v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})** under the title. If your phone shows anything else after installing, the install did not replace the old app — uninstall it first, then install again.
 
-          Built and tested automatically from [${{ steps.apk.outputs.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})." \
-            --prerelease
+          Built and tested automatically from [${{ steps.apk.outputs.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})."
+          # Deliberately not a prerelease: GitHub's /releases/latest skips those, and that
+          # URL is the whole point of publishing here — one stable link to bookmark.
+          gh release view latest --json isPrerelease --jq '.isPrerelease'
 
       - name: Upload test reports on failure
         if: failure()

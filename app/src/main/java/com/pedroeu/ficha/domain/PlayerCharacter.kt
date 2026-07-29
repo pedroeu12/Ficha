@@ -31,6 +31,39 @@ data class KnownSpell(
     val source: String = "",
 )
 
+/** An attack or action the player wrote themselves, kept alongside the derived weapon lines. */
+@Serializable
+data class CustomAttack(
+    val id: String,
+    val name: String,
+    val damageDice: String = "",
+    /** Free text so "+7", "DEX + PB", or "spell attack" all work. */
+    val bonus: String = "",
+    val damageType: String = "",
+    val range: String = "",
+    val notes: String = "",
+)
+
+/** A limited-use resource the player added by hand, for anything the rules engine misses. */
+@Serializable
+data class CustomResource(
+    val id: String,
+    val name: String,
+    val max: Int,
+    /** Matches [com.pedroeu.ficha.data.model.Recharge] by name. */
+    val recharge: String,
+    val notes: String = "",
+)
+
+/** A feature the player wrote themselves, shown on the Features tab. */
+@Serializable
+data class CustomFeature(
+    val id: String,
+    val name: String,
+    val description: String = "",
+    val source: String = "Custom",
+)
+
 /**
  * Stats the sheet normally derives from the rules but that Edit Mode can pin to a fixed value.
  * Stored by [name] so the map survives serialization.
@@ -120,6 +153,23 @@ data class PlayerCharacter(
     val spellSlotsExpended: Map<String, Int> = emptyMap(),
     /** Spell level (as String) -> total slots, replacing the class table value. */
     val spellSlotOverrides: Map<String, Int> = emptyMap(),
+
+    /** Attacks and actions written by the player. */
+    val customAttacks: List<CustomAttack> = emptyList(),
+    /** Extra features written by the player. */
+    val customFeatures: List<CustomFeature> = emptyList(),
+    /** Limited-use resources written by the player. */
+    val customResources: List<CustomResource> = emptyList(),
+    /** Resource id -> uses spent so far. */
+    val resourceUses: Map<String, Int> = emptyMap(),
+    /** Resource id -> maximum that replaces the derived one. */
+    val resourceMaxOverrides: Map<String, Int> = emptyMap(),
+
+    /**
+     * Free text the player has rewritten, layered over the static rules content.
+     * Keyed as "<scope>:<id>:name" or "<scope>:<id>:description" so a reset is per-field.
+     */
+    val textOverrides: Map<String, String> = emptyMap(),
 
     val currentHitPoints: Int = 0,
     val temporaryHitPoints: Int = 0,

@@ -49,6 +49,12 @@ data class Choice(
     val options: List<ChoiceOption> = emptyList(),
     /** Where this choice came from, shown as a caption, e.g. "Sage" or "Level 4". */
     val source: String = "",
+    /**
+     * True when the rules let you swap this selection during a rest — a Tattooed Warrior
+     * reshaping a tattoo, a Fiend Warlock changing their resistance. Those are offered
+     * again whenever the character rests.
+     */
+    val changeableOnRest: Boolean = false,
 )
 
 /** Convenience builders for the common option shapes. */

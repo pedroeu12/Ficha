@@ -15,7 +15,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -47,25 +49,38 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     val ability = CharacterCalculations.spellcastingAbility(character)
     val slots = CharacterCalculations.spellSlots(character)
     var editingStat by remember { mutableStateOf<OverridableStat?>(null) }
+    var addingSpell by remember { mutableStateOf(false) }
 
-    if (ability == null && character.knownSpells.isEmpty() && !editMode) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                text = "This character has no spellcasting.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(32.dp),
-            )
-        }
-        return
-    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        item {
+            Button(
+                onClick = { addingSpell = true },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null)
+                Text("  Add a spell", style = MaterialTheme.typography.labelLarge)
+            }
+        }
+
+        if (ability == null && character.knownSpells.isEmpty()) {
+            item {
+                Text(
+                    text = "This character has no spellcasting from their class. You can still " +
+                        "add spells from feats, items, or anywhere else.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 24.dp),
+                )
+            }
+        }
+
         if (ability != null) {
             item {
                 Card(
@@ -132,6 +147,17 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 )
             }
         }
+    }
+
+    if (addingSpell) {
+        SpellPickerSheet(
+            character = character,
+            onDismiss = { addingSpell = false },
+            onAdd = { spell ->
+                viewModel.addSpell(spell)
+                addingSpell = false
+            },
+        )
     }
 
     editingStat?.let { stat ->

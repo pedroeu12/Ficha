@@ -62,6 +62,7 @@ fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bo
     ) {
         item { VitalsRow(character, viewModel, editMode) { editingStat = it } }
         item { HitPointsCard(character, viewModel, editMode) { editingStat = it } }
+        item { ResourcesCard(character, viewModel, editMode) }
         item { DeathSavesCard(character, viewModel) }
 
         item {

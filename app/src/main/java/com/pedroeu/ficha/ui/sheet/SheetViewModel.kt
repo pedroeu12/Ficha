@@ -4,15 +4,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pedroeu.ficha.data.CharacterRepository
+import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.OriginChoices
+import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.InventoryItem
+import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.Coins
+import com.pedroeu.ficha.domain.CustomAttack
+import com.pedroeu.ficha.domain.CustomFeature
+import com.pedroeu.ficha.domain.CustomResource
 import com.pedroeu.ficha.domain.DeathSaves
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.domain.RestEngine
+import com.pedroeu.ficha.domain.RestOutcome
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -120,6 +132,13 @@ class SheetViewModel(
         character.copy(
             inventory = character.inventory + InventoryItem(name = name.trim(), quantity = quantity)
         )
+    }
+
+    fun updateInventoryItem(index: Int, item: InventoryItem) = update { character ->
+        val items = character.inventory.toMutableList()
+        if (index !in items.indices) return@update character
+        items[index] = item
+        character.copy(inventory = items)
     }
 
     fun setInventoryQuantity(index: Int, quantity: Int) = update { character ->
@@ -314,21 +333,203 @@ class SheetViewModel(
         )
     }
 
+
+    // ------------------------------------------------------------------ Resources
+
+    fun setResourceSpent(resourceId: String, spent: Int) = update { character ->
+        CharacterResources.withUsesChanged(character, resourceId, spent)
+    }
+
+    fun adjustResource(resourceId: String, delta: Int) = update { character ->
+        val current = character.resourceUses[resourceId] ?: 0
+        CharacterResources.withUsesChanged(character, resourceId, current + delta)
+    }
+
+    fun setResourceMax(resourceId: String, max: Int?) = update { character ->
+        character.copy(
+            resourceMaxOverrides = if (max == null) {
+                character.resourceMaxOverrides - resourceId
+            } else {
+                character.resourceMaxOverrides + (resourceId to max.coerceIn(0, 999))
+            }
+        )
+    }
+
+    fun addCustomResource(name: String, max: Int, recharge: Recharge, notes: String) =
+        update { character ->
+            if (name.isBlank()) return@update character
+            character.copy(
+                customResources = character.customResources + CustomResource(
+                    id = "custom:${UUID.randomUUID()}",
+                    name = name.trim(),
+                    max = max.coerceAtLeast(1),
+                    recharge = recharge.name,
+                    notes = notes.trim(),
+                )
+            )
+        }
+
+    fun removeCustomResource(resourceId: String) = update { character ->
+        character.copy(
+            customResources = character.customResources.filterNot { it.id == resourceId },
+            resourceUses = character.resourceUses - resourceId,
+            resourceMaxOverrides = character.resourceMaxOverrides - resourceId,
+        )
+    }
+
+    // ------------------------------------------------------------------ Attacks
+
+    fun addCustomAttack(attack: CustomAttack) = update { character ->
+        if (attack.name.isBlank()) return@update character
+        character.copy(customAttacks = character.customAttacks + attack)
+    }
+
+    fun updateCustomAttack(attack: CustomAttack) = update { character ->
+        character.copy(
+            customAttacks = character.customAttacks.map {
+                if (it.id == attack.id) attack else it
+            }
+        )
+    }
+
+    fun removeCustomAttack(attackId: String) = update { character ->
+        character.copy(customAttacks = character.customAttacks.filterNot { it.id == attackId })
+    }
+
+    // ------------------------------------------------------------------ Feats & features
+
+    /** Adds a feat and records any picks it forces, such as Magic Initiate's spells. */
+    fun addFeat(featId: String, selections: Map<String, List<String>> = emptyMap()) =
+        update { character ->
+            if (character.featIds.contains(featId)) return@update character
+
+            val feat = FeatData.byId(featId)
+            val learned = feat?.let {
+                OriginChoices.forFeat(it.id, it.name)
+                    .filter { choice -> choice.kind == ChoiceKind.SPELL }
+                    .flatMap { choice ->
+                        selections[choice.id].orEmpty().mapNotNull { spellId ->
+                            SpellData.byId(spellId)?.let { spell ->
+                                KnownSpell(
+                                    id = spell.id,
+                                    name = spell.name,
+                                    level = spell.level,
+                                    school = spell.school,
+                                    description = spell.description,
+                                    source = it.name,
+                                )
+                            }
+                        }
+                    }
+            }.orEmpty()
+
+            val tools = feat?.let {
+                OriginChoices.forFeat(it.id, it.name)
+                    .filter { choice -> choice.kind == ChoiceKind.TOOL }
+                    .flatMap { choice -> selections[choice.id].orEmpty() }
+            }.orEmpty()
+
+            val skills = feat?.let {
+                OriginChoices.forFeat(it.id, it.name)
+                    .filter { choice -> choice.kind == ChoiceKind.SKILL }
+                    .flatMap { choice -> selections[choice.id].orEmpty() }
+            }.orEmpty()
+
+            character.copy(
+                featIds = character.featIds + featId,
+                originChoiceSelections = character.originChoiceSelections + selections,
+                knownSpells = (character.knownSpells + learned).distinctBy { it.id },
+                toolProficiencies = (character.toolProficiencies + tools).distinct(),
+                skillProficiencies = character.skillProficiencies + skills,
+            )
+        }
+
+    fun removeFeat(featId: String) = update { character ->
+        character.copy(featIds = character.featIds - featId)
+    }
+
+    fun addCustomFeature(name: String, description: String, source: String) = update { character ->
+        if (name.isBlank()) return@update character
+        character.copy(
+            customFeatures = character.customFeatures + CustomFeature(
+                id = "feature:${UUID.randomUUID()}",
+                name = name.trim(),
+                description = description.trim(),
+                source = source.ifBlank { "Custom" },
+            )
+        )
+    }
+
+    fun updateCustomFeature(feature: CustomFeature) = update { character ->
+        character.copy(
+            customFeatures = character.customFeatures.map {
+                if (it.id == feature.id) feature else it
+            }
+        )
+    }
+
+    fun removeCustomFeature(featureId: String) = update { character ->
+        character.copy(customFeatures = character.customFeatures.filterNot { it.id == featureId })
+    }
+
+    /** Re-records a choice, used by Edit Mode and by rests that let you swap a pick. */
+    fun setChoiceSelection(choiceId: String, level: Int, optionIds: List<String>) =
+        update { character ->
+            if (level > 0) {
+                character.copy(
+                    levelSelections = character.levelSelections + ("$level:$choiceId" to optionIds)
+                )
+            } else {
+                character.copy(
+                    originChoiceSelections =
+                        character.originChoiceSelections + (choiceId to optionIds)
+                )
+            }
+        }
+
+    // ------------------------------------------------------------------ Free text
+
+    fun setText(key: String, value: String?) = update { character ->
+        character.copy(
+            textOverrides = if (value.isNullOrBlank()) {
+                character.textOverrides - key
+            } else {
+                character.textOverrides + (key to value)
+            }
+        )
+    }
+
+    fun setName(value: String) = update { it.copy(name = value.ifBlank { it.name }) }
+    fun setAlignment(value: String) = update { it.copy(alignment = value) }
+
+    // ------------------------------------------------------------------ Rests
+
+    fun shortRest(diceRolls: List<Int>): RestOutcome? {
+        val current = _character.value ?: return null
+        val outcome = RestEngine.shortRest(current, diceRolls)
+        _character.value = outcome.character
+        viewModelScope.launch { repository.save(outcome.character) }
+        return outcome
+    }
+
+    fun rollHitDie(): Int {
+        val current = _character.value ?: return 1
+        return RestEngine.rollHitDie(CharacterCalculations.hitDie(current))
+    }
+
+    fun longRestDetailed(): RestOutcome? {
+        val current = _character.value ?: return null
+        val outcome = RestEngine.longRest(current)
+        _character.value = outcome.character
+        viewModelScope.launch { repository.save(outcome.character) }
+        return outcome
+    }
+
     // ------------------------------------------------------------------ Notes
 
     fun setNotes(value: String) = update { it.copy(notes = value) }
     fun setAppearance(value: String) = update { it.copy(appearance = value) }
     fun setBackstory(value: String) = update { it.copy(backstory = value) }
-
-    fun longRest() = update { character ->
-        character.copy(
-            currentHitPoints = CharacterCalculations.maxHitPoints(character),
-            temporaryHitPoints = 0,
-            hitDiceSpent = (character.hitDiceSpent - maxOf(1, character.level / 2)).coerceAtLeast(0),
-            deathSaves = DeathSaves(),
-            spellSlotsExpended = emptyMap(),
-        )
-    }
 
     class Factory(
         private val repository: CharacterRepository,

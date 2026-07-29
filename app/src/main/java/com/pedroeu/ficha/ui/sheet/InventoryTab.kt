@@ -46,7 +46,7 @@ import com.pedroeu.ficha.ui.components.SectionHeader
 
 @Composable
 fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
-    var detailItem by remember { mutableStateOf<InventoryItem?>(null) }
+    var detailIndex by remember { mutableStateOf<Int?>(null) }
     var showAddSheet by remember { mutableStateOf(false) }
 
     LazyColumn(
@@ -79,7 +79,7 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode
             InventoryRow(
                 item = item,
                 editMode = editMode,
-                onOpen = { detailItem = item },
+                onOpen = { detailIndex = index },
                 onToggleEquipped = { viewModel.toggleEquipped(index) },
                 onRemove = { viewModel.removeInventoryItem(index) },
                 onQuantityChange = { viewModel.setInventoryQuantity(index, it) },
@@ -97,8 +97,16 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode
         }
     }
 
-    detailItem?.let { item ->
-        ItemDetailSheet(item = item, onDismiss = { detailItem = null })
+    detailIndex?.let { index ->
+        character.inventory.getOrNull(index)?.let { item ->
+            ItemDetailSheet(
+                item = item,
+                onDismiss = { detailIndex = null },
+                editMode = editMode,
+                onRename = { viewModel.updateInventoryItem(index, item.copy(name = it)) },
+                onNotesChange = { viewModel.updateInventoryItem(index, item.copy(notes = it)) },
+            )
+        }
     }
 
     if (showAddSheet) {

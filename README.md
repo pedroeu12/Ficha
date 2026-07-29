@@ -72,17 +72,16 @@ Seven tabs, modeled on the official 2024 sheet layout:
 
 | Tab | Contents |
 | --- | --- |
-| **Stats** | AC, initiative, speed, size, passive Perception, proficiency bonus, Heroic Inspiration, hit points with quick ±1/±5 adjusters, temp HP, hit dice, death saves |
+| **Stats** | AC, initiative, speed, size, passive Perception, proficiency bonus, Heroic Inspiration, hit points with quick ±1/±5 adjusters, temp HP, hit dice, death saves, and every limited-use tracker |
 | **Skills** | All 18 skills grouped under their governing ability, with proficiency and expertise pips, plus tool proficiencies |
-| **Combat** | Weapon attack table (attack bonus, damage, properties), equipment training, defenses |
-| **Features** | Class features by level, chosen options, subclass features, species traits, lineage, feats |
+| **Combat** | Weapon attack table (attack bonus, damage, properties), your own custom attacks, equipment training, defenses |
+| **Features** | Class features by level, subclass features, species traits, lineage, feats, and **the actual choices made inside each feature** |
 | **Spells** | Spellcasting ability/save DC/attack bonus, prepared and cantrip capacity, tappable spell slots, known spells with preparation toggles |
 | **Inventory** | Equippable gear (toggling armor recalculates AC live), coins in all five denominations, and a tap‑through detail view for every item |
 | **Bio** | Identity summary, appearance, backstory, session notes |
 
 Everything is calculated, not typed: AC responds to what you equip, skill bonuses to proficiency and
-expertise, HP to your class hit die and Constitution. The toolbar's rest button restores HP, clears
-death saves, and refreshes spell slots.
+expertise, HP to your class hit die and Constitution — until you decide otherwise in Edit Mode.
 
 ### Inventory
 
@@ -92,10 +91,36 @@ two routes: browse or search the rulebook catalog of ~124 weapons, armor, packs,
 fills in every stat automatically; or write a custom entry for anything homebrewed. Items added before
 the catalog existed still resolve by name, so older characters get descriptions too.
 
+### Limited-use trackers
+
+Anything with a set number of uses gets a counter rather than a sentence buried in a description:
+Monk Focus Points, Sorcery Points, Rage, Second Wind, Action Surge, Channel Divinity, Wild Shape,
+Lay on Hands, Bardic Inspiration, Superiority and Psionic dice, Portent, Arcane Ward — and the small
+ones that are easiest to forget, like a Dragonborn's Breath Weapon, an Orc's Relentless Endurance, a
+Lucky feat's Luck Points, or the single free casting Magic Initiate grants once per Long Rest.
+
+Trackers know how they recharge, so rests refill exactly the right ones. Small pools show tappable
+pips; large ones (Focus, Sorcery Points, Lay on Hands) show a counter. Every maximum is editable, and
+**Track something else** adds your own pool for anything the app doesn't model.
+
+### Short Rest and Long Rest
+
+**Short Rest** opens a panel to spend Hit Dice one at a time — roll in-app or take the average — showing
+what each die restores before you commit. It then returns every short-rest resource, plus a Warlock's
+Pact Magic slots. **Long Rest** restores hit points, half your Hit Dice, all spell slots, every
+resource, and clears death saves. Both report exactly what they put back rather than silently changing
+numbers, and both offer any pick the rules let you revisit while resting — a Tattooed Warrior reshaping
+a tattoo, a Fiend Warlock changing their resistance, a Transmuter re-attuning their stone.
+
 ### Edit Mode
 
 The pencil in the toolbar turns the sheet fully editable, for the times the rules engine and your DM
-disagree. Two mechanisms compose, and they're kept distinct:
+disagree. **Nothing is read-only while it's on** — every number and every piece of text, including
+your character's name, feature names and descriptions, species trait text, proficiency lines, item
+names and notes, and identity fields. Rules text is never destroyed: your version is stored as an
+override, and every edited field can be reset back to the rulebook.
+
+For numbers, two mechanisms compose and are kept distinct:
 
 - a **bonus** adds to whatever the rules produce — the right tool for "+2 Stealth for this arc",
 - an **override** replaces the value outright, for anything the app doesn't model.
@@ -108,7 +133,22 @@ Overrides always win, adjusted values are tinted so you can see at a glance what
 - edit ability scores, AC, initiative, speed, max HP, proficiency bonus, passive Perception,
   spell save DC, spell attack bonus, and prepared/cantrip capacity,
 - set spell slots per level 1–9 outright, or reset them to the class table,
-- add and remove tool proficiencies, spells, and inventory items, and change item quantities.
+- add and remove tool proficiencies, spells, feats, features, attacks, and inventory items,
+- change any limited-use maximum, or hide a tracker entirely by setting it to zero,
+- re-pick any choice a feature granted, at any time.
+
+### Adding things
+
+Every category has an **Add** button that opens the matching rulebook list:
+
+| Category | What opens |
+| --- | --- |
+| **Feats** | The full feat list, searchable. A feat carrying its own decisions — Magic Initiate's spells, Skilled's proficiencies, Crafter's tools — asks for them before it can be added |
+| **Spells** | The spell catalog, filterable by level and by your class list, plus add-by-name for anything beyond it |
+| **Equipment** | 124 weapons, armor, packs, tools, and gear, with stats filled in automatically |
+| **Attacks** | A form for name, damage die, attack/damage bonus, damage type, range, and free-text special effects |
+| **Features** | A free-text feature for anything homebrewed |
+| **Trackers** | A custom limited-use pool, with its own recharge rule |
 
 ## Building
 
@@ -136,7 +176,8 @@ app/src/main/java/com/pedroeu/ficha/
 │   │               spells, equipment, the item catalog, and the level tables
 │   └── db/         Room entity, DAO, database
 ├── domain/         PlayerCharacter + the calculation engine (AC, HP, saves, skills, attacks,
-│                   spell slots, and the override layer)
+│                   spell slots, the override layer, limited-use resources, the rest engine,
+│                   and the choice resolver)
 └── ui/
     ├── creation/   The seven-step wizard and its state machine
     ├── levelup/    The level-up flow and its state machine
@@ -158,7 +199,7 @@ ink for text, crimson chrome, and gold section headings.
 
 ## Tests
 
-81 unit tests over the parts worth getting right:
+110 unit tests over the parts worth getting right:
 
 ```bash
 ./gradlew test
@@ -171,7 +212,13 @@ ink for text, crimson chrome, and gold section headings.
 - the Edit Mode override layer: bonuses stack, overrides replace, overrides beat bonuses,
 - the full progression tables — spell slots for all three caster types, ASI levels per class,
   subclass timing, and that every level-up choice for every class is answerable,
-- that every "of your choice" grant is actually presented, including the Sage's Magic Initiate spells.
+- that every "of your choice" grant is actually presented, including the Sage's Magic Initiate spells,
+- limited-use derivation for every class, subclass, species, and feat at every level, and that no
+  tracker is ever generated empty or nameless,
+- Short Rest hit-dice spending and Long Rest restoration, including which resources each one refills
+  and that a Warlock's Pact slots come back on a Short Rest while a Wizard's do not,
+- that a choice made inside a feature resolves back to readable names — the Monk's tattoos, Battle
+  Master maneuvers, Metamagic, Fighting Styles taken after level 1, and Magic Initiate spells.
 
 ## Scope
 

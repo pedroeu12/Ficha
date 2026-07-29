@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +32,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +47,7 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.ui.components.EditableText
 import kotlinx.coroutines.launch
 
 private val TABS = listOf("Stats", "Skills", "Combat", "Features", "Spells", "Inventory", "Bio")
@@ -62,6 +67,7 @@ fun CharacterSheetScreen(
     val editMode by viewModel.editMode.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState(pageCount = { TABS.size })
     val scope = rememberCoroutineScope()
+    var restKind by remember { mutableStateOf<RestKind?>(null) }
 
     // Coming back from the level-up flow, the stored character has changed underneath us.
     LaunchedEffect(Unit) { viewModel.refresh() }
@@ -82,7 +88,14 @@ fun CharacterSheetScreen(
         TopAppBar(
             title = {
                 Column {
-                    Text(loaded.name, style = MaterialTheme.typography.titleLarge)
+                    EditableText(
+                        value = loaded.name,
+                        editMode = editMode,
+                        onChange = { viewModel.setName(it.orEmpty()) },
+                        label = "Character name",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
                     Text(
                         text = buildString {
                             append("Level ${loaded.level} $species $charClass")
@@ -103,7 +116,10 @@ fun CharacterSheetScreen(
                         Icon(Icons.Default.TrendingUp, contentDescription = "Level up")
                     }
                 }
-                IconButton(onClick = viewModel::longRest) {
+                IconButton(onClick = { restKind = RestKind.SHORT }) {
+                    Icon(Icons.Default.LocalCafe, contentDescription = "Short rest")
+                }
+                IconButton(onClick = { restKind = RestKind.LONG }) {
                     Icon(Icons.Default.Bedtime, contentDescription = "Long rest")
                 }
                 IconButton(onClick = viewModel::toggleEditMode) {
@@ -152,13 +168,32 @@ fun CharacterSheetScreen(
             when (TABS[page]) {
                 "Stats" -> StatsTab(loaded, viewModel, editMode)
                 "Skills" -> SkillsTab(loaded, viewModel, editMode)
-                "Combat" -> CombatTab(loaded)
-                "Features" -> FeaturesTab(loaded)
+                "Combat" -> CombatTab(loaded, viewModel, editMode)
+                "Features" -> FeaturesTab(loaded, viewModel, editMode)
                 "Spells" -> SpellsTab(loaded, viewModel, editMode)
                 "Inventory" -> InventoryTab(loaded, viewModel, editMode)
-                "Bio" -> BioTab(loaded, viewModel)
+                "Bio" -> BioTab(loaded, viewModel, editMode)
             }
         }
+    }
+
+    RestSheetHost(
+        restKind = restKind,
+        character = loaded,
+        viewModel = viewModel,
+        onDismiss = { restKind = null },
+    )
+}
+
+@Composable
+private fun RestSheetHost(
+    restKind: RestKind?,
+    character: com.pedroeu.ficha.domain.PlayerCharacter,
+    viewModel: SheetViewModel,
+    onDismiss: () -> Unit,
+) {
+    restKind?.let { kind ->
+        RestSheet(kind = kind, character = character, viewModel = viewModel, onDismiss = onDismiss)
     }
 }
 

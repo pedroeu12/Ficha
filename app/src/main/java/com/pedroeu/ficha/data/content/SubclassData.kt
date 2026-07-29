@@ -25,6 +25,7 @@ object SubclassData {
         source: String,
         types: List<String>,
         count: Int = 1,
+        changeableOnRest: Boolean = false,
     ) = Choice(
         id = id,
         label = label,
@@ -33,6 +34,7 @@ object SubclassData {
         kind = ChoiceKind.DAMAGE_TYPE,
         options = ChoiceOptions.fromStrings(types),
         source = source,
+        changeableOnRest = changeableOnRest,
     )
 
     private val BATTLE_MASTER_MANEUVERS = listOf(
@@ -253,7 +255,7 @@ object SubclassData {
                         ChoiceOption("archer", "Archer", "A Bonus Action ranged attack for 1d8 + Wisdom Radiant damage."),
                         ChoiceOption("chalice", "Chalice", "Whenever you heal, another creature nearby also regains hit points."),
                         ChoiceOption("dragon", "Dragon", "Treat a 9 or lower as a 10 on Intelligence and Wisdom checks and Concentration saves."),
-                    ), "Level 3")),
+                    ), "Level 3", changeableOnRest = true)),
                 f(6, "Cosmic Omen", "After a Long Rest, roll to determine a Weal or Woe omen you can invoke as a Reaction."),
                 f(10, "Twinkling Constellations", "Your Starry Form improves and you can change constellation each turn."),
                 f(14, "Full of Stars", "While in Starry Form you are partially incorporeal, gaining Resistance to several damage types."),
@@ -394,25 +396,25 @@ object SubclassData {
                         ChoiceOption("crane", "Crane", "You know Guidance and gain Advantage after a missed Flurry of Blows attack."),
                         ChoiceOption("horse", "Horse", "You know Message and gain 10 feet of Speed when you use Step of the Wind."),
                         ChoiceOption("tortoise", "Tortoise", "You know Spare the Dying and gain +1 AC when you use Patient Defense."),
-                    ), "Level 3")),
+                    ), "Level 3", changeableOnRest = true)),
                 f(6, "Celestial Tattoo", "You gain a tattoo depicting a celestial phenomenon.",
                     Choice("celestial_tattoo", "Celestial Tattoo", "Choose a celestial tattoo.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("comet", "Comet", "Spend a Focus Point to add a Martial Arts die to a Search check."),
                         ChoiceOption("eclipse", "Eclipse", "Spend a Focus Point to add a Martial Arts die to a Stealth check when you Hide."),
                         ChoiceOption("sunburst", "Sunburst", "Spend a Focus Point to add a Martial Arts die to a Study check."),
-                    ), "Level 6")),
+                    ), "Level 6", changeableOnRest = true)),
                 f(11, "Nature Tattoo", "You gain a tattoo depicting a natural feature.",
                     Choice("nature_tattoo", "Nature Tattoo", "Choose a nature tattoo.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("sea_storm", "Sea Storm", "Resistance to Cold, Lightning, or Thunder damage, changeable on a rest."),
                         ChoiceOption("volcano", "Volcano", "Resistance to Acid, Fire, or Poison damage, changeable on a rest."),
-                    ), "Level 11")),
+                    ), "Level 11", changeableOnRest = true)),
                 f(17, "Monster Tattoo", "You gain a tattoo depicting a mighty creature.",
                     Choice("monster_tattoo", "Monster Tattoo", "Choose a monster tattoo.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("beholder", "Beholder", "Gain a Fly Speed and fire four eye rays dealing Force damage."),
                         ChoiceOption("chromatic_dragon", "Chromatic Dragon", "Replace an attack with a 30-foot Cone of elemental damage."),
                         ChoiceOption("displacer_beast", "Displacer Beast", "Cast Mirror Image as part of Flurry of Blows or Step of the Wind."),
                         ChoiceOption("troll", "Troll", "Regain hit points at the start of each turn while Bloodied, and regrow severed parts."),
-                    ), "Level 17")),
+                    ), "Level 17", changeableOnRest = true)),
             ),
             source = UA),
 
@@ -619,7 +621,7 @@ object SubclassData {
                 f(6, "Dark One's Own Luck", "Add 1d10 to an ability check or saving throw, once per Short or Long Rest."),
                 f(10, "Fiendish Resilience", "Choose a damage type to resist after each rest.",
                     damageTypeChoice("fiendish_resilience", "Fiendish Resilience", "Level 10",
-                        listOf("Acid", "Cold", "Fire", "Lightning", "Necrotic", "Poison", "Psychic", "Radiant", "Thunder"))),
+                        listOf("Acid", "Cold", "Fire", "Lightning", "Necrotic", "Poison", "Psychic", "Radiant", "Thunder"), changeableOnRest = true)),
                 f(14, "Hurl Through Hell", "Once per Long Rest, banish a creature you hit through the Lower Planes for 8d10 Psychic damage."),
             )),
         Subclass("great_old_one", "warlock", "Great Old One Patron",
@@ -713,7 +715,7 @@ object SubclassData {
                         ChoiceOption("darkvision", "Darkvision", "The bearer gains or extends Darkvision by 60 feet."),
                         ChoiceOption("speed", "Speed", "The bearer's Speed increases by 10 feet."),
                         ChoiceOption("resistance", "Resistance", "Resistance to Acid, Cold, Fire, Lightning, Poison, or Thunder damage."),
-                    ), "Level 3")),
+                    ), "Level 3", changeableOnRest = true)),
                 f(3, "Wondrous Alteration", "You always have Alter Self prepared, cast it free once per Long Rest, and each of its options gains a bonus."),
                 f(6, "Empowered Transmutation", "Cast a non-damaging Transmutation spell as if using a slot one level higher."),
                 f(10, "Potent Stone", "Your Transmuter's Stone grants two benefits, adding Mighty Build and Tremorsense as options."),

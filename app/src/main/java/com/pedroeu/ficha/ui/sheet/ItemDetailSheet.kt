@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.CatalogItem
 import com.pedroeu.ficha.data.content.ItemCatalog
 import com.pedroeu.ficha.data.model.InventoryItem
+import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.ui.components.SectionHeader
 
 /**
@@ -29,6 +30,9 @@ import com.pedroeu.ficha.ui.components.SectionHeader
 fun ItemDetailSheet(
     item: InventoryItem,
     onDismiss: () -> Unit,
+    editMode: Boolean = false,
+    onRename: (String) -> Unit = {},
+    onNotesChange: (String) -> Unit = {},
 ) {
     val catalogItem: CatalogItem? = ItemCatalog.resolve(item)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -45,8 +49,11 @@ fun ItemDetailSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Column {
-                Text(
-                    text = item.name,
+                EditableText(
+                    value = item.name,
+                    editMode = editMode,
+                    onChange = { onRename(it.orEmpty()) },
+                    label = "Item name",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -104,13 +111,16 @@ fun ItemDetailSheet(
                 )
             }
 
-            if (item.notes.isNotBlank() && catalogItem != null && item.notes != catalogItem.description) {
+            if (editMode || (item.notes.isNotBlank() && item.notes != catalogItem?.description)) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     SectionHeader("Your notes")
-                    Text(
-                        text = item.notes,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    EditableText(
+                        value = item.notes,
+                        editMode = editMode,
+                        onChange = { onNotesChange(it.orEmpty()) },
+                        label = "Item notes",
+                        multiline = true,
+                        placeholder = if (editMode) "Tap to add your own notes" else "",
                     )
                 }
             }

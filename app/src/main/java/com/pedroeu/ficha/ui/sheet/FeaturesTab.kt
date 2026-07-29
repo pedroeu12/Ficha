@@ -3,15 +3,28 @@ package com.pedroeu.ficha.ui.sheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,18 +33,31 @@ import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
-import com.pedroeu.ficha.data.model.ClassChoice
+import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.domain.ResolvedChoice
+import com.pedroeu.ficha.ui.components.ChoiceSection
+import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.ui.components.SectionHeader
+import com.pedroeu.ficha.ui.components.TextEditDialog
 
 @Composable
-fun FeaturesTab(character: PlayerCharacter) {
+fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
     val species = SpeciesData.byId(character.speciesId)
     val charClass = ClassData.byId(character.classId)
     val lineage = species?.lineageOptions?.find { it.id == character.lineageId }
-
     val progression = ProgressionData.forClass(character.classId)
     val subclass = character.subclassId?.let { SubclassData.byId(it) }
+
+    // Selections are stored in three separate maps; the resolver reads all of them so a
+    // feature's actual picks appear under it rather than only its name.
+    val classChoices = ChoiceResolver.classFeatureChoices(character).groupBy { it.featureName }
+    val subclassChoices = ChoiceResolver.subclassFeatureChoices(character).groupBy { it.featureName }
+    val originChoices = ChoiceResolver.originChoices(character).filter { it.isAnswered }
+
+    var addingFeat by remember { mutableStateOf(false) }
+    var addingFeature by remember { mutableStateOf(false) }
+    var editingChoice by remember { mutableStateOf<ResolvedChoice?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -42,26 +68,42 @@ fun FeaturesTab(character: PlayerCharacter) {
             item {
                 FeatureCard("Class Features — ${charClass.name}") {
                     charClass.level1Features.forEach { feature ->
-                        FeatureEntry(feature.name, feature.description)
+                        FeatureEntry(
+                            name = feature.name,
+                            description = feature.description,
+                            scope = "class",
+                            character = character,
+                            viewModel = viewModel,
+                            editMode = editMode,
+                            choices = classChoices[feature.name].orEmpty(),
+                            onEditChoice = { editingChoice = it },
+                        )
                     }
-                    // Surface the options the player picked during creation alongside the fixed features.
-                    charClass.choices.filterIsInstance<ClassChoice.FeatureOption>()
-                        .forEach { choice ->
-                            val selectedId = character.classChoiceSelections[choice.id]?.firstOrNull()
-                            val option = choice.options.find { it.id == selectedId }
-                            if (option != null) {
-                                FeatureEntry("${choice.label}: ${option.name}", option.description)
-                            }
-                        }
-
+                    // The level-1 branch options, e.g. Fighting Style or Divine Order.
+                    ChoiceResolver.levelOneClassOptions(character).forEach { (label, option) ->
+                        FeatureEntry(
+                            name = "$label: $option",
+                            description = "",
+                            scope = "class",
+                            character = character,
+                            viewModel = viewModel,
+                            editMode = editMode,
+                        )
+                    }
                     // Everything gained from level 2 onward, in the order it was earned.
                     progression?.features
                         ?.filter { it.level in 2..character.level }
                         ?.sortedBy { it.level }
                         ?.forEach { feature ->
                             FeatureEntry(
-                                "Level ${feature.level} — ${feature.name}",
-                                feature.description,
+                                name = "Level ${feature.level} — ${feature.name}",
+                                description = feature.description,
+                                scope = "class",
+                                character = character,
+                                viewModel = viewModel,
+                                editMode = editMode,
+                                choices = classChoices[feature.name].orEmpty(),
+                                onEditChoice = { editingChoice = it },
                             )
                         }
                 }
@@ -88,8 +130,14 @@ fun FeaturesTab(character: PlayerCharacter) {
                         .sortedBy { it.level }
                         .forEach { feature ->
                             FeatureEntry(
-                                "Level ${feature.level} — ${feature.name}",
-                                feature.description,
+                                name = "Level ${feature.level} — ${feature.name}",
+                                description = feature.description,
+                                scope = "subclass",
+                                character = character,
+                                viewModel = viewModel,
+                                editMode = editMode,
+                                choices = subclassChoices[feature.name].orEmpty(),
+                                onEditChoice = { editingChoice = it },
                             )
                         }
                 }
@@ -100,37 +148,214 @@ fun FeaturesTab(character: PlayerCharacter) {
             item {
                 FeatureCard("Species Traits — ${species.name}") {
                     FeatureEntry(
-                        "Size & Speed",
-                        "${species.size}, ${species.speed} feet of movement." +
+                        name = "Size & Speed",
+                        description = "${species.size}, ${species.speed} feet of movement." +
                             if (species.darkvisionRange > 0)
                                 " Darkvision out to ${species.darkvisionRange} feet."
                             else "",
+                        scope = "species",
+                        character = character,
+                        viewModel = viewModel,
+                        editMode = editMode,
                     )
                     species.traits.forEach { trait ->
-                        FeatureEntry(trait.name, trait.description)
+                        FeatureEntry(
+                            name = trait.name,
+                            description = trait.description,
+                            scope = "species",
+                            character = character,
+                            viewModel = viewModel,
+                            editMode = editMode,
+                        )
                     }
                     if (lineage != null) {
                         FeatureEntry(
-                            "${species.lineageChoiceLabel ?: "Lineage"}: ${lineage.name}",
-                            lineage.description,
+                            name = "${species.lineageChoiceLabel ?: "Lineage"}: ${lineage.name}",
+                            description = lineage.description,
+                            scope = "species",
+                            character = character,
+                            viewModel = viewModel,
+                            editMode = editMode,
                         )
                     }
                 }
             }
         }
 
-        if (character.featIds.isNotEmpty()) {
+        item {
+            FeatureCard("Feats") {
+                if (character.featIds.isEmpty()) {
+                    Text(
+                        text = "No feats yet.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                character.featIds.forEach { featId ->
+                    val feat = FeatData.byId(featId)
+                    FeatureEntry(
+                        name = feat?.name ?: featId,
+                        description = feat?.description.orEmpty(),
+                        scope = "feat",
+                        featureId = featId,
+                        character = character,
+                        viewModel = viewModel,
+                        editMode = editMode,
+                        onRemove = { viewModel.removeFeat(featId) },
+                    )
+                }
+                TextButton(onClick = { addingFeat = true }) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Text("  Add feat")
+                }
+            }
+        }
+
+        if (originChoices.isNotEmpty()) {
             item {
-                FeatureCard("Feats") {
-                    character.featIds.forEach { featId ->
-                        FeatData.byId(featId)?.let { feat ->
-                            FeatureEntry(feat.name, feat.description)
+                FeatureCard("Origin Choices") {
+                    Text(
+                        text = "What you picked from your species, class, and background.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(top = 8.dp),
+                    ) {
+                        originChoices.forEach { resolved ->
+                            ChoiceLine(resolved, editMode) { editingChoice = resolved }
                         }
                     }
                 }
             }
         }
+
+        item {
+            FeatureCard("Other Features") {
+                if (character.customFeatures.isEmpty()) {
+                    Text(
+                        text = "Anything the app doesn't already know about goes here.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                character.customFeatures.forEach { feature ->
+                    FeatureEntry(
+                        name = feature.name,
+                        description = feature.description,
+                        scope = "custom",
+                        featureId = feature.id,
+                        character = character,
+                        viewModel = viewModel,
+                        editMode = editMode,
+                        onRemove = { viewModel.removeCustomFeature(feature.id) },
+                    )
+                }
+                TextButton(onClick = { addingFeature = true }) {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                    Text("  Add feature")
+                }
+            }
+        }
     }
+
+    if (addingFeat) {
+        FeatPickerSheet(
+            character = character,
+            onDismiss = { addingFeat = false },
+            onAdd = { featId, selections ->
+                viewModel.addFeat(featId, selections)
+                addingFeat = false
+            },
+        )
+    }
+
+    if (addingFeature) {
+        TextEditDialog(
+            title = "New feature",
+            initial = "",
+            multiline = true,
+            onDismiss = { addingFeature = false },
+            onConfirm = { text ->
+                if (!text.isNullOrBlank()) {
+                    // First line is the name, the rest is the description.
+                    val name = text.lineSequence().first().trim()
+                    val description = text.lineSequence().drop(1).joinToString("\n").trim()
+                    viewModel.addCustomFeature(name, description, "Custom")
+                }
+                addingFeature = false
+            },
+        )
+    }
+
+    editingChoice?.let { resolved ->
+        ChoiceEditDialog(
+            resolved = resolved,
+            onDismiss = { editingChoice = null },
+            onToggle = { optionId ->
+                val current = resolved.selectedIds
+                val next = when {
+                    current.contains(optionId) -> current - optionId
+                    current.size < resolved.choice.count -> current + optionId
+                    resolved.choice.count == 1 -> listOf(optionId)
+                    else -> current.drop(1) + optionId
+                }
+                viewModel.setChoiceSelection(resolved.choice.id, resolved.level, next)
+            },
+        )
+    }
+}
+
+/** Shows the picks made inside a feature, and lets Edit Mode change them. */
+@Composable
+private fun ChoiceLine(
+    resolved: ResolvedChoice,
+    editMode: Boolean,
+    onEdit: () -> Unit,
+) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        Text(
+            text = "${resolved.choice.label}: ",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Text(
+            text = resolved.summary.ifBlank { "not chosen yet" },
+            style = MaterialTheme.typography.bodySmall,
+            color = if (resolved.isAnswered) MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.error,
+            modifier = Modifier.weight(1f),
+        )
+        if (editMode || !resolved.isAnswered) {
+            TextButton(onClick = onEdit) {
+                Text(if (resolved.isAnswered) "Change" else "Choose")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChoiceEditDialog(
+    resolved: ResolvedChoice,
+    onDismiss: () -> Unit,
+    onToggle: (String) -> Unit,
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(resolved.choice.label) },
+        text = {
+            ChoiceSection(
+                choice = resolved.choice,
+                selected = resolved.selectedIds,
+                onToggle = onToggle,
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Done") }
+        },
+    )
 }
 
 @Composable
@@ -149,19 +374,67 @@ private fun FeatureCard(title: String, content: @Composable () -> Unit) {
     }
 }
 
+/**
+ * One feature: its name, its text, and any sub-choices it carries. Both the name and the text
+ * can be rewritten in Edit Mode without losing the ability to reset back to the rulebook.
+ */
 @Composable
-private fun FeatureEntry(name: String, description: String) {
-    Column {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+private fun FeatureEntry(
+    name: String,
+    description: String,
+    scope: String,
+    character: PlayerCharacter,
+    viewModel: SheetViewModel,
+    editMode: Boolean,
+    featureId: String = name,
+    choices: List<ResolvedChoice> = emptyList(),
+    onEditChoice: (ResolvedChoice) -> Unit = {},
+    onRemove: (() -> Unit)? = null,
+) {
+    val nameKey = "$scope:$featureId:name"
+    val descKey = "$scope:$featureId:description"
+    val nameOverride = character.textOverrides[nameKey]
+    val descOverride = character.textOverrides[descKey]
+
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            EditableText(
+                value = nameOverride ?: name,
+                editMode = editMode,
+                onChange = { viewModel.setText(nameKey, it) },
+                label = "Feature name",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold,
+                isOverridden = nameOverride != null,
+                modifier = Modifier.weight(1f),
+            )
+            if (editMode && onRemove != null) {
+                IconButton(onClick = onRemove) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Remove $name",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
+        if (description.isNotBlank() || descOverride != null || editMode) {
+            EditableText(
+                value = descOverride ?: description,
+                editMode = editMode,
+                onChange = { viewModel.setText(descKey, it) },
+                label = "Feature text",
+                style = MaterialTheme.typography.bodySmall,
+                multiline = true,
+                isOverridden = descOverride != null,
+                placeholder = if (editMode) "Tap to add a description" else "",
+            )
+        }
+
+        choices.forEach { resolved ->
+            ChoiceLine(resolved, editMode) { onEditChoice(resolved) }
+        }
     }
 }

@@ -7,6 +7,10 @@ on:
     branches: ["**"]
   workflow_dispatch:
 
+# Needed to publish the APK to a release.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,13 +36,20 @@ jobs:
 
       # The APK is named after the commit so it is obvious which build you installed.
       - name: Name the APK after the commit
+        id: apk
         run: |
           VERSION=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          BUILD=$(grep -oP 'versionCode = \K\d+' app/build.gradle.kts)
           SHORT_SHA=$(git rev-parse --short HEAD)
           mkdir -p out
           cp app/build/outputs/apk/debug/app-debug.apk \
              "out/ficha-${VERSION}-${SHORT_SHA}.apk"
           ls -lh out/
+          {
+            echo "version=$VERSION"
+            echo "build=$BUILD"
+            echo "sha=$SHORT_SHA"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload the APK
         uses: actions/upload-artifact@v4
@@ -47,6 +58,24 @@ jobs:
           path: out/*.apk
           if-no-files-found: error
           retention-days: 90
+
+      # A rolling "latest" release, so the phone always has one stable link to a raw .apk.
+      # Artifacts arrive as a ZIP, which is painful to unpack on a phone; this is a direct
+      # download that taps straight into the Android installer.
+      - name: Publish the APK to the latest release
+        if: github.ref_name == 'claude/dnd-character-sheet-android-mvkrja'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest out/*.apk \
+            --title "Latest build — v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})" \
+            --notes "Debug build of \`${{ steps.apk.outputs.sha }}\`.
+
+          The home screen shows **v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})** under the title. If your phone shows anything else after installing, the install did not replace the old app — uninstall it first, then install again.
+
+          Built and tested automatically from [${{ steps.apk.outputs.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})." \
+            --prerelease
 
       - name: Upload test reports on failure
         if: failure()

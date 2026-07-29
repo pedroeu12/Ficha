@@ -55,6 +55,12 @@ data class Choice(
      * again whenever the character rests.
      */
     val changeableOnRest: Boolean = false,
+    /**
+     * The limited-use pool these options are spent from, when there is one — Metamagic is
+     * paid for with Sorcery Points, maneuvers with Superiority Dice. Lets the tracker list
+     * the options the character actually picked, with their rules text.
+     */
+    val resourceId: String? = null,
 )
 
 /** Convenience builders for the common option shapes. */

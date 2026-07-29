@@ -87,6 +87,9 @@ fun ChoiceSection(
                             selected = selected.contains(option.id),
                             onClick = { onToggle(option.id) },
                             trailingLabel = option.supporting.ifBlank { null },
+                            // Options now carry full rules text; clamp it so a list of
+                            // nineteen maneuvers is still something you can scroll.
+                            subtitleMaxLines = 3,
                         )
                     }
                 }

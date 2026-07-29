@@ -23,10 +23,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /** A tappable card used for picking a species, class, background, or feature option. */
@@ -40,9 +45,15 @@ fun SelectableCard(
     modifier: Modifier = Modifier,
     trailingLabel: String? = null,
     expandedContent: (@Composable () -> Unit)? = null,
+    /**
+     * Clamps a long [subtitle] to this many lines and offers a "Read more" toggle. Used for
+     * pickers whose options carry full rules text, which would otherwise be unscannable.
+     */
+    subtitleMaxLines: Int? = null,
 ) {
     val borderColor = if (selected) MaterialTheme.colorScheme.secondary
     else MaterialTheme.colorScheme.outlineVariant
+    var subtitleExpanded by remember(title) { mutableStateOf(false) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -88,12 +99,27 @@ fun SelectableCard(
                 }
             }
             if (subtitle.isNotBlank()) {
+                val clamped = subtitleMaxLines != null && !subtitleExpanded
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = if (clamped) subtitleMaxLines else Int.MAX_VALUE,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 6.dp),
                 )
+                // Only worth offering when there is plausibly something hidden behind the clamp.
+                if (subtitleMaxLines != null && subtitle.length > subtitleMaxLines * 60) {
+                    Text(
+                        text = if (subtitleExpanded) "Show less" else "Read more",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .clickable { subtitleExpanded = !subtitleExpanded },
+                    )
+                }
             }
             AnimatedVisibility(visible = selected && expandedContent != null) {
                 Column(Modifier.padding(top = 12.dp)) {

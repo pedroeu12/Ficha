@@ -1,8 +1,11 @@
 package com.pedroeu.ficha.domain
 
+import com.pedroeu.ficha.data.content.FeatureText
 import com.pedroeu.ficha.data.content.ResourceData
+import com.pedroeu.ficha.data.content.ResourceOptionData
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.ResourceDef
+import com.pedroeu.ficha.data.model.ResourceOption
 
 /** A resource paired with how much of it the character has spent. */
 data class ResourceState(
@@ -54,6 +57,49 @@ object CharacterResources {
                 if (override == null) def else def.copy(max = override)
             }
             .filter { it.max > 0 }
+            .map { def ->
+                def.copy(
+                    options = optionsFor(character, def.id),
+                    // Custom pools are the player's own words; everything else borrows the
+                    // rules text from the feature that granted it.
+                    description = if (def.isCustom) def.description
+                    else def.description.ifBlank { FeatureText.forName(def.name) },
+                )
+            }
+    }
+
+    /**
+     * The named abilities a pool pays for: the ones the rules grant outright, plus whatever
+     * the player picked from a choice that spends this pool (Metamagic, maneuvers, Arcane
+     * Shot). Both carry their own rules text so the sheet can explain each one.
+     */
+    fun optionsFor(character: PlayerCharacter, resourceId: String): List<ResourceOption> {
+        val granted = ResourceOptionData.forResource(
+            resourceId = resourceId,
+            subclassId = character.subclassId,
+            level = character.level,
+        )
+
+        val chosen = ChoiceResolver.all(character)
+            .filter { it.choice.resourceId == resourceId }
+            .flatMap { resolved ->
+                resolved.selectedIds.mapNotNull { optionId ->
+                    resolved.choice.options.find { it.id == optionId }?.let { option ->
+                        ResourceOption(
+                            id = "${resolved.choice.id}:${option.id}",
+                            name = option.name,
+                            cost = option.supporting,
+                            actionType = "",
+                            description = option.description,
+                            unlockLevel = resolved.level,
+                            isChosen = true,
+                        )
+                    }
+                }
+            }
+            .distinctBy { it.name }
+
+        return granted + chosen
     }
 
     fun states(character: PlayerCharacter): List<ResourceState> =

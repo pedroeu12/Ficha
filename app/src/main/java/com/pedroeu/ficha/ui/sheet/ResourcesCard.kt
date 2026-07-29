@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResourceState
+import com.pedroeu.ficha.ui.components.ExpandableOption
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.StatEditDialog
 
@@ -127,6 +131,7 @@ private fun ResourceRow(
     onDelete: () -> Unit,
 ) {
     val def = state.def
+    var optionsShown by remember(def.id) { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -222,6 +227,55 @@ private fun ResourceRow(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+
+        // Everything this pool pays for, each opening to its own rules text. Without this the
+        // sheet would only tell you how many points you have, never what to spend them on.
+        val hasDetail = def.options.isNotEmpty() || def.description.isNotBlank()
+        if (hasDetail) {
+            TextButton(
+                onClick = { optionsShown = !optionsShown },
+                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
+            ) {
+                Icon(
+                    imageVector = if (optionsShown) Icons.Default.KeyboardArrowUp
+                    else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Text(
+                    text = when {
+                        optionsShown -> "  Hide details"
+                        def.options.isNotEmpty() ->
+                            "  What you can spend it on (${def.options.size})"
+                        else -> "  What this does"
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+
+            if (optionsShown) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.padding(bottom = 2.dp),
+                ) {
+                    if (def.description.isNotBlank()) {
+                        Text(
+                            text = def.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    def.options.forEach { option ->
+                        ExpandableOption(
+                            name = option.name,
+                            description = option.description,
+                            subtitle = option.subtitle,
+                            trailingLabel = if (option.isChosen) "chosen" else "",
+                        )
+                    }
+                }
+            }
         }
     }
 }

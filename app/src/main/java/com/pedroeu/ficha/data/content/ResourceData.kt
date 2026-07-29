@@ -206,6 +206,9 @@ object ResourceData {
                         max = 1,
                         recharge = Recharge.LONG_REST,
                         source = "Paladin's Smite",
+                        description = "You always have the Divine Smite spell prepared. " +
+                            "You can cast it without expending a spell slot once, and you " +
+                            "regain the ability to do so when you finish a Long Rest.",
                     )
                 )
                 if (level >= 5) add(
@@ -215,6 +218,9 @@ object ResourceData {
                         max = 1,
                         recharge = Recharge.LONG_REST,
                         source = "Faithful Steed",
+                        description = "You always have the Find Steed spell prepared. You " +
+                            "can also cast it without expending a spell slot once, and you " +
+                            "regain the ability to do so when you finish a Long Rest.",
                     )
                 )
             }
@@ -653,6 +659,9 @@ object ResourceData {
                         max = 1,
                         recharge = Recharge.LONG_REST,
                         source = "Fey Wanderer",
+                        description = "You always have the Summon Fey spell prepared. You " +
+                            "can cast it without expending a spell slot once, and you " +
+                            "regain the ability to do so when you finish a Long Rest.",
                     )
                 )
                 if (level >= 15) add(

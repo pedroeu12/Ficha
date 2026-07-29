@@ -38,25 +38,161 @@ object SubclassData {
     )
 
     private val BATTLE_MASTER_MANEUVERS = listOf(
-        ChoiceOption("ambush", "Ambush", "Add the die to a Stealth check or your Initiative roll."),
-        ChoiceOption("bait_and_switch", "Bait and Switch", "Swap places with an ally and grant one of you bonus AC."),
-        ChoiceOption("commanders_strike", "Commander's Strike", "Forgo an attack to let an ally strike using your die."),
-        ChoiceOption("disarming_attack", "Disarming Attack", "Force a Strength save or the target drops an object."),
-        ChoiceOption("distracting_strike", "Distracting Strike", "The next attack against the target has Advantage."),
-        ChoiceOption("evasive_footwork", "Evasive Footwork", "Add the die to your AC while you move."),
-        ChoiceOption("feinting_attack", "Feinting Attack", "Gain Advantage against a creature within 5 feet."),
-        ChoiceOption("goading_attack", "Goading Attack", "Force a Wisdom save or the target has Disadvantage against others."),
-        ChoiceOption("lunging_attack", "Lunging Attack", "Increase your reach by 5 feet for the attack."),
-        ChoiceOption("maneuvering_attack", "Maneuvering Attack", "An ally can move without provoking Opportunity Attacks."),
-        ChoiceOption("menacing_attack", "Menacing Attack", "Force a Wisdom save or the target is Frightened."),
-        ChoiceOption("parry", "Parry", "Reduce melee damage to you by the die plus your Dexterity modifier."),
-        ChoiceOption("precision_attack", "Precision Attack", "Add the die to an attack roll, before or after rolling."),
-        ChoiceOption("pushing_attack", "Pushing Attack", "Force a Strength save or push the target 15 feet."),
-        ChoiceOption("rally", "Rally", "Grant an ally Temporary Hit Points."),
-        ChoiceOption("riposte", "Riposte", "As a Reaction after a miss, attack the attacker."),
-        ChoiceOption("sweeping_attack", "Sweeping Attack", "Deal damage to a second creature next to the target."),
-        ChoiceOption("tactical_assessment", "Tactical Assessment", "Add the die to a History, Insight, or Investigation check."),
-        ChoiceOption("trip_attack", "Trip Attack", "Force a Strength save or knock the target Prone."),
+        ChoiceOption(
+            "ambush", "Ambush",
+            "When you make a Dexterity (Stealth) check or an Initiative roll, you can expend " +
+                "one Superiority Die and add the die to the roll, unless you have the " +
+                "Incapacitated condition.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "bait_and_switch", "Bait and Switch",
+            "When you're within 5 feet of a creature on your turn, you can expend one " +
+                "Superiority Die and switch places with that creature, provided you spend at " +
+                "least 5 feet of movement and the creature is willing and doesn't have the " +
+                "Incapacitated condition. This movement doesn't provoke Opportunity Attacks. " +
+                "Roll the Superiority Die. Until the start of your next turn, you or the other " +
+                "creature (your choice) gains a bonus to AC equal to the number rolled.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "commanders_strike", "Commander's Strike",
+            "When you take the Attack action on your turn, you can replace one of your attacks " +
+                "to direct one of your companions to strike. When you do so, choose an ally " +
+                "within 30 feet of yourself who can see or hear you, and expend one Superiority " +
+                "Die. That ally can immediately use their Reaction to make one attack with a " +
+                "weapon or an Unarmed Strike, adding the Superiority Die to the attack's damage " +
+                "roll on a hit.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "disarming_attack", "Disarming Attack",
+            "When you hit a creature with an attack roll, you can expend one Superiority Die to " +
+                "attempt to knock an object from the target's grasp. Add the Superiority Die " +
+                "roll to the attack's damage roll. The target must succeed on a Strength saving " +
+                "throw or drop an object of your choice that it's holding, with the object " +
+                "landing in its space.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "distracting_strike", "Distracting Strike",
+            "When you hit a creature with an attack roll, you can expend one Superiority Die to " +
+                "distract the target. Add the Superiority Die roll to the attack's damage roll. " +
+                "The next attack roll against the target by an attacker other than you has " +
+                "Advantage if the attack is made before the start of your next turn.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "evasive_footwork", "Evasive Footwork",
+            "As a Bonus Action, you can expend one Superiority Die and take the Disengage " +
+                "action. If you do so, roll the die and add the number rolled to your AC until " +
+                "the start of your next turn.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "feinting_attack", "Feinting Attack",
+            "As a Bonus Action, you can expend one Superiority Die to feint, choosing one " +
+                "creature within 5 feet of yourself as your target. You have Advantage on your " +
+                "next attack roll against that target this turn. If that attack hits, add the " +
+                "Superiority Die to the attack's damage roll.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "goading_attack", "Goading Attack",
+            "When you hit a creature with an attack roll, you can expend one Superiority Die to " +
+                "attempt to goad the target into attacking you. Add the Superiority Die roll to " +
+                "the attack's damage roll. The target must succeed on a Wisdom saving throw or " +
+                "have Disadvantage on attack rolls against targets other than you until the end " +
+                "of your next turn.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "lunging_attack", "Lunging Attack",
+            "When you move at least 5 feet on your turn, you can expend one Superiority Die and " +
+                "make a melee attack with a reach that is 5 feet greater than normal. If you " +
+                "hit, add the Superiority Die to the attack's damage roll.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "maneuvering_attack", "Maneuvering Attack",
+            "When you hit a creature with an attack roll, you can expend one Superiority Die to " +
+                "maneuver one of your comrades into another position. Add the Superiority Die " +
+                "roll to the attack's damage roll, and choose a willing ally who can see or hear " +
+                "you. That ally can use their Reaction to move up to half their Speed without " +
+                "provoking an Opportunity Attack from the target of your attack.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "menacing_attack", "Menacing Attack",
+            "When you hit a creature with an attack roll, you can expend one Superiority Die to " +
+                "attempt to frighten the target. Add the Superiority Die roll to the attack's " +
+                "damage roll. The target must succeed on a Wisdom saving throw or have the " +
+                "Frightened condition until the end of your next turn.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "parry", "Parry",
+            "When another creature damages you with a melee attack roll, you can take a " +
+                "Reaction and expend one Superiority Die to reduce the damage by the number you " +
+                "roll on the die plus your Strength or Dexterity modifier (your choice).",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "precision_attack", "Precision Attack",
+            "When you miss with an attack roll, you can expend one Superiority Die, roll the " +
+                "die, and add it to the attack roll, potentially causing the attack to hit.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "pushing_attack", "Pushing Attack",
+            "When you hit a creature with an attack using a weapon or an Unarmed Strike, you " +
+                "can expend one Superiority Die to attempt to drive the target back. Add the " +
+                "Superiority Die roll to the attack's damage roll. If the target is Large or " +
+                "smaller, it must succeed on a Strength saving throw or be pushed up to 15 feet " +
+                "directly away from you.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "rally", "Rally",
+            "As a Bonus Action, you can expend one Superiority Die to bolster the resolve of an " +
+                "ally. Choose an ally who can see or hear you and who is within 30 feet of you. " +
+                "That creature gains Temporary Hit Points equal to the Superiority Die roll plus " +
+                "your Charisma modifier (minimum of 1 Temporary Hit Point).",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "riposte", "Riposte",
+            "When a creature misses you with a melee attack roll, you can take a Reaction and " +
+                "expend one Superiority Die to make a melee attack roll with a weapon or an " +
+                "Unarmed Strike against the creature. If you hit, add the Superiority Die to the " +
+                "attack's damage roll.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "sweeping_attack", "Sweeping Attack",
+            "When you hit a creature with a melee attack roll using a weapon or an Unarmed " +
+                "Strike, you can expend one Superiority Die to attempt to damage another " +
+                "creature. Choose another creature within 5 feet of the original target and " +
+                "within your reach. If the original attack roll would hit the second creature, " +
+                "it takes damage equal to the number you roll on your Superiority Die. The " +
+                "damage is of the same type dealt by the original attack.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "tactical_assessment", "Tactical Assessment",
+            "When you make an Intelligence (History), Intelligence (Investigation), or Wisdom " +
+                "(Insight) check, you can expend one Superiority Die and add the die to the " +
+                "ability check.",
+            "1 Superiority Die",
+        ),
+        ChoiceOption(
+            "trip_attack", "Trip Attack",
+            "When you hit a creature with an attack roll using a weapon or an Unarmed Strike, " +
+                "you can expend one Superiority Die and add the die to the attack's damage roll. " +
+                "If the target is Large or smaller, it must succeed on a Strength saving throw " +
+                "or have the Prone condition.",
+            "1 Superiority Die",
+        ),
     )
 
     private fun maneuverChoice(id: String, count: Int, level: Int) = Choice(
@@ -67,17 +203,83 @@ object SubclassData {
         kind = ChoiceKind.OPTION,
         options = BATTLE_MASTER_MANEUVERS,
         source = "Level $level",
+        resourceId = "battle_master:superiority",
     )
 
     private val ARCANE_SHOT_OPTIONS = listOf(
-        ChoiceOption("banishing", "Banishing Shot", "Extra Psychic damage and a Charisma save or the target is briefly banished."),
-        ChoiceOption("beguiling", "Beguiling Shot", "Extra Psychic damage and a Wisdom save or the target is Charmed by an ally."),
-        ChoiceOption("bursting", "Bursting Shot", "Force damage to the target and everything in a 10-foot Emanation."),
-        ChoiceOption("enfeebling", "Enfeebling Shot", "Extra Necrotic damage and a Constitution save or the target is Poisoned and weakened."),
-        ChoiceOption("grasping", "Grasping Shot", "Extra Slashing damage and a Strength save or the target is Restrained by brambles."),
-        ChoiceOption("piercing", "Piercing Shot", "The shot becomes a 30-foot Line ignoring cover, with a Dexterity save for half."),
-        ChoiceOption("seeking", "Seeking Shot", "The shot hunts a creature you have seen, ignoring cover, with a Dexterity save."),
-        ChoiceOption("shadow", "Shadow Shot", "Extra Psychic damage and a Wisdom save or the target is Blinded."),
+        ChoiceOption(
+            "banishing", "Banishing Shot",
+            "You weave banishing magic into your shot. The target takes an extra 2d6 Force " +
+                "damage, and it must succeed on a Charisma saving throw or have the Incapacitated " +
+                "condition and be transported to a harmless demiplane until the start of your " +
+                "next turn. At the end of that turn, the target reappears in the space it left " +
+                "or in the nearest unoccupied space if that space is occupied.",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "beguiling", "Beguiling Shot",
+            "Your enchantment magic causes this shot to temporarily beguile its target. The " +
+                "target takes an extra 2d6 Psychic damage, and it must succeed on a Wisdom " +
+                "saving throw or have the Charmed condition until the start of your next turn. " +
+                "While Charmed in this way, the target is Charmed by a creature of your choice " +
+                "that you can see, and the condition ends early if that creature attacks the " +
+                "target or deals damage to it.",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "bursting", "Bursting Shot",
+            "You imbue your shot with force energy drawn from the school of evocation. The " +
+                "target and each creature within 10 feet of it take 2d6 Force damage each.",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "enfeebling", "Enfeebling Shot",
+            "You weave necromantic magic into your shot. The target takes an extra 2d6 Necrotic " +
+                "damage, and it must succeed on a Constitution saving throw or have the Poisoned " +
+                "condition until the start of your next turn. While Poisoned in this way, the " +
+                "damage of the target's attacks is halved (round down).",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "grasping", "Grasping Shot",
+            "When this shot strikes its target, conjuration magic creates grasping, poisonous " +
+                "brambles which wrap around the target. The target takes an extra 2d6 Slashing " +
+                "damage, and it must succeed on a Strength saving throw or have the Restrained " +
+                "condition and its Speed reduced to 0. The target repeats the save at the end of " +
+                "each of its turns, ending the effect on itself on a success; it takes 2d6 " +
+                "Slashing damage each time it fails.",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "piercing", "Piercing Shot",
+            "You use transmutation magic to give your shot an ethereal quality. When you use " +
+                "this option, you don't make an attack roll. Instead, the shot travels in a " +
+                "30-foot-long, 1-foot-wide Line, passing through creatures and objects and " +
+                "ignoring Cover. Each creature in the Line makes a Dexterity saving throw, " +
+                "taking the weapon's damage plus an extra 1d6 Force damage on a failed save, or " +
+                "half as much damage on a successful one.",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "seeking", "Seeking Shot",
+            "Using divination magic, you grant your shot the ability to seek out a target. When " +
+                "you use this option, you don't make an attack roll. Instead, choose one " +
+                "creature you have seen in the past minute. The shot flies toward that creature, " +
+                "moving around corners if necessary and ignoring Cover. If the target is within " +
+                "the weapon's range and there is a path large enough for the shot to travel, the " +
+                "target must make a Dexterity saving throw, taking the weapon's damage plus an " +
+                "extra 2d6 Force damage on a failed save, or half as much damage on a successful " +
+                "one. You then learn the target's current location.",
+            "1 Arcane Shot use",
+        ),
+        ChoiceOption(
+            "shadow", "Shadow Shot",
+            "You weave illusion magic into your shot, causing it to occlude your foe's vision " +
+                "with shadows. The target takes an extra 2d6 Psychic damage, and it must succeed " +
+                "on a Wisdom saving throw or have the Blinded condition until the start of your " +
+                "next turn.",
+            "1 Arcane Shot use",
+        ),
     )
 
     private fun arcaneShotChoice(id: String, count: Int, level: Int) = Choice(
@@ -88,6 +290,7 @@ object SubclassData {
         kind = ChoiceKind.OPTION,
         options = ARCANE_SHOT_OPTIONS,
         source = "Level $level",
+        resourceId = "arcane_archer:arcane_shot",
     )
 
     val ALL: List<Subclass> = listOf(

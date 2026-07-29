@@ -38,6 +38,7 @@ import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.EditableText
+import com.pedroeu.ficha.ui.components.ExpandableOption
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.TextEditDialog
 
@@ -314,23 +315,50 @@ private fun ChoiceLine(
     editMode: Boolean,
     onEdit: () -> Unit,
 ) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        Text(
-            text = "${resolved.choice.label}: ",
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.secondary,
-        )
-        Text(
-            text = resolved.summary.ifBlank { "not chosen yet" },
-            style = MaterialTheme.typography.bodySmall,
-            color = if (resolved.isAnswered) MaterialTheme.colorScheme.onSurface
-            else MaterialTheme.colorScheme.error,
-            modifier = Modifier.weight(1f),
-        )
-        if (editMode || !resolved.isAnswered) {
-            TextButton(onClick = onEdit) {
-                Text(if (resolved.isAnswered) "Change" else "Choose")
+    // The options the player actually picked, paired back to their rulebook entries so the
+    // sheet can show what each one does rather than only its name.
+    val picked = resolved.selectedIds.mapNotNull { id ->
+        resolved.choice.options.find { it.id == id }
+    }
+    val hasRulesText = picked.any { it.description.isNotBlank() }
+
+    Column(
+        Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+            Text(
+                text = if (hasRulesText) resolved.choice.label else "${resolved.choice.label}: ",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = if (hasRulesText) Modifier.weight(1f) else Modifier,
+            )
+            if (!hasRulesText) {
+                Text(
+                    text = resolved.summary.ifBlank { "not chosen yet" },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (resolved.isAnswered) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.error,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            if (editMode || !resolved.isAnswered) {
+                TextButton(onClick = onEdit) {
+                    Text(if (resolved.isAnswered) "Change" else "Choose")
+                }
+            }
+        }
+
+        // Each pick opens to its own full rules text; picks without any (a skill, an ability
+        // score) stay flat, which is why the compact one-line form is kept for those choices.
+        if (hasRulesText) {
+            picked.forEach { option ->
+                ExpandableOption(
+                    name = option.name,
+                    description = option.description,
+                    subtitle = option.supporting,
+                )
             }
         }
     }

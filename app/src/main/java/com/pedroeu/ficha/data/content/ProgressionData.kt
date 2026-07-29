@@ -34,16 +34,16 @@ object ProgressionData {
     )
 
     private val METAMAGIC_OPTIONS = listOf(
-        ChoiceOption("careful", "Careful Spell", "Protect chosen creatures from your area spells."),
-        ChoiceOption("distant", "Distant Spell", "Double a spell's range, or make a touch spell reach 30 feet."),
-        ChoiceOption("empowered", "Empowered Spell", "Reroll a number of damage dice up to your Charisma modifier."),
-        ChoiceOption("extended", "Extended Spell", "Double a spell's duration, to a maximum of 24 hours."),
-        ChoiceOption("heightened", "Heightened Spell", "One target has Disadvantage on its save against the spell."),
-        ChoiceOption("quickened", "Quickened Spell", "Cast a 1-action spell as a Bonus Action."),
-        ChoiceOption("seeking", "Seeking Spell", "Reroll a missed spell attack roll."),
-        ChoiceOption("subtle", "Subtle Spell", "Cast without Verbal, Somatic, or Material components."),
-        ChoiceOption("transmuted", "Transmuted Spell", "Change a spell's damage type."),
-        ChoiceOption("twinned", "Twinned Spell", "Target a second creature with a single-target spell."),
+        ChoiceOption("careful", "Careful Spell", "When you cast a spell that forces other creatures to make a saving throw, you can protect some of them. You spend 1 Sorcery Point and choose a number of those creatures up to your Charisma modifier (minimum of one). A chosen creature automatically succeeds on its saving throw against the spell, and it takes no damage if it would normally take half damage on a successful save.", "1 Sorcery Point"),
+        ChoiceOption("distant", "Distant Spell", "When you cast a spell that has a range of 5 feet or greater, you can spend 1 Sorcery Point to double the spell's range. Or when you cast a spell that has a range of Touch, you can spend 1 Sorcery Point to make its range 30 feet.", "1 Sorcery Point"),
+        ChoiceOption("empowered", "Empowered Spell", "When you roll damage for a spell, you can spend 1 Sorcery Point to reroll a number of the damage dice up to your Charisma modifier (minimum of one), and you must use the new rolls. You can use this Metamagic even if you have already used another one during the casting of the spell.", "1 Sorcery Point"),
+        ChoiceOption("extended", "Extended Spell", "When you cast a spell that has a duration of 1 minute or longer, you can spend 1 Sorcery Point to double its duration, to a maximum duration of 24 hours. If the spell requires Concentration, you have Advantage on any saving throw you make to maintain that Concentration.", "1 Sorcery Point"),
+        ChoiceOption("heightened", "Heightened Spell", "When you cast a spell that forces a creature to make a saving throw, you can spend 2 Sorcery Points to give one target of the spell Disadvantage on saves against the spell.", "2 Sorcery Points"),
+        ChoiceOption("quickened", "Quickened Spell", "When you cast a spell that has a casting time of an action, you can spend 2 Sorcery Points to change the casting time to a Bonus Action for this casting. You can't modify a spell in this way if you have already cast a level 1+ spell on the current turn, nor can you cast a level 1+ spell on this turn after modifying a spell in this way.", "2 Sorcery Points"),
+        ChoiceOption("seeking", "Seeking Spell", "If you make an attack roll for a spell and miss, you can spend 1 Sorcery Point to reroll the d20, and you must use the new roll. You can use this Metamagic even if you have already used another one during the casting of the spell.", "1 Sorcery Point"),
+        ChoiceOption("subtle", "Subtle Spell", "When you cast a spell, you can spend 1 Sorcery Point to cast it without any Verbal, Somatic, or Material components, except Material components that are consumed by the spell or that have a cost specified in the spell.", "1 Sorcery Point"),
+        ChoiceOption("transmuted", "Transmuted Spell", "When you cast a spell that deals a type of damage from the following list, you can spend 1 Sorcery Point to change that damage type to one of the other listed types: Acid, Cold, Fire, Lightning, Poison, Thunder.", "1 Sorcery Point"),
+        ChoiceOption("twinned", "Twinned Spell", "When you cast a spell such as Charm Person that can be cast with a higher-level spell slot to target an additional creature, you can spend a number of Sorcery Points equal to the spell's level to increase its effective level by 1. If the spell is a cantrip, it costs 1 Sorcery Point.", "Spell level in points"),
     )
 
     private fun metamagicChoice(id: String, count: Int, level: Int) = Choice(
@@ -54,19 +54,20 @@ object ProgressionData {
         kind = ChoiceKind.OPTION,
         options = METAMAGIC_OPTIONS,
         source = "Level $level",
+        resourceId = "sorcerer:sorcery_points",
     )
 
     private val FIGHTING_STYLE_OPTIONS = listOf(
-        ChoiceOption("archery", "Archery", "+2 to attack rolls with ranged weapons."),
-        ChoiceOption("blind_fighting", "Blind Fighting", "Blindsight with a range of 10 feet."),
-        ChoiceOption("defense", "Defense", "+1 AC while wearing armor."),
-        ChoiceOption("dueling", "Dueling", "+2 damage when wielding a melee weapon in one hand and no other weapon."),
-        ChoiceOption("great_weapon", "Great Weapon Fighting", "Treat a 1 or 2 on a two-handed weapon's damage die as a 3."),
-        ChoiceOption("interception", "Interception", "Reduce damage to a nearby creature as a Reaction."),
-        ChoiceOption("protection", "Protection", "Impose Disadvantage on an attack against a creature next to you."),
-        ChoiceOption("thrown_weapon", "Thrown Weapon Fighting", "+2 damage with thrown weapons, and draw them as part of the attack."),
-        ChoiceOption("two_weapon", "Two-Weapon Fighting", "Add your ability modifier to the off-hand attack's damage."),
-        ChoiceOption("unarmed", "Unarmed Fighting", "Your Unarmed Strike deals 1d6 damage, or 1d8 with no weapon or shield."),
+        ChoiceOption("archery", "Archery", "You gain a +2 bonus to attack rolls you make with Ranged weapons."),
+        ChoiceOption("blind_fighting", "Blind Fighting", "You have Blindsight with a range of 10 feet. Within that range, you can see anything that isn't behind Total Cover even if you have the Blinded condition or are in Darkness. Moreover, in that range you can see a creature that has the Invisible condition."),
+        ChoiceOption("defense", "Defense", "While you're wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class."),
+        ChoiceOption("dueling", "Dueling", "When you're wielding a Melee weapon in one hand and no other weapons, you gain a +2 bonus to damage rolls with that weapon."),
+        ChoiceOption("great_weapon", "Great Weapon Fighting", "When you hit with a weapon that has the Two-Handed property, you can treat any roll of 1 or 2 on a damage die as a 3. The weapon must be a Melee weapon to gain this benefit."),
+        ChoiceOption("interception", "Interception", "When a creature you can see hits a target, other than you, within 5 feet of you with an attack, you can take a Reaction to reduce the damage the target takes by 1d10 plus your Proficiency Bonus. You must be wielding a Shield or a Simple or Martial weapon to use this Reaction."),
+        ChoiceOption("protection", "Protection", "When a creature you can see attacks a target other than you that is within 5 feet of you, you can take a Reaction to interpose your Shield if you're holding one. You impose Disadvantage on the triggering attack roll."),
+        ChoiceOption("thrown_weapon", "Thrown Weapon Fighting", "When you hit with a Ranged attack using a weapon that has the Thrown property, you gain a +2 bonus to the damage roll."),
+        ChoiceOption("two_weapon", "Two-Weapon Fighting", "When you make an extra attack as a result of the Light property, you can add your ability modifier to the damage of that extra attack."),
+        ChoiceOption("unarmed", "Unarmed Fighting", "Your Unarmed Strikes can deal Bludgeoning damage equal to 1d6 plus your Strength modifier on a hit. If you're not wielding any weapons or a Shield when you make the attack roll, the d6 becomes a d8. At the start of each of your turns, you can deal 1d4 Bludgeoning damage to one creature you're Grappling."),
     )
 
     private fun fightingStyleChoice(level: Int, id: String = "fighting_style") = Choice(
@@ -387,14 +388,14 @@ object ProgressionData {
                 feature(1, "Pact Magic", "You cast Warlock spells using Charisma. Your slots are always at the highest level you can cast and return on a Short Rest."),
                 feature(1, "Eldritch Invocations", "Choose Eldritch Invocations that grant passive and active magical powers.",
                     Choice("invocations_1", "Eldritch Invocations", "Choose 1 Eldritch Invocation.", 1, ChoiceKind.OPTION, listOf(
-                        ChoiceOption("agonizing_blast", "Agonizing Blast", "Add your Charisma modifier to one cantrip's damage."),
-                        ChoiceOption("armor_of_shadows", "Armor of Shadows", "Cast Mage Armor on yourself at will."),
-                        ChoiceOption("devils_sight", "Devil's Sight", "You see normally in magical and nonmagical darkness to 120 feet."),
-                        ChoiceOption("eldritch_mind", "Eldritch Mind", "Advantage on Constitution saves to maintain Concentration."),
-                        ChoiceOption("mask_of_many_faces", "Mask of Many Faces", "Cast Disguise Self at will."),
-                        ChoiceOption("pact_blade", "Pact of the Blade", "Conjure a magical weapon that uses Charisma for its attacks."),
-                        ChoiceOption("pact_chain", "Pact of the Chain", "Cast Find Familiar and gain more exotic familiar forms."),
-                        ChoiceOption("pact_tome", "Pact of the Tome", "Gain a Book of Shadows granting extra cantrips and rituals."),
+                        ChoiceOption("agonizing_blast", "Agonizing Blast", "Choose one of your known Warlock cantrips that deals damage. You add your Charisma modifier to that spell's damage against any target it hits. Prerequisite: a Warlock cantrip that deals damage."),
+                        ChoiceOption("armor_of_shadows", "Armor of Shadows", "You can cast Mage Armor on yourself without expending a spell slot or material components."),
+                        ChoiceOption("devils_sight", "Devil's Sight", "You can see normally in Dim Light and Darkness, both magical and nonmagical, within 120 feet of yourself."),
+                        ChoiceOption("eldritch_mind", "Eldritch Mind", "You have Advantage on Constitution saving throws that you make to maintain Concentration."),
+                        ChoiceOption("mask_of_many_faces", "Mask of Many Faces", "You can cast Disguise Self without expending a spell slot."),
+                        ChoiceOption("pact_blade", "Pact of the Blade", "As a Bonus Action, you can conjure a pact weapon in your hand — a Simple or Martial Melee weapon of your choice with which you bond. You have proficiency with it while you wield it, and it counts as Magical. You can use your Charisma modifier instead of Strength or Dexterity for its attack and damage rolls."),
+                        ChoiceOption("pact_chain", "Pact of the Chain", "You learn Find Familiar and can cast it as a Magic action without expending a spell slot. Your familiar can take the form of an Imp, Pseudodragon, Quasit, Skeleton, Slaad Tadpole, Sphinx of Wonder, Sprite, or Venomous Snake, and when you take the Attack action you can forgo one attack to let your familiar make one attack of its own."),
+                        ChoiceOption("pact_tome", "Pact of the Tome", "Choose three cantrips and one level 1 spell with the Ritual tag from any class's spell list. They are written in a Book of Shadows, and you can cast the spells in it as Rituals. The book is your Spellcasting Focus, and if it is lost you can perform a 1-hour ceremony to replace it."),
                     ), "Level 1")),
                 feature(2, "Magical Cunning", "Once per Long Rest, spend 1 minute to regain expended Pact Magic spell slots."),
                 feature(9, "Contact Patron", "You always have Contact Other Plane prepared and can cast it once per Long Rest to reach your patron."),

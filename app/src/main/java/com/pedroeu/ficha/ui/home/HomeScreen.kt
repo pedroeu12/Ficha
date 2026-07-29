@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pedroeu.ficha.BuildConfig
 import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
@@ -62,7 +63,17 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ficha", style = MaterialTheme.typography.headlineMedium) },
+                title = {
+                    Column {
+                        Text("Ficha", style = MaterialTheme.typography.headlineMedium)
+                        // A visible build stamp: if this doesn't match what you just installed,
+                        // the device is still running an older APK.
+                        Text(
+                            text = "v${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})",
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,

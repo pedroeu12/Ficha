@@ -10,6 +10,12 @@ enum class CasterType {
     /** Paladin, Ranger: slots from level 2, progressing at half speed. */
     HALF,
 
+    /**
+     * Artificer: the half-caster table, except slots arrive at level 1 rather than level 2.
+     * It is the only class in the game with this progression, which is why it can't reuse HALF.
+     */
+    ARTIFICER,
+
     /** Warlock: few slots, always at the highest level available, refreshed on a short rest. */
     PACT,
 }
@@ -103,6 +109,9 @@ object SpellSlotTables {
         listOf(4, 3, 3, 3, 2),
     )
 
+    /** Artificer: identical to [HALF] from level 2 on, but level 1 already grants two slots. */
+    val ARTIFICER: List<List<Int>> = listOf(listOf(2)) + HALF.drop(1)
+
     /** Warlock Pact Magic: slot count paired with the single level those slots are cast at. */
     val PACT: List<Pair<Int, Int>> = listOf(
         1 to 1, 2 to 1, 2 to 2, 2 to 2, 2 to 3,
@@ -118,6 +127,8 @@ object SpellSlotTables {
             CasterType.NONE -> emptyMap()
             CasterType.FULL -> FULL[index].mapIndexed { i, count -> (i + 1) to count }.toMap()
             CasterType.HALF -> HALF[index].mapIndexed { i, count -> (i + 1) to count }.toMap()
+            CasterType.ARTIFICER ->
+                ARTIFICER[index].mapIndexed { i, count -> (i + 1) to count }.toMap()
             CasterType.PACT -> {
                 val (count, slotLevel) = PACT[index]
                 mapOf(slotLevel to count)

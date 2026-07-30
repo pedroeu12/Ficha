@@ -33,6 +33,27 @@ object ProgressionData {
         2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15,
     )
 
+    /**
+     * Arcane plans for the Artificer's Replicate Magic Item feature. The options come straight
+     * from [MagicItemData], so a plan and the item a DM hands out are always the same entry.
+     */
+    private fun replicateChoice(id: String, count: Int, level: Int) = Choice(
+        id = id,
+        label = "Magic Item Plans",
+        prompt = "Choose $count plan${if (count == 1) "" else "s"} to learn.",
+        count = count,
+        kind = ChoiceKind.OPTION,
+        options = MagicItemData.artificerPlans(level).map { magicItem ->
+            ChoiceOption(
+                id = magicItem.id,
+                name = magicItem.name,
+                description = magicItem.description,
+                supporting = magicItem.subtitle,
+            )
+        },
+        source = "Level $level",
+    )
+
     private val METAMAGIC_OPTIONS = listOf(
         ChoiceOption("careful", "Careful Spell", "When you cast a spell that forces other creatures to make a saving throw, you can protect some of them. You spend 1 Sorcery Point and choose a number of those creatures up to your Charisma modifier (minimum of one). A chosen creature automatically succeeds on its saving throw against the spell, and it takes no damage if it would normally take half damage on a successful save.", "1 Sorcery Point"),
         ChoiceOption("distant", "Distant Spell", "When you cast a spell that has a range of 5 feet or greater, you can spend 1 Sorcery Point to double the spell's range. Or when you cast a spell that has a range of Touch, you can spend 1 Sorcery Point to make its range 30 feet.", "1 Sorcery Point"),
@@ -429,6 +450,33 @@ object ProgressionData {
             ),
             cantripsKnown = mapOf(1 to 3, 4 to 4, 10 to 5),
             preparedSpells = FULL_CASTER_PREPARED,
+        ),
+        ClassProgression(
+            classId = "artificer",
+            casterType = CasterType.ARTIFICER,
+            subclassLevel = 3,
+            subclassLabel = "Artificer Subclass",
+            asiLevels = STANDARD_ASI,
+            features = listOf(
+                feature(1, "Spellcasting", "You cast Artificer spells through Thieves' Tools, Tinker's Tools, or Artisan's Tools used as a Spellcasting Focus. Intelligence is your spellcasting ability, and you can change your prepared spells whenever you finish a Long Rest."),
+                feature(1, "Tinker's Magic", "You know the Mending cantrip, and as a Magic action while holding Tinker's Tools you can conjure a mundane item within 5 feet of yourself that lasts until your next Long Rest."),
+                feature(2, "Replicate Magic Item", "You learn arcane plans and can create magic items from them when you finish a Long Rest, so long as you have Tinker's Tools in hand. An item created this way vanishes 1d4 days after you die, and any Wand or Weapon you create can serve as a Spellcasting Focus.",
+                    replicateChoice("replicate_plans_2", 4, 2)),
+                feature(6, "Magic Item Tinker", "Your Replicate Magic Item feature gains two options: Charge Magic Item, which spends a level 1+ spell slot as a Bonus Action to recharge an item you made, and Drain Magic Item, which destroys one of your items to recover a spell slot once per Long Rest.",
+                    replicateChoice("replicate_plans_6", 1, 6)),
+                feature(7, "Flash of Genius", "When you or a creature you can see within 30 feet of you fails an ability check or a saving throw, you can take a Reaction to add your Intelligence modifier (minimum of +1) to the roll, potentially causing it to succeed. You can do this a number of times equal to your Intelligence modifier (minimum of once) per Long Rest."),
+                feature(10, "Magic Item Adept", "You can now attune to up to four magic items at once.",
+                    replicateChoice("replicate_plans_10", 1, 10)),
+                feature(11, "Spell-Storing Item", "Whenever you finish a Long Rest, you can store a level 1, 2, or 3 Artificer spell with a casting time of an action in a weapon or Spellcasting Focus you touch. Any creature holding the object can take a Magic action to produce the spell's effect, using your spellcasting ability modifier. The spell lasts until used twice your Intelligence modifier times (minimum of twice) or until you store another."),
+                feature(14, "Advanced Artifice", "Magic Item Savant lets you attune to up to five magic items at once, and Refreshed Genius returns one expended use of Flash of Genius whenever you finish a Short Rest.",
+                    replicateChoice("replicate_plans_14", 1, 14)),
+                feature(18, "Magic Item Master", "You can now attune to up to six magic items at once.",
+                    replicateChoice("replicate_plans_18", 1, 18)),
+                feature(20, "Soul of Artifice", "Cheat Death lets you disintegrate any number of Uncommon or Rare items you created when reduced to 0 Hit Points but not killed outright, setting your Hit Points to 20 times the number destroyed. Magical Guidance returns all expended uses of Flash of Genius on a Short Rest, provided you are attuned to at least one magic item."),
+            ),
+            cantripsKnown = mapOf(1 to 2, 10 to 3, 14 to 4),
+            // The Artificer's prepared-spell curve is the same as the other half casters'.
+            preparedSpells = HALF_CASTER_PREPARED,
         ),
     )
 

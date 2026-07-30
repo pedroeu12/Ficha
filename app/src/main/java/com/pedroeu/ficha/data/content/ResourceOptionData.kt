@@ -329,7 +329,95 @@ object ResourceOptionData {
     // ------------------------------------------------------------------ Lookup
 
     /** Options granted automatically, keyed by the resource id they are spent from. */
+    /** The Alchemist rolls on this table for each elixir, or picks from it by spending a slot. */
+    private val EXPERIMENTAL_ELIXIR = listOf(
+        option(
+            "elixir_healing", "Healing", "1 elixir", "Bonus Action to drink",
+            "The drinker regains a number of Hit Points equal to 2d8 plus your Intelligence " +
+                "modifier. The healing increases by 1d8 at Artificer level 9 (3d8) and again " +
+                "at level 15 (4d8).",
+        ),
+        option(
+            "elixir_swiftness", "Swiftness", "1 elixir", "Bonus Action to drink",
+            "The drinker's Speed increases by 10 feet for 1 hour. The bonus increases at " +
+                "Artificer level 9 (15 feet) and again at level 15 (20 feet).",
+        ),
+        option(
+            "elixir_resilience", "Resilience", "1 elixir", "Bonus Action to drink",
+            "The drinker gains a +1 bonus to Armor Class for 10 minutes. The duration " +
+                "increases at Artificer level 9 (1 hour) and again at level 15 (8 hours).",
+        ),
+        option(
+            "elixir_boldness", "Boldness", "1 elixir", "Bonus Action to drink",
+            "The drinker can roll 1d4 and add the number rolled to every attack roll and " +
+                "saving throw it makes for the next minute. The duration increases at " +
+                "Artificer level 9 (10 minutes) and again at level 15 (1 hour).",
+        ),
+        option(
+            "elixir_flight", "Flight", "1 elixir", "Bonus Action to drink",
+            "The drinker gains a Fly Speed of 10 feet for 10 minutes. The Fly Speed increases " +
+                "at Artificer level 9 (20 feet) and again at level 15 (30 feet).",
+        ),
+        option(
+            "elixir_transformation", "Transformation", "1 elixir", "Bonus Action to drink",
+            "Rolled as a 6 on the Experimental Elixir table, this result lets you determine " +
+                "the elixir's effect by choosing any one of the other rows instead.",
+        ),
+    )
+
+    /** The Artillerist's cannon does one of three things each time it is activated. */
+    private val ELDRITCH_CANNON = listOf(
+        option(
+            "cannon_flamethrower", "Flamethrower", "1 activation", "Bonus Action",
+            "The cannon blasts fire in a 15-foot Cone. Each creature in that area makes a " +
+                "Dexterity saving throw against your spell save DC, taking 2d8 Fire damage on " +
+                "a failed save or half as much on a successful one. Flammable objects in the " +
+                "Cone that aren't being worn or carried start burning. The damage increases by " +
+                "1d8 at Artificer level 9.",
+        ),
+        option(
+            "cannon_force_ballista", "Force Ballista", "1 activation", "Bonus Action",
+            "Make a ranged spell attack originating from the cannon at one creature or object " +
+                "within 120 feet of it. On a hit the target takes 2d8 Force damage, and a " +
+                "creature is pushed up to 5 feet away from the cannon. The damage increases by " +
+                "1d8 at Artificer level 9.",
+        ),
+        option(
+            "cannon_protector", "Protector", "1 activation", "Bonus Action",
+            "The cannon emits a burst of positive energy, granting itself and each creature of " +
+                "your choice within 10 feet of it Temporary Hit Points equal to 1d8 plus your " +
+                "Intelligence modifier (minimum of +1). The Temporary Hit Points increase by " +
+                "1d8 at Artificer level 9.",
+        ),
+        option(
+            "cannon_detonate", "Detonate", "The cannon itself", "Reaction",
+            "When your cannon takes damage and you are within 60 feet of it, you can command " +
+                "it to detonate. Doing so destroys the cannon and forces each creature within " +
+                "20 feet of it to make a Dexterity saving throw against your spell save DC, " +
+                "taking 3d10 Force damage on a failed save or half as much on a success.",
+            unlockLevel = 9,
+        ),
+    )
+
+    /** The Battle Smith chooses one of these each time they channel Arcane Jolt. */
+    private val ARCANE_JOLT = listOf(
+        option(
+            "jolt_destructive", "Destructive Energy", "1 use", "No action",
+            "The target takes an extra 2d6 Force damage. This increases to 4d6 at Artificer " +
+                "level 15.",
+        ),
+        option(
+            "jolt_restorative", "Restorative Energy", "1 use", "No action",
+            "Choose one creature or object you can see within 30 feet of the target. Healing " +
+                "energy flows into the chosen recipient, restoring 2d6 Hit Points to it. This " +
+                "increases to 4d6 at Artificer level 15.",
+        ),
+    )
+
     private val BY_RESOURCE: Map<String, List<ResourceOption>> = mapOf(
+        "alchemist:experimental_elixir" to EXPERIMENTAL_ELIXIR,
+        "artillerist:eldritch_cannon" to ELDRITCH_CANNON,
+        "battle_smith:arcane_jolt" to ARCANE_JOLT,
         "monk:focus" to MONK_FOCUS,
         "sorcerer:sorcery_points" to FONT_OF_MAGIC,
         "cleric:channel_divinity" to CLERIC_CHANNEL_DIVINITY,

@@ -3,7 +3,7 @@ package com.pedroeu.ficha.data.content
 import com.pedroeu.ficha.data.model.ArmorCategory
 import com.pedroeu.ficha.data.model.InventoryItem
 
-enum class CatalogItemType { WEAPON, ARMOR, GEAR }
+enum class CatalogItemType { WEAPON, ARMOR, GEAR, MAGIC }
 
 /**
  * A single browsable entry backing both the item detail view and the "add from rulebook"
@@ -121,6 +121,39 @@ object ItemCatalog {
                     weightLb = gear.weightLb,
                     description = gear.description,
                     stats = emptyList(),
+                )
+            )
+        }
+
+        // Magic items sit in the same picker as everything else, so a DM handing one out is
+        // just another thing the player searches for and adds.
+        MagicItemData.ALL.forEach { magicItem ->
+            add(
+                CatalogItem(
+                    id = "magic:${magicItem.id}",
+                    name = magicItem.name,
+                    type = CatalogItemType.MAGIC,
+                    category = "Magic — ${magicItem.rarity.label}",
+                    // Magic items have no list price; they're found or granted, not bought.
+                    costGp = 0.0,
+                    weightLb = magicItem.weightLb,
+                    description = magicItem.description,
+                    stats = buildList {
+                        add("Type" to magicItem.kind)
+                        add("Rarity" to magicItem.rarity.label)
+                        add(
+                            "Attunement" to if (magicItem.requiresAttunement) {
+                                listOf("Required", magicItem.attunementNote)
+                                    .filter { it.isNotBlank() }
+                                    .joinToString(" ")
+                            } else {
+                                "Not required"
+                            }
+                        )
+                        magicItem.artificerPlanLevel?.let {
+                            add("Artificer Plan" to "Level $it+")
+                        }
+                    },
                 )
             )
         }

@@ -355,6 +355,73 @@ object ClassData {
             spellcastingAbility = Ability.INT,
             summary = "A scholarly spellcaster who masters magic through study, logic, and a well-kept spellbook.",
         ),
+        CharClass(
+            id = "artificer",
+            name = "Artificer",
+            hitDie = 8,
+            primaryAbility = listOf(Ability.INT),
+            savingThrows = listOf(Ability.CON, Ability.INT),
+            armorProficiencies = listOf("Light", "Medium", "Shields"),
+            weaponProficiencies = listOf("Simple"),
+            toolProficiencies = listOf(
+                "Thieves' Tools",
+                "Tinker's Tools",
+                "One type of Artisan's Tools of your choice",
+            ),
+            level1Features = listOf(
+                Trait(
+                    "Spellcasting",
+                    "You channel magic through tools. You can use Thieves' Tools, Tinker's Tools, " +
+                        "or another kind of Artisan's Tools with which you have proficiency as a " +
+                        "Spellcasting Focus, and you must have one of those focuses in hand when you " +
+                        "cast an Artificer spell. Intelligence is your spellcasting ability. You know " +
+                        "two Artificer cantrips and prepare two level 1 Artificer spells to start; " +
+                        "you can change your prepared spells and swap one cantrip whenever you finish " +
+                        "a Long Rest.",
+                ),
+                Trait(
+                    "Tinker's Magic",
+                    "You know the Mending cantrip. As a Magic action while holding Tinker's Tools, " +
+                        "you can create one mundane item — such as a bedroll, a crowbar, a lamp, a net, " +
+                        "or a torch — in an unoccupied space within 5 feet of yourself. The item lasts " +
+                        "until you finish a Long Rest, at which point it vanishes. You can do this a " +
+                        "number of times equal to your Intelligence modifier (minimum of once), and " +
+                        "you regain all expended uses when you finish a Long Rest.",
+                ),
+            ),
+            choices = listOf(
+                skillChoice(2, listOf(
+                    Skill.ARCANA, Skill.HISTORY, Skill.INVESTIGATION,
+                    Skill.MEDICINE, Skill.NATURE, Skill.PERCEPTION, Skill.SLEIGHT_OF_HAND,
+                )),
+                cantrips("cantrips", "Cantrips Known", 2, listOf(
+                    SpellStub("art_acid_splash", "Acid Splash", 0, "Evocation", "Hurl a bubble of acid that splashes one or two creatures you can see."),
+                    SpellStub("art_prestidigitation", "Prestidigitation", 0, "Transmutation", "A minor magical trick: clean, chill, warm, flavor, or light a small object."),
+                    SpellStub("art_dancing_lights", "Dancing Lights", 0, "Illusion", "Create up to four torch-sized lights that you can move around the battlefield."),
+                    SpellStub("art_fire_bolt", "Fire Bolt", 0, "Evocation", "Hurl a mote of fire at a creature or object within range."),
+                    SpellStub("art_guidance", "Guidance", 0, "Divination", "Touch a willing creature; it adds 1d4 to one ability check of its choice."),
+                    SpellStub("art_light", "Light", 0, "Evocation", "An object you touch sheds Bright Light in a 20-foot radius."),
+                    SpellStub("art_ray_of_frost", "Ray of Frost", 0, "Evocation", "A ray of cold deals damage and reduces the target's speed."),
+                    SpellStub("art_spare_the_dying", "Spare the Dying", 0, "Necromancy", "Stabilize a creature that has 0 Hit Points, without needing a Medicine check."),
+                    SpellStub("art_thorn_whip", "Thorn Whip", 0, "Transmutation", "A vine-like whip lashes out, dealing damage and pulling the target toward you."),
+                )),
+                cantrips("spells1", "Prepared Spells (Level 1)", 2, listOf(
+                    SpellStub("art_cure_wounds", "Cure Wounds", 1, "Abjuration", "A touch restores hit points to a creature."),
+                    SpellStub("art_grease", "Grease", 1, "Conjuration", "Slick grease covers the ground, knocking creatures Prone."),
+                    SpellStub("art_faerie_fire", "Faerie Fire", 1, "Evocation", "Outline creatures in colorful light, making them easier to hit."),
+                    SpellStub("art_absorb_elements", "Absorb Elements", 1, "Abjuration", "As a Reaction, gain Resistance to the triggering damage type and add damage to your next hit."),
+                    SpellStub("art_detect_magic", "Detect Magic", 1, "Divination", "Sense the presence of magic within 30 feet."),
+                    SpellStub("art_identify", "Identify", 1, "Divination", "Learn the properties of a magic item or effect."),
+                    SpellStub("art_jump", "Jump", 1, "Transmutation", "A creature you touch has its Jump distance tripled."),
+                    SpellStub("art_longstrider", "Longstrider", 1, "Transmutation", "A creature you touch gains 10 feet of Speed for an hour."),
+                    SpellStub("art_purify_food", "Purify Food and Drink", 1, "Transmutation", "Remove poison and rot from food and drink in a 5-foot Sphere."),
+                    SpellStub("art_tashas_caustic", "Tasha's Caustic Brew", 1, "Evocation", "A line of acid clings to creatures, dealing damage each turn."),
+                )),
+            ),
+            isSpellcaster = true,
+            spellcastingAbility = Ability.INT,
+            summary = "An inventor who unlocks magic in objects, replicating wondrous items and turning tools into a spellcasting focus.",
+        ),
     )
 
     fun byId(id: String): CharClass? = ALL.find { it.id == id }

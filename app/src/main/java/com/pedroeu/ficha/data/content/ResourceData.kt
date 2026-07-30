@@ -325,6 +325,70 @@ object ResourceData {
                 )
             }
 
+            "artificer" -> buildList {
+                add(
+                    ResourceDef(
+                        id = "artificer:tinkers_magic",
+                        name = "Tinker's Magic",
+                        max = c.modAtLeastOne(Ability.INT),
+                        recharge = Recharge.LONG_REST,
+                        source = "Artificer",
+                    )
+                )
+                if (level >= 2) add(
+                    ResourceDef(
+                        id = "artificer:magic_items",
+                        name = "Replicated Magic Items",
+                        description = "When you finish a Long Rest with Tinker's Tools in " +
+                            "hand, you can create magic items from the plans you know. You " +
+                            "can attune to an item the instant you create it. An item made " +
+                            "this way works like the real thing, except its magic isn't " +
+                            "permanent: it vanishes 1d4 days after you die, or immediately if " +
+                            "you replace the plan it was built from. If you exceed your " +
+                            "maximum, the oldest item vanishes as the new one appears.",
+                        max = when {
+                            level >= 18 -> 6
+                            level >= 14 -> 5
+                            level >= 10 -> 4
+                            level >= 6 -> 3
+                            else -> 2
+                        },
+                        recharge = Recharge.SPECIAL,
+                        source = "Artificer",
+                        notes = "How many items from Replicate Magic Item you currently have. " +
+                            "Creating a new one past your maximum makes the oldest vanish.",
+                    )
+                )
+                if (level >= 6) add(
+                    ResourceDef(
+                        id = "artificer:drain_magic_item",
+                        name = "Drain Magic Item",
+                        description = "As a Bonus Action you can touch a magic item within 5 " +
+                            "feet that you created with Replicate Magic Item and cause it to " +
+                            "vanish, converting its magical energy into a spell slot. The slot " +
+                            "is level 1 if the item is Common, or level 2 if it is Uncommon or " +
+                            "Rare. Any slot created this way vanishes when you finish a Long Rest.",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Magic Item Tinker",
+                    )
+                )
+                if (level >= 7) add(
+                    ResourceDef(
+                        id = "artificer:flash_of_genius",
+                        name = "Flash of Genius",
+                        max = c.modAtLeastOne(Ability.INT),
+                        recharge = Recharge.LONG_REST,
+                        source = "Artificer",
+                        notes = when {
+                            level >= 20 -> "You regain all uses on a Short Rest while attuned to at least one magic item."
+                            level >= 14 -> "You regain one expended use whenever you finish a Short Rest."
+                            else -> ""
+                        },
+                    )
+                )
+            }
+
             else -> emptyList()
         }
     }
@@ -837,6 +901,258 @@ object ResourceData {
 
             "beast_master" -> emptyList()
 
+            // ------------------------------------------- Artificer subclasses
+
+            "alchemist" -> buildList {
+                add(
+                    ResourceDef(
+                        id = "alchemist:experimental_elixir",
+                        name = "Experimental Elixirs",
+                        max = when {
+                            level >= 15 -> 5
+                            level >= 9 -> 4
+                            level >= 5 -> 3
+                            else -> 2
+                        },
+                        recharge = Recharge.LONG_REST,
+                        source = "Alchemist",
+                        notes = "You can also spend a spell slot to brew another, choosing its effect.",
+                    )
+                )
+                if (level >= 9) add(
+                    ResourceDef(
+                        id = "alchemist:restorative_reagents",
+                        name = "Restorative Reagents",
+                        max = c.modAtLeastOne(Ability.INT),
+                        recharge = Recharge.LONG_REST,
+                        source = "Alchemist",
+                        notes = "Free castings of Lesser Restoration through Alchemist's Supplies.",
+                    )
+                )
+                if (level >= 15) add(
+                    ResourceDef(
+                        id = "alchemist:conjured_cauldron",
+                        name = "Conjured Cauldron",
+                        description = "You can cast Tasha's Bubbling Cauldron without " +
+                            "expending a spell slot, without preparing the spell, and without " +
+                            "Material components, provided you use Alchemist's Supplies as the " +
+                            "Spellcasting Focus.",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Chemical Mastery",
+                        notes = "A free casting of Tasha's Bubbling Cauldron.",
+                    )
+                )
+            }
+
+            "armorer" -> buildList {
+                add(
+                    ResourceDef(
+                        id = "armorer:giant_stature",
+                        name = "Giant Stature",
+                        description = "As a Bonus Action you transform and enlarge your " +
+                            "Dreadnaught armor for 1 minute. Your reach increases by 5 feet, " +
+                            "and if you are smaller than Large you become Large along with " +
+                            "anything you are wearing. At Artificer level 15 your reach " +
+                            "increases by 10 feet instead, you can become Large or Huge, and " +
+                            "you have Advantage on Strength checks and Strength saving throws " +
+                            "for the duration.",
+                        max = c.modAtLeastOne(Ability.INT),
+                        recharge = Recharge.LONG_REST,
+                        source = "Dreadnaught Armor",
+                        notes = "Only applies while your Arcane Armor uses the Dreadnaught model.",
+                    )
+                )
+                if (level >= 15) add(
+                    ResourceDef(
+                        id = "armorer:perfected_armor",
+                        name = "Perfected Armor",
+                        max = c.modAtLeastOne(Ability.INT),
+                        recharge = Recharge.LONG_REST,
+                        source = "Perfected Armor",
+                        notes = "The Guardian's pulling Reaction and the Infiltrator's Bonus " +
+                            "Action flight both draw on this pool.",
+                    )
+                )
+            }
+
+            "artillerist" -> listOf(
+                ResourceDef(
+                    id = "artillerist:eldritch_cannon",
+                    name = "Eldritch Cannon",
+                    max = if (level >= 15) 2 else 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Artillerist",
+                    notes = "You can also expend a spell slot to build another cannon.",
+                )
+            )
+
+            "battle_smith" -> if (level >= 9) listOf(
+                ResourceDef(
+                    id = "battle_smith:arcane_jolt",
+                    name = "Arcane Jolt",
+                    max = c.modAtLeastOne(Ability.INT),
+                    recharge = Recharge.LONG_REST,
+                    source = "Battle Smith",
+                    notes = "No more than once per turn.",
+                )
+            ) else emptyList()
+
+            "cartographer" -> buildList {
+                add(
+                    ResourceDef(
+                        id = "cartographer:illuminated_cartography",
+                        name = "Illuminated Cartography",
+                        description = "You can cast Faerie Fire without expending a spell " +
+                            "slot, outlining the affected creatures as if in ink. Your Guided " +
+                            "Precision and Superior Atlas features both key off creatures " +
+                            "affected by it.",
+                        max = c.modAtLeastOne(Ability.INT),
+                        recharge = Recharge.LONG_REST,
+                        source = "Cartographer",
+                        notes = "Free castings of Faerie Fire.",
+                    )
+                )
+                if (level >= 15) add(
+                    ResourceDef(
+                        id = "cartographer:unerring_path",
+                        name = "Unerring Path",
+                        description = "While you are one of the map holders for your " +
+                            "Adventurer's Atlas, you can cast Find the Path without expending " +
+                            "a spell slot, without preparing the spell, and without needing " +
+                            "spell components.",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Superior Atlas",
+                        notes = "A free casting of Find the Path.",
+                    )
+                )
+            }
+
+            // ------------------------------------------- Heroes of Faerûn subclasses
+
+            "college_of_the_moon" -> if (level >= 6) listOf(
+                ResourceDef(
+                    id = "moon:blessing_of_moonlight",
+                    name = "Blessing of Moonlight",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "College of the Moon",
+                    notes = "Modifies one casting of Moonbeam.",
+                )
+            ) else emptyList()
+
+            "knowledge_domain" -> if (level >= 17) listOf(
+                ResourceDef(
+                    id = "knowledge:divine_foreknowledge",
+                    name = "Divine Foreknowledge",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Knowledge Domain",
+                    notes = "You can also restore it by expending a level 6+ spell slot.",
+                )
+            ) else emptyList()
+
+            "banneret" -> listOf(
+                ResourceDef(
+                    id = "banneret:group_recovery",
+                    name = "Group Recovery",
+                    max = 1,
+                    recharge = Recharge.SHORT_REST,
+                    source = "Banneret",
+                )
+            )
+
+            "noble_genies" -> buildList {
+                if (level >= 15) add(
+                    ResourceDef(
+                        id = "noble_genies:elemental_rebuke",
+                        name = "Elemental Rebuke",
+                        max = c.modAtLeastOne(Ability.CHA),
+                        recharge = Recharge.LONG_REST,
+                        source = "Oath of the Noble Genies",
+                    )
+                )
+                if (level >= 20) add(
+                    ResourceDef(
+                        id = "noble_genies:noble_scion",
+                        name = "Noble Scion",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Oath of the Noble Genies",
+                        notes = "You can also restore it by expending a level 5 spell slot.",
+                    )
+                )
+            }
+
+            "winter_walker" -> buildList {
+                if (level >= 7) add(
+                    ResourceDef(
+                        id = "winter_walker:fortifying_soul",
+                        name = "Fortifying Soul",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Winter Walker",
+                    )
+                )
+                if (level >= 11) add(
+                    ResourceDef(
+                        id = "winter_walker:chilling_retribution",
+                        name = "Chilling Retribution",
+                        max = c.modAtLeastOne(Ability.WIS),
+                        recharge = Recharge.LONG_REST,
+                        source = "Winter Walker",
+                    )
+                )
+                if (level >= 15) add(
+                    ResourceDef(
+                        id = "winter_walker:frozen_haunt",
+                        name = "Frozen Haunt",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Winter Walker",
+                        notes = "You can also use it again by expending a level 4+ spell slot.",
+                    )
+                )
+            }
+
+            "scion_of_the_three" -> listOf(
+                ResourceDef(
+                    id = "scion_three:bloodthirst",
+                    name = "Bloodthirst",
+                    max = c.modAtLeastOne(Ability.INT),
+                    recharge = Recharge.LONG_REST,
+                    source = "Scion of the Three",
+                    notes = if (level >= 17) {
+                        "You regain one expended use whenever you finish a Short Rest."
+                    } else {
+                        ""
+                    },
+                )
+            )
+
+            "spellfire_sorcery" -> if (level >= 18) listOf(
+                ResourceDef(
+                    id = "spellfire:crown_of_spellfire",
+                    name = "Crown of Spellfire",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Spellfire Sorcery",
+                    notes = "You can also restore it by spending 5 Sorcery Points.",
+                )
+            ) else emptyList()
+
+            "bladesinger" -> listOf(
+                ResourceDef(
+                    id = "bladesinger:bladesong",
+                    name = "Bladesong",
+                    max = c.modAtLeastOne(Ability.INT),
+                    recharge = Recharge.LONG_REST,
+                    source = "Bladesinger",
+                    notes = "You also regain one expended use when you use Arcane Recovery.",
+                )
+            )
+
             else -> emptyList()
         }
     }
@@ -911,6 +1227,27 @@ object ResourceData {
 
         "elf" -> emptyList()
 
+        "shifter" -> listOf(
+            ResourceDef(
+                id = "shifter:shifting",
+                name = "Shifting",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Shifter",
+            )
+        )
+
+        "khoravar" -> listOf(
+            ResourceDef(
+                id = "khoravar:lethargy_resilience",
+                name = "Lethargy Resilience",
+                max = 1,
+                recharge = Recharge.SPECIAL,
+                source = "Khoravar",
+                notes = "Returns after 1d4 Long Rests rather than on a fixed schedule.",
+            )
+        )
+
         else -> emptyList()
     }
 
@@ -961,6 +1298,205 @@ object ResourceData {
                 max = 1,
                 recharge = Recharge.LONG_REST,
                 source = "Shadow-Touched",
+            )
+
+            // Every dragonmark grants at least one free casting per Long Rest. The Greater
+            // version of a mark upgrades that pool rather than adding a second one.
+            "mark_of_detection", "mark_of_finding", "mark_of_handling", "mark_of_healing",
+            "mark_of_hospitality", "mark_of_making", "mark_of_passage", "mark_of_scribing",
+            "mark_of_sentinel", "mark_of_shadow", "mark_of_storm", "mark_of_warding",
+            -> {
+                val markName = FeatData.byId(featId)?.name ?: "Dragonmark"
+                // Greater Mark of Healing turns its single free Cure Wounds into several.
+                val improvedHealing =
+                    featId == "mark_of_healing" && "greater_mark_of_healing" in c.featIds
+                ResourceDef(
+                    id = "feat:$featId",
+                    name = "$markName Spells",
+                    max = if (improvedHealing) c.proficiencyBonus else 1,
+                    recharge = Recharge.LONG_REST,
+                    source = markName,
+                    notes = "Free castings of the spells your mark grants.",
+                )
+            }
+
+            "aberrant_dragonmark" -> ResourceDef(
+                id = "feat:aberrant_dragonmark",
+                name = "Aberrant Fortitude",
+                max = 1,
+                recharge = if ("greater_aberrant_mark" in c.featIds) {
+                    Recharge.SHORT_REST
+                } else {
+                    Recharge.LONG_REST
+                },
+                source = "Aberrant Dragonmark",
+                notes = "Your free casting of the mark's level 1 spell also returns on a rest.",
+            )
+
+            "greater_mark_of_handling" -> ResourceDef(
+                id = "feat:subdue_animal",
+                name = "Subdue Animal",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Greater Mark of Handling",
+            )
+
+            "greater_mark_of_warding" -> ResourceDef(
+                id = "feat:improved_warding",
+                name = "Improved Warding",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Greater Mark of Warding",
+            )
+
+            "greater_aberrant_mark" -> ResourceDef(
+                id = "feat:mark_of_inspiration",
+                name = "Mark of Inspiration",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Greater Aberrant Mark",
+            )
+
+            "potent_dragonmark" -> ResourceDef(
+                id = "feat:dragonmark_slot",
+                name = "Dragonmark Spell Slot",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Potent Dragonmark",
+                notes = "Level equals half your level, rounded up, to a maximum of level 5.",
+            )
+
+            // ------------------------------------------------ Heroes of Faerûn feats
+
+            "cult_of_the_dragon_initiate" -> ResourceDef(
+                id = "feat:inspired_by_fear",
+                name = "Inspired by Fear",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Cult of the Dragon Initiate",
+            )
+
+            "emerald_enclave_fledgling" -> ResourceDef(
+                id = "feat:speak_with_animals",
+                name = "Speak with Animals",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Emerald Enclave Fledgling",
+                notes = "A free casting; you can also cast it with spell slots.",
+            )
+
+            "purple_dragon_rook" -> ResourceDef(
+                id = "feat:rallying_cry",
+                name = "Rallying Cry",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Purple Dragon Rook",
+            )
+
+            "spellfire_spark" -> ResourceDef(
+                id = "feat:spellfire_flame",
+                name = "Spellfire Flame",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Spellfire Spark",
+                notes = "Bonus Action castings of Sacred Flame.",
+            )
+
+            "fairy_trickster" -> ResourceDef(
+                id = "feat:flustering_strike",
+                name = "Flustering Strike",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Fairy Trickster",
+            )
+
+            "genie_magic" -> ResourceDef(
+                id = "feat:wish_magic",
+                name = "Wish Magic",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Genie Magic",
+            )
+
+            "mythal_touched" -> ResourceDef(
+                id = "feat:mythal_ward",
+                name = "Mythal Ward",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Mythal Touched",
+            )
+
+            "lordly_resolve" -> ResourceDef(
+                id = "feat:standard_bearer",
+                name = "Standard Bearer",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Lordly Resolve",
+            )
+
+            "purple_dragon_commandant" -> ResourceDef(
+                id = "feat:encourage_ally",
+                name = "Encourage Ally",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Purple Dragon Commandant",
+            )
+
+            "enclave_magic" -> ResourceDef(
+                id = "feat:beast_sense",
+                name = "Beast Sense",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Enclave Magic",
+                notes = "A free casting that needs no Concentration.",
+            )
+
+            "boon_of_siberys" -> ResourceDef(
+                id = "feat:boon_of_siberys",
+                name = "Siberys Mark Spell",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Boon of Siberys",
+            )
+
+            "boon_of_exquisite_radiance" -> ResourceDef(
+                id = "feat:powerful_radiance",
+                name = "Powerful Radiance",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Boon of Exquisite Radiance",
+            )
+
+            "boon_of_fluid_forms" -> ResourceDef(
+                id = "feat:shapechanger",
+                name = "Shapechanger",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Boon of Fluid Forms",
+            )
+
+            "boon_of_revelry" -> ResourceDef(
+                id = "feat:inspire_dance",
+                name = "Inspire Dance",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Boon of Revelry",
+            )
+
+            "boon_of_terror" -> ResourceDef(
+                id = "feat:flee_fools",
+                name = "Flee, Fools!",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Boon of Terror",
+            )
+
+            "boon_of_the_soul_drinker" -> ResourceDef(
+                id = "feat:siphon_life",
+                name = "Siphon Life",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Boon of the Soul Drinker",
             )
 
             "healer" -> ResourceDef(

@@ -176,6 +176,91 @@ object SpeciesData {
                 LineageOption("white", "White Dragon", "Cold damage."),
             ),
         ),
+
+        // ====================================== Eberron: Forge of the Artificer
+
+        Species(
+            id = "changeling",
+            name = "Changeling",
+            size = "Medium or Small",
+            speed = 30,
+            darkvisionRange = 0,
+            summary = "Fey-touched shapeshifters who wear faces the way others wear clothes, living undetected in many societies.",
+            traits = listOf(
+                Trait("Fey", "Your creature type is Fey rather than Humanoid."),
+                Trait("Changeling Instincts", "Thanks to your connection to the fey realm, you gain proficiency in two skills of your choice from Deception, Insight, Intimidation, Performance, or Persuasion."),
+                Trait("Shape-Shifter", "As an action you can change your appearance and voice, including coloration, hair length, sex, height, weight, and your size between Medium and Small. You can appear as a member of another playable species, though none of your game statistics change, and you must adopt a form with the same basic arrangement of limbs. This doesn't change your clothing or equipment. While shape-shifted you have Advantage on Charisma checks, and you stay in the new form until you take an action to revert."),
+            ),
+            bonusSkillChoiceCount = 2,
+        ),
+        Species(
+            id = "kalashtar",
+            name = "Kalashtar",
+            size = "Medium",
+            speed = 30,
+            darkvisionRange = 0,
+            summary = "Born of the union of humanity and renegade dream-spirits, kalashtar carry minor psionic gifts and a guarded mind.",
+            traits = listOf(
+                Trait("Aberration", "Your creature type is Aberration rather than Humanoid."),
+                Trait("Dual Mind", "You have Advantage on Wisdom and Charisma saving throws."),
+                Trait("Mental Discipline", "You have Resistance to Psychic damage."),
+                Trait("Mind Link", "You have telepathy with a range in feet equal to 10 times your level. While speaking telepathically to a creature this way, you can take a Magic action to let that creature speak telepathically with you for 1 hour, or until you end the effect with another Magic action."),
+                Trait("Severed from Dreams", "You can't be the target of the Dream spell. In addition, whenever you finish a Long Rest you gain proficiency in one skill of your choice, lasting until you finish another Long Rest."),
+            ),
+            bonusSkillChoiceCount = 1,
+        ),
+        Species(
+            id = "khoravar",
+            name = "Khoravar",
+            size = "Medium or Small",
+            speed = 30,
+            darkvisionRange = 60,
+            summary = "The \"children of Khorvaire\", descended from humans and elves, who see themselves as the bridge between peoples.",
+            traits = listOf(
+                Trait("Fey Ancestry", "You have Advantage on saving throws you make to avoid or end the Charmed condition."),
+                Trait("Fey Gift", "You know the Friends cantrip. Whenever you finish a Long Rest you can replace it with a different cantrip from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for it, chosen when you select this species."),
+                Trait("Lethargy Resilience", "When you fail a saving throw to avoid or end the Unconscious condition, you can succeed instead. Once you use this trait, you can't do so again until you finish 1d4 Long Rests."),
+                Trait("Skill Versatility", "You gain proficiency in one skill or with one tool of your choice, and whenever you finish a Long Rest you can replace it with another skill or tool proficiency."),
+            ),
+            bonusSkillChoiceCount = 1,
+        ),
+        Species(
+            id = "shifter",
+            name = "Shifter",
+            size = "Medium or Small",
+            speed = 30,
+            darkvisionRange = 60,
+            summary = "Descended from those who bore lycanthropy, shifters can't change shape fully, but they can bring the beast within to the surface.",
+            traits = listOf(
+                Trait("Bestial Instincts", "Channeling the beast within, you gain proficiency in one skill of your choice from Acrobatics, Athletics, Intimidation, or Survival."),
+                Trait("Shifting", "As a Bonus Action you can assume a more bestial appearance for 1 minute, or until you revert as a Bonus Action. When you shift you gain Temporary Hit Points equal to twice your Proficiency Bonus. You can shift a number of times equal to your Proficiency Bonus, regaining all expended uses when you finish a Long Rest."),
+            ),
+            lineageChoiceLabel = "Shifting Feature",
+            lineageOptions = listOf(
+                LineageOption("beasthide", "Beasthide", "You gain 1d6 additional Temporary Hit Points when you shift, and while shifted you have a +1 bonus to your Armor Class."),
+                LineageOption("longtooth", "Longtooth", "When you shift, and as a Bonus Action on your other turns while shifted, you can make an Unarmed Strike with your elongated fangs. On a hit you can deal Piercing damage equal to 1d6 plus your Strength modifier instead of the normal Unarmed Strike damage."),
+                LineageOption("swiftstride", "Swiftstride", "While shifted your Speed increases by 10 feet, and you can move up to 10 feet as a Reaction when a creature ends its turn within 5 feet of you. This movement doesn't provoke Opportunity Attacks."),
+                LineageOption("wildhunt", "Wildhunt", "While shifted you have Advantage on Wisdom checks, and no creature within 30 feet of you can have Advantage on an attack roll against you unless you have the Incapacitated condition."),
+            ),
+            bonusSkillChoiceCount = 1,
+        ),
+        Species(
+            id = "warforged",
+            name = "Warforged",
+            size = "Medium or Small",
+            speed = 30,
+            darkvisionRange = 0,
+            summary = "Sentient constructs of wood, steel, and alchemical cord, built as weapons for the Last War and now forging their own purpose.",
+            traits = listOf(
+                Trait("Construct", "Your creature type is Construct rather than Humanoid."),
+                Trait("Construct Resilience", "You have Resistance to Poison damage, and Advantage on saving throws you make to avoid or end the Poisoned condition."),
+                Trait("Integrated Protection", "You gain a +1 bonus to your Armor Class, and armor you have donned can't be removed against your will while you're alive."),
+                Trait("Sentry's Rest", "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 6 hours spent in an inactive, motionless state during which you appear inert but remain conscious."),
+                Trait("Specialized Design", "You gain one skill proficiency and one tool proficiency of your choice."),
+                Trait("Tireless", "You don't gain Exhaustion levels from dehydration, malnutrition, or suffocation."),
+            ),
+            bonusSkillChoiceCount = 1,
+        ),
     )
 
     fun byId(id: String): Species? = ALL.find { it.id == id }

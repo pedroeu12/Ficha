@@ -15,6 +15,8 @@ import com.pedroeu.ficha.data.model.SubclassFeature
 object SubclassData {
 
     private const val UA = "Unearthed Arcana 2025: Arcane Updates"
+    private const val EFOTA = "Eberron: Forge of the Artificer"
+    private const val HOF = "Forgotten Realms: Heroes of Faerûn"
 
     private fun f(level: Int, name: String, description: String, vararg choices: Choice) =
         SubclassFeature(level, name, description, choices.toList())
@@ -204,6 +206,116 @@ object SubclassData {
         options = BATTLE_MASTER_MANEUVERS,
         source = "Level $level",
         resourceId = "battle_master:superiority",
+    )
+
+    private val ARMOR_MODEL_OPTIONS = listOf(
+        ChoiceOption(
+            "dreadnaught", "Dreadnaught",
+            "You design your armor to become a towering juggernaut in battle. Force Demolisher: " +
+                "an arcane wrecking ball or sledgehammer projects from your armor, counting as a " +
+                "Simple Melee weapon with the Reach property that deals 1d10 Force damage on a " +
+                "hit; if you hit a creature at least one size smaller than you, you can push or " +
+                "pull it up to 10 feet. Giant Stature: as a Bonus Action you enlarge the armor " +
+                "for 1 minute, increasing your reach by 5 feet and making you Large if you are " +
+                "smaller, a number of times equal to your Intelligence modifier per Long Rest.",
+            "Force Demolisher",
+        ),
+        ChoiceOption(
+            "guardian", "Guardian",
+            "You design your armor to be in the front line of conflict. Thunder Pulse: strikes " +
+                "from your armor count as a Simple Melee weapon dealing 1d8 Thunder damage, and " +
+                "a creature hit by the pulse has Disadvantage on attack rolls against targets " +
+                "other than you until the start of your next turn. Defensive Field: while " +
+                "Bloodied, you can take a Bonus Action to gain Temporary Hit Points equal to " +
+                "your Artificer level, which you lose if you doff the armor.",
+            "Thunder Pulse",
+        ),
+        ChoiceOption(
+            "infiltrator", "Infiltrator",
+            "You customize your armor for subtler undertakings. Lightning Launcher: a gemlike " +
+                "node counts as a Simple Ranged weapon with a range of 90/300 feet dealing 1d6 " +
+                "Lightning damage, plus an extra 1d6 once on each of your turns. Powered Steps: " +
+                "your Speed increases by 5 feet. Dampening Field: you have Advantage on Dexterity " +
+                "(Stealth) checks.",
+            "Lightning Launcher",
+        ),
+    )
+
+    private fun armorModelChoice() = Choice(
+        id = "armor_model",
+        label = "Armor Model",
+        prompt = "Choose the model your Arcane Armor takes.",
+        count = 1,
+        kind = ChoiceKind.OPTION,
+        options = ARMOR_MODEL_OPTIONS,
+        source = "Level 3",
+        // The rules let you re-forge the armor into a different model on any rest.
+        changeableOnRest = true,
+    )
+
+    private val CANNON_OPTIONS = listOf(
+        ChoiceOption(
+            "flamethrower", "Flamethrower",
+            "The cannon blasts fire in a 15-foot Cone. Each creature in that area makes a " +
+                "Dexterity saving throw against your spell save DC, taking 2d8 Fire damage on a " +
+                "failed save or half as much damage on a successful one. Flammable objects in " +
+                "the Cone that aren't being worn or carried start burning.",
+            "Bonus Action",
+        ),
+        ChoiceOption(
+            "force_ballista", "Force Ballista",
+            "Make a ranged spell attack originating from the cannon at one creature or object " +
+                "within 120 feet of it. On a hit, the target takes 2d8 Force damage, and if the " +
+                "target is a creature, it is pushed up to 5 feet away from the cannon.",
+            "Bonus Action",
+        ),
+        ChoiceOption(
+            "protector", "Protector",
+            "The cannon emits a burst of positive energy that grants itself and each creature of " +
+                "your choice within 10 feet of it a number of Temporary Hit Points equal to 1d8 " +
+                "plus your Intelligence modifier (minimum of +1).",
+            "Bonus Action",
+        ),
+    )
+
+    private fun cannonChoice() = Choice(
+        id = "cannon_activation",
+        label = "Activate Cannon",
+        prompt = "Note the option you use most; you choose freely each time you activate the cannon.",
+        count = 1,
+        kind = ChoiceKind.OPTION,
+        options = CANNON_OPTIONS,
+        source = "Level 3",
+        changeableOnRest = true,
+        resourceId = "artillerist:eldritch_cannon",
+    )
+
+    private val ARCANE_JOLT_OPTIONS = listOf(
+        ChoiceOption(
+            "destructive", "Destructive Energy",
+            "The target takes an extra 2d6 Force damage. This increases to 4d6 at Artificer " +
+                "level 15.",
+            "1 use",
+        ),
+        ChoiceOption(
+            "restorative", "Restorative Energy",
+            "Choose one creature or object you can see within 30 feet of the target. Healing " +
+                "energy flows into the chosen recipient, restoring 2d6 Hit Points to it. This " +
+                "increases to 4d6 at Artificer level 15.",
+            "1 use",
+        ),
+    )
+
+    private fun arcaneJoltChoice() = Choice(
+        id = "arcane_jolt",
+        label = "Arcane Jolt",
+        prompt = "Note the effect you favor; you choose freely each time you channel the energy.",
+        count = 1,
+        kind = ChoiceKind.OPTION,
+        options = ARCANE_JOLT_OPTIONS,
+        source = "Level 9",
+        changeableOnRest = true,
+        resourceId = "battle_smith:arcane_jolt",
     )
 
     private val ARCANE_SHOT_OPTIONS = listOf(
@@ -926,6 +1038,193 @@ object SubclassData {
                 f(14, "Master Transmuter", "Consume the stone for Major Transformation, Panacea, Restore Life, or Restore Youth."),
             ),
             source = UA),
+
+        // ================================================================= Artificer
+
+        Subclass("alchemist", "artificer", "Alchemist",
+            "An expert at combining reagents to produce magical effects, giving life and leeching it away.",
+            listOf(
+                f(3, "Tools of the Trade", "You gain proficiency with Alchemist's Supplies and the Herbalism Kit; if you already have one, you gain another type of Artisan's Tools instead (or two other types if you have both). Brewing a potion also takes half the usual time."),
+                f(3, "Alchemist Spells", "You always have these prepared once you reach the listed Artificer level: Healing Word and Ray of Sickness at 3, Flaming Sphere and Melf's Acid Arrow at 5, Gaseous Form and Mass Healing Word at 9, Death Ward and Vitriolic Sphere at 13, and Cloudkill and Raise Dead at 17."),
+                f(3, "Experimental Elixir", "Whenever you finish a Long Rest while holding Alchemist's Supplies, you magically produce two elixirs, rolling on the Experimental Elixir table for each. A creature can drink one or administer it to another creature within 5 feet as a Bonus Action. As a Magic action you can expend a spell slot to create another elixir, choosing its effect rather than rolling. You make an additional elixir per Long Rest at Artificer levels 5, 9, and 15."),
+                f(5, "Alchemical Savant", "Whenever you cast a spell using your Alchemist's Supplies as the Spellcasting Focus, you add your Intelligence modifier (minimum of +1) to one roll of the spell that restores Hit Points or deals Acid, Fire, or Poison damage."),
+                f(9, "Restorative Reagents", "You can cast Lesser Restoration without a spell slot and without preparing it, provided you use Alchemist's Supplies as the Spellcasting Focus. You can do so a number of times equal to your Intelligence modifier (minimum of once) per Long Rest."),
+                f(15, "Chemical Mastery", "Alchemical Eruption adds 2d8 Force damage once per turn to an Artificer spell that deals Acid, Fire, or Poison damage. Chemical Resistance grants Resistance to Acid and Poison damage and Immunity to the Poisoned condition. Conjured Cauldron lets you cast Tasha's Bubbling Cauldron free once per Long Rest."),
+            ),
+            source = EFOTA),
+
+        Subclass("armorer", "artificer", "Armorer",
+            "You modify armor until it works like a second skin, honing your magic and unleashing potent attacks.",
+            listOf(
+                f(3, "Tools of the Trade", "You gain training with Heavy armor and proficiency with Smith's Tools; if you already have the tool proficiency, you gain another type of Artisan's Tools instead. Crafting armor also takes half the usual time."),
+                f(3, "Armorer Spells", "You always have these prepared once you reach the listed Artificer level: Magic Missile and Thunderwave at 3, Mirror Image and Shatter at 5, Hypnotic Pattern and Lightning Bolt at 9, Fire Shield and Greater Invisibility at 13, and Passwall and Wall of Force at 17."),
+                f(3, "Arcane Armor", "As a Magic action while holding Smith's Tools, you turn a suit of armor you are wearing into Arcane Armor, which it remains until you don other armor or die. The armor has no Strength requirement for you, can be donned or doffed as a Utilize action and never removed against your will, and serves as a Spellcasting Focus for your Artificer spells."),
+                f(3, "Armor Model", "You customize your Arcane Armor into one of three models, each with a special weapon you can attack with using Intelligence instead of Strength or Dexterity. You can change the model whenever you finish a Short or Long Rest with Smith's Tools in hand.",
+                    armorModelChoice()),
+                f(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action on your turn."),
+                f(9, "Improved Armorer", "Armor Replication grants an additional Replicate Magic Item plan that must be in the Armor category, plus an extra item created from it. Improved Arsenal gives a +1 bonus to attack and damage rolls with your armor model's special weapon."),
+                f(15, "Perfected Armor", "Dreadnaught's Force Demolisher rises to 2d6, and Giant Stature extends your reach by 10 feet and can make you Huge with Advantage on Strength checks and saves. Guardian's Thunder Pulse rises to 1d10, and you can pull a Huge or smaller creature 25 feet toward you as a Reaction and attack it. Infiltrator's Lightning Launcher rises to 2d6, makes targets glimmer with revealing light, and grants a Bonus Action Fly Speed of twice your Speed."),
+            ),
+            source = EFOTA),
+
+        Subclass("artillerist", "artificer", "Artillerist",
+            "A specialist in hurling energy, projectiles, and explosions across the battlefield.",
+            listOf(
+                f(3, "Tools of the Trade", "You gain proficiency with Martial Ranged weapons and with Woodcarver's Tools; if you already have the tool proficiency, you gain another type of Artisan's Tools instead. Crafting a magic Wand also takes half the usual time."),
+                f(3, "Artillerist Spells", "You always have these prepared once you reach the listed Artificer level: Shield and Thunderwave at 3, Scorching Ray and Shatter at 5, Fireball and Wind Wall at 9, Ice Storm and Wall of Fire at 13, and Cone of Cold and Wall of Force at 17."),
+                f(3, "Eldritch Cannon", "Using Smith's Tools or Woodcarver's Tools you can take a Magic action to create a Small or Tiny Eldritch Cannon within 5 feet of yourself. It has AC 18 and Hit Points equal to five times your Artificer level, and it disappears at 0 Hit Points or after 1 hour. Once you create a cannon you can't do so again until you finish a Long Rest or expend a spell slot, and you can have only one at a time.",
+                    cannonChoice()),
+                f(5, "Arcane Firearm", "When you finish a Long Rest you can carve sigils into a Rod, Staff, Wand, or Martial Ranged weapon with Woodcarver's Tools, making it your Arcane Firearm. You can use it as a Spellcasting Focus, and when you cast an Artificer spell through it you roll 1d8 and add the result to one of the spell's damage rolls."),
+                f(9, "Explosive Cannon", "Detonate lets you take a Reaction when your cannon takes damage to destroy it, forcing each creature within 20 feet to make a Dexterity saving throw for 3d10 Force damage, or half as much on a success. Firepower increases the cannon's damage rolls and its Protector Temporary Hit Points by 1d8."),
+                f(15, "Fortified Position", "Double Firepower lets you have two cannons at once, create both with the same Magic action, and activate both with the same Bonus Action. Shimmering Field Projection gives you and your allies Half Cover while within 10 feet of a cannon."),
+            ),
+            source = EFOTA),
+
+        Subclass("battle_smith", "artificer", "Battle Smith",
+            "A protector and medic who repairs both materiel and personnel, aided by a Steel Defender of their own making.",
+            listOf(
+                f(3, "Tools of the Trade", "You gain proficiency with Smith's Tools; if you already have it, you gain another type of Artisan's Tools instead. Crafting a weapon also takes half the usual time."),
+                f(3, "Battle Smith Spells", "You always have these prepared once you reach the listed Artificer level: Heroism and Shield at 3, Shining Smite and Warding Bond at 5, Aura of Vitality and Conjure Barrage at 9, Aura of Purity and Fire Shield at 13, and Banishing Smite and Mass Cure Wounds at 17."),
+                f(3, "Battle Ready", "Arcane Empowerment lets you use your Intelligence modifier instead of Strength or Dexterity for attack and damage rolls with a magic weapon. Weapon Knowledge grants proficiency with Martial weapons, and any weapon you're proficient with can serve as a Spellcasting Focus for your Artificer spells."),
+                f(3, "Steel Defender", "Your tinkering produces a Medium Construct companion with AC 12 plus your Intelligence modifier and Hit Points equal to 5 plus five times your Artificer level. It is Friendly to you and your allies, obeys you, and vanishes if you die. In combat it acts on your turn, taking only the Dodge action unless you spend a Bonus Action to command it. Its Force-Empowered Rend deals 1d8 + 2 plus your Intelligence modifier Force damage, it can Repair three times per day, and its Deflect Attack Reaction imposes Disadvantage on an attack against another creature."),
+                f(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action on your turn, and you can forgo one of those attacks to command your Steel Defender to use Force-Empowered Rend."),
+                f(9, "Arcane Jolt", "When you hit with a magic weapon or your Steel Defender hits a target, you can channel magic through the strike.",
+                    arcaneJoltChoice()),
+                f(15, "Improved Defender", "Improved Jolt raises both the extra damage and the healing of Arcane Jolt to 4d6. Improved Deflection makes the attacker take 1d4 plus your Intelligence modifier Force damage whenever your Steel Defender uses Deflect Attack."),
+            ),
+            source = EFOTA),
+
+        Subclass("cartographer", "artificer", "Cartographer",
+            "A navigator and reconnaissance agent who highlights threats, safeguards allies, and carves portals to distant places.",
+            listOf(
+                f(3, "Tools of the Trade", "You gain proficiency with Calligrapher's Supplies and Cartographer's Tools; if you already have one, you gain another type of Artisan's Tools instead (or two other types if you have both). Scribing a Spell Scroll also takes half the usual time."),
+                f(3, "Cartographer Spells", "You always have these prepared once you reach the listed Artificer level: Faerie Fire, Guiding Bolt, and Healing Word at 3, Locate Object and Mind Spike at 5, Call Lightning and Clairvoyance at 9, Banishment and Locate Creature at 13, and Scrying and Teleportation Circle at 17."),
+                f(3, "Adventurer's Atlas", "Whenever you finish a Long Rest while holding Cartographer's Tools, you touch at least two creatures — up to 1 plus your Intelligence modifier — and give each a magical map that constantly updates to show the others' positions and is illegible to anyone else. A map holder adds 1d4 to Initiative rolls, always knows where the other holders are on its plane, and can target another holder with a spell regardless of sight or cover so long as the target is in range. The maps last until you die or use this feature again."),
+                f(3, "Mapping Magic", "Illuminated Cartography lets you cast Faerie Fire without a spell slot a number of times equal to your Intelligence modifier (minimum of once) per Long Rest, outlining the affected creatures as if in ink. Portal Jump lets you spend half your Speed on your turn to teleport to an unoccupied space you can see within 10 feet of yourself, or within 5 feet of a creature within 30 feet that holds one of your maps."),
+                f(5, "Guided Precision", "Once per turn, when you cast a spell from your Cartographer Spells list or hit a creature affected by your Faerie Fire with an attack roll, you can add your Intelligence modifier to one damage roll of the spell or attack. Taking damage also can't break your Concentration on Faerie Fire."),
+                f(9, "Ingenious Movement", "When you use your Flash of Genius, you or a willing creature you can see within 30 feet can teleport up to 30 feet to an unoccupied space you can see as part of that same Reaction."),
+                f(15, "Superior Atlas", "Safe Haven lets a map holder reduced to 0 Hit Points but not killed outright destroy its map, setting its Hit Points to twice your Artificer level and teleporting it within 5 feet of you or another holder. Unerring Path lets you cast Find the Path free once per Long Rest while you hold one of the maps."),
+            ),
+            source = EFOTA),
+
+        // ============================================ Forgotten Realms: Heroes of Faerûn
+
+        Subclass("college_of_the_moon", "bard", "College of the Moon",
+            "A Bard trained by the druids of the Moonshae Isles, drawing on moonwells and local folktales.",
+            listOf(
+                f(3, "Moon's Inspiration", "Inspired Eclipse: when you take a Bonus Action to give a creature a Bardic Inspiration die, you can gain the Invisible condition and teleport up to 30 feet to an unoccupied space you can see as part of that Bonus Action; the invisibility lasts until the start of your next turn and ends early when you make an attack roll, deal damage, or cast a spell. Lunar Vitality: once per turn when you restore Hit Points with a spell, you can expend a Bardic Inspiration die to increase the Hit Points restored by a roll of the die, and the creature's Speed also increases by 10 feet until the end of its next turn."),
+                f(3, "Primal Lore", "You learn Druidic and one cantrip from the Druid spell list, which counts as a Bard spell for you but doesn't count against your cantrips known. You can replace that cantrip whenever you gain a Bard level.",
+                    Choice("moon_primal_skill", "Primal Lore", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
+                        ChoiceOptions.fromSkills(listOf(Skill.ANIMAL_HANDLING, Skill.INSIGHT, Skill.MEDICINE, Skill.NATURE, Skill.PERCEPTION, Skill.SURVIVAL)), "Level 3")),
+                f(6, "Blessing of Moonlight", "You always have the Moonbeam spell prepared. When you cast it you can modify the spell so that you glow faintly while it is active, shedding Dim Light out to 5 feet; whenever a creature fails its saving throw against that Moonbeam, another creature of your choice within 60 feet regains 2d4 Hit Points. Once you modify a casting this way, you can't do so again until you finish a Long Rest."),
+                f(14, "Eventide's Splendor", "Shadow of the New Moon: when you use Inspired Eclipse, the creature who received the Bardic Inspiration die can also gain the Invisible condition and immediately take a Reaction to teleport up to 30 feet to an unoccupied space it can see, remaining Invisible until the start of its next turn. Vibrance of the Full Moon: when you use Lunar Vitality, you can roll 1d6 and use the number rolled in place of expending a Bardic Inspiration die."),
+            ),
+            source = HOF),
+
+        Subclass("knowledge_domain", "cleric", "Knowledge Domain",
+            "A Cleric who values learning above all, unearthing secrets and mastering the mind.",
+            listOf(
+                f(3, "Blessings of Knowledge", "You gain proficiency with one type of Artisan's Tools of your choice, and Expertise in two of the listed skills.",
+                    Choice("knowledge_expertise", "Blessings of Knowledge", "Choose two skills to gain proficiency and Expertise in.", 2, ChoiceKind.EXPERTISE,
+                        ChoiceOptions.fromSkills(listOf(Skill.ARCANA, Skill.HISTORY, Skill.NATURE, Skill.RELIGION)), "Level 3")),
+                f(3, "Knowledge Domain Spells", "You always have these prepared once you reach the listed Cleric level: Command, Comprehend Languages, Detect Magic, Detect Thoughts, Identify, and Mind Spike at 3; Dispel Magic, Nondetection, and Tongues at 5; Arcane Eye, Banishment, and Confusion at 7; and Legend Lore, Scrying, and Synaptic Static at 9."),
+                f(3, "Mind Magic", "As a Magic action, you can expend one use of your Channel Divinity to manifest your magical knowledge. Choose one spell from the Divination school on the Knowledge Domain Spells table that you have prepared. As part of that action, you cast that spell without expending a spell slot or needing Material components."),
+                f(6, "Unfettered Mind", "You gain telepathy out to 50 feet, and when you use this telepathy you can simultaneously contact a number of creatures equal to your Wisdom modifier (minimum of one). You also gain proficiency in Intelligence saving throws, or in one ability you lack if you already have it."),
+                f(17, "Divine Foreknowledge", "As a Bonus Action, you magically expand your mind into the future. For 1 hour, you have Advantage on D20 Tests. Once you use this feature you can't use it again until you finish a Long Rest, though you can also restore it by expending a level 6+ spell slot (no action required)."),
+            ),
+            source = HOF),
+
+        Subclass("banneret", "fighter", "Banneret",
+            "A paragon of valor and leadership who rallies fellow adventurers to the causes of justice and freedom.",
+            listOf(
+                f(3, "Knightly Envoy", "Comprehension: you can cast Comprehend Languages, but only as a Ritual, using Charisma as your spellcasting ability. Polyglot: you learn one language, and whenever you finish a Long Rest you can replace it with another language you have heard, seen signed, or read in the past 24 hours.",
+                    Choice("banneret_skill", "Well Spoken", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
+                        ChoiceOptions.fromSkills(listOf(Skill.INSIGHT, Skill.INTIMIDATION, Skill.PERSUASION, Skill.PERFORMANCE)), "Level 3")),
+                f(3, "Group Recovery", "When you use your Second Wind to regain Hit Points, you can choose allies within a 30-foot Emanation originating from yourself, up to a number equal to your Charisma modifier (minimum of one). Each of those allies regains Hit Points equal to 1d4 plus your Fighter level. Once you use this ability you can't use it again until you finish a Short or Long Rest."),
+                f(7, "Team Tactics", "When you use Group Recovery, each chosen ally has Advantage on D20 Tests until the start of your next turn."),
+                f(10, "Rallying Surge", "When you use your Action Surge, you can choose allies within a 30-foot Emanation originating from yourself, up to a number equal to your Charisma modifier (minimum of one). Each of those allies can immediately take a Reaction either to make one attack with a weapon or an Unarmed Strike, or to move up to half its Speed without provoking Opportunity Attacks."),
+                f(15, "Shared Resilience", "When an ally you can see within 60 feet of yourself fails a saving throw, you can take a Reaction to expend a use of your Indomitable feature. The ally can immediately reroll the saving throw with a bonus equal to your Fighter level, and must use the new roll."),
+                f(18, "Inspiring Commander", "Bolstered Rally: the area of effect for both Group Recovery and Rallying Surge becomes a 60-foot Emanation. Unshakable Bravery: you have Immunity to the Charmed and Frightened conditions."),
+            ),
+            source = HOF),
+
+        Subclass("noble_genies", "paladin", "Oath of the Noble Genies",
+            "A Paladin who reveres the Elemental Planes and the four noble genies, brandishing their elemental splendor.",
+            listOf(
+                f(3, "Elemental Smite", "Immediately after you cast Divine Smite, you can expend one use of your Channel Divinity to invoke one of four genie effects.",
+                    Choice("elemental_smite", "Elemental Smite", "Note the genie whose power you invoke most; you choose freely each time.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("dao", "Dao's Crush", "Earth rises up around the target of your Divine Smite. The target has the Grappled condition, with an escape DC equal to your spell save DC. While Grappled this way, the target also has the Restrained condition.", "1 Channel Divinity"),
+                        ChoiceOption("djinni", "Djinni's Escape", "You teleport to an unoccupied space you can see within 30 feet of yourself and take on a semi-incorporeal form until the end of your next turn. While in this form you have Resistance to Bludgeoning, Piercing, and Slashing damage, and Immunity to the Grappled, Prone, and Restrained conditions.", "1 Channel Divinity"),
+                        ChoiceOption("efreeti", "Efreeti's Fury", "The target of your Divine Smite takes an extra 2d4 Fire damage, and fire jumps from the target to another creature you can see within 30 feet of yourself. That second creature also takes 2d4 Fire damage.", "1 Channel Divinity"),
+                        ChoiceOption("marid", "Marid's Surge", "The target of your Divine Smite and each creature of your choice in a 10-foot Emanation originating from you make a Strength saving throw against your spell save DC. On a failed save, a creature is pushed 15 feet straight away from you and has the Prone condition.", "1 Channel Divinity"),
+                    ), "Level 3", changeableOnRest = true, resourceId = "paladin:channel_divinity")),
+                f(3, "Genie Spells", "You always have these prepared once you reach the listed Paladin level: Chromatic Orb, Elementalism, and Thunderous Smite at 3; Mirror Image and Phantasmal Force at 5; Fly and Gaseous Form at 9; Conjure Minor Elementals and Summon Elemental at 13; and Banishing Smite and Contact Other Plane at 17."),
+                f(3, "Genie's Splendor", "When you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Charisma modifiers. You can use a Shield and still gain this benefit.",
+                    Choice("genie_skill", "Genie's Splendor", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
+                        ChoiceOptions.fromSkills(listOf(Skill.ACROBATICS, Skill.INTIMIDATION, Skill.PERFORMANCE, Skill.PERSUASION)), "Level 3")),
+                f(7, "Aura of Elemental Shielding", "Choose Acid, Cold, Fire, Lightning, or Thunder. You and your allies have Resistance to that damage type while in your Aura of Protection. At the start of each of your turns you can change the damage type to another of the listed options (no action required).",
+                    damageTypeChoice("elemental_shielding", "Aura of Elemental Shielding", "Level 7",
+                        listOf("Acid", "Cold", "Fire", "Lightning", "Thunder"), changeableOnRest = true)),
+                f(15, "Elemental Rebuke", "When you are hit by an attack roll, you can take a Reaction to halve the attack's damage against yourself (round down) and force the attacker to make a Dexterity saving throw against your spell save DC. On a failed save the attacker takes 2d10 plus your Charisma modifier damage of a type you choose from Acid, Cold, Fire, Lightning, or Thunder; on a success it takes half as much. You can do this a number of times equal to your Charisma modifier (minimum of once) per Long Rest."),
+                f(20, "Noble Scion", "As a Bonus Action you gain the following benefits for 10 minutes or until you end them (no action required). Flight: you have a Fly Speed of 60 feet and can hover. Minor Wish: when you or an ally in your Aura of Protection fails a D20 Test, you can take a Reaction to make that creature succeed instead. Once you use this feature you can't use it again until you finish a Long Rest, though you can also restore it by expending a level 5 spell slot (no action required)."),
+            ),
+            source = HOF),
+
+        Subclass("winter_walker", "ranger", "Winter Walker",
+            "A Ranger of frigid wastelands, wielding the magic of cold and ice against the horrors that haunt them.",
+            listOf(
+                f(3, "Frigid Explorer", "Biting Cold: damage from your weapon attacks, Ranger spells, and Ranger features ignores Resistance to Cold damage. Frost Resistance: you have Resistance to Cold damage. Polar Strikes: when you hit a creature with an attack roll using a weapon, you can deal an extra 1d4 Cold damage to the target, once per turn; this increases to 1d6 at Ranger level 11."),
+                f(3, "Hunter's Rime", "When you cast Hunter's Mark, you gain Temporary Hit Points equal to 1d10 plus your Ranger level. Additionally, while a creature is marked by your Hunter's Mark, it can't take the Disengage action."),
+                f(3, "Winter Walker Spells", "You always have these prepared once you reach the listed Ranger level: Ice Knife at 3, Hold Person at 5, Remove Curse at 9, Ice Storm at 13, and Cone of Cold at 17."),
+                f(7, "Fortifying Soul", "As a Magic action, choose a number of creatures you can see equal to your Wisdom modifier (minimum of one). Each chosen creature regains Hit Points equal to 1d10 plus your Ranger level and has Advantage on saving throws to avoid or end the Frightened condition for 1 hour. Once you use this feature you can't use it again until you finish a Long Rest."),
+                f(11, "Chilling Retribution", "When a creature hits you with an attack roll, you can take a Reaction to force it to make a Wisdom saving throw against your spell save DC. On a failed save the target has the Stunned condition until the end of your next turn, and while Stunned its Speed is reduced to 0 feet. You can do this a number of times equal to your Wisdom modifier (minimum of once) per Long Rest."),
+                f(15, "Frozen Haunt", "When you cast Hunter's Mark, you can adopt a ghostly, snowy form that lasts until the spell ends. Frozen Soul: you have Immunity to Cold damage, and when you first adopt the form and at the start of each of your subsequent turns, each creature of your choice in a 15-foot Emanation originating from you takes 2d4 Cold damage. Partially Incorporeal: you have Immunity to the Grappled, Prone, and Restrained conditions and can move through creatures and objects as Difficult Terrain, taking 1d10 Force damage if you end your turn inside one. Once you use this feature you can't use it again until you finish a Long Rest unless you expend a level 4+ spell slot (no action required)."),
+            ),
+            source = HOF),
+
+        Subclass("scion_of_the_three", "rogue", "Scion of the Three",
+            "A Rogue who draws power from the Dead Three — Bane, Bhaal, and Myrkul — as a gift or a curse.",
+            listOf(
+                f(3, "Bloodthirst", "When an enemy you can see within 30 feet of yourself takes damage and is Bloodied after taking that damage but not killed outright, you can take a Reaction and teleport to an unoccupied space you can see within 5 feet of that enemy. You can then make one melee attack. You can use this feature a number of times equal to your Intelligence modifier (minimum of once) per Long Rest."),
+                f(3, "Dread Allegiance", "Choose one of the Dead Three. You gain Resistance to one type of damage and the ability to cast a cantrip, with Intelligence as your spellcasting ability for it. You can change your choice whenever you finish a Long Rest.",
+                    Choice("dread_allegiance", "Dread Allegiance", "Choose one of the Dead Three.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("bane", "Bane", "Bane is the god of tyranny. You gain Resistance to Psychic damage and can cast the Minor Illusion cantrip, using Intelligence as your spellcasting ability.", "Psychic"),
+                        ChoiceOption("bhaal", "Bhaal", "Bhaal is the god of violence and murder. You gain Resistance to Poison damage and can cast the Blade Ward cantrip, using Intelligence as your spellcasting ability.", "Poison"),
+                        ChoiceOption("myrkul", "Myrkul", "Myrkul is the god of death. You gain Resistance to Necrotic damage and can cast the Chill Touch cantrip, using Intelligence as your spellcasting ability.", "Necrotic"),
+                    ), "Level 3", changeableOnRest = true)),
+                f(9, "Strike Fear", "You gain the Terrify Cunning Strike option, which costs 1d6 of your Sneak Attack damage. The target must succeed on a Wisdom saving throw or have the Frightened condition for 1 minute. While the target is Frightened this way, you have Advantage on attack rolls against it. The target repeats the save at the end of each of its turns, ending the effect on itself on a success."),
+                f(13, "Aura of Malevolence", "You radiate malignant power associated with one of the Dead Three. When you use Bloodthirst and teleport, each creature of your choice within 10 feet of either the space you left or your destination space (your choice) takes damage equal to your Intelligence modifier. The damage type is the same as the Resistance granted by your Dread Allegiance choice, and it ignores Resistance."),
+                f(17, "Dread Incarnate", "Cutthroat: you regain one expended use of Bloodthirst whenever you finish a Short Rest. Murderous Intent: when you roll your Sneak Attack damage, you can treat a roll of 1 or 2 on a die as a 3."),
+            ),
+            source = HOF),
+
+        Subclass("spellfire_sorcery", "sorcerer", "Spellfire Sorcery",
+            "A Sorcerer born with the ability to manipulate spellfire, the raw radiant power of the Weave itself.",
+            listOf(
+                f(3, "Spellfire Burst", "When you spend at least 1 Sorcery Point as part of a Magic action or a Bonus Action on your turn, you can unleash one of these effects. You can do so only once per turn.",
+                    Choice("spellfire_burst", "Spellfire Burst", "Note the effect you favor; you choose freely each time you burst.", 1, ChoiceKind.OPTION, listOf(
+                        ChoiceOption("bolstering_flames", "Bolstering Flames", "You or one creature you can see within 30 feet of yourself gains Temporary Hit Points equal to 1d4 plus your Charisma modifier. At Sorcerer level 14 you add your Sorcerer level to these Temporary Hit Points.", "No extra cost"),
+                        ChoiceOption("radiant_fire", "Radiant Fire", "One creature you can see within 30 feet of yourself takes 1d4 Fire or Radiant damage (your choice). At Sorcerer level 14 this damage increases to 1d8.", "No extra cost"),
+                    ), "Level 3", changeableOnRest = true, resourceId = "sorcerer:sorcery_points")),
+                f(3, "Spellfire Spells", "You always have these prepared once you reach the listed Sorcerer level: Cure Wounds, Guiding Bolt, Lesser Restoration, and Scorching Ray at 3; Aura of Vitality and Dispel Magic at 5; Fire Shield and Wall of Fire at 7; and Greater Restoration and Flame Strike at 9."),
+                f(6, "Absorb Spells", "You always have the Counterspell spell prepared. Additionally, whenever a target fails the saving throw against a Counterspell you cast, you regain 1d4 Sorcery Points."),
+                f(14, "Honed Spellfire", "Your Spellfire Burst improves. You add your Sorcerer level to the Temporary Hit Points gained from Bolstering Flames, and the damage of your Radiant Fire increases to 1d8."),
+                f(18, "Crown of Spellfire", "When you use Innate Sorcery you can alter it and infuse yourself with the essence of spellfire, gaining these benefits while that use of Innate Sorcery is active. Burning Life Force: once per turn when you are hit by an attack roll, you can expend a number of Hit Point Dice up to your Charisma modifier (minimum of one), roll them, and reduce the attack's damage by the total. Flight: you gain a Fly Speed of 60 feet and can hover. Spell Avoidance: when a spell or magical effect allows a saving throw for half damage, you instead take no damage on a success and only half damage on a failure, unless you have the Incapacitated condition. Once you use this feature you can't use it again until you finish a Long Rest unless you spend 5 Sorcery Points (no action required)."),
+            ),
+            source = HOF),
+
+        Subclass("bladesinger", "wizard", "Bladesinger",
+            "A Wizard who has mastered an ancient elven tradition of wizardry that incorporates swordplay and dance.",
+            listOf(
+                f(3, "Bladesong", "As a Bonus Action you invoke an elven magic called the Bladesong, provided you aren't wearing armor or using a Shield. It lasts 1 minute and ends early if you have the Incapacitated condition, if you don armor or a Shield, or if you use two hands to make an attack with a weapon. While it is active you gain a bonus to your Armor Class equal to your Intelligence modifier (minimum of +1), your Speed increases by 10 feet, you have Advantage on Dexterity (Acrobatics) checks, you can use Intelligence for attack and damage rolls with weapons you're proficient with, and you can add your Intelligence modifier to Constitution saves made to maintain Concentration. You can invoke it a number of times equal to your Intelligence modifier (minimum of once) per Long Rest, and you regain one use when you use Arcane Recovery."),
+                f(3, "Training in War and Song", "You gain proficiency with all Melee Martial weapons that don't have the Two-Handed or Heavy property, and you can use a Melee weapon you're proficient with as a Spellcasting Focus for your Wizard spells.",
+                    Choice("bladesinger_skill", "Training in War and Song", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
+                        ChoiceOptions.fromSkills(listOf(Skill.ACROBATICS, Skill.ATHLETICS, Skill.PERFORMANCE, Skill.PERSUASION)), "Level 3")),
+                f(6, "Extra Attack", "You can attack twice, instead of once, whenever you take the Attack action on your turn. Moreover, you can cast one of your Wizard cantrips that has a casting time of an action in place of one of those attacks."),
+                f(10, "Song of Defense", "When you take damage while your Bladesong is active, you can take a Reaction to expend one spell slot and reduce the damage taken by an amount equal to five times the spell slot's level."),
+                f(14, "Song of Victory", "After you cast a spell that has a casting time of an action, you can make one attack with a weapon as a Bonus Action."),
+            ),
+            source = HOF),
     )
 
     fun forClass(classId: String): List<Subclass> = ALL.filter { it.classId == classId }

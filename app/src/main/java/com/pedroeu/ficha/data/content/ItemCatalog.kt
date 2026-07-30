@@ -168,13 +168,33 @@ object ItemCatalog {
 
     fun search(query: String, category: String? = null): List<CatalogItem> {
         val trimmed = query.trim().lowercase()
-        return ALL.filter { item ->
+        val matches = ALL.filter { item ->
             (category == null || item.category == category) &&
                 (trimmed.isEmpty() ||
                     item.name.lowercase().contains(trimmed) ||
                     item.category.lowercase().contains(trimmed) ||
                     item.description.lowercase().contains(trimmed))
         }
+        if (trimmed.isEmpty()) return matches
+
+        // Rank by how close the query is to the name. Descriptions cross-reference each other
+        // — a Bag of Devouring "looks like a Bag of Holding" — so a plain alphabetical sort
+        // would bury the item the player actually typed.
+        return matches.sortedWith(
+            compareBy(
+                { item ->
+                    val name = item.name.lowercase()
+                    when {
+                        name == trimmed -> 0
+                        name.startsWith(trimmed) -> 1
+                        name.contains(trimmed) -> 2
+                        item.category.lowercase().contains(trimmed) -> 3
+                        else -> 4
+                    }
+                },
+                { it.name },
+            )
+        )
     }
 
     /**

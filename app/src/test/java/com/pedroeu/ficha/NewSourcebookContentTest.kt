@@ -10,6 +10,7 @@ import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.CasterType
+import com.pedroeu.ficha.data.model.ItemRarity
 import com.pedroeu.ficha.data.model.SpellSlotTables
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterResources
@@ -155,6 +156,33 @@ class NewSourcebookContentTest {
         val inventoryItem = entry.toInventoryItem()
         assertEquals("Bag of Holding", inventoryItem.name)
         assertTrue("the item carries its rules text into inventory", inventoryItem.notes.isNotBlank())
+    }
+
+    @Test
+    fun `searching puts the item you named first, not one that merely mentions it`() {
+        // A Bag of Devouring "looks like a Bag of Holding", so it matches the same query.
+        val results = ItemCatalog.search("Bag of Holding")
+        assertTrue("both bags should match", results.size >= 2)
+        assertEquals("Bag of Holding", results.first().name)
+
+        assertEquals("Cloak of Elvenkind", ItemCatalog.search("cloak of elven").first().name)
+        assertEquals("Flame Tongue", ItemCatalog.search("flame tongue").first().name)
+    }
+
+    @Test
+    fun `the catalog covers the breadth of the rulebook, at every rarity`() {
+        assertTrue(
+            "the magic item list should be substantial, not a sample",
+            MagicItemData.ALL.size >= 200,
+        )
+        // Artifacts are campaign-defining one-offs a DM writes themselves, so the catalog
+        // deliberately stops at Legendary.
+        ItemRarity.entries.filter { it != ItemRarity.ARTIFACT }.forEach { rarity ->
+            assertTrue(
+                "nothing is listed at ${rarity.label}",
+                MagicItemData.ALL.any { it.rarity == rarity },
+            )
+        }
     }
 
     @Test

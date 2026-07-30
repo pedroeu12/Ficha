@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.ChoiceKind
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.ui.components.ChoiceSection
 
 /**
@@ -53,16 +54,13 @@ fun OriginChoicesStep(state: CreationState, viewModel: CreationViewModel) {
 
         items(choices.size, key = { choices[it].id }) { index ->
             val choice = choices[index]
-            // Skills already covered elsewhere can't be taken twice.
-            val disabled = if (choice.kind == ChoiceKind.SKILL) {
-                val selected = state.originSelections[choice.id].orEmpty().toSet()
-                (state.grantedSkills + state.classSkillChoices)
-                    .map { it.name }
-                    .filterNot { it in selected }
-                    .toSet()
-            } else {
-                emptySet()
-            }
+            // Anything the character already has — a skill, a tool, a language, a spell —
+            // is greyed out here, whichever earlier step granted it.
+            val disabled = OwnedOptions.disabledFor(
+                choice = choice,
+                owned = state.owned,
+                currentSelection = state.originSelections[choice.id].orEmpty().toSet(),
+            )
 
             ChoiceSection(
                 choice = choice,

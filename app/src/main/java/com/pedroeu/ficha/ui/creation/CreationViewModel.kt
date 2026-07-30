@@ -36,6 +36,7 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
     fun selectSpecies(id: String) = _state.update { current ->
         if (current.speciesId == id) current
         else current.copy(speciesId = id, lineageId = null, speciesSkillChoices = emptySet())
+            .withoutDuplicateSkills()
     }
 
     fun selectLineage(id: String) = _state.update { it.copy(lineageId = id) }
@@ -49,7 +50,7 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             // At the limit, replace the oldest pick so tapping always responds.
             else -> selected.drop(1).toSet() + skill
         }
-        current.copy(speciesSkillChoices = next)
+        current.copy(speciesSkillChoices = next).withoutDuplicateSkills()
     }
 
     fun selectClass(id: String) = _state.update { current ->
@@ -66,6 +67,8 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
         val choice = current.charClass?.choices
             ?.filterIsInstance<ClassChoice.SkillProficiencyChoice>()?.firstOrNull()
             ?: return@update current
+        // The chip is disabled for these, but never let one through by another route.
+        if (skill in current.grantedSkills) return@update current
         val selected = current.classSkillChoices
         val next = when {
             selected.contains(skill) -> selected - skill
@@ -112,7 +115,7 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             originSelections = current.originSelections.filterKeys {
                 !it.startsWith("background:") && !it.startsWith("feat:")
             },
-        )
+        ).withoutDuplicateSkills()
     }
 
     /**

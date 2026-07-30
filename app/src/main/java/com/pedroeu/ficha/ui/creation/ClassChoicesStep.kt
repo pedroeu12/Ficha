@@ -49,7 +49,8 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                             trailing = "${state.classSkillChoices.size} / ${choice.count}",
                         )
                         Text(
-                            text = "Skills already covered by your species or origin are shown as unavailable.",
+                            text = "Skills your species or origin already grants are shown as " +
+                                "unavailable, so a pick is never wasted on a duplicate.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 6.dp),
@@ -82,12 +83,15 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.padding(top = 8.dp),
                         ) {
+                            val chosenHere = state.classSelections[choice.id].orEmpty()
                             choice.options.forEach { option ->
+                                val owned = option.id in state.owned.options &&
+                                    option.id !in chosenHere
                                 SelectableCard(
                                     title = option.name,
                                     subtitle = option.description,
-                                    selected = state.classSelections[choice.id]
-                                        ?.contains(option.id) == true,
+                                    selected = chosenHere.contains(option.id),
+                                    enabled = !owned,
                                     onClick = { viewModel.selectFeatureOption(choice.id, option.id) },
                                 )
                             }
@@ -107,10 +111,17 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                             modifier = Modifier.padding(top = 8.dp),
                         ) {
                             choice.options.forEach { spell ->
+                                // A spell the character already has — from another class
+                                // list, a species trait, or a feat — is not offered twice.
+                                val owned = spell.id !in picked &&
+                                    (spell.id in state.owned.spells ||
+                                        spell.name in state.ownedSpellNames)
+
                                 SelectableCard(
                                     title = spell.name,
                                     subtitle = spell.description,
                                     selected = picked.contains(spell.id),
+                                    enabled = !owned,
                                     onClick = {
                                         viewModel.toggleSpell(choice.id, spell.id, choice.count)
                                     },

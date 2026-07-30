@@ -44,6 +44,8 @@ fun SelectableCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     trailingLabel: String? = null,
+    /** False greys the card out and stops it responding, for an option already owned. */
+    enabled: Boolean = true,
     expandedContent: (@Composable () -> Unit)? = null,
     /**
      * Clamps a long [subtitle] to this many lines and offers a "Read more" toggle. Used for
@@ -58,11 +60,14 @@ fun SelectableCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(if (selected) 2.dp else 1.dp, borderColor),
         colors = CardDefaults.cardColors(
             containerColor = if (selected) MaterialTheme.colorScheme.secondaryContainer
-            else MaterialTheme.colorScheme.surface
+            else MaterialTheme.colorScheme.surface,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
         ),
     ) {
         Column(Modifier.padding(14.dp)) {
@@ -71,8 +76,16 @@ fun SelectableCard(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = if (enabled) MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     )
+                    if (!enabled) {
+                        Text(
+                            text = "Already gained from another source",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                     if (trailingLabel != null) {
                         Text(
                             text = trailingLabel,

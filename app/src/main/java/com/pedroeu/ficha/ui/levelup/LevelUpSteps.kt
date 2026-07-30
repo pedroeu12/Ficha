@@ -41,6 +41,7 @@ import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.ui.components.ChoiceChip
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.SelectableCard
@@ -253,17 +254,13 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
 
         items(choices.size, key = { choices[it].id }) { index ->
             val choice = choices[index]
-            val disabled = if (choice.kind == ChoiceKind.SKILL) {
-                state.character.skillProficiencies
-            } else if (choice.kind == ChoiceKind.EXPERTISE) {
-                // Expertise applies to skills you are already proficient with.
-                choice.options
-                    .map { it.id }
-                    .filterNot { it in state.character.skillProficiencies }
-                    .toSet()
-            } else {
-                emptySet()
-            }
+            // Everything the character already has is greyed out, so levelling up can't
+            // hand them a second copy of a proficiency, spell, feat, or feature option.
+            val disabled = OwnedOptions.disabledFor(
+                choice = choice,
+                owned = OwnedOptions.of(state.character),
+                currentSelection = state.selections[choice.id].orEmpty().toSet(),
+            )
 
             ChoiceSection(
                 choice = choice,

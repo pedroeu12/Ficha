@@ -4,12 +4,14 @@ import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.data.content.ToolData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.domain.AbilityScoreGeneration
+import com.pedroeu.ficha.domain.Owned
 import com.pedroeu.ficha.domain.ScoreMethod
 
 /** The two ability spreads a 2024 background may grant across its three listed abilities. */
@@ -18,11 +20,17 @@ enum class BonusSpread(val label: String, val values: List<Int>) {
     THREE_ONES("+1 / +1 / +1", listOf(1, 1, 1)),
 }
 
+/**
+ * Order matters. Background comes before Class so the proficiencies it grants outright are
+ * already known when the class offers its skill list, letting the class step grey out what
+ * the character would get anyway. Origin Options stays last of the three because some of its
+ * grants depend on choices made inside the class.
+ */
 enum class CreationStep(val title: String, val shortLabel: String) {
     SPECIES("Choose a Species", "Species"),
+    BACKGROUND("Choose an Origin", "Origin"),
     CLASS("Choose a Class", "Class"),
     CLASS_CHOICES("Class Options", "Options"),
-    BACKGROUND("Choose an Origin", "Origin"),
     ORIGIN_CHOICES("Origin Options", "Grants"),
     ABILITIES("Ability Scores", "Abilities"),
     DETAILS("Name & Details", "Details");
@@ -97,6 +105,93 @@ data class CreationState(
 
     val allSkillProficiencies: Set<Skill>
         get() = grantedSkills + classSkillChoices + originSkillChoices
+
+    /** Tools granted outright by the class or the background, before any choice is made. */
+    private val grantedTools: Set<String>
+        get() = buildSet {
+            charClass?.toolProficiencies
+                ?.filterNot { it.contains("of your choice", ignoreCase = true) }
+                ?.let { addAll(it) }
+            background?.toolProficiency
+                ?.takeIf { ToolData.optionsForOpenEndedTool(it) == null }
+                ?.let { add(it) }
+            originChoices
+                .filter { it.kind == ChoiceKind.TOOL }
+                .flatMap { originSelections[it.id].orEmpty() }
+                .let { addAll(it) }
+        }
+
+    /** Spells already on the sheet, whether picked from a class list or an origin grant. */
+    private val chosenSpellIds: Set<String>
+        get() = buildSet {
+            charClass?.choices
+                ?.filterIsInstance<ClassChoice.CantripChoice>()
+                ?.forEach { addAll(classSelections[it.id].orEmpty()) }
+            originChoices
+                .filter { it.kind == ChoiceKind.SPELL }
+                .forEach { addAll(originSelections[it.id].orEmpty()) }
+        }
+
+    /**
+     * The names of those spells. A class's cantrip list and the spell catalog give the same
+     * spell different ids, so names are what actually catch a duplicate across the two.
+     */
+    val ownedSpellNames: Set<String>
+        get() = buildSet {
+            charClass?.choices
+                ?.filterIsInstance<ClassChoice.CantripChoice>()
+                ?.forEach { choice ->
+                    val picked = classSelections[choice.id].orEmpty()
+                    choice.options.filter { it.id in picked }.forEach { add(it.name) }
+                }
+            originChoices
+                .filter { it.kind == ChoiceKind.SPELL }
+                .forEach { choice ->
+                    val picked = originSelections[choice.id].orEmpty()
+                    choice.options.filter { it.id in picked }.forEach { add(it.name) }
+                }
+        }
+
+    /**
+     * Everything the half-built character already has, so every picker in the wizard can grey
+     * out a duplicate no matter which step granted it first.
+     */
+    val owned: Owned
+        get() = Owned(
+            skills = allSkillProficiencies.map { it.name }.toSet(),
+            expertise = expertiseChoices.map { it.name }.toSet(),
+            tools = grantedTools,
+            spells = chosenSpellIds,
+            spellNames = ownedSpellNames.map { it.lowercase() }.toSet(),
+            languages = originChoices
+                .filter { it.kind == ChoiceKind.LANGUAGE }
+                .flatMap { originSelections[it.id].orEmpty() }
+                .toSet(),
+            feats = setOfNotNull(background?.featId),
+            options = charClass?.choices
+                ?.filterIsInstance<ClassChoice.FeatureOption>()
+                ?.flatMap { classSelections[it.id].orEmpty() }
+                .orEmpty()
+                .toSet(),
+        )
+
+    /**
+     * Drops class and expertise picks the character now gets for free from another source.
+     *
+     * The pickers grey out anything already owned, but a player can go back and change their
+     * species or background after choosing class skills. Re-running this whenever those
+     * change means no duplicate survives, whichever source ended up granting it first.
+     */
+    fun withoutDuplicateSkills(): CreationState {
+        val freeSkills = grantedSkills
+        val classPicks = classSkillChoices - freeSkills
+        return copy(
+            classSkillChoices = classPicks,
+            expertiseChoices = expertiseChoices
+                .filter { it in classPicks || it in freeSkills }
+                .toSet(),
+        )
+    }
 
     /** True when every decision on the current step has been made. */
     val canAdvance: Boolean

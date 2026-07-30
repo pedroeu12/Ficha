@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -51,6 +52,10 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     var editingStat by remember { mutableStateOf<OverridableStat?>(null) }
     var addingSpell by remember { mutableStateOf(false) }
 
+
+    // Spells the rules grant outright are derived rather than stored, so they appear the
+    // moment a character gains the class, subclass, species, or feat that supplies them.
+    val spells = CharacterSpells.all(character)
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -68,7 +73,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
             }
         }
 
-        if (ability == null && character.knownSpells.isEmpty()) {
+        if (ability == null && spells.isEmpty()) {
             item {
                 Text(
                     text = "This character has no spellcasting from their class. You can still " +
@@ -128,17 +133,19 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
             }
         }
 
-        val cantrips = character.knownSpells.filter { it.level == 0 }
-        val leveled = character.knownSpells.filter { it.level > 0 }
+        val cantrips = spells.filter { it.level == 0 }
+        val leveled = spells.filter { it.level > 0 }
 
         if (cantrips.isNotEmpty()) {
-            item { SpellSection("Cantrips", cantrips, viewModel, editMode) }
+            item { SpellSection("Cantrips", cantrips, character, viewModel, editMode) }
         }
         if (leveled.isNotEmpty()) {
-            item { SpellSection("Prepared & Known Spells", leveled, viewModel, editMode) }
+            item {
+                SpellSection("Prepared & Known Spells", leveled, character, viewModel, editMode)
+            }
         }
 
-        if (character.knownSpells.isEmpty()) {
+        if (spells.isEmpty()) {
             item {
                 Text(
                     text = "No spells recorded yet. Level up to learn some, or add them here in Edit Mode.",
@@ -190,9 +197,13 @@ private fun PreparedCountCard(
     editMode: Boolean,
     onEdit: (OverridableStat) -> Unit,
 ) {
-    val prepared = character.knownSpells.count { it.level > 0 && it.prepared }
+    // Spells the rules always have prepared for you don't count against the limit, so the
+    // capacity row counts only what the player actually chose to prepare.
+    val granted = CharacterSpells.granted(character).map { it.spell.id }.toSet()
+    val onSheet = CharacterSpells.all(character)
+    val prepared = onSheet.count { it.level > 0 && it.prepared && it.id !in granted }
     val maxPrepared = CharacterCalculations.maxPreparedSpells(character)
-    val cantrips = character.knownSpells.count { it.level == 0 }
+    val cantrips = onSheet.count { it.level == 0 && it.id !in granted }
     val maxCantrips = CharacterCalculations.maxCantripsKnown(character)
 
     Card(
@@ -352,6 +363,7 @@ private fun SpellStat(
 private fun SpellSection(
     title: String,
     spells: List<KnownSpell>,
+    character: PlayerCharacter,
     viewModel: SheetViewModel,
     editMode: Boolean,
 ) {
@@ -362,6 +374,7 @@ private fun SpellSection(
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader(title, trailing = "${spells.size}")
             spells.forEach { spell ->
+                val isGranted = CharacterSpells.isGranted(character, spell.id)
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -372,14 +385,23 @@ private fun SpellSection(
                             modifier = Modifier.weight(1f),
                         )
                         if (spell.level > 0) {
-                            // Preparation is a per-day decision, so it stays tappable always.
+                            // A granted spell is always prepared, so there's nothing to toggle.
                             Text(
-                                text = if (spell.prepared) "Prepared" else "Not prepared",
+                                text = when {
+                                    isGranted -> "Always prepared"
+                                    spell.prepared -> "Prepared"
+                                    else -> "Not prepared"
+                                },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = if (spell.prepared) MaterialTheme.colorScheme.secondary
                                 else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier
-                                    .clickable { viewModel.toggleSpellPrepared(spell.id) }
+                                    .then(
+                                        if (isGranted) Modifier
+                                        else Modifier.clickable {
+                                            viewModel.toggleSpellPrepared(spell.id)
+                                        }
+                                    )
                                     .padding(horizontal = 6.dp, vertical = 2.dp),
                             )
                         }
@@ -388,7 +410,9 @@ private fun SpellSection(
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )
-                        if (editMode) {
+                        // Removing a granted spell would be undone on the next redraw, so
+                        // the delete button only appears for spells the player added.
+                        if (editMode && !isGranted) {
                             IconButton(onClick = { viewModel.removeSpell(spell.id) }) {
                                 Icon(
                                     Icons.Default.Close,

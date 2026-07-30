@@ -61,6 +61,33 @@ object CharacterSpells {
         return grantedSpells + character.knownSpells.filterNot { it.id in grantedIds }
     }
 
+    /**
+     * Classes that rebuild their prepared list whenever they finish a Long Rest, rather than
+     * knowing a fixed set of spells. Bards, Sorcerers, and Warlocks are the exceptions — they
+     * swap a spell when they gain a level, not each day.
+     */
+    private val PREPARES_DAILY = setOf(
+        "artificer", "cleric", "druid", "paladin", "ranger", "wizard",
+    )
+
+    /** True when a Long Rest should offer to rebuild this character's prepared list. */
+    fun preparesDaily(character: PlayerCharacter): Boolean =
+        character.classId in PREPARES_DAILY
+
+    /**
+     * The spells a Long Rest can prepare or set aside: level 1+ spells the player chose.
+     * Cantrips are always available, and granted spells are always prepared, so neither is
+     * part of the daily decision.
+     */
+    fun preparable(character: PlayerCharacter): List<KnownSpell> {
+        val granted = granted(character).map { it.spell.id }.toSet()
+        return all(character).filter { it.level > 0 && it.id !in granted }
+    }
+
+    /** How many of those are currently prepared, for checking against the class limit. */
+    fun preparedCount(character: PlayerCharacter): Int =
+        preparable(character).count { it.prepared }
+
     /** True when the sheet should refuse to delete a spell, because the rules keep granting it. */
     fun isGranted(character: PlayerCharacter, spellId: String): Boolean =
         granted(character).any { it.spell.id == spellId }

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterDcs
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
@@ -51,6 +52,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     val slots = CharacterCalculations.spellSlots(character)
     var editingStat by remember { mutableStateOf<OverridableStat?>(null) }
     var addingSpell by remember { mutableStateOf(false) }
+    var openSpell by remember { mutableStateOf<KnownSpell?>(null) }
 
 
     // Spells the rules grant outright are derived rather than stored, so they appear the
@@ -127,6 +129,58 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
             }
         }
 
+        // A character can impose several different save DCs at once — a Monk's Wisdom DC and
+        // a Magic Initiate cantrip's Intelligence DC are both live and neither replaces the
+        // other — so each source is listed with its own number.
+        val saveDcs = CharacterDcs.all(character)
+        if (saveDcs.size > 1 || (ability == null && saveDcs.isNotEmpty())) {
+            item {
+                Card(
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                ) {
+                    Column(
+                        Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        SectionHeader("Save DCs by source", trailing = "${saveDcs.size}")
+                        saveDcs.forEach { dc ->
+                            Column {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = dc.label,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    Text(
+                                        text = "DC ${dc.dc}",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                    )
+                                }
+                                Text(
+                                    text = "${dc.ability.fullName} • Attack " +
+                                        CharacterCalculations.formatModifier(dc.attackBonus),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                )
+                                Text(
+                                    text = dc.note,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (slots.isNotEmpty() || editMode) {
             item {
                 SpellSlotsCard(character, viewModel, editMode, slots)
@@ -137,11 +191,17 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         val leveled = spells.filter { it.level > 0 }
 
         if (cantrips.isNotEmpty()) {
-            item { SpellSection("Cantrips", cantrips, character, viewModel, editMode) }
+            item {
+                SpellSection("Cantrips", cantrips, character, viewModel, editMode) {
+                    openSpell = it
+                }
+            }
         }
         if (leveled.isNotEmpty()) {
             item {
-                SpellSection("Prepared & Known Spells", leveled, character, viewModel, editMode)
+                SpellSection(
+                    "Prepared & Known Spells", leveled, character, viewModel, editMode,
+                ) { openSpell = it }
             }
         }
 
@@ -154,6 +214,10 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 )
             }
         }
+    }
+
+    openSpell?.let { spell ->
+        SpellDetailSheet(spell = spell, onDismiss = { openSpell = null })
     }
 
     if (addingSpell) {
@@ -366,6 +430,7 @@ private fun SpellSection(
     character: PlayerCharacter,
     viewModel: SheetViewModel,
     editMode: Boolean,
+    onOpenSpell: (KnownSpell) -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(14.dp),
@@ -382,7 +447,9 @@ private fun SpellSection(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { onOpenSpell(spell) },
                         )
                         if (spell.level > 0) {
                             // A granted spell is always prepared, so there's nothing to toggle.

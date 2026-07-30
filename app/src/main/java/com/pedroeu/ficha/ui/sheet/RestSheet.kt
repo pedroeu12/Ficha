@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterResources
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.RestEngine
@@ -173,6 +175,64 @@ fun RestSheet(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                    }
+                }
+            }
+
+            // Clerics, Artificers, and the other prepared casters rebuild their list each
+            // day, so a Long Rest is exactly when that decision gets made.
+            if (kind == RestKind.LONG && CharacterSpells.preparesDaily(character)) {
+                val preparable = CharacterSpells.preparable(character)
+                if (preparable.isNotEmpty()) {
+                    val maxPrepared = CharacterCalculations.maxPreparedSpells(character)
+                    val preparedNow = preparable.count { it.prepared }
+                    Text(
+                        text = "Prepared spells  $preparedNow / $maxPrepared",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (preparedNow > maxPrepared) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.secondary,
+                    )
+                    Text(
+                        text = "Tap to swap which spells you have ready for the day.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.heightIn(max = 240.dp),
+                    ) {
+                        items(preparable.size, key = { preparable[it].id }) { index ->
+                            val spell = preparable[index]
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { viewModel.toggleSpellPrepared(spell.id) }
+                                    .padding(vertical = 4.dp),
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        text = spell.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                    Text(
+                                        text = "Level ${spell.level}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                    )
+                                }
+                                Text(
+                                    text = if (spell.prepared) "Prepared" else "Not prepared",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (spell.prepared) {
+                                        MaterialTheme.colorScheme.secondary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
+                                )
+                            }
+                        }
                     }
                 }
             }

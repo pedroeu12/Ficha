@@ -18,6 +18,8 @@ data class AttackLine(
     val damage: String,
     val damageType: String,
     val notes: String,
+    /** Where the line came from, so the sheet can group weapons apart from cantrips. */
+    val source: AttackSource = AttackSource.WEAPON,
 )
 
 /**
@@ -280,6 +282,7 @@ object CharacterCalculations {
                     damage = "${weapon.damageDice} ${formatModifier(abilityMod)}",
                     damageType = weapon.damageType,
                     notes = weapon.properties.joinToString(", "),
+                    source = AttackSource.WEAPON,
                 )
             }
     }

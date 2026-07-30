@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.domain.CharacterAttacks
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -40,7 +41,9 @@ import com.pedroeu.ficha.ui.components.SectionHeader
 
 @Composable
 fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
-    val attacks = CharacterCalculations.attacks(character)
+    // Weapons carried, plus everything else the character can attack with: an Unarmed
+    // Strike, a feature's conjured weapon, and any damage cantrip they know.
+    val attacks = CharacterAttacks.all(character)
     val charClass = ClassData.byId(character.classId)
 
     var editingAttack by remember { mutableStateOf<CustomAttack?>(null) }
@@ -56,7 +59,7 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 SectionHeader("Weapons & Damage Cantrips")
                 if (attacks.isEmpty()) {
                     Text(
-                        text = "No weapons carried. Add gear on the Inventory tab.",
+                        text = "Nothing to attack with yet. Add a weapon on the Inventory tab.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),

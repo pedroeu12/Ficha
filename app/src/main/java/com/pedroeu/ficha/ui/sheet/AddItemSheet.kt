@@ -4,14 +4,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,6 +98,7 @@ fun AddItemSheet(
 private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf<String?>(null) }
+    var filtersOpen by remember { mutableStateOf(false) }
 
     val results = remember(query, category) { ItemCatalog.search(query, category) }
 
@@ -108,22 +115,61 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
                 .padding(top = 12.dp),
         )
 
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(vertical = 10.dp),
+        // The catalog has enough categories that showing every chip would push the results
+        // off the sheet, so the filters fold away and say what they're currently set to.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
         ) {
-            ChoiceChip(
-                label = "All",
-                selected = category == null,
-                onClick = { category = null },
-            )
-            ItemCatalog.CATEGORIES.forEach { name ->
-                ChoiceChip(
-                    label = name,
-                    selected = category == name,
-                    onClick = { category = if (category == name) null else name },
+            TextButton(
+                onClick = { filtersOpen = !filtersOpen },
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+            ) {
+                Icon(
+                    imageVector = if (filtersOpen) Icons.Default.KeyboardArrowUp
+                    else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
                 )
+                Text(
+                    text = "  Filter: ${category ?: "All"}",
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+            Spacer(Modifier.weight(1f))
+            if (category != null) {
+                TextButton(onClick = { category = null }) { Text("Clear") }
+            }
+        }
+
+        if (filtersOpen) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom = 10.dp),
+            ) {
+                ChoiceChip(
+                    label = "All",
+                    selected = category == null,
+                    onClick = {
+                        category = null
+                        filtersOpen = false
+                    },
+                )
+                ItemCatalog.CATEGORIES.forEach { name ->
+                    ChoiceChip(
+                        label = name,
+                        selected = category == name,
+                        onClick = {
+                            category = if (category == name) null else name
+                            // Picking a filter is the whole point of opening the list, so
+                            // fold it away again and give the results the room back.
+                            filtersOpen = false
+                        },
+                    )
+                }
             }
         }
 

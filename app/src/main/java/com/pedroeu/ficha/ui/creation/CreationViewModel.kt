@@ -294,7 +294,14 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             weaponProficiencies = charClass?.weaponProficiencies.orEmpty(),
             classChoiceSelections = state.classSelections,
             originChoiceSelections = state.originSelections,
-            featIds = listOfNotNull(background?.featId),
+            // The background's feat, plus any feat picked through an origin choice — the
+            // Human's Versatile trait grants one the same way.
+            featIds = (
+                listOfNotNull(background?.featId) +
+                    state.originChoices
+                        .filter { it.kind == ChoiceKind.FEAT }
+                        .flatMap { state.originSelections[it.id].orEmpty() }
+                ).distinct(),
             knownSpells = spells,
             inventory = buildInventory(state),
             coins = Coins(

@@ -87,25 +87,34 @@ object ChoiceResolver {
         )
     }
 
-    /** Every choice attached to class-table features the character has reached. */
-    fun classFeatureChoices(character: PlayerCharacter): List<ResolvedChoice> {
-        val progression = ProgressionData.forClass(character.classId) ?: return emptyList()
-        return progression.features
-            .filter { it.level <= character.level }
-            .flatMap { feature ->
-                feature.choices.map { resolve(character, it, feature.name, feature.level) }
-            }
-    }
+    /**
+     * Every choice attached to class-table features the character has reached.
+     *
+     * Features advance on the level in their own class, so a Fighter 5 / Wizard 3 sees a
+     * level 5 Fighter's choices and a level 3 Wizard's, not level 8 of either.
+     */
+    fun classFeatureChoices(character: PlayerCharacter): List<ResolvedChoice> =
+        ClassLevels.of(character).flatMap { entry ->
+            val progression = ProgressionData.forClass(entry.classId)
+                ?: return@flatMap emptyList()
+            progression.features
+                .filter { it.level <= entry.level }
+                .flatMap { feature ->
+                    feature.choices.map { resolve(character, it, feature.name, feature.level) }
+                }
+        }
 
     /** Every choice attached to subclass features the character has reached. */
-    fun subclassFeatureChoices(character: PlayerCharacter): List<ResolvedChoice> {
-        val subclass = character.subclassId?.let { SubclassData.byId(it) } ?: return emptyList()
-        return subclass.features
-            .filter { it.level <= character.level }
-            .flatMap { feature ->
-                feature.choices.map { resolve(character, it, feature.name, feature.level) }
-            }
-    }
+    fun subclassFeatureChoices(character: PlayerCharacter): List<ResolvedChoice> =
+        ClassLevels.of(character).flatMap { entry ->
+            val subclass = entry.subclassId?.let { SubclassData.byId(it) }
+                ?: return@flatMap emptyList()
+            subclass.features
+                .filter { it.level <= entry.level }
+                .flatMap { feature ->
+                    feature.choices.map { resolve(character, it, feature.name, feature.level) }
+                }
+        }
 
     /**
      * Level-1 class options, which use the older [ClassChoice] shape. Only the feature

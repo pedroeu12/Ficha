@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.SectionHeader
@@ -309,7 +310,9 @@ private fun HitPointsCard(
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader(
                 "Hit Points",
-                trailing = "Hit Dice: ${character.level - character.hitDiceSpent}/${character.level} d$hitDie",
+                // A multiclass character has a mix, e.g. "5d10 + 3d6", so show the breakdown.
+                trailing = "Hit Dice: ${character.level - character.hitDiceSpent}/" +
+                    "${character.level} ${ClassLevels.hitDiceLabel(character)}",
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {

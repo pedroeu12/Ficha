@@ -47,6 +47,7 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.ui.components.EditableText
 import kotlinx.coroutines.launch
 
@@ -81,7 +82,10 @@ fun CharacterSheetScreen(
     }
 
     val species = SpeciesData.byId(loaded.speciesId)?.name.orEmpty()
-    val charClass = ClassData.byId(loaded.classId)?.name.orEmpty()
+    // A multiclass character reads "Fighter 5 / Wizard 3", which already carries the levels,
+    // so the "Level N" prefix is dropped for them.
+    val isMulticlassed = ClassLevels.isMulticlassed(loaded)
+    val charClass = ClassLevels.label(loaded)
     val subclass = loaded.subclassId?.let { SubclassData.byId(it)?.name }
 
     Column(Modifier.fillMaxSize()) {
@@ -98,8 +102,12 @@ fun CharacterSheetScreen(
                     )
                     Text(
                         text = buildString {
-                            append("Level ${loaded.level} $species $charClass")
-                            if (subclass != null) append(" ($subclass)")
+                            if (isMulticlassed) {
+                                append("$species $charClass")
+                            } else {
+                                append("Level ${loaded.level} $species $charClass")
+                                if (subclass != null) append(" ($subclass)")
+                            }
                         },
                         style = MaterialTheme.typography.labelSmall,
                     )

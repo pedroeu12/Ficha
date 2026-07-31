@@ -18,8 +18,12 @@ class CreationStateTest {
         val elfNoLineage = CreationState(step = CreationStep.SPECIES, speciesId = "elf")
         assertFalse(elfNoLineage.canAdvance)
 
+        // Keen Senses is a choice of Insight, Perception, or Survival, so the Elf also needs
+        // that pick before the step is complete.
         val elfWithLineage = elfNoLineage.copy(lineageId = "wood_elf")
-        assertTrue(elfWithLineage.canAdvance)
+        assertFalse("the Keen Senses skill is still unchosen", elfWithLineage.canAdvance)
+
+        assertTrue(elfWithLineage.copy(speciesSkillChoices = setOf(Skill.PERCEPTION)).canAdvance)
     }
 
     @Test
@@ -99,9 +103,10 @@ class CreationStateTest {
     fun `granted skills combine species and background proficiencies`() {
         val state = CreationState(
             speciesId = "elf",
+            // The Elf's Keen Senses is a pick among three skills rather than a fixed grant.
+            speciesSkillChoices = setOf(Skill.PERCEPTION),
             backgroundId = "soldier",
         )
-        // Elf grants Perception; Soldier grants Athletics and Intimidation.
         assertTrue(state.grantedSkills.contains(Skill.PERCEPTION))
         assertTrue(state.grantedSkills.contains(Skill.ATHLETICS))
         assertTrue(state.grantedSkills.contains(Skill.INTIMIDATION))

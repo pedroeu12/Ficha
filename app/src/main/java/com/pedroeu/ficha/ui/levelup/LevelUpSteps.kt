@@ -40,6 +40,7 @@ import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.ui.components.ChoiceChip
 import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.ui.components.ChoiceSection
@@ -618,5 +619,93 @@ private fun SummaryRow(label: String, value: String) {
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.secondary,
         )
+    }
+}
+
+/**
+ * Which class this level goes into.
+ *
+ * Levelling the class you already have is the common case, so it leads. A class the
+ * character's scores can't support is shown greyed out with the score it needs, rather than
+ * hidden — knowing why a class isn't available is more useful than it quietly missing.
+ */
+@Composable
+fun ChooseClassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
+    val options = state.multiclassOptions
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item {
+            Text(
+                text = "You are ${ClassLevels.label(state.character)}. Continue in one of " +
+                    "those, or start a new class if your scores allow it.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        val (existing, fresh) = options.partition { it.alreadyHas }
+
+        item {
+            Text(
+                text = "Classes you already have",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+        }
+        items(existing.size, key = { "have:${existing[it].classId}" }) { index ->
+            val option = existing[index]
+            val current = ClassLevels.levelIn(state.character, option.classId)
+            SelectableCard(
+                title = "${option.className} $current → ${current + 1}",
+                subtitle = option.entry.note,
+                selected = state.classId == option.classId,
+                onClick = { viewModel.selectLevellingClass(option.classId) },
+            )
+        }
+
+        if (fresh.isNotEmpty()) {
+            item {
+                Text(
+                    text = "Start a new class",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            items(fresh.size, key = { "new:${fresh[it].classId}" }) { index ->
+                val option = fresh[index]
+                val gained = buildList {
+                    if (option.entry.armorTraining.isNotEmpty()) {
+                        add("Armor: ${option.entry.armorTraining.joinToString(", ")}")
+                    }
+                    if (option.entry.weaponProficiencies.isNotEmpty()) {
+                        add("Weapons: ${option.entry.weaponProficiencies.joinToString(", ")}")
+                    }
+                    if (option.entry.toolProficiencies.isNotEmpty()) {
+                        add("Tools: ${option.entry.toolProficiencies.joinToString(", ")}")
+                    }
+                    if (option.entry.skillCount > 0) {
+                        add("One skill of your choice")
+                    }
+                    if (option.entry.note.isNotBlank()) add(option.entry.note)
+                }
+                SelectableCard(
+                    title = "${option.className} 1",
+                    subtitle = if (option.allowed) {
+                        "Requires ${option.entry.prerequisiteLabel}. You gain: " +
+                            gained.joinToString(" • ").ifBlank { "no extra proficiencies" }
+                    } else {
+                        option.reason
+                    },
+                    selected = state.classId == option.classId,
+                    enabled = option.allowed,
+                    onClick = { viewModel.selectLevellingClass(option.classId) },
+                )
+            }
+        }
     }
 }

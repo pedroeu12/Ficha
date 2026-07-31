@@ -16,10 +16,12 @@ object SpeciesData {
             darkvisionRange = 0,
             summary = "Ambitious and adaptable, humans are found in every corner of the world, thriving through sheer versatility.",
             traits = listOf(
-                Trait("Resourceful", "You gain proficiency in one skill of your choice."),
-                Trait("Determined", "Once per long rest, when you fail an ability check, you can reroll it."),
+                Trait("Resourceful", "You gain Heroic Inspiration whenever you finish a Long Rest."),
+                Trait("Skillful", "You gain proficiency in one skill of your choice."),
+                Trait("Versatile", "You gain an Origin feat of your choice."),
             ),
             bonusSkillChoiceCount = 1,
+            grantsOriginFeat = true,
         ),
         Species(
             id = "elf",
@@ -30,7 +32,7 @@ object SpeciesData {
             summary = "Graceful and long-lived, elves feel a deep connection to magic and the natural world.",
             traits = listOf(
                 Trait("Fey Ancestry", "You have advantage on saving throws against being charmed, and magic can't put you to sleep."),
-                Trait("Keen Senses", "You gain proficiency in the Perception skill."),
+                Trait("Keen Senses", "You gain proficiency in the Insight, Perception, or Survival skill of your choice."),
                 Trait("Trance", "You don't need to sleep. Instead you meditate for 4 hours a day to gain the benefit of a long rest."),
             ),
             lineageChoiceLabel = "Elven Lineage",
@@ -39,7 +41,8 @@ object SpeciesData {
                 LineageOption("high_elf", "High Elf", "You know one cantrip of your choice from the Wizard spell list (Intelligence)."),
                 LineageOption("wood_elf", "Wood Elf", "Your speed increases to 35 feet and you know the Druidcraft cantrip (Wisdom)."),
             ),
-            grantedSkills = listOf(Skill.PERCEPTION),
+            bonusSkillChoiceCount = 1,
+            bonusSkillOptions = listOf(Skill.INSIGHT, Skill.PERCEPTION, Skill.SURVIVAL),
         ),
         Species(
             id = "dwarf",
@@ -50,8 +53,8 @@ object SpeciesData {
             summary = "Stout and sturdy, dwarves are famed for their resilience, craftsmanship, and unshakable resolve.",
             traits = listOf(
                 Trait("Dwarven Resilience", "You have resistance to poison damage and advantage on saving throws against being poisoned."),
-                Trait("Dwarven Toughness", "Your hit point maximum increases by 1, and increases by 1 again whenever you gain a level."),
-                Trait("Stonecunning", "You have expertise on History checks related to the origin of stonework."),
+                Trait("Dwarven Toughness", "Your Hit Point maximum increases by 1, and it increases by 1 again whenever you gain a level."),
+                Trait("Stonecunning", "As a Bonus Action you gain Tremorsense with a range of 60 feet for 10 minutes, provided you are on a stone surface. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
             ),
         ),
         Species(
@@ -95,12 +98,12 @@ object SpeciesData {
             ),
             lineageChoiceLabel = "Giant Ancestry",
             lineageOptions = listOf(
-                LineageOption("cloud", "Cloud's Jaunt", "As a bonus action, you can teleport up to 30 feet to an unoccupied space you can see. Usable a number of times equal to your proficiency bonus per long rest."),
-                LineageOption("fire", "Fire's Burn", "When you hit with an attack, you can deal an extra 1d10 fire damage. Usable once per long rest."),
-                LineageOption("frost", "Frost's Chill", "When you hit with an attack, you can deal an extra 1d6 cold damage and reduce the target's speed by 10 feet until the end of your next turn."),
-                LineageOption("hill", "Hill's Tumble", "When you hit a Large or smaller creature with an attack, you can knock it prone. Usable once per long rest."),
-                LineageOption("stone", "Stone's Endurance", "When you take damage, you can reduce it by 1d12 + your Constitution modifier. Usable once per long rest."),
-                LineageOption("storm", "Storm's Thunder Clap", "As an action, you can create a burst of thunderous force in a 5-foot radius, dealing 1d8 thunder damage. Usable once per long rest."),
+                LineageOption("cloud", "Cloud's Jaunt", "As a Bonus Action you can teleport up to 30 feet to an unoccupied space you can see. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
+                LineageOption("fire", "Fire's Burn", "When you hit a creature with an attack roll, you can deal an extra 1d10 Fire damage. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
+                LineageOption("frost", "Frost's Chill", "When you hit a creature with an attack roll, you can deal an extra 1d6 Cold damage and reduce its Speed by 10 feet until the start of your next turn. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
+                LineageOption("hill", "Hill's Tumble", "When you hit a Large or smaller creature with an attack roll, you can give it the Prone condition. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
+                LineageOption("stone", "Stone's Endurance", "When you take damage, you can take a Reaction to roll 1d12 and reduce the damage by that roll plus your Constitution modifier. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
+                LineageOption("storm", "Storm's Thunder Clap", "When you take damage from a creature within 60 feet, you can take a Reaction to force it to make a Constitution saving throw, taking 1d8 Thunder damage on a failure. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
             ),
         ),
         Species(

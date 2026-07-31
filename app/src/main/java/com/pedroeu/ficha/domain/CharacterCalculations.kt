@@ -2,6 +2,7 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.EquipmentData
+import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.model.Ability
@@ -108,7 +109,8 @@ object CharacterCalculations {
     fun initiative(character: PlayerCharacter): Int {
         val dex = abilityModifiers(character)[Ability.DEX] ?: 0
         val alertBonus = if (character.featIds.contains("alert")) proficiencyBonus(character) else 0
-        return adjust(character, OverridableStat.INITIATIVE, dex + alertBonus)
+        val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.INITIATIVE)
+        return adjust(character, OverridableStat.INITIATIVE, dex + alertBonus + passive)
     }
 
     fun speed(character: PlayerCharacter): Int {
@@ -127,7 +129,12 @@ object CharacterCalculations {
         val monkUnarmoredMovement =
             if (character.classId == "monk" && equippedArmor.isEmpty()) monkSpeedBonus(character.level) else 0
 
-        return adjust(character, OverridableStat.SPEED, base + barbarianFastMovement + monkUnarmoredMovement)
+        val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.SPEED)
+        return adjust(
+            character,
+            OverridableStat.SPEED,
+            base + barbarianFastMovement + monkUnarmoredMovement + passive,
+        )
     }
 
     private fun monkSpeedBonus(level: Int): Int = when {
@@ -146,20 +153,30 @@ object CharacterCalculations {
 
     fun maxHitPoints(character: PlayerCharacter): Int {
         val conMod = abilityModifiers(character)[Ability.CON] ?: 0
-        val die = hitDie(character)
 
-        // Level 1 always grants the full die. Later levels use whatever was rolled or taken
-        // as the fixed average during level up, falling back to the average when unrecorded.
-        val average = die / 2 + 1
-        val laterLevels = (2..character.level).sumOf { level ->
-            val recorded = character.hitPointsPerLevel.getOrNull(level - 2)
-            (recorded ?: average) + conMod
+        // Each class brings its own hit die, so a Fighter 5 / Wizard 3 rolls d10s for five
+        // levels and d6s for three. The very first level of the starting class is maximised.
+        val classes = ClassLevels.of(character)
+        var levelsCounted = 0
+        var fromLevels = 0
+        classes.forEach { entry ->
+            val die = ClassData.byId(entry.classId)?.hitDie ?: 8
+            val average = die / 2 + 1
+            repeat(entry.level) { indexInClass ->
+                val isVeryFirstLevel = levelsCounted == 0
+                val rolled = if (isVeryFirstLevel) {
+                    die
+                } else {
+                    character.hitPointsPerLevel.getOrNull(levelsCounted - 1) ?: average
+                }
+                fromLevels += rolled + conMod
+                levelsCounted++
+            }
         }
-        val fromLevels = die + conMod + laterLevels
 
-        val dwarvenToughness = if (character.speciesId == "dwarf") character.level else 0
-        val toughFeat = if (character.featIds.contains("tough")) character.level * 2 else 0
-        val computed = (fromLevels + dwarvenToughness + toughFeat).coerceAtLeast(1)
+        // Dwarven Toughness, the Tough feat, and anything else that quietly adds hit points.
+        val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.MAX_HIT_POINTS)
+        val computed = (fromLevels + passive).coerceAtLeast(1)
         return adjust(character, OverridableStat.MAX_HIT_POINTS, computed).coerceAtLeast(1)
     }
 
@@ -200,7 +217,10 @@ object CharacterCalculations {
         // A Monk's Unarmored Defense requires no shield, so only add the shield when it applies.
         val monkUnarmoredWins =
             character.classId == "monk" && unarmoredAc != null && best == unarmoredAc
-        val computed = if (monkUnarmoredWins) best else best + shieldBonus
+        val withShield = if (monkUnarmoredWins) best else best + shieldBonus
+        // A Warforged's plating and anything like it applies whatever the character wears.
+        val computed = withShield +
+            PassiveBonuses.totalFor(character, PassiveBonusData.Target.ARMOR_CLASS)
         return adjust(character, OverridableStat.ARMOR_CLASS, computed)
     }
 
@@ -208,6 +228,37 @@ object CharacterCalculations {
 
     fun casterType(character: PlayerCharacter): CasterType =
         ProgressionData.forClass(character.classId)?.casterType ?: CasterType.NONE
+
+    /**
+     * Shared spell slots for however many classes the character has.
+     *
+     * A single-class character reads their own table, which is what the rules say and also
+     * keeps the Warlock's Pact Magic intact. Anyone with levels in two or more casting
+     * classes uses the combined caster level instead, where each class contributes its own
+     * fraction of its levels.
+     */
+    private fun multiclassSlots(character: PlayerCharacter): Map<Int, Int> {
+        val classes = ClassLevels.of(character)
+        if (classes.size == 1) {
+            return SpellSlotTables.slotsFor(casterType(character), character.level)
+        }
+
+        val casterLevel = ClassLevels.casterLevel(character)
+        val shared = if (casterLevel > 0) {
+            SpellSlotTables.slotsFor(CasterType.FULL, casterLevel)
+        } else {
+            emptyMap()
+        }
+
+        // Pact Magic is a separate pool, so a Warlock multiclass keeps both sets of slots.
+        val pactLevel = ClassLevels.pactLevel(character)
+        if (pactLevel == 0) return shared
+
+        val pact = SpellSlotTables.slotsFor(CasterType.PACT, pactLevel)
+        return (shared.keys + pact.keys).associateWith { level ->
+            (shared[level] ?: 0) + (pact[level] ?: 0)
+        }
+    }
 
     fun spellcastingAbility(character: PlayerCharacter): Ability? =
         ClassData.byId(character.classId)?.spellcastingAbility
@@ -226,7 +277,7 @@ object CharacterCalculations {
 
     /** Spell slots by level, from the class table unless Edit Mode has pinned them. */
     fun spellSlots(character: PlayerCharacter): Map<Int, Int> {
-        val fromTable = SpellSlotTables.slotsFor(casterType(character), character.level)
+        val fromTable = multiclassSlots(character)
         if (character.spellSlotOverrides.isEmpty()) return fromTable
 
         val merged = fromTable.toMutableMap()

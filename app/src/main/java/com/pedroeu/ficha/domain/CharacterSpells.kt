@@ -72,7 +72,7 @@ object CharacterSpells {
 
     /** True when a Long Rest should offer to rebuild this character's prepared list. */
     fun preparesDaily(character: PlayerCharacter): Boolean =
-        character.classId in PREPARES_DAILY
+        ClassLevels.of(character).any { it.classId in PREPARES_DAILY }
 
     /**
      * The spells a Long Rest can prepare or set aside: level 1+ spells the player chose.
@@ -94,13 +94,25 @@ object CharacterSpells {
 
     private fun grantsInEffect(
         character: PlayerCharacter,
-    ): List<Pair<String, SpellGrantData.Grant>> = SpellGrantData.forSources(
-        classId = character.classId,
-        subclassId = character.subclassId,
-        speciesId = character.speciesId,
-        lineageId = character.lineageId,
-        featIds = character.featIds,
-    ).filter { (_, grant) -> grant.level <= character.level }
+    ): List<Pair<String, SpellGrantData.Grant>> {
+        // A subclass's spell list advances on the level in that class, so a Cleric 3 who
+        // multiclasses into Fighter still has only their level 3 domain spells.
+        val classes = ClassLevels.of(character)
+        return classes.flatMapIndexed { index, entry ->
+            SpellGrantData.forSources(
+                classId = entry.classId,
+                subclassId = entry.subclassId,
+                speciesId = if (index == 0) character.speciesId else "",
+                lineageId = if (index == 0) character.lineageId else null,
+                featIds = if (index == 0) character.featIds else emptyList(),
+            ).filter { (sourceId, grant) ->
+                // Species and feat grants key off total character level; class and subclass
+                // grants key off the level in that class.
+                val isClassGrant = sourceId == entry.classId || sourceId == entry.subclassId
+                grant.level <= if (isClassGrant) entry.level else character.level
+            }
+        }.distinctBy { it.second.spellId }
+    }
 
     /** Turns a source id into something worth printing under the spell's name. */
     private fun sourceLabel(sourceId: String, character: PlayerCharacter): String = when (sourceId) {

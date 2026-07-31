@@ -31,6 +31,22 @@ data class KnownSpell(
     val source: String = "",
 )
 
+/**
+ * One class the character has levels in.
+ *
+ * A multiclass character's features advance on the level in *that* class, so this is what
+ * every feature lookup keys off. Proficiency Bonus and spell slots are the exceptions: both
+ * work off the total across all classes.
+ */
+@Serializable
+data class ClassLevel(
+    val classId: String,
+    val level: Int,
+    val subclassId: String? = null,
+    /** True for the class taken at character creation, which grants the full proficiencies. */
+    val isStarting: Boolean = false,
+)
+
 /** An attack or action the player wrote themselves, kept alongside the derived weapon lines. */
 @Serializable
 data class CustomAttack(
@@ -103,6 +119,16 @@ data class PlayerCharacter(
     val classId: String,
     val subclassId: String? = null,
     val backgroundId: String,
+
+    /**
+     * Levels in each class, in the order they were taken.
+     *
+     * Empty on a single-class character and on everything saved before multiclassing
+     * existed, in which case [ClassLevels.of] rebuilds it from [classId], [level], and
+     * [subclassId]. Nothing needs migrating, and a character only grows this list the moment
+     * they take a level in a second class.
+     */
+    val classLevels: List<ClassLevel> = emptyList(),
 
     /** Ability -> base score before any bonuses, keyed by Ability.name. */
     val baseAbilityScores: Map<String, Int>,

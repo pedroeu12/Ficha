@@ -24,18 +24,25 @@ data class ResourceState(
 object CharacterResources {
 
     fun definitions(character: PlayerCharacter): List<ResourceDef> {
-        val derived = ResourceData.forContext(
-            ResourceData.Context(
-                classId = character.classId,
-                subclassId = character.subclassId,
-                speciesId = character.speciesId,
-                lineageId = character.lineageId,
-                featIds = character.featIds,
-                level = character.level,
-                proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
-                abilityModifiers = CharacterCalculations.abilityModifiers(character),
+        // Each class's pools scale on the level in that class, so a Fighter 5 / Cleric 3 has
+        // a level 5 Fighter's Second Wind and a level 3 Cleric's Channel Divinity. Species
+        // and feat pools are gathered once, from the first class, to avoid duplicates.
+        val classes = ClassLevels.of(character)
+        val derived = classes.flatMapIndexed { index, entry ->
+            ResourceData.forContext(
+                ResourceData.Context(
+                    classId = entry.classId,
+                    subclassId = entry.subclassId,
+                    // Only the first pass carries the species and feats.
+                    speciesId = if (index == 0) character.speciesId else "",
+                    lineageId = if (index == 0) character.lineageId else null,
+                    featIds = if (index == 0) character.featIds else emptyList(),
+                    level = entry.level,
+                    proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
+                    abilityModifiers = CharacterCalculations.abilityModifiers(character),
+                )
             )
-        )
+        }.distinctBy { it.id }
 
         val custom = character.customResources.map { resource ->
             ResourceDef(

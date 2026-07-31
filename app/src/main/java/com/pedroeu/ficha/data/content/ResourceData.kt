@@ -1208,8 +1208,8 @@ object ResourceData {
             ResourceDef(
                 id = "goliath:giant_ancestry",
                 name = "Giant Ancestry",
-                // Cloud's Jaunt is the one that scales with the proficiency bonus.
-                max = if (c.lineageId == "cloud") c.proficiencyBonus else 1,
+                // Every Giant Ancestry benefit is Proficiency Bonus uses, not one.
+                max = c.proficiencyBonus,
                 recharge = Recharge.LONG_REST,
                 source = "Goliath",
             )
@@ -1217,11 +1217,25 @@ object ResourceData {
 
         "human" -> listOf(
             ResourceDef(
-                id = "human:determined",
-                name = "Determined",
+                id = "human:resourceful",
+                name = "Heroic Inspiration",
                 max = 1,
                 recharge = Recharge.LONG_REST,
                 source = "Human",
+                description = "Resourceful: you gain Heroic Inspiration whenever you finish " +
+                    "a Long Rest.",
+            )
+        )
+
+        "dwarf" -> listOf(
+            ResourceDef(
+                id = "dwarf:stonecunning",
+                name = "Stonecunning",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Dwarf",
+                description = "As a Bonus Action you gain Tremorsense with a range of 60 feet " +
+                    "for 10 minutes, provided you are on a stone surface.",
             )
         )
 

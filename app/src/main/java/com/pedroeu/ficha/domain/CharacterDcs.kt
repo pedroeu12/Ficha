@@ -7,7 +7,7 @@ import com.pedroeu.ficha.data.model.Ability
 /**
  * One save DC the character can impose, and the spell attack bonus that goes with it.
  *
- * [isPrimary] marks the class's own spellcasting, which is what the Spells tab headlines.
+ * [isPrimary] marks the starting class's spellcasting, which is what the sheet headlines.
  */
 data class SaveDc(
     val id: String,
@@ -23,13 +23,15 @@ data class SaveDc(
  * Every save DC the character has, kept separate by source.
  *
  * A Monk's Stunning Strike is 8 + Proficiency Bonus + Wisdom. If that same Monk takes Magic
- * Initiate (Wizard), the cantrip it grants uses Intelligence instead. Both are live at once
- * and neither is "the" DC, so the sheet lists them side by side rather than picking one.
+ * Initiate (Wizard), the cantrip it grants uses Intelligence instead. Multiclassing adds more
+ * of the same: a Cleric 3 / Wizard 2 casts from Wisdom and Intelligence at once. None of
+ * these replaces another, so the sheet lists them side by side rather than picking one.
  */
 object CharacterDcs {
 
     fun all(character: PlayerCharacter): List<SaveDc> {
         val mods = CharacterCalculations.abilityModifiers(character)
+        // Proficiency Bonus is one of the two things that works off total character level.
         val pb = CharacterCalculations.proficiencyBonus(character)
 
         fun dcFor(
@@ -52,34 +54,41 @@ object CharacterDcs {
         }
 
         return buildList {
-            // The class's own spellcasting, when it has any.
-            val charClass = ClassData.byId(character.classId)
-            charClass?.spellcastingAbility?.let { ability ->
-                add(
-                    dcFor(
-                        id = "class:${character.classId}",
+            ClassLevels.of(character).forEach { entry ->
+                val charClass = ClassData.byId(entry.classId)
+                val isStarting = entry.classId == character.classId
+
+                charClass?.spellcastingAbility?.let { ability ->
+                    val base = dcFor(
+                        id = "class:${entry.classId}",
                         label = charClass.name,
                         ability = ability,
                         note = "${charClass.name} spells.",
-                        isPrimary = true,
-                    ).let { primary ->
-                        // Edit Mode can pin the headline DC and attack bonus by hand.
-                        primary.copy(
-                            dc = CharacterCalculations.spellSaveDc(character) ?: primary.dc,
-                            attackBonus = CharacterCalculations.spellAttackBonus(character)
-                                ?: primary.attackBonus,
-                        )
-                    }
-                )
+                        isPrimary = isStarting,
+                    )
+                    // Edit Mode can pin the headline DC and attack bonus by hand, but only
+                    // for the starting class — the others have no stat to override.
+                    add(
+                        if (isStarting) {
+                            base.copy(
+                                dc = CharacterCalculations.spellSaveDc(character) ?: base.dc,
+                                attackBonus = CharacterCalculations.spellAttackBonus(character)
+                                    ?: base.attackBonus,
+                            )
+                        } else {
+                            base
+                        }
+                    )
+                }
+
+                // Features that force saves without granting spellcasting, e.g. a Monk's.
+                SaveDcData.forClass(entry.classId)
+                    ?.takeIf { charClass?.spellcastingAbility != it.ability }
+                    ?.let { add(dcFor("feature:${it.id}", it.label, it.ability, it.note)) }
+
+                SaveDcData.forSubclass(entry.subclassId)
+                    ?.let { add(dcFor("subclass:${it.id}", it.label, it.ability, it.note)) }
             }
-
-            // Features that force saves without granting spellcasting, e.g. a Monk's.
-            SaveDcData.forClass(character.classId)
-                ?.takeIf { charClass?.spellcastingAbility != it.ability }
-                ?.let { add(dcFor("feature:${it.id}", it.label, it.ability, it.note)) }
-
-            SaveDcData.forSubclass(character.subclassId)
-                ?.let { add(dcFor("subclass:${it.id}", it.label, it.ability, it.note)) }
 
             SaveDcData.forSpecies(character.speciesId)
                 ?.let { add(dcFor("species:${it.id}", it.label, it.ability, it.note)) }
@@ -94,9 +103,11 @@ object CharacterDcs {
         }.distinctBy { it.id }
     }
 
-    /** The DC the sheet leads with: the class's spellcasting, or the first source it has. */
-    fun primary(character: PlayerCharacter): SaveDc? =
-        all(character).firstOrNull { it.isPrimary } ?: all(character).firstOrNull()
+    /** The DC the sheet leads with: the starting class's spellcasting, or the first source. */
+    fun primary(character: PlayerCharacter): SaveDc? {
+        val dcs = all(character)
+        return dcs.firstOrNull { it.isPrimary } ?: dcs.firstOrNull()
+    }
 
     /** True when the character has more than one DC in play, so the sheet must show them all. */
     fun hasMultiple(character: PlayerCharacter): Boolean = all(character).size > 1

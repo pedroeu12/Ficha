@@ -24,4 +24,14 @@ data class Species(
     val lineageOptions: List<LineageOption> = emptyList(),
     val grantedSkills: List<Skill> = emptyList(),
     val bonusSkillChoiceCount: Int = 0,
+    /**
+     * The skills [bonusSkillChoiceCount] may be spent on. Empty means any skill, as the
+     * Human's Skillful trait allows; the Elf's Keen Senses names three.
+     */
+    val bonusSkillOptions: List<Skill> = emptyList(),
+    /**
+     * True when the species hands out an Origin feat of the player's choice, as the Human's
+     * Versatile trait does. The creation flow offers the same list a background draws from.
+     */
+    val grantsOriginFeat: Boolean = false,
 )

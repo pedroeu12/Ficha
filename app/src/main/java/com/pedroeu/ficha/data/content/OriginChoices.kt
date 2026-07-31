@@ -118,6 +118,28 @@ object OriginChoices {
     }
 
     /** Cantrips a species lineage lets the player pick rather than granting outright. */
+    /**
+     * An Origin feat granted by the species itself, as the Human's Versatile trait does. It
+     * draws from the same list a background's feat comes from.
+     */
+    fun forSpecies(speciesId: String?): List<Choice> {
+        val species = speciesId?.let { SpeciesData.byId(it) } ?: return emptyList()
+        if (!species.grantsOriginFeat) return emptyList()
+        return listOf(
+            Choice(
+                id = "species:$speciesId:origin_feat",
+                label = "Origin Feat",
+                prompt = "Choose an Origin feat. ${species.name}s gain one from Versatile.",
+                count = 1,
+                kind = ChoiceKind.FEAT,
+                options = FeatData.ORIGIN_FEATS.map {
+                    ChoiceOption(it.id, it.name, it.description)
+                },
+                source = species.name,
+            )
+        )
+    }
+
     fun forLineage(speciesId: String, lineageId: String?): List<Choice> {
         if (lineageId == null) return emptyList()
         return when {
@@ -208,6 +230,7 @@ object OriginChoices {
     ): List<Choice> {
         val choices = mutableListOf<Choice>()
 
+        choices += forSpecies(speciesId)
         if (speciesId != null) choices += forLineage(speciesId, lineageId)
         if (classId != null) choices += forClass(classId, classSelections)
 

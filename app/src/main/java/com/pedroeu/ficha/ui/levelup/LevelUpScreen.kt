@@ -130,6 +130,7 @@ fun LevelUpScreen(
                 .padding(padding)
         ) {
             when (loaded.step) {
+                LevelUpStep.CLASS -> ChooseClassStep(loaded, viewModel)
                 LevelUpStep.HIT_POINTS -> HitPointsStep(loaded, viewModel)
                 LevelUpStep.SUBCLASS -> SubclassStep(loaded, viewModel)
                 LevelUpStep.FEATURES -> FeaturesStep(loaded, viewModel)
@@ -187,6 +188,7 @@ private fun hintFor(state: LevelUpState): String = when {
     state.step == LevelUpStep.SUMMARY -> "Confirm to save your new level"
     state.canAdvance -> "Looks good"
     else -> when (state.step) {
+        LevelUpStep.CLASS -> "Put this level into a class"
         LevelUpStep.HIT_POINTS -> "Choose how to gain hit points"
         LevelUpStep.SUBCLASS -> "Pick your subclass"
         LevelUpStep.FEATURES -> "Complete every choice below"

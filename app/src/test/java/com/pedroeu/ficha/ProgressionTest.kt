@@ -114,11 +114,25 @@ class ProgressionTest {
     }
 
     @Test
-    fun `a level up always starts on hit points and ends on the summary`() {
+    fun `a level up always covers hit points and ends on the summary`() {
         ClassData.ALL.forEach { charClass ->
             (1..19).forEach { level ->
                 val state = LevelUpState(character = character(charClass.id, level))
-                assertEquals(LevelUpStep.HIT_POINTS, state.steps.first())
+                // The class step leads whenever the character could multiclass; hit points
+                // always follow, and the summary always closes.
+                assertEquals(
+                    "${charClass.id} L$level should open on the class or hit point step",
+                    if (state.steps.first() == LevelUpStep.CLASS) {
+                        LevelUpStep.CLASS
+                    } else {
+                        LevelUpStep.HIT_POINTS
+                    },
+                    state.steps.first(),
+                )
+                assertTrue(
+                    "${charClass.id} L$level must still ask about hit points",
+                    state.steps.contains(LevelUpStep.HIT_POINTS),
+                )
                 assertEquals(LevelUpStep.SUMMARY, state.steps.last())
                 assertEquals(
                     "${charClass.id} L$level has duplicate steps",

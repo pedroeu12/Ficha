@@ -44,6 +44,7 @@ import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.PlayerCharacter
 import kotlinx.coroutines.launch
@@ -141,7 +142,8 @@ private fun CharacterRow(
     onDelete: () -> Unit,
 ) {
     val species = SpeciesData.byId(character.speciesId)?.name ?: "Unknown"
-    val charClass = ClassData.byId(character.classId)?.name ?: "Unknown"
+    // "Fighter 5 / Wizard 3" once multiclassed, just the class name otherwise.
+    val charClass = ClassLevels.label(character).ifBlank { "Unknown" }
     val background = BackgroundData.byId(character.backgroundId)?.name ?: ""
 
     Card(

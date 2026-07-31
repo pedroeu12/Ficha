@@ -8,10 +8,15 @@ import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ClassFeature
 import com.pedroeu.ficha.data.model.SubclassFeature
+import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.PlayerCharacter
 
 enum class LevelUpStep(val title: String, val shortLabel: String) {
+    /** Which class the level goes into, shown first because everything else depends on it. */
+    CLASS("Choose a Class", "Class"),
     HIT_POINTS("Hit Points", "HP"),
     SUBCLASS("Choose a Subclass", "Subclass"),
     FEATURES("New Features", "Features"),
@@ -36,7 +41,7 @@ enum class AsiMode(val label: String) {
 
 data class LevelUpState(
     val character: PlayerCharacter,
-    val step: LevelUpStep = LevelUpStep.HIT_POINTS,
+    val step: LevelUpStep = LevelUpStep.CLASS,
 
     val hitPointMethod: HitPointMethod = HitPointMethod.AVERAGE,
     val rolledHitPoints: Int? = null,
@@ -56,18 +61,37 @@ data class LevelUpState(
     val newSpells: List<String> = emptyList(),
     /** Spells typed in by hand, for levels the catalog doesn't cover. */
     val manualSpells: List<String> = emptyList(),
+    /**
+     * The class this level goes into. Defaults to the starting class, and is set to something
+     * else when the player multiclasses.
+     */
+    val levellingClassId: String? = null,
 ) {
     val currentLevel: Int get() = character.level
     val targetLevel: Int get() = character.level + 1
 
-    val progression get() = ProgressionData.forClass(character.classId)
+    /** The class gaining this level, which is what every feature lookup keys off. */
+    val classId: String get() = levellingClassId ?: character.classId
+
+    /** Levels the character will have in that class once this one is taken. */
+    val targetClassLevel: Int get() = ClassLevels.levelIn(character, classId) + 1
+
+    /** True when this level starts a class the character had no levels in. */
+    val isNewClass: Boolean get() = ClassLevels.levelIn(character, classId) == 0
+
+    val progression get() = ProgressionData.forClass(classId)
+
+    /** Classes this character could put the level into, with the ones they can't and why. */
+    val multiclassOptions get() = Multiclassing.options(character)
 
     /** The character with its new level applied, used to preview the resulting numbers. */
-    val leveledCharacter: PlayerCharacter get() = character.copy(level = targetLevel)
+    val leveledCharacter: PlayerCharacter
+        get() = Multiclassing.withLevelIn(character, classId)
 
     // ---------------------------------------------------------------- Hit points
 
-    val hitDie: Int get() = CharacterCalculations.hitDie(character)
+    /** The hit die of the class being levelled, not of the character's first class. */
+    val hitDie: Int get() = ClassData.byId(classId)?.hitDie ?: 8
 
     val averageHitPoints: Int get() = hitDie / 2 + 1
 
@@ -81,23 +105,27 @@ data class LevelUpState(
     // ---------------------------------------------------------------- Gains this level
 
     val gainsSubclass: Boolean
-        get() = progression?.subclassLevel == targetLevel && character.subclassId == null
+        get() = progression?.subclassLevel == targetClassLevel &&
+            ClassLevels.subclassIn(character, classId) == null
 
-    val subclassOptions get() = SubclassData.forClass(character.classId)
+    val subclassOptions get() = SubclassData.forClass(classId)
 
-    val activeSubclassId: String? get() = subclassId ?: character.subclassId
+    val activeSubclassId: String?
+        get() = subclassId ?: ClassLevels.subclassIn(character, classId)
 
     val newClassFeatures: List<ClassFeature>
-        get() = progression?.featuresAt(targetLevel).orEmpty()
+        get() = progression?.featuresAt(targetClassLevel).orEmpty()
 
     val newSubclassFeatures: List<SubclassFeature>
-        get() = activeSubclassId?.let { SubclassData.byId(it)?.featuresAt(targetLevel) }.orEmpty()
+        get() = activeSubclassId?.let {
+            SubclassData.byId(it)?.featuresAt(targetClassLevel)
+        }.orEmpty()
 
     /** Every decision the new features force, from both the class and the subclass. */
     val featureChoices: List<Choice>
         get() = newClassFeatures.flatMap { it.choices } + newSubclassFeatures.flatMap { it.choices }
 
-    val grantsAsi: Boolean get() = progression?.grantsAsiAt(targetLevel) == true
+    val grantsAsi: Boolean get() = progression?.grantsAsiAt(targetClassLevel) == true
 
     val grantsEpicBoon: Boolean get() = progression?.grantsEpicBoonAt(targetLevel) == true
 
@@ -145,6 +173,11 @@ data class LevelUpState(
     /** Only the steps that actually apply to this level, in order. */
     val steps: List<LevelUpStep>
         get() = buildList {
+            // The class choice only appears once there's a real decision: a character who
+            // can't meet any multiclass prerequisite just keeps levelling what they have.
+            if (multiclassOptions.any { it.allowed && !it.alreadyHas }) {
+                add(LevelUpStep.CLASS)
+            }
             add(LevelUpStep.HIT_POINTS)
             if (gainsSubclass) add(LevelUpStep.SUBCLASS)
             if (newClassFeatures.isNotEmpty() || newSubclassFeatures.isNotEmpty()) {
@@ -157,6 +190,7 @@ data class LevelUpState(
 
     val canAdvance: Boolean
         get() = when (step) {
+            LevelUpStep.CLASS -> Multiclassing.canTake(character, classId)
             LevelUpStep.HIT_POINTS -> hitPointsGained >= 1
             LevelUpStep.SUBCLASS -> activeSubclassId != null
             LevelUpStep.FEATURES -> featureChoices.all {

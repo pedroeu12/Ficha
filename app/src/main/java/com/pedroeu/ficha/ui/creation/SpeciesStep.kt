@@ -107,7 +107,9 @@ private fun SpeciesDetails(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Skill.ALL.forEach { skill ->
+                // Keen Senses names three skills; Skillful allows any.
+                val options = species.bonusSkillOptions.ifEmpty { Skill.ALL }
+                options.forEach { skill ->
                     val selected = state.speciesSkillChoices.contains(skill)
                     ChoiceChip(
                         label = skill.displayName,

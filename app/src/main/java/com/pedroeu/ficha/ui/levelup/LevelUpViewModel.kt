@@ -11,6 +11,7 @@ import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.PlayerCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,6 +66,26 @@ class LevelUpViewModel(
     }
 
     // ------------------------------------------------------------------ Choices
+
+    /**
+     * Puts this level into a different class. Everything downstream — hit die, features,
+     * subclass timing — reads from it, so the picks made so far are cleared.
+     */
+    fun selectLevellingClass(classId: String) = edit { current ->
+        if (current.classId == classId) {
+            current
+        } else {
+            current.copy(
+                levellingClassId = classId,
+                subclassId = null,
+                selections = emptyMap(),
+                newCantrips = emptyList(),
+                newSpells = emptyList(),
+                manualSpells = emptyList(),
+                rolledHitPoints = null,
+            )
+        }
+    }
 
     fun selectSubclass(id: String) = edit { it.copy(subclassId = id, selections = emptyMap()) }
 
@@ -182,7 +203,9 @@ class LevelUpViewModel(
         allChoices.forEach { choice ->
             val picked = state.selections[choice.id].orEmpty()
             if (picked.isEmpty()) return@forEach
-            choiceSelections["${state.targetLevel}:${choice.id}"] = picked
+            // Keyed by the level in the class that granted it, so a multiclass character's
+            // picks stay attached to the right feature.
+            choiceSelections["${state.targetClassLevel}:${choice.id}"] = picked
 
             when (choice.kind) {
                 ChoiceKind.SKILL -> newSkills += picked.filter { id ->
@@ -226,18 +249,45 @@ class LevelUpViewModel(
             abilityImprovements[ability.name] = (abilityImprovements[ability.name] ?: 0) + points
         }
 
-        val leveled = character.copy(
-            level = state.targetLevel,
-            subclassId = state.activeSubclassId,
+        // Taking the first level in a new class grants a reduced set of proficiencies —
+        // never saving throws, which only the class you started with provides.
+        val multiclassEntry = if (state.isNewClass) {
+            Multiclassing.proficienciesGained(state.classId)
+        } else {
+            null
+        }
+
+        val withLevel = Multiclassing.withLevelIn(character, state.classId)
+        val leveled = withLevel.copy(
+            subclassId = if (state.classId == character.classId) {
+                state.activeSubclassId
+            } else {
+                character.subclassId
+            },
             hitPointsPerLevel = character.hitPointsPerLevel + state.hitPointsGained,
             skillProficiencies = character.skillProficiencies + newSkills,
             skillExpertise = character.skillExpertise + newExpertise,
-            toolProficiencies = (character.toolProficiencies + newTools).distinct(),
+            toolProficiencies = (
+                character.toolProficiencies + newTools +
+                    multiclassEntry?.toolProficiencies.orEmpty()
+                ).distinct(),
+            armorTraining = (
+                character.armorTraining + multiclassEntry?.armorTraining.orEmpty()
+                ).distinct(),
+            weaponProficiencies = (
+                character.weaponProficiencies + multiclassEntry?.weaponProficiencies.orEmpty()
+                ).distinct(),
             abilityScoreImprovements = abilityImprovements,
             featIds = character.featIds + listOfNotNull(state.featId),
             knownSpells = (character.knownSpells + learnedSpells).distinctBy { it.id },
             levelSelections = character.levelSelections + choiceSelections,
-        )
+        ).let { updated ->
+            // Record the subclass against its own class, so each class keeps its own.
+            state.activeSubclassId
+                ?.takeIf { state.gainsSubclass }
+                ?.let { Multiclassing.withSubclass(updated, state.classId, it) }
+                ?: updated
+        }
 
         // Gaining a level raises max HP; current hit points rise by the same amount so the
         // character isn't suddenly wounded by levelling up.

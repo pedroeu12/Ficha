@@ -14,6 +14,7 @@ import com.pedroeu.ficha.data.model.SubclassFeature
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.FeatPrerequisites
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -253,12 +254,13 @@ data class LevelUpState(
         }
 
     private fun asiValid(): Boolean {
-        if (grantsEpicBoon) return featId != null
+        // A feat has to be one the character qualifies for, not merely one they tapped.
+        if (grantsEpicBoon) return featChoiceValid()
         if (!grantsAsi) return true
         return when (asiMode) {
             AsiMode.PLUS_TWO -> asiPoints.values.sum() == 2 && asiPoints.size == 1
             AsiMode.PLUS_ONE_ONE -> asiPoints.values.sum() == 2 && asiPoints.size == 2
-            AsiMode.FEAT -> featId != null
+            AsiMode.FEAT -> featChoiceValid()
         }
     }
 
@@ -284,4 +286,20 @@ data class LevelUpState(
         } else {
             FeatData.GENERAL_FEATS.filterNot { it.id == "ability_score_improvement" }
         }.filterNot { it.id in character.featIds }
+
+    /**
+     * Why a feat can't be taken yet, keyed by feat id and empty for the ones that can.
+     *
+     * Unavailable feats stay on the list rather than vanishing: a player weighing up the
+     * Path of the Lich needs to see that Lich Ascension is the end of it and what it costs
+     * to get there.
+     */
+    val featBlockers: Map<String, String>
+        get() = featOptions.associate { feat ->
+            feat.id to FeatPrerequisites.check(leveledCharacter, feat.id).missing
+        }
+
+    /** True when the feat currently selected is one the character actually qualifies for. */
+    private fun featChoiceValid(): Boolean =
+        featId?.let { FeatPrerequisites.isAllowed(leveledCharacter, it) } ?: false
 }

@@ -4,6 +4,7 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.EquipmentData
 import com.pedroeu.ficha.data.content.FeatChoiceData
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.FeatPrerequisiteData
 import com.pedroeu.ficha.data.content.MasteryData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpellData
@@ -15,8 +16,12 @@ import com.pedroeu.ficha.domain.CharacterMasteries
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.FeatPrerequisites
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.creation.CreationState
+import com.pedroeu.ficha.ui.levelup.AsiMode
+import com.pedroeu.ficha.ui.levelup.LevelUpState
+import com.pedroeu.ficha.ui.levelup.LevelUpStep
 import com.pedroeu.ficha.ui.creation.CreationStep
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -355,12 +360,159 @@ class MasteryAndPlaytestTest {
             )
         }
 
-        // The Initiate feats are the entry points and belong with the other Origin feats;
-        // everything after them is taken in place of an Ability Score Improvement.
-        assertTrue(FeatData.ORIGIN_FEATS.any { it.id == "death_knight_initiate" })
-        assertTrue(FeatData.ORIGIN_FEATS.any { it.id == "lich_initiate" })
-        assertTrue(FeatData.GENERAL_FEATS.any { it.id == "death_knight_ascension" })
-        assertTrue(FeatData.GENERAL_FEATS.any { it.id == "lich_ascension" })
+        // Every feat on both paths, the Initiates included, has a level 4+ prerequisite and
+        // is taken in place of an Ability Score Improvement. None of them is an Origin feat,
+        // so a level 1 character can't start down either path at creation.
+        (deathKnight + lich).forEach { id ->
+            assertTrue(
+                "$id needs level 4, so it can't sit with the Origin feats",
+                FeatData.GENERAL_FEATS.any { it.id == id },
+            )
+            assertFalse(
+                "$id must not be offered at character creation",
+                FeatData.ORIGIN_FEATS.any { it.id == id },
+            )
+        }
+    }
+
+    /**
+     * The Origin feat list is what a background grants and what a Human's Versatile trait
+     * draws from, both at level 1. Anything in it whose own text demands a level is in the
+     * wrong list — which is exactly how the two Initiate feats slipped through.
+     */
+    @Test
+    fun `no origin feat asks for a level the character cannot have yet`() {
+        val levelled = FeatData.ORIGIN_FEATS.filter { feat ->
+            Regex("""level \d+""", RegexOption.IGNORE_CASE).containsMatchIn(feat.description) &&
+                !feat.description.contains("character level", ignoreCase = true) &&
+                !feat.description.contains("level 1 spell", ignoreCase = true)
+        }
+        assertTrue(
+            "these are offered at creation but require a level: ${levelled.map { it.id }}",
+            levelled.isEmpty(),
+        )
+    }
+
+    // ------------------------------------------------------------- Feat prerequisites
+
+    @Test
+    fun `every prerequisite key and target names a real feat`() {
+        val known = FeatData.ALL.map { it.id }.toSet()
+        val unknown = FeatPrerequisiteData.sourceIds() - known
+        assertTrue("these prerequisite ids match no feat: $unknown", unknown.isEmpty())
+    }
+
+    @Test
+    fun `a path opens at level 4 and only for a class that qualifies`() {
+        // A Fighter has Weapon Mastery, so the Death Knight path is open from level 4.
+        val fighter = character(classId = "fighter", level = 4)
+        assertTrue(FeatPrerequisites.isAllowed(fighter, "death_knight_initiate"))
+
+        // A Wizard has no Weapon Mastery, so it never is.
+        val wizard = character(classId = "wizard", level = 12)
+        val blocked = FeatPrerequisites.check(wizard, "death_knight_initiate")
+        assertFalse(blocked.allowed)
+        assertTrue(blocked.missing.contains("Weapon Mastery"))
+
+        // And the Lich path wants spellcasting, which the Fighter lacks and the Wizard has.
+        assertTrue(FeatPrerequisites.isAllowed(wizard, "lich_initiate"))
+        assertFalse(FeatPrerequisites.isAllowed(fighter, "lich_initiate"))
+    }
+
+    @Test
+    fun `a path feat needs its initiate first`() {
+        val fighter = character(classId = "fighter", level = 8)
+        val without = FeatPrerequisites.check(fighter, "deathly_presence")
+        assertFalse(without.allowed)
+        assertTrue(without.missing.contains("Death Knight Initiate"))
+
+        val initiated = fighter.copy(featIds = listOf("death_knight_initiate"))
+        assertTrue(FeatPrerequisites.isAllowed(initiated, "deathly_presence"))
+
+        // Level 8 is its own bar on top of that.
+        val tooEarly = character(classId = "fighter", level = 4)
+            .copy(featIds = listOf("death_knight_initiate"))
+        assertFalse(FeatPrerequisites.isAllowed(tooEarly, "deathly_presence"))
+    }
+
+    @Test
+    fun `ascension needs level 12 and two other feats from the same path`() {
+        val oneFeat = character(classId = "fighter", level = 12)
+            .copy(featIds = listOf("death_knight_initiate"))
+        val short = FeatPrerequisites.check(oneFeat, "death_knight_ascension")
+        assertFalse("one path feat isn't enough", short.allowed)
+        assertTrue(short.missing.contains("2 feats from this path"))
+
+        val twoFeats = oneFeat.copy(
+            featIds = listOf("death_knight_initiate", "harbinger_of_doom")
+        )
+        assertTrue(FeatPrerequisites.isAllowed(twoFeats, "death_knight_ascension"))
+
+        val tooEarly = character(classId = "fighter", level = 8)
+            .copy(featIds = listOf("death_knight_initiate", "harbinger_of_doom"))
+        assertFalse(FeatPrerequisites.isAllowed(tooEarly, "death_knight_ascension"))
+    }
+
+    @Test
+    fun `a greater dragonmark needs the mark it improves`() {
+        val plain = character(level = 4)
+        assertFalse(FeatPrerequisites.isAllowed(plain, "greater_mark_of_storm"))
+
+        val marked = plain.copy(featIds = listOf("mark_of_storm"))
+        assertTrue(FeatPrerequisites.isAllowed(marked, "greater_mark_of_storm"))
+        // Potent Dragonmark takes any mark, not one specific one.
+        assertTrue(FeatPrerequisites.isAllowed(marked, "potent_dragonmark"))
+        assertFalse(FeatPrerequisites.isAllowed(plain, "potent_dragonmark"))
+    }
+
+    @Test
+    fun `a feat that accepts either the feat or the feature takes whichever you have`() {
+        val sparked = character(classId = "fighter", level = 4)
+            .copy(featIds = listOf("spellfire_spark"))
+        assertTrue("the feat alone qualifies", FeatPrerequisites.isAllowed(sparked, "spellfire_adept"))
+
+        val caster = character(classId = "wizard", level = 4)
+        assertTrue("so does being a caster", FeatPrerequisites.isAllowed(caster, "spellfire_adept"))
+
+        val neither = character(classId = "fighter", level = 4)
+        assertFalse(FeatPrerequisites.isAllowed(neither, "spellfire_adept"))
+    }
+
+    @Test
+    fun `an ordinary feat has nothing to meet`() {
+        val anyone = character(level = 4)
+        listOf("alert", "tough", "skill_expert", "war_caster").forEach { id ->
+            assertTrue("$id should need no prerequisite", FeatPrerequisites.isAllowed(anyone, id))
+        }
+    }
+
+    @Test
+    fun `the level up picker blocks a feat you don't qualify for`() {
+        val wizard = character(classId = "wizard", level = 3)
+        val state = LevelUpState(character = wizard, levellingClassId = "wizard")
+
+        assertTrue("the ASI level offers feats", state.grantsAsi)
+        assertTrue(
+            "an unavailable feat stays on the list with a reason",
+            state.featBlockers["death_knight_initiate"]?.contains("Weapon Mastery") == true,
+        )
+        assertEquals(
+            "an available one carries no reason",
+            "",
+            state.featBlockers["war_caster"],
+        )
+
+        // Picking a blocked feat must not let the level be finished.
+        val blocked = state.copy(
+            requestedStep = LevelUpStep.ASI,
+            asiMode = AsiMode.FEAT,
+            featId = "death_knight_initiate",
+        )
+        assertFalse(blocked.canAdvance)
+
+        assertTrue(
+            blocked.copy(featId = "war_caster").canAdvance
+        )
     }
 
     @Test

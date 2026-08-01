@@ -419,13 +419,19 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                     trailing = if (state.featId == null) "Choose 1" else null,
                 )
             }
+            val blockers = state.featBlockers
             items(feats.size, key = { feats[it].id }) { index ->
                 val feat = feats[index]
+                // A feat whose prerequisites aren't met stays visible with the reason, so
+                // the path it belongs to is legible before you're eligible for it.
+                val blocked = blockers[feat.id].orEmpty()
                 SelectableCard(
                     title = feat.name,
                     subtitle = feat.description,
                     selected = state.featId == feat.id,
+                    enabled = blocked.isEmpty(),
                     onClick = { viewModel.selectFeat(feat.id) },
+                    trailingLabel = blocked,
                 )
             }
         }

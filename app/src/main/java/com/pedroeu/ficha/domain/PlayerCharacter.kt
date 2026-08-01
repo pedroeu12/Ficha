@@ -110,15 +110,23 @@ enum class OverridableStat(val label: String) {
 @Serializable
 data class PlayerCharacter(
     val id: String,
-    val name: String,
+    /**
+     * Everything below the id has a default.
+     *
+     * That matters for backups more than for the database: a file written by an older build
+     * won't carry a field added since, and one written by a newer build may carry a field
+     * that was later dropped. Defaults everywhere mean a partial character still opens with
+     * what it does have, rather than the whole file being refused over one missing key.
+     */
+    val name: String = "Unnamed Character",
     val level: Int = 1,
     val experiencePoints: Int = 0,
 
-    val speciesId: String,
+    val speciesId: String = "",
     val lineageId: String? = null,
-    val classId: String,
+    val classId: String = "",
     val subclassId: String? = null,
-    val backgroundId: String,
+    val backgroundId: String = "",
 
     /**
      * Levels in each class, in the order they were taken.
@@ -131,7 +139,7 @@ data class PlayerCharacter(
     val classLevels: List<ClassLevel> = emptyList(),
 
     /** Ability -> base score before any bonuses, keyed by Ability.name. */
-    val baseAbilityScores: Map<String, Int>,
+    val baseAbilityScores: Map<String, Int> = emptyMap(),
     /** Ability -> background bonus (+2/+1), keyed by Ability.name. */
     val backgroundAbilityBonuses: Map<String, Int> = emptyMap(),
     /** Ability -> points gained from Ability Score Improvements taken on level up. */

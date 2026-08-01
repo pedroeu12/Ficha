@@ -18,6 +18,9 @@ interface CharacterDao {
     @Query("SELECT * FROM characters WHERE id = :id")
     suspend fun getById(id: String): CharacterEntity?
 
+    @Query("SELECT * FROM characters ORDER BY updatedAt DESC")
+    suspend fun getAll(): List<CharacterEntity>
+
     @Upsert
     suspend fun upsert(entity: CharacterEntity)
 

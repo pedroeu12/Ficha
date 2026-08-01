@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.home
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,11 +45,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pedroeu.ficha.BuildConfig
+import com.pedroeu.ficha.data.BackupFiles
+import com.pedroeu.ficha.data.CharacterBackup
 import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
@@ -82,7 +90,10 @@ fun HomeScreen(
                         )
                     }
                 },
-                actions = { AppearanceButton() },
+                actions = {
+                    AppearanceButton()
+                    BackupMenu(repository)
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -264,5 +275,101 @@ private fun AppearanceButton() {
                 )
             }
         }
+    }
+}
+
+/**
+ * Backing characters up and restoring them.
+ *
+ * Updating the app means installing over the old build, and when that doesn't take, the
+ * advice is to uninstall first — which deletes the database along with it. A character that
+ * took an evening to build shouldn't be a casualty of a version bump, so this writes them to
+ * a file the uninstall can't reach.
+ */
+@Composable
+private fun BackupMenu(repository: CharacterRepository) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val files = remember(context) { BackupFiles(context) }
+
+    var showMenu by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf<String?>(null) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument(CharacterBackup.MIME_TYPE)
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val characters = repository.getAll()
+            val text = CharacterBackup.encode(
+                characters = characters,
+                appVersion = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                now = System.currentTimeMillis(),
+            )
+            result = files.write(uri, text).fold(
+                onSuccess = {
+                    val count = characters.size
+                    "Backed up $count character${if (count == 1) "" else "s"}."
+                },
+                onFailure = { it.message ?: "Couldn't write that file." },
+            )
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            result = files.read(uri)
+                .mapCatching { text -> CharacterBackup.decode(text).getOrThrow() }
+                .fold(
+                    onSuccess = { incoming ->
+                        val plan = CharacterBackup.plan(repository.getAll(), incoming)
+                        repository.restore(plan.toWrite)
+                        plan.summary()
+                    },
+                    onFailure = { it.message ?: "Couldn't read that file." },
+                )
+        }
+    }
+
+    Box {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "Backup and restore")
+        }
+        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            DropdownMenuItem(
+                text = { Text("Back up characters") },
+                onClick = {
+                    showMenu = false
+                    exportLauncher.launch(
+                        CharacterBackup.fileName(System.currentTimeMillis())
+                    )
+                },
+                leadingIcon = { Icon(Icons.Default.Save, contentDescription = null) },
+            )
+            DropdownMenuItem(
+                text = { Text("Restore from backup") },
+                onClick = {
+                    showMenu = false
+                    // Some file providers hand back a generic type for a .json file, so
+                    // anything is accepted and the contents decide whether it's a backup.
+                    importLauncher.launch(arrayOf("*/*"))
+                },
+                leadingIcon = { Icon(Icons.Default.Restore, contentDescription = null) },
+            )
+        }
+    }
+
+    result?.let { message ->
+        AlertDialog(
+            onDismissRequest = { result = null },
+            title = { Text("Backup") },
+            text = { Text(message) },
+            confirmButton = {
+                TextButton(onClick = { result = null }) { Text("OK") }
+            },
+        )
     }
 }

@@ -39,6 +39,32 @@ class CharacterRepository(private val dao: CharacterDao) {
 
     suspend fun delete(id: String) = dao.deleteById(id)
 
+    /** Every character, read once rather than observed, for writing a backup. */
+    suspend fun getAll(): List<PlayerCharacter> = dao.getAll().map { decode(it) }
+
+    /**
+     * Writes restored characters back.
+     *
+     * The stored timestamp is kept rather than stamped with now, because it is what decides
+     * whether a later restore counts as newer. Saving normally would make every restored
+     * character look freshly edited and defeat that comparison.
+     */
+    suspend fun restore(characters: List<PlayerCharacter>) {
+        characters.forEach { character ->
+            dao.upsert(
+                CharacterEntity(
+                    id = character.id,
+                    name = character.name,
+                    speciesId = character.speciesId,
+                    classId = character.classId,
+                    level = character.level,
+                    updatedAt = character.updatedAt,
+                    payload = json.encodeToString(PlayerCharacter.serializer(), character),
+                )
+            )
+        }
+    }
+
     private fun decode(entity: CharacterEntity): PlayerCharacter =
         json.decodeFromString(PlayerCharacter.serializer(), entity.payload)
 }

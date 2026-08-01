@@ -77,10 +77,19 @@ class ProgressionTest {
     }
 
     @Test
-    fun `half casters get nothing at level 1 and lag behind`() {
-        assertTrue(SpellSlotTables.slotsFor(CasterType.HALF, 1).isEmpty())
+    fun `half casters cast from level 1 and then lag behind`() {
+        // The 2024 Paladin and Ranger both gain Spellcasting at level 1 with two slots; the
+        // older tables that started them at level 2 left a level 1 Ranger unable to cast.
+        assertEquals(mapOf(1 to 2), SpellSlotTables.slotsFor(CasterType.HALF, 1))
         assertEquals(mapOf(1 to 2), SpellSlotTables.slotsFor(CasterType.HALF, 2))
+        assertEquals(mapOf(1 to 3), SpellSlotTables.slotsFor(CasterType.HALF, 3))
+        assertEquals(mapOf(1 to 4, 2 to 2), SpellSlotTables.slotsFor(CasterType.HALF, 5))
         assertEquals(mapOf(1 to 4, 2 to 3, 3 to 3, 4 to 3, 5 to 2), SpellSlotTables.slotsFor(CasterType.HALF, 20))
+        // A half caster still trails a full caster of the same level.
+        assertTrue(
+            SpellSlotTables.maxSpellLevel(CasterType.HALF, 9) <
+                SpellSlotTables.maxSpellLevel(CasterType.FULL, 9)
+        )
     }
 
     @Test
@@ -149,9 +158,9 @@ class ProgressionTest {
             val state = LevelUpState(character = character(charClass.id, 2))
             assertTrue("${charClass.id} must pick a subclass at 3", state.gainsSubclass)
             assertTrue(state.steps.contains(LevelUpStep.SUBCLASS))
-            assertFalse("cannot advance without choosing", state.copy(step = LevelUpStep.SUBCLASS).canAdvance)
+            assertFalse("cannot advance without choosing", state.copy(requestedStep = LevelUpStep.SUBCLASS).canAdvance)
             assertTrue(
-                state.copy(step = LevelUpStep.SUBCLASS, subclassId = state.subclassOptions.first().id)
+                state.copy(requestedStep = LevelUpStep.SUBCLASS, subclassId = state.subclassOptions.first().id)
                     .canAdvance
             )
         }
@@ -159,7 +168,7 @@ class ProgressionTest {
 
     @Test
     fun `an ability score improvement level demands two full points or a feat`() {
-        val state = LevelUpState(character = character("wizard", 3), step = LevelUpStep.ASI)
+        val state = LevelUpState(character = character("wizard", 3), requestedStep = LevelUpStep.ASI)
         assertTrue(state.grantsAsi)
         assertFalse("nothing assigned yet", state.canAdvance)
 

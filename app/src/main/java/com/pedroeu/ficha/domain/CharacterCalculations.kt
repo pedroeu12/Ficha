@@ -56,19 +56,28 @@ object CharacterCalculations {
     fun proficiencyBonus(level: Int): Int = 2 + (level - 1) / 4
 
     /**
-     * Base scores plus background bonuses, level-up improvements, and any Edit Mode bonus.
-     * Species grants no ability bonuses in the 2024 rules.
+     * Base scores plus background bonuses, level-up improvements, the increases the
+     * character's feats grant, and any Edit Mode bonus. Species grants no ability bonuses in
+     * the 2024 rules.
+     *
+     * The feat increases are capped at 20 — or 30 for an Epic Boon, which is the one thing
+     * that may push a score past the usual ceiling. An Edit Mode override skips all of it.
      */
-    fun finalAbilityScores(character: PlayerCharacter): Map<Ability, Int> =
-        Ability.ALL.associateWith { ability ->
+    fun finalAbilityScores(character: PlayerCharacter): Map<Ability, Int> {
+        val fromFeats = FeatBonuses.byAbility(character)
+        return Ability.ALL.associateWith { ability ->
             character.abilityScoreOverrides[ability.name] ?: run {
                 val base = character.baseAbilityScores[ability.name] ?: 10
                 val background = character.backgroundAbilityBonuses[ability.name] ?: 0
                 val improvements = character.abilityScoreImprovements[ability.name] ?: 0
                 val manual = character.abilityScoreBonuses[ability.name] ?: 0
-                base + background + improvements + manual
+                val feats = fromFeats[ability] ?: 0
+                val withoutFeats = base + background + improvements + manual
+                (withoutFeats + feats)
+                    .coerceAtMost(maxOf(FeatBonuses.capFor(character, ability), withoutFeats))
             }
         }
+    }
 
     fun abilityModifiers(character: PlayerCharacter): Map<Ability, Int> =
         finalAbilityScores(character).mapValues { (_, score) -> modifier(score) }
@@ -291,14 +300,18 @@ object CharacterCalculations {
     fun maxSpellLevel(character: PlayerCharacter): Int =
         spellSlots(character).keys.maxOrNull() ?: 0
 
-    /** How many spells the character can have prepared, per the class table. */
+    /**
+     * How many spells the character can have prepared, per the class table.
+     *
+     * Each class contributes what its own level allows, so a Cleric 5 / Wizard 3 prepares a
+     * level 5 Cleric's spells plus a level 3 Wizard's rather than reading one table at
+     * character level 8.
+     */
     fun maxPreparedSpells(character: PlayerCharacter): Int {
-        val progression = ProgressionData.forClass(character.classId) ?: return 0
-        return adjust(
-            character,
-            OverridableStat.MAX_PREPARED_SPELLS,
-            progression.preparedSpellsAt(character.level),
-        )
+        val total = ClassLevels.of(character).sumOf { entry ->
+            ProgressionData.forClass(entry.classId)?.preparedSpellsAt(entry.level) ?: 0
+        }
+        return adjust(character, OverridableStat.MAX_PREPARED_SPELLS, total)
     }
 
     fun maxCantripsKnown(character: PlayerCharacter): Int {

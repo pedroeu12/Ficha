@@ -108,12 +108,15 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
 
     fun selectBackground(id: String) = _state.update { current ->
         if (current.backgroundId == id) current
-        else current.copy(
+        // Only the outgoing background's own picks are dropped. A feat taken through the
+        // species keeps its answers, which used to be swept away alongside.
+        val oldFeat = current.background?.featId
+        current.copy(
             backgroundId = id,
             backgroundBonuses = emptyMap(),
-            // The old background's feat and tool picks no longer apply.
-            originSelections = current.originSelections.filterKeys {
-                !it.startsWith("background:") && !it.startsWith("feat:")
+            originSelections = current.originSelections.filterKeys { key ->
+                !key.startsWith("background:") &&
+                    (oldFeat == null || !key.startsWith("feat:$oldFeat:"))
             },
         ).withoutDuplicateSkills()
     }

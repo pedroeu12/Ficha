@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.ChoiceKind
@@ -123,7 +124,15 @@ class LevelUpViewModel(
         current.copy(asiPoints = next)
     }
 
-    fun selectFeat(id: String) = edit { it.copy(featId = id) }
+    /** Changing the feat drops whatever was picked inside the old one. */
+    fun selectFeat(id: String) = edit { current ->
+        if (current.featId == id) return@edit current
+        val staleChoiceIds = current.featChoices.map { it.id }.toSet()
+        current.copy(
+            featId = id,
+            selections = current.selections.filterKeys { it !in staleChoiceIds },
+        )
+    }
 
     // ------------------------------------------------------------------ Spells
 
@@ -166,7 +175,7 @@ class LevelUpViewModel(
         val steps = current.steps
         val index = steps.indexOf(current.step)
         if (!current.canAdvance || index == steps.lastIndex) current
-        else current.copy(step = steps[index + 1])
+        else current.copy(requestedStep = steps[index + 1])
     }
 
     /** Returns false when already on the first step, so the caller can leave the flow. */
@@ -175,7 +184,7 @@ class LevelUpViewModel(
         val steps = current.steps
         val index = steps.indexOf(current.step)
         if (index <= 0) return false
-        _state.value = current.copy(step = steps[index - 1])
+        _state.value = current.copy(requestedStep = steps[index - 1])
         return true
     }
 
@@ -219,14 +228,45 @@ class LevelUpViewModel(
             }
         }
 
+        // What the feat taken this level asked for. These are keyed by the feat rather than
+        // by the level, because a feat is taken once and its answers belong to it — that also
+        // lets the sheet resolve them the same way as a feat gained at character creation.
+        val featSelections = mutableMapOf<String, List<String>>()
+        state.featChoices.forEach { choice ->
+            val picked = state.selections[choice.id].orEmpty()
+            if (picked.isEmpty()) return@forEach
+            featSelections[choice.id] = picked
+
+            when (choice.kind) {
+                ChoiceKind.SKILL -> newSkills += picked.filter { id ->
+                    Skill.ALL.any { it.name == id }
+                }
+                ChoiceKind.EXPERTISE -> newExpertise += picked.filter { id ->
+                    Skill.ALL.any { it.name == id }
+                }
+                ChoiceKind.TOOL -> newTools += picked
+                // An ability score increase is derived from this selection rather than
+                // written in, so it stays right if the feat list is ever corrected.
+                else -> Unit
+            }
+        }
+
         // A subclass feature can grant Expertise in a skill the character isn't proficient
         // with yet; taking the proficiency alongside it keeps the sheet consistent.
         newSkills += newExpertise
+
+        val featName = state.featId?.let { FeatData.byId(it)?.name ?: it }.orEmpty()
 
         val learnedSpells = buildList {
             state.newCantrips.forEach { id ->
                 SpellData.byId(id)?.let { add(it.toKnownSpell(state.className())) }
             }
+            // A feat that teaches a spell — Fey-Touched, Spell Sniper, Magic Initiate taken
+            // in place of an improvement — puts it on the list under the feat's name.
+            state.featChoices
+                .filter { it.kind == ChoiceKind.SPELL }
+                .flatMap { featSelections[it.id].orEmpty() }
+                .forEach { id -> SpellData.byId(id)?.let { add(it.toKnownSpell(featName)) } }
             state.newSpells.forEach { id ->
                 SpellData.byId(id)?.let { add(it.toKnownSpell(state.className())) }
             }
@@ -281,6 +321,7 @@ class LevelUpViewModel(
             featIds = character.featIds + listOfNotNull(state.featId),
             knownSpells = (character.knownSpells + learnedSpells).distinctBy { it.id },
             levelSelections = character.levelSelections + choiceSelections,
+            originChoiceSelections = character.originChoiceSelections + featSelections,
         ).let { updated ->
             // Record the subclass against its own class, so each class keeps its own.
             state.activeSubclassId
@@ -299,9 +340,9 @@ class LevelUpViewModel(
         )
     }
 
+    /** The class the spells belong to, which is the one being levelled, not the first one. */
     private fun LevelUpState.className(): String =
-        ClassData.byId(character.classId)?.name
-            ?: character.classId.replaceFirstChar { it.uppercase() }
+        ClassData.byId(classId)?.name ?: classId.replaceFirstChar { it.uppercase() }
 
     private fun SpellDef.toKnownSpell(source: String) = KnownSpell(
         id = id,

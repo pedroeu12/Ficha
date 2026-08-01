@@ -264,6 +264,46 @@ object SpeciesData {
             ),
             bonusSkillChoiceCount = 1,
         ),
+        Species(
+            id = "grung",
+            name = "Grung",
+            size = "Small",
+            speed = 25,
+            darkvisionRange = 0,
+            summary = "Small, brightly coloured frogfolk of the deep jungle, rigidly ordered by the hue of their skin and armed with a poison that seeps from it.",
+            traits = listOf(
+                Trait("Amphibious", "You can breathe air and water. You also have a Climb Speed and a Swim Speed equal to your Speed."),
+                Trait("Poison Immunity", "You have Immunity to Poison damage and to the Poisoned condition."),
+                Trait("Poisonous Skin", "Any creature that Grapples you, or otherwise comes into direct contact with your skin, must succeed on a DC 12 Constitution saving throw or have the Poisoned condition for 1 minute. As a Utilize action you can instead coat one piercing weapon or up to three pieces of ammunition with the poison; a creature damaged by the coated weapon makes the same saving throw. The coating keeps its potency for 1 minute or until you hit with the weapon. You can handle and wear armor, clothing, and other objects without poisoning them."),
+                Trait("Standing Leap", "Your Long Jump is up to 25 feet and your High Jump up to 15 feet, with or without a running start."),
+                Trait("Water Dependency", "If you do not immerse yourself in water for at least 1 hour during a day, you gain 1 level of Exhaustion at the end of that day. You can only recover from this Exhaustion through magic or by immersing yourself in water for at least 1 hour."),
+            ),
+            // Grung society is rigidly ordered by skin colour, but the caste carries no
+            // mechanical benefit of its own — it is who you are among your own kind.
+            lineageChoiceLabel = "Grung Caste",
+            lineageOptions = listOf(
+                LineageOption("green_grung", "Green", "The most numerous caste: labourers, hunters, and the warriors who defend the tribe."),
+                LineageOption("blue_grung", "Blue", "Artisans, toolmakers, and homebuilders, who raise the tribe's dwellings and craft its goods."),
+                LineageOption("purple_grung", "Purple", "Overseers, who direct the work of the green and blue castes and keep order."),
+                LineageOption("red_grung", "Red", "Scholars, teachers, and keepers of lore, entrusted with the tribe's memory."),
+                LineageOption("orange_grung", "Orange", "Diplomats and go-betweens who speak for the tribe to outsiders and to other grung."),
+                LineageOption("gold_grung", "Gold", "The ruling caste, from whom the tribe's kings and queens are drawn."),
+            ),
+        ),
+        Species(
+            id = "triton",
+            name = "Triton",
+            size = "Medium",
+            speed = 30,
+            darkvisionRange = 60,
+            summary = "Guardians of the ocean depths, long charged with holding back the horrors of the Elemental Plane of Water and now surfacing into a world that has forgotten them.",
+            traits = listOf(
+                Trait("Amphibious", "You can breathe air and water. You also have a Swim Speed equal to your Speed."),
+                Trait("Control Air and Water", "You always have Fog Cloud prepared. At character level 3 you also have Gust of Wind prepared, and at character level 5 Wall of Water. You can cast each of these spells once without a spell slot, regaining that use when you finish a Long Rest, and you can also cast them using any spell slots you have. Charisma is your spellcasting ability for them."),
+                Trait("Emissary of the Sea", "Aquatic creatures have an extraordinary affinity with your people. You can communicate simple ideas to any Beast, Elemental, or Monstrosity that has a Swim Speed. It can understand your words, though you have no special ability to understand it in return."),
+                Trait("Guardians of the Depths", "Adapted to even the most extreme ocean depths, you have Resistance to Cold damage, and you ignore any of the drawbacks caused by a deep, underwater environment."),
+            ),
+        ),
     )
 
     fun byId(id: String): Species? = ALL.find { it.id == id }

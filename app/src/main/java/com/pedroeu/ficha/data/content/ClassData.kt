@@ -16,6 +16,19 @@ object ClassData {
     private fun cantrips(id: String, label: String, count: Int, options: List<SpellStub>) =
         ClassChoice.CantripChoice(id, label, count, options)
 
+    /**
+     * The class's whole list at one spell level, straight from the spell catalog.
+     *
+     * The older hand-written stubs above carry their own ids (`sorc_shield`), which is why
+     * duplicate detection has to fall back on matching names. Anything added from here uses
+     * the catalog's own id, so a spell picked at creation and the same spell granted by a
+     * feature are recognisably the same entry.
+     */
+    private fun catalogSpells(classId: String, level: Int): List<SpellStub> =
+        SpellData.forClass(classId, level).map { spell ->
+            SpellStub(spell.id, spell.name, spell.level, spell.school, spell.description)
+        }
+
     val ALL: List<CharClass> = listOf(
         CharClass(
             id = "barbarian",
@@ -101,6 +114,7 @@ object ClassData {
                     SpellStub("cleric_thaumaturgy", "Thaumaturgy", 0, "Transmutation", "Manifest a minor, wondrous sign of divine power."),
                     SpellStub("cleric_toll_dead", "Toll the Dead", 0, "Necromancy", "A dolorous bell tolls, dealing necrotic damage."),
                 )),
+                cantrips("spells1", "Prepared Spells (Level 1)", 4, catalogSpells("cleric", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.WIS,
@@ -133,6 +147,7 @@ object ClassData {
                     SpellStub("druid_shillelagh", "Shillelagh", 0, "Transmutation", "Imbue a club or quarterstaff with power, using Wisdom for its attacks."),
                     SpellStub("druid_thorn_whip", "Thorn Whip", 0, "Transmutation", "A vine-like whip drags a creature closer to you and deals damage."),
                 )),
+                cantrips("spells1", "Prepared Spells (Level 1)", 4, catalogSpells("druid", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.WIS,
@@ -194,12 +209,13 @@ object ClassData {
             toolProficiencies = emptyList(),
             level1Features = listOf(
                 Trait("Lay on Hands", "You have a pool of healing power equal to 5 times your Paladin level, which you can touch a creature to restore as hit points, refreshing on a long rest."),
-                Trait("Spellcasting (from level 2)", "Starting at 2nd level, you can cast spells using Charisma as your spellcasting ability."),
+                Trait("Spellcasting", "You cast Paladin spells using Charisma as your spellcasting ability, preparing them from the Paladin spell list and changing them whenever you finish a Long Rest."),
             ),
             choices = listOf(
                 skillChoice(2, listOf(Skill.ATHLETICS, Skill.INSIGHT, Skill.INTIMIDATION, Skill.MEDICINE, Skill.PERSUASION, Skill.RELIGION)),
+                cantrips("spells1", "Prepared Spells (Level 1)", 2, catalogSpells("paladin", 1)),
             ),
-            isSpellcaster = false,
+            isSpellcaster = true,
             spellcastingAbility = Ability.CHA,
             summary = "A holy warrior bound by a sacred oath, blending martial prowess with divine magic.",
         ),
@@ -213,13 +229,14 @@ object ClassData {
             weaponProficiencies = listOf("Simple", "Martial"),
             toolProficiencies = emptyList(),
             level1Features = listOf(
-                Trait("Favored Enemy", "You have advantage on Survival checks to track and Intelligence checks to recall information about creatures you hunt."),
-                Trait("Spellcasting (from level 2)", "Starting at 2nd level, you can cast spells using Wisdom as your spellcasting ability."),
+                Trait("Favored Enemy", "You always have Hunter's Mark prepared, and can cast it without a spell slot a number of times equal to your Proficiency Bonus per Long Rest."),
+                Trait("Spellcasting", "You cast Ranger spells using Wisdom as your spellcasting ability, preparing them from the Ranger spell list and changing them whenever you finish a Long Rest."),
             ),
             choices = listOf(
                 skillChoice(3, listOf(Skill.ANIMAL_HANDLING, Skill.ATHLETICS, Skill.INSIGHT, Skill.INVESTIGATION, Skill.NATURE, Skill.PERCEPTION, Skill.STEALTH, Skill.SURVIVAL)),
+                cantrips("spells1", "Prepared Spells (Level 1)", 2, catalogSpells("ranger", 1)),
             ),
-            isSpellcaster = false,
+            isSpellcaster = true,
             spellcastingAbility = Ability.WIS,
             summary = "A skilled hunter and survivalist at home in the wilderness, blending martial skill with nature magic.",
         ),

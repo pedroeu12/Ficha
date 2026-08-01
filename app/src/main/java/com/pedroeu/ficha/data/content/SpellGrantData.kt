@@ -38,6 +38,10 @@ object SpellGrantData {
         // Druidic teaches Druidcraft alongside the secret language.
         "druid" to at(1, "druidcraft"),
         "warlock" to at(1, "eldritch_blast"),
+        // Favored Enemy at level 1, then Paladin's Smite at 2 and Faithful Steed at 5. All
+        // three are worded "you always have X prepared", so they cost nothing from the limit.
+        "ranger" to at(1, "hunters_mark"),
+        "paladin" to at(2, "divine_smite") + at(5, "find_steed"),
     )
 
     // ------------------------------------------------------------------ Subclasses
@@ -190,6 +194,8 @@ object SpellGrantData {
     private val BY_SPECIES: Map<String, List<Grant>> = mapOf(
         // The Khoravar's Fey Gift starts as Friends and can be swapped on a Long Rest.
         "khoravar" to at(1, "friends"),
+        // Control Air and Water opens up as the Triton grows into their heritage.
+        "triton" to at(1, "fog_cloud") + at(3, "gust_of_wind") + at(5, "wall_of_water"),
     )
 
     private val BY_LINEAGE: Map<String, List<Grant>> = mapOf(

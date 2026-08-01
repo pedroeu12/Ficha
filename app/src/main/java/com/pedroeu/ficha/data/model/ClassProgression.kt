@@ -85,9 +85,16 @@ object SpellSlotTables {
         listOf(4, 3, 3, 3, 3, 2, 2, 1, 1),
     )
 
-    /** Paladin and Ranger. Level 1 has no slots. */
+    /**
+     * Paladin and Ranger. In the 2024 rules both gain Spellcasting at level 1 with two level 1
+     * slots — the 2013 tables that started them at level 2 are what left a level 1 Ranger with
+     * no slots, no prepared spells, and a level-up spell picker with nothing in it.
+     *
+     * Multiclassing is unaffected: a half caster still contributes half its levels rounded
+     * down to the shared caster level, which is why a Paladin 1 adds nothing to it.
+     */
     val HALF: List<List<Int>> = listOf(
-        emptyList(),
+        listOf(2),
         listOf(2),
         listOf(3),
         listOf(3),
@@ -109,8 +116,11 @@ object SpellSlotTables {
         listOf(4, 3, 3, 3, 2),
     )
 
-    /** Artificer: identical to [HALF] from level 2 on, but level 1 already grants two slots. */
-    val ARTIFICER: List<List<Int>> = listOf(listOf(2)) + HALF.drop(1)
+    /**
+     * Artificer. Its own slot table is the same as [HALF]; what makes the Artificer different
+     * is multiclassing, where it counts half its levels rounded *up* rather than down.
+     */
+    val ARTIFICER: List<List<Int>> = HALF
 
     /** Warlock Pact Magic: slot count paired with the single level those slots are cast at. */
     val PACT: List<Pair<Int, Int>> = listOf(

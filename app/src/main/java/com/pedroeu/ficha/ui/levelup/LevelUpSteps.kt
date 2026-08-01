@@ -273,6 +273,48 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
     }
 }
 
+/**
+ * What the feat taken this level still wants decided. A feat is not a flat grant: most raise
+ * an ability score the player picks, and several name a spell, a skill, or a damage type
+ * on top of that. Those prompts appear here rather than being quietly skipped.
+ */
+@Composable
+fun FeatChoicesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
+    val feat = state.featId?.let { FeatData.byId(it) }
+    val choices = state.featChoices
+
+    StepColumn {
+        if (feat != null) {
+            item {
+                InfoCard {
+                    SectionHeader(feat.name)
+                    Text(
+                        feat.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+            }
+        }
+
+        items(choices.size, key = { choices[it].id }) { index ->
+            val choice = choices[index]
+            val disabled = OwnedOptions.disabledFor(
+                choice = choice,
+                owned = OwnedOptions.of(state.character),
+                currentSelection = state.selections[choice.id].orEmpty().toSet(),
+            )
+
+            ChoiceSection(
+                choice = choice,
+                selected = state.selections[choice.id].orEmpty(),
+                onToggle = { viewModel.toggleSelection(choice.id, it, choice.count) },
+                disabledOptionIds = disabled,
+            )
+        }
+    }
+}
+
 @Composable
 private fun FeatureRow(name: String, description: String) {
     Column {

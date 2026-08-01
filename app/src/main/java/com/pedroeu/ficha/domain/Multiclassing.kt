@@ -18,10 +18,16 @@ data class MulticlassOption(
 /**
  * The rules around taking a level in a new class.
  *
- * Both halves of the requirement matter: you need the scores for the class you're joining
- * *and* for every class you already have, since leaving a class has the same bar as entering
- * one. A Fighter with Strength 13 and Intelligence 10 can't become a Wizard, and a Wizard
- * with Intelligence 13 and Strength 10 can't become a Fighter.
+ * Prerequisites gate *joining* a class, never continuing one. A Bard who rolled a 12 in
+ * Charisma is still a Bard and still levels up as one; the 13 is only ever asked for at the
+ * moment a second class is added. Getting that backwards left single-class characters unable
+ * to advance at all, so [MulticlassOption.allowed] is unconditionally true for a class the
+ * character already has levels in.
+ *
+ * For a genuinely new class both halves of the requirement matter: you need the scores for
+ * the class you're joining *and* for every class you already have, since leaving a class has
+ * the same bar as entering one. A Fighter with Strength 13 and Intelligence 10 can't become a
+ * Wizard, and a Wizard with Intelligence 13 and Strength 10 can't become a Fighter.
  */
 object Multiclassing {
 
@@ -33,10 +39,13 @@ object Multiclassing {
 
         return ClassData.ALL.mapNotNull { charClass ->
             val entry = MulticlassData.forClass(charClass.id) ?: return@mapNotNull null
+            val alreadyHas = charClass.id in existing
             val missing = unmet(entry, scores)
 
-            val allowed = missing.isEmpty() && leaveBlockers.isEmpty()
+            val allowed = alreadyHas || (missing.isEmpty() && leaveBlockers.isEmpty())
             val reason = when {
+                alreadyHas -> entry.prerequisiteLabel
+
                 missing.isNotEmpty() ->
                     "Needs ${missing.joinToString(" and ") { "${it.fullName} ${MulticlassData.REQUIRED_SCORE}" }}"
 
@@ -55,7 +64,7 @@ object Multiclassing {
                 entry = entry,
                 allowed = allowed,
                 reason = reason,
-                alreadyHas = charClass.id in existing,
+                alreadyHas = alreadyHas,
             )
         }
     }

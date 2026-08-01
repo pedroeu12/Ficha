@@ -131,7 +131,11 @@ object ChoiceResolver {
             }
     }
 
-    /** Choices from species, background, and origin feats, resolved for display. */
+    /**
+     * Choices from species, background, and every feat the character holds — including ones
+     * taken in place of an Ability Score Improvement, which have their own sub-choices and
+     * used to appear nowhere at all.
+     */
     fun originChoices(character: PlayerCharacter): List<ResolvedChoice> =
         OriginChoices.all(
             speciesId = character.speciesId,
@@ -139,6 +143,8 @@ object ChoiceResolver {
             classId = character.classId,
             classSelections = character.classChoiceSelections,
             backgroundId = character.backgroundId,
+            originSelections = character.originChoiceSelections,
+            extraFeatIds = character.featIds,
         ).map { choice -> resolve(character, choice, choice.label, 0) }
 
     /** Everything the character has decided, for the "your choices" view and rests. */

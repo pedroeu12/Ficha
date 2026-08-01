@@ -85,7 +85,13 @@ data class CreationState(
             background?.skillProficiencies?.let { addAll(it) }
         }
 
-    /** Every "of your choice" grant still outstanding, derived from the picks made so far. */
+    /**
+     * Every "of your choice" grant still outstanding, derived from the picks made so far.
+     *
+     * The selections go back in because some of these grants only exist once an earlier one
+     * has been answered: choosing Magic Initiate as a Human's Origin feat is what brings its
+     * cantrip and spell prompts into being.
+     */
     val originChoices: List<Choice>
         get() = OriginChoices.all(
             speciesId = speciesId,
@@ -93,6 +99,7 @@ data class CreationState(
             classId = classId,
             classSelections = classSelections,
             backgroundId = backgroundId,
+            originSelections = originSelections,
         )
 
     /** Skills picked through an origin choice, such as the Skilled feat. */
@@ -167,7 +174,11 @@ data class CreationState(
                 .filter { it.kind == ChoiceKind.LANGUAGE }
                 .flatMap { originSelections[it.id].orEmpty() }
                 .toSet(),
-            feats = setOfNotNull(background?.featId),
+            // Including feats picked through a choice, so a Human offered an Origin feat
+            // can't be handed the one their background already gave them.
+            feats = setOfNotNull(background?.featId) + originChoices
+                .filter { it.kind == ChoiceKind.FEAT }
+                .flatMap { originSelections[it.id].orEmpty() },
             options = charClass?.choices
                 ?.filterIsInstance<ClassChoice.FeatureOption>()
                 ?.flatMap { classSelections[it.id].orEmpty() }

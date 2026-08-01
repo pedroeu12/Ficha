@@ -21,9 +21,16 @@ object ResourceData {
         val speciesId: String,
         val lineageId: String?,
         val featIds: List<String>,
+        /** Levels in [classId], which is what class and subclass pools scale on. */
         val level: Int,
         val proficiencyBonus: Int,
         val abilityModifiers: Map<Ability, Int>,
+        /**
+         * Total character level. Species, lineage, and feat pools key off this rather than
+         * off levels in one class — a Triton Fighter 3 / Wizard 2 is character level 5 and
+         * has grown into every part of their heritage.
+         */
+        val characterLevel: Int = level,
     ) {
         fun mod(ability: Ability): Int = abilityModifiers[ability] ?: 0
 
@@ -1261,6 +1268,44 @@ object ResourceData {
                 notes = "Returns after 1d4 Long Rests rather than on a fixed schedule.",
             )
         )
+
+        // Each of the Triton's three spells is free once per Long Rest on its own, so they
+        // are tracked separately rather than sharing one pool.
+        "triton" -> buildList {
+            add(
+                ResourceDef(
+                    id = "triton:fog_cloud",
+                    name = "Fog Cloud (free casting)",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Control Air and Water",
+                    description = "Cast Fog Cloud without expending a spell slot, using " +
+                        "Charisma as your spellcasting ability.",
+                )
+            )
+            if (c.characterLevel >= 3) add(
+                ResourceDef(
+                    id = "triton:gust_of_wind",
+                    name = "Gust of Wind (free casting)",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Control Air and Water",
+                    description = "Cast Gust of Wind without expending a spell slot, using " +
+                        "Charisma as your spellcasting ability.",
+                )
+            )
+            if (c.characterLevel >= 5) add(
+                ResourceDef(
+                    id = "triton:wall_of_water",
+                    name = "Wall of Water (free casting)",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Control Air and Water",
+                    description = "Cast Wall of Water without expending a spell slot, using " +
+                        "Charisma as your spellcasting ability.",
+                )
+            )
+        }
 
         else -> emptyList()
     }

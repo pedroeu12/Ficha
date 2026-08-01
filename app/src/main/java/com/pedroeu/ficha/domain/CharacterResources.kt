@@ -40,6 +40,7 @@ object CharacterResources {
                     level = entry.level,
                     proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
                     abilityModifiers = CharacterCalculations.abilityModifiers(character),
+                    characterLevel = character.level,
                 )
             )
         }.distinctBy { it.id }

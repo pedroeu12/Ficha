@@ -66,17 +66,26 @@ class NewSourcebookContentTest {
     }
 
     @Test
-    fun `the artificer gets spell slots at level 1, unlike other half casters`() {
-        val artificer = SpellSlotTables.slotsFor(CasterType.ARTIFICER, 1)
-        val paladin = SpellSlotTables.slotsFor(CasterType.HALF, 1)
-
-        assertEquals("two level 1 slots straight away", mapOf(1 to 2), artificer)
-        assertTrue("a Paladin has none at level 1", paladin.isEmpty())
+    fun `every half caster has spell slots at level 1`() {
+        assertEquals(
+            "two level 1 slots straight away",
+            mapOf(1 to 2),
+            SpellSlotTables.slotsFor(CasterType.ARTIFICER, 1),
+        )
+        assertEquals(
+            "the Paladin and Ranger start casting at level 1 too",
+            mapOf(1 to 2),
+            SpellSlotTables.slotsFor(CasterType.HALF, 1),
+        )
     }
 
+    /**
+     * What sets the Artificer apart is multiclassing, not its own table: it counts half its
+     * levels rounded up where a Paladin or Ranger rounds down.
+     */
     @Test
-    fun `from level 2 the artificer matches the half caster table exactly`() {
-        (2..20).forEach { level ->
+    fun `the artificer matches the half caster table at every level`() {
+        (1..20).forEach { level ->
             assertEquals(
                 "level $level should match the half caster progression",
                 SpellSlotTables.slotsFor(CasterType.HALF, level),

@@ -158,7 +158,7 @@ object SpellData {
             setOf(PALADIN)),
         SpellDef("entangle", "Entangle", 1, "Conjuration", "Action", "90 feet", "V, S", "1 minute",
             "Grasping weeds fill a 20-foot square. Creatures there make a Strength save or are Restrained.",
-            setOf(DRUID), concentration = true),
+            setOf(DRUID, RANGER), concentration = true),
         SpellDef("faerie_fire", "Faerie Fire", 1, "Evocation", "Action", "60 feet", "V", "1 minute",
             "Objects and creatures in a 20-foot cube are outlined in light. Attacks against them have Advantage.",
             setOf(BARD, DRUID, ARTIFICER), concentration = true),
@@ -693,6 +693,18 @@ object SpellData {
         SpellDef("steel_wind_strike", "Steel Wind Strike", 5, "Conjuration", "Action", "30 feet", "S, M", "Instantaneous",
             "You flash toward up to five creatures you can see, making a melee spell attack against each for 6d10 Force damage.",
             setOf(RANGER, WIZARD)),
+        SpellDef("divine_smite", "Divine Smite", 1, "Evocation", "Bonus Action", "Self", "V", "Instantaneous",
+            "Cast immediately after hitting a creature with a Melee weapon or an Unarmed Strike. The target takes an extra 2d8 Radiant damage, plus 1d8 if it is a Fiend or an Undead. The damage increases by 1d8 for each spell slot level above 1.",
+            setOf(PALADIN)),
+        SpellDef("find_steed", "Find Steed", 2, "Conjuration", "10 minutes", "30 feet", "V, S, M", "Instantaneous",
+            "You summon a spirit that takes the form of a loyal, celestial mount. It uses the Otherworldly Steed stat block, which scales with the slot you used, and it vanishes when it drops to 0 Hit Points or when you dismiss it.",
+            setOf(PALADIN)),
+        SpellDef("wall_of_water", "Wall of Water", 3, "Evocation", "Action", "60 feet", "V, S, M", "10 minutes",
+            "You conjure a wall of water up to 30 feet long, 10 feet high, and 1 foot thick, or a ring 20 feet in diameter. Ranged weapon attacks passing through it have Disadvantage, Fire damage passing through is halved, and Cold damage freezes it into difficult terrain.",
+            setOf(DRUID, SORCERER, WIZARD), concentration = true),
+        SpellDef("hail_of_thorns", "Hail of Thorns", 1, "Conjuration", "Bonus Action", "Self", "V", "Instantaneous",
+            "Cast immediately after hitting a creature with a Ranged weapon. Thorns burst out in a 5-foot Emanation around the target; each creature there makes a Dexterity saving throw, taking 1d10 Piercing damage on a failure or half as much on a success.",
+            setOf(RANGER)),
     )
 
     private val byIdMap: Map<String, SpellDef> = ALL.associateBy { it.id }

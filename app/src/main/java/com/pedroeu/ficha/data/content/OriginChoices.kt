@@ -15,13 +15,6 @@ import com.pedroeu.ficha.data.model.Skill
  */
 object OriginChoices {
 
-    /** Which spell list each Magic Initiate origin feat draws from. */
-    private val MAGIC_INITIATE_LISTS: Map<String, Pair<String, String>> = mapOf(
-        "magic_initiate_cleric" to ("cleric" to "Wisdom"),
-        "magic_initiate_druid" to ("druid" to "Wisdom"),
-        "magic_initiate_wizard" to ("wizard" to "Intelligence"),
-    )
-
     private fun spellOptions(classId: String, level: Int): List<ChoiceOption> =
         SpellData.forClass(classId, level).map { spell ->
             ChoiceOption(
@@ -33,73 +26,50 @@ object OriginChoices {
         }
 
     /**
-     * Choices granted by an origin feat. Magic Initiate is the important one: two cantrips
-     * plus one level 1 spell, all from a specific class list.
+     * Every choice a feat forces, whatever route the feat arrived by. The table lives in
+     * [FeatChoiceData] so a feat asks the same questions whether it came from a background,
+     * a species trait, or an Ability Score Improvement.
      */
-    fun forFeat(featId: String, featName: String): List<Choice> {
-        MAGIC_INITIATE_LISTS[featId]?.let { (listId, ability) ->
-            val listName = listId.replaceFirstChar { it.uppercase() }
-            return listOf(
-                Choice(
-                    id = "feat:$featId:cantrips",
-                    label = "$featName Cantrips",
-                    prompt = "Choose 2 cantrips from the $listName spell list. $ability is your spellcasting ability for them.",
-                    count = 2,
-                    kind = ChoiceKind.SPELL,
-                    options = spellOptions(listId, 0),
-                    source = featName,
-                ),
-                Choice(
-                    id = "feat:$featId:spell",
-                    label = "$featName Level 1 Spell",
-                    prompt = "Choose 1 level 1 spell from the $listName list. You can cast it once per Long Rest without a slot.",
-                    count = 1,
-                    kind = ChoiceKind.SPELL,
-                    options = spellOptions(listId, 1),
-                    source = featName,
-                ),
-            )
+    fun forFeat(featId: String, featName: String): List<Choice> =
+        FeatChoiceData.choicesFor(featId, featName)
+
+    /** The same, resolved from the feat id alone. */
+    fun forFeat(featId: String): List<Choice> =
+        forFeat(featId, FeatData.byId(featId)?.name ?: featId)
+
+    /**
+     * Choices for a set of feats, following each one into the feats *it* grants.
+     *
+     * A Human's Versatile trait offers an Origin feat; picking Magic Initiate there has to
+     * raise Magic Initiate's own cantrip and spell prompts. Nothing in the rules nests more
+     * than a level or two deep, but resolving to a fixed point costs nothing and means a
+     * future feat-granting feat needs no special handling. [selections] is what has been
+     * picked so far, which is how a feat chosen inside a choice becomes visible here.
+     */
+    fun forFeats(
+        featIds: Collection<String>,
+        selections: Map<String, List<String>>,
+    ): List<Choice> {
+        val choices = mutableListOf<Choice>()
+        val seen = mutableSetOf<String>()
+        var frontier = featIds.toList()
+
+        while (frontier.isNotEmpty()) {
+            val next = mutableListOf<String>()
+            frontier.forEach { featId ->
+                if (!seen.add(featId)) return@forEach
+                forFeat(featId).forEach { choice ->
+                    choices += choice
+                    // A FEAT-kind choice hands us more feats to follow, once answered.
+                    if (choice.kind == ChoiceKind.FEAT) {
+                        next += selections[choice.id].orEmpty()
+                    }
+                }
+            }
+            frontier = next
         }
 
-        return when (featId) {
-            "skilled" -> listOf(
-                Choice(
-                    id = "feat:skilled:skills",
-                    label = "Skilled",
-                    prompt = "Choose 3 skill proficiencies.",
-                    count = 3,
-                    kind = ChoiceKind.SKILL,
-                    options = ChoiceOptions.fromSkills(Skill.ALL),
-                    source = featName,
-                )
-            )
-
-            "crafter" -> listOf(
-                Choice(
-                    id = "feat:crafter:tools",
-                    label = "Crafter",
-                    prompt = "Choose 3 kinds of Artisan's Tools to gain proficiency with.",
-                    count = 3,
-                    kind = ChoiceKind.TOOL,
-                    options = ChoiceOptions.fromStrings(ToolData.ARTISANS_TOOLS),
-                    source = featName,
-                )
-            )
-
-            "musician" -> listOf(
-                Choice(
-                    id = "feat:musician:instruments",
-                    label = "Musician",
-                    prompt = "Choose 3 Musical Instruments to gain proficiency with.",
-                    count = 3,
-                    kind = ChoiceKind.TOOL,
-                    options = ChoiceOptions.fromStrings(ToolData.MUSICAL_INSTRUMENTS),
-                    source = featName,
-                )
-            )
-
-            else -> emptyList()
-        }
+        return choices
     }
 
     /** A background's tool grant, when it names a group instead of a specific tool. */
@@ -219,7 +189,14 @@ object OriginChoices {
 
     /**
      * Every outstanding choice for a character being built, in the order they should be shown.
-     * [grantedSkills] lets skill choices hide options the character already has.
+     *
+     * [originSelections] matters as much as the ids: a feat is only known once it has been
+     * chosen, so the choices that feat brings with it can't appear until the player has picked
+     * it. Passing the selections back in is what lets a Human who takes Magic Initiate through
+     * Versatile then be asked which cantrips they learn.
+     *
+     * [extraFeatIds] covers feats the character already holds by another route — one taken in
+     * place of an Ability Score Improvement, for instance — so their prompts show up too.
      */
     fun all(
         speciesId: String?,
@@ -227,20 +204,26 @@ object OriginChoices {
         classId: String?,
         classSelections: Map<String, List<String>>,
         backgroundId: String?,
+        originSelections: Map<String, List<String>> = emptyMap(),
+        extraFeatIds: Collection<String> = emptyList(),
     ): List<Choice> {
         val choices = mutableListOf<Choice>()
 
         choices += forSpecies(speciesId)
         if (speciesId != null) choices += forLineage(speciesId, lineageId)
         if (classId != null) choices += forClass(classId, classSelections)
+        if (backgroundId != null) forBackgroundTool(backgroundId)?.let { choices += it }
 
-        if (backgroundId != null) {
-            forBackgroundTool(backgroundId)?.let { choices += it }
-            val background = BackgroundData.byId(backgroundId)
-            val feat = background?.featId?.let { FeatData.byId(it) }
-            if (feat != null) choices += forFeat(feat.id, feat.name)
-        }
+        // Every feat the character has, from wherever, followed into whatever it grants.
+        val rootFeats = buildList {
+            backgroundId?.let { BackgroundData.byId(it)?.featId?.let(::add) }
+            // A species Origin feat is itself a choice, so it starts from what was selected.
+            forSpecies(speciesId).forEach { addAll(originSelections[it.id].orEmpty()) }
+            addAll(extraFeatIds)
+        }.distinct()
 
-        return choices
+        choices += forFeats(rootFeats, originSelections)
+
+        return choices.distinctBy { it.id }
     }
 }

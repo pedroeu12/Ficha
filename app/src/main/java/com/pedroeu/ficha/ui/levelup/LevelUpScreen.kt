@@ -135,6 +135,7 @@ fun LevelUpScreen(
                 LevelUpStep.SUBCLASS -> SubclassStep(loaded, viewModel)
                 LevelUpStep.FEATURES -> FeaturesStep(loaded, viewModel)
                 LevelUpStep.ASI -> AbilityImprovementStep(loaded, viewModel)
+                LevelUpStep.FEAT_CHOICES -> FeatChoicesStep(loaded, viewModel)
                 LevelUpStep.SPELLS -> NewSpellsStep(loaded, viewModel)
                 LevelUpStep.SUMMARY -> SummaryStep(loaded)
             }
@@ -193,6 +194,7 @@ private fun hintFor(state: LevelUpState): String = when {
         LevelUpStep.SUBCLASS -> "Pick your subclass"
         LevelUpStep.FEATURES -> "Complete every choice below"
         LevelUpStep.ASI -> "Assign both points, or choose a feat"
+        LevelUpStep.FEAT_CHOICES -> "Complete every choice your feat asks for"
         LevelUpStep.SPELLS -> "Choose your new spells"
         LevelUpStep.SUMMARY -> ""
     }

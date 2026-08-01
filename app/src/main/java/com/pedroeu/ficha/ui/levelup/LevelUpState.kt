@@ -1,16 +1,20 @@
 package com.pedroeu.ficha.ui.levelup
 
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ClassFeature
+import com.pedroeu.ficha.data.model.SpellSlotTables
 import com.pedroeu.ficha.data.model.SubclassFeature
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.PlayerCharacter
 
@@ -21,6 +25,8 @@ enum class LevelUpStep(val title: String, val shortLabel: String) {
     SUBCLASS("Choose a Subclass", "Subclass"),
     FEATURES("New Features", "Features"),
     ASI("Ability Scores or Feat", "Improve"),
+    /** What the feat taken at [ASI] leaves to decide — a spell, a skill, a damage type. */
+    FEAT_CHOICES("Feat Options", "Feat"),
     SPELLS("New Spells", "Spells"),
     SUMMARY("Review", "Review"),
 }
@@ -41,7 +47,13 @@ enum class AsiMode(val label: String) {
 
 data class LevelUpState(
     val character: PlayerCharacter,
-    val step: LevelUpStep = LevelUpStep.CLASS,
+    /**
+     * The step the flow has navigated to. Read [step] instead: a character with nothing to
+     * multiclass into never sees the class picker, and landing on a step that isn't part of
+     * this level's flow left the player looking at a screen whose Next button could never
+     * light up.
+     */
+    val requestedStep: LevelUpStep = LevelUpStep.CLASS,
 
     val hitPointMethod: HitPointMethod = HitPointMethod.AVERAGE,
     val rolledHitPoints: Int? = null,
@@ -67,6 +79,9 @@ data class LevelUpState(
      */
     val levellingClassId: String? = null,
 ) {
+    /** The step actually being shown, clamped to the ones this level calls for. */
+    val step: LevelUpStep get() = if (requestedStep in steps) requestedStep else steps.first()
+
     val currentLevel: Int get() = character.level
     val targetLevel: Int get() = character.level + 1
 
@@ -129,34 +144,68 @@ data class LevelUpState(
 
     val grantsEpicBoon: Boolean get() = progression?.grantsEpicBoonAt(targetLevel) == true
 
+    /**
+     * What the feat taken this level still asks for. Skill Expert wants a skill and an
+     * Expertise, Fey-Touched a spell, Elemental Adept a damage type, and most feats from
+     * level 4 on want to know which ability score goes up. None of it used to be asked.
+     */
+    val featChoices: List<Choice>
+        get() = featId?.let { OriginChoices.forFeat(it) }.orEmpty()
+
     // ---------------------------------------------------------------- Spellcasting
 
-    private val currentCantripCount: Int get() = character.knownSpells.count { it.level == 0 }
-    private val currentSpellCount: Int get() = character.knownSpells.count { it.level > 0 }
+    /**
+     * Spells already on the sheet that count against *this* class's allowance.
+     *
+     * Each class tracks its own list, so a Wizard 5 who takes a level of Cleric starts the
+     * Cleric list from nothing rather than being told they already know eight Cleric spells.
+     * A single-class character counts everything, since their spells may predate the source
+     * label and there is only one list to belong to anyway.
+     */
+    private fun knownFromThisClass(predicate: (KnownSpell) -> Boolean): Int {
+        val spells = character.knownSpells.filter(predicate)
+        if (!ClassLevels.isMulticlassed(character) && !isNewClass) return spells.size
+        val className = ClassData.byId(classId)?.name ?: classId
+        return spells.count { it.source.equals(className, ignoreCase = true) }
+    }
+
+    private val currentCantripCount: Int get() = knownFromThisClass { it.level == 0 }
+    private val currentSpellCount: Int get() = knownFromThisClass { it.level > 0 }
 
     val cantripsToLearn: Int
         get() {
             val progression = progression ?: return 0
-            val target = progression.cantripsKnownAt(targetLevel)
+            val target = progression.cantripsKnownAt(targetClassLevel)
             return (target - currentCantripCount).coerceAtLeast(0)
         }
 
     val spellsToLearn: Int
         get() {
             val progression = progression ?: return 0
-            val target = progression.preparedSpellsAt(targetLevel)
+            val target = progression.preparedSpellsAt(targetClassLevel)
             return (target - currentSpellCount).coerceAtLeast(0)
         }
 
+    /** The highest level of slot the character will have, across every class. */
     val maxSpellLevel: Int get() = CharacterCalculations.maxSpellLevel(leveledCharacter)
+
+    /**
+     * The highest spell level this class's own list offers. Slots come from the combined
+     * table, but what you may prepare is still capped by your level in the class that grants
+     * it — a Cleric 1 / Wizard 8 prepares level 1 Cleric spells, not level 4 ones.
+     */
+    private val maxSpellLevelForThisClass: Int
+        get() = SpellSlotTables
+            .maxSpellLevel(progression?.casterType ?: CasterType.NONE, targetClassLevel)
+            .coerceAtMost(maxSpellLevel)
 
     private val knownSpellIds: Set<String> get() = character.knownSpells.map { it.id }.toSet()
 
     val cantripOptions
-        get() = SpellData.cantripsForClass(character.classId).filterNot { it.id in knownSpellIds }
+        get() = SpellData.cantripsForClass(classId).filterNot { it.id in knownSpellIds }
 
     val spellOptions
-        get() = SpellData.forClassUpTo(character.classId, maxSpellLevel)
+        get() = SpellData.forClassUpTo(classId, maxSpellLevelForThisClass)
             .filter { it.level > 0 && it.id !in knownSpellIds }
 
     /**
@@ -165,7 +214,7 @@ data class LevelUpState(
      * Edit Mode override has pushed the prepared count past what the class list holds.
      */
     val needsManualSpellEntry: Boolean
-        get() = maxSpellLevel > SpellData.MAX_CATALOGUED_LEVEL ||
+        get() = maxSpellLevelForThisClass > SpellData.MAX_CATALOGUED_LEVEL ||
             spellOptions.size < spellsToLearn
 
     // ---------------------------------------------------------------- Step flow
@@ -184,6 +233,7 @@ data class LevelUpState(
                 add(LevelUpStep.FEATURES)
             }
             if (grantsAsi || grantsEpicBoon) add(LevelUpStep.ASI)
+            if (featChoices.isNotEmpty()) add(LevelUpStep.FEAT_CHOICES)
             if (cantripsToLearn > 0 || spellsToLearn > 0) add(LevelUpStep.SPELLS)
             add(LevelUpStep.SUMMARY)
         }
@@ -197,6 +247,7 @@ data class LevelUpState(
                 selections[it.id]?.size == it.count
             }
             LevelUpStep.ASI -> asiValid()
+            LevelUpStep.FEAT_CHOICES -> featChoices.all { selections[it.id]?.size == it.count }
             LevelUpStep.SPELLS -> spellsValid()
             LevelUpStep.SUMMARY -> true
         }
@@ -223,10 +274,14 @@ data class LevelUpState(
         return cantripsOk && spellsOk
     }
 
+    /**
+     * The feats on offer. A feat already taken is left out entirely rather than shown and
+     * greyed, since taking the same one twice grants nothing.
+     */
     val featOptions
         get() = if (grantsEpicBoon) {
             FeatData.EPIC_BOONS
         } else {
             FeatData.GENERAL_FEATS.filterNot { it.id == "ability_score_improvement" }
-        }
+        }.filterNot { it.id in character.featIds }
 }

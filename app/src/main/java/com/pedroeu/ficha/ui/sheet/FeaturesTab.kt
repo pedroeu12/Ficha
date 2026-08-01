@@ -54,7 +54,10 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
     // feature's actual picks appear under it rather than only its name.
     val classChoices = ChoiceResolver.classFeatureChoices(character).groupBy { it.featureName }
     val subclassChoices = ChoiceResolver.subclassFeatureChoices(character).groupBy { it.featureName }
-    val originChoices = ChoiceResolver.originChoices(character).filter { it.isAnswered }
+    // Unanswered ones stay in the list rather than being hidden: a feat gained before the
+    // app knew to ask, or one added by hand, still owes a decision, and this card is the
+    // only place to make it. ChoiceLine already marks an open choice and offers "Choose".
+    val originChoices = ChoiceResolver.originChoices(character)
 
     var addingFeat by remember { mutableStateOf(false) }
     var addingFeature by remember { mutableStateOf(false) }
@@ -216,7 +219,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
             item {
                 FeatureCard("Origin Choices") {
                     Text(
-                        text = "What you picked from your species, class, and background.",
+                        text = "What you picked from your species, class, background, and feats.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

@@ -12,6 +12,7 @@ import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -36,9 +37,28 @@ class LevelUpViewModel(
     init {
         viewModelScope.launch {
             repository.getById(characterId)?.let { character ->
-                _state.value = LevelUpState(character = character)
+                _state.value = LevelUpState(character = character).withExistingAnswers()
             }
         }
+    }
+
+    /**
+     * Pre-fills any choice this level asks again under the same id.
+     *
+     * Weapon Mastery is asked at every level the count grows, and each asking restates the
+     * whole list rather than adding one — so a Fighter reaching level 4 should see their three
+     * existing weapons already ticked and add a fourth, not start from nothing. Choices that
+     * genuinely accumulate (a Battle Master's maneuvers) use a different id per level and are
+     * untouched by this.
+     */
+    private fun LevelUpState.withExistingAnswers(): LevelUpState {
+        val seeded = featureChoices.mapNotNull { choice ->
+            ChoiceResolver.selectionsFor(character, choice.id)
+                .takeIf { it.isNotEmpty() }
+                ?.take(choice.count)
+                ?.let { choice.id to it }
+        }
+        return if (seeded.isEmpty()) this else copy(selections = selections + seeded)
     }
 
     private fun edit(transform: (LevelUpState) -> LevelUpState) {

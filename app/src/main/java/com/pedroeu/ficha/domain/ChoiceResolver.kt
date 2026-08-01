@@ -154,7 +154,15 @@ object ChoiceResolver {
             originChoices(character))
             .distinctBy { it.choice.id to it.level }
 
-    /** Choices the rules let you revisit when you rest. */
+    /**
+     * Choices the rules let you revisit when you rest.
+     *
+     * A choice asked again at several levels — Weapon Mastery, which restates the whole list
+     * each time the count grows — is one decision, so only its current form is offered.
+     */
     fun restChangeable(character: PlayerCharacter): List<ResolvedChoice> =
-        all(character).filter { it.choice.changeableOnRest }
+        all(character)
+            .filter { it.choice.changeableOnRest }
+            .groupBy { it.choice.id }
+            .map { (_, versions) -> versions.maxBy { it.level } }
 }

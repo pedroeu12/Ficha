@@ -21,6 +21,13 @@ data class AttackLine(
     val notes: String,
     /** Where the line came from, so the sheet can group weapons apart from cantrips. */
     val source: AttackSource = AttackSource.WEAPON,
+    /**
+     * The weapon mastery property this character can use with this weapon, if any. Blank
+     * when the weapon has none or the character hasn't mastered it — the property is still
+     * named in [notes] either way, but only a usable one gets its rules text.
+     */
+    val masteryProperty: String = "",
+    val masteryDescription: String = "",
 )
 
 /**
@@ -340,13 +347,21 @@ object CharacterCalculations {
                 val abilityMod = if (weapon.usesDexOption && dex > str) dex else str
                 val proficient = isProficientWithWeapon(character, weapon)
                 val attackBonus = abilityMod + if (proficient) pb else 0
+                // The mastery property sits alongside the ordinary properties, marked with
+                // whether this character can actually use it.
+                val masteryNote = CharacterMasteries.noteFor(character, weapon)
+                val mastery = CharacterMasteries.forWeapon(character, weapon)
                 AttackLine(
                     name = weapon.name,
                     attackBonus = attackBonus,
                     damage = "${weapon.damageDice} ${formatModifier(abilityMod)}",
                     damageType = weapon.damageType,
-                    notes = weapon.properties.joinToString(", "),
+                    notes = (weapon.properties + masteryNote)
+                        .filter { it.isNotBlank() }
+                        .joinToString(", "),
                     source = AttackSource.WEAPON,
+                    masteryProperty = mastery?.property.orEmpty(),
+                    masteryDescription = mastery?.description.orEmpty(),
                 )
             }
     }

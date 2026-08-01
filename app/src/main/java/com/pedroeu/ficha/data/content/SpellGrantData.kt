@@ -180,6 +180,58 @@ object SpellGrantData {
             at(13, "banishment", "locate_creature") +
             at(17, "scrying", "teleportation_circle"),
 
+        // ---- Unearthed Arcana 2026: Villainous Options
+        "pestilence_domain" to at(
+            3, "detect_poison_disease", "protection_from_poison", "ray_of_enfeeblement",
+            "ray_of_sickness",
+        ) + at(5, "stinking_cloud", "vampiric_touch") +
+            at(7, "blight", "giant_insect") +
+            at(9, "contagion", "insect_plague"),
+        "circle_of_the_titan" to at(3, "enlarge_reduce", "thaumaturgy", "thunderwave") +
+            at(5, "fear") +
+            at(7, "fire_shield") +
+            at(9, "destructive_wave"),
+        "demonic_sorcery" to at(3, "bane", "dissonant_whispers", "spike_growth", "web") +
+            at(5, "bestow_curse", "dispel_magic") +
+            at(7, "giant_insect", "hallucinatory_terrain") +
+            at(9, "contact_other_plane", "modify_memory"),
+
+        // ---- Unearthed Arcana 2025: Horror Subclasses
+        "reanimator" to at(3, "false_life", "spare_the_dying", "witch_bolt") +
+            at(5, "blindness_deafness", "enhance_ability") +
+            at(9, "animate_dead", "lightning_bolt") +
+            at(13, "blight", "death_ward") +
+            at(17, "antilife_shell", "raise_dead"),
+        "grave_domain" to at(
+            3, "bane", "chill_touch", "detect_evil_and_good", "gentle_repose",
+            "ray_of_enfeeblement",
+        ) + at(5, "revivify", "vampiric_touch") +
+            at(7, "blight", "dispel_evil_and_good") +
+            at(9, "hold_monster", "raise_dead"),
+        "hollow_warden" to at(3, "wrathful_smite") +
+            at(5, "spike_growth") +
+            at(9, "phantom_steed") +
+            at(13, "hallucinatory_terrain") +
+            at(17, "awaken"),
+        "shadow_sorcery" to at(3, "bane", "darkness", "inflict_wounds", "pass_without_trace") +
+            at(5, "hunger_of_hadar", "summon_undead") +
+            at(7, "greater_invisibility", "phantasmal_killer") +
+            at(9, "contagion", "creation"),
+        "hexblade_patron" to at(
+            3, "arcane_vigor", "hex", "magic_weapon", "shield", "wrathful_smite",
+        ) + at(5, "conjure_barrage", "dispel_magic") +
+            at(7, "freedom_of_movement", "staggering_smite") +
+            at(9, "animate_objects", "steel_wind_strike"),
+        "undead_patron" to at(
+            3, "blindness_deafness", "false_life", "phantasmal_force", "ray_of_sickness",
+        ) + at(5, "speak_with_dead", "vampiric_touch") +
+            at(7, "death_ward", "phantasmal_killer") +
+            at(9, "antilife_shell", "cloudkill"),
+
+        // The College of Spirits and the Phantom always have one spell rather than a table.
+        "college_of_spirits" to at(6, "spirit_guardians"),
+        "phantom" to at(9, "speak_with_dead") + at(9, "augury"),
+
         // ---- Other subclasses that hand over a specific spell
         "college_of_the_moon" to at(6, "moonbeam"),
         "land" to emptyList(),
@@ -237,6 +289,17 @@ object SpellGrantData {
         "cold_caster" to at(1, "ray_of_frost"),
         "boon_of_revelry" to at(1, "ottos_irresistible_dance"),
         "boon_of_the_furious_storm" to emptyList(),
+
+        // ---- Paths of Villainy. Each feat names one spell you always have prepared and
+        // can cast by spending Death Points rather than a spell slot.
+        "death_knight_initiate" to at(1, "wrathful_smite"),
+        "dread_authority" to at(1, "command"),
+        "harbinger_of_doom" to at(1, "bane"),
+        "deathly_presence" to at(1, "fear"),
+        "unholy_steed" to at(1, "find_steed"),
+        "undead_grasp" to at(1, "chill_touch"),
+        "lich_ascension" to at(1, "fear"),
+        "boon_of_the_cleansed_heart" to at(1, "dispel_evil_and_good"),
     )
 
     /**

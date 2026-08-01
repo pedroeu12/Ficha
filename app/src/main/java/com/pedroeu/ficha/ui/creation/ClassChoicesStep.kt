@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.ui.components.ChoiceChip
+import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.SelectableCard
 
@@ -172,6 +173,18 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                     }
                 }
             }
+        }
+
+        // Decisions the class table's level 1 features force, which the older class-choice
+        // shape doesn't model — a martial class's Weapon Mastery above all.
+        val featureChoices = state.classFeatureChoices
+        items(featureChoices.size, key = { featureChoices[it].id }) { index ->
+            val choice = featureChoices[index]
+            ChoiceSection(
+                choice = choice,
+                selected = state.classFeatureSelections[choice.id].orEmpty(),
+                onToggle = { viewModel.toggleClassFeatureChoice(choice.id, it, choice.count) },
+            )
         }
     }
 }

@@ -101,6 +101,21 @@ object ProgressionData {
         source = "Level $level",
     )
 
+    /**
+     * Which weapons the character has mastery with. The list of options and the counts live
+     * in [MasteryData], so a class's table and the property text stay in one place.
+     */
+    private fun masteryChoice(classId: String, count: Int, level: Int) =
+        MasteryData.choiceFor(classId, count, level)
+
+    /** The feature text for a level where the mastery count goes up. */
+    private fun masteryGrowth(classId: String, level: Int, count: Int) = feature(
+        level,
+        "Weapon Mastery",
+        "The number of weapons you have mastery with increases to $count.",
+        masteryChoice(classId, count, level),
+    )
+
     private fun expertiseChoice(level: Int, id: String, count: Int = 2) = Choice(
         id = id,
         label = "Expertise",
@@ -123,7 +138,10 @@ object ProgressionData {
             features = listOf(
                 feature(1, "Rage", "Enter a Rage as a Bonus Action for bonus damage, Resistance to Bludgeoning, Piercing, and Slashing damage, and Advantage on Strength checks and saves."),
                 feature(1, "Unarmored Defense", "While not wearing armor, your AC equals 10 + your Dexterity modifier + your Constitution modifier."),
-                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with. Whenever you finish a Long Rest, you can swap one of those weapons for a different one.",
+                    masteryChoice("barbarian", 2, 1)),
+                masteryGrowth("barbarian", 4, 3),
+                masteryGrowth("barbarian", 10, 4),
                 feature(2, "Danger Sense", "You have Advantage on Dexterity saving throws unless you have the Incapacitated condition."),
                 feature(2, "Reckless Attack", "Attack recklessly to gain Advantage on Strength-based melee attacks, at the cost of Advantage for attacks against you."),
                 feature(3, "Primal Knowledge", "You gain proficiency in another skill of your choice from the Barbarian list, and can make certain checks using Strength while raging.",
@@ -239,7 +257,11 @@ object ProgressionData {
                 feature(1, "Fighting Style", "You gain a Fighting Style feat of your choice.",
                     fightingStyleChoice(1)),
                 feature(1, "Second Wind", "As a Bonus Action, regain 1d10 + your Fighter level hit points, twice per Short or Long Rest."),
-                feature(1, "Weapon Mastery", "You can use the mastery property of three kinds of weapons you are proficient with."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of three kinds of weapons you are proficient with. Whenever you finish a Long Rest, you can swap one of those weapons for a different one.",
+                    masteryChoice("fighter", 3, 1)),
+                masteryGrowth("fighter", 4, 4),
+                masteryGrowth("fighter", 10, 5),
+                masteryGrowth("fighter", 16, 6),
                 feature(2, "Action Surge", "Take one additional action on your turn, once per Short or Long Rest."),
                 feature(2, "Tactical Mind", "When you fail an ability check, spend a use of Second Wind to add 1d10 to the roll."),
                 feature(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action."),
@@ -295,7 +317,9 @@ object ProgressionData {
             features = listOf(
                 feature(1, "Lay On Hands", "You have a pool of healing equal to five times your Paladin level that you can spend as a Bonus Action."),
                 feature(1, "Spellcasting", "You cast Paladin spells using Charisma, preparing them from the Paladin spell list."),
-                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with. Whenever you finish a Long Rest, you can swap one of those weapons for a different one.",
+                    masteryChoice("paladin", 2, 1)),
+                masteryGrowth("paladin", 9, 3),
                 feature(2, "Fighting Style", "You gain a Fighting Style feat of your choice.",
                     fightingStyleChoice(2)),
                 feature(2, "Paladin's Smite", "You always have Divine Smite prepared, and can cast it once per Long Rest without a slot."),
@@ -323,7 +347,9 @@ object ProgressionData {
             features = listOf(
                 feature(1, "Spellcasting", "You cast Ranger spells using Wisdom, preparing them from the Ranger spell list."),
                 feature(1, "Favored Enemy", "You always have Hunter's Mark prepared and can cast it a number of times per Long Rest without a slot."),
-                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with. Whenever you finish a Long Rest, you can swap one of those weapons for a different one.",
+                    masteryChoice("ranger", 2, 1)),
+                masteryGrowth("ranger", 9, 3),
                 feature(2, "Deft Explorer", "You gain Expertise in one skill you are proficient with and learn two languages.",
                     expertiseChoice(2, "ranger_expertise_2", count = 1)),
                 feature(2, "Fighting Style", "You gain a Fighting Style feat of your choice.",
@@ -354,7 +380,9 @@ object ProgressionData {
                     expertiseChoice(1, "rogue_expertise_1")),
                 feature(1, "Sneak Attack", "Once per turn, deal an extra 1d6 damage to a target you have Advantage against or that is next to an ally."),
                 feature(1, "Thieves' Cant", "You know a secret mix of dialect, jargon, and code that hides messages in ordinary conversation."),
-                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with."),
+                feature(1, "Weapon Mastery", "You can use the mastery property of two kinds of weapons you are proficient with. Whenever you finish a Long Rest, you can swap one of those weapons for a different one.",
+                    masteryChoice("rogue", 2, 1)),
+                masteryGrowth("rogue", 9, 3),
                 feature(2, "Cunning Action", "You can take the Dash, Disengage, or Hide action as a Bonus Action."),
                 feature(3, "Steady Aim", "As a Bonus Action, give yourself Advantage on your next attack this turn if you haven't moved."),
                 feature(5, "Cunning Strike", "When you deal Sneak Attack damage, trade dice for effects such as Poison, Trip, or Withdraw."),

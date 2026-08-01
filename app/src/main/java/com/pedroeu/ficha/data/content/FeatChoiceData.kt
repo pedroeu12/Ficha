@@ -101,6 +101,19 @@ object FeatChoiceData {
         "street_justice" to listOf(Ability.STR, Ability.DEX),
         "zhentarim_tactics" to listOf(Ability.DEX, Ability.CHA),
 
+        // ---------------------------------------------------------- Villainous Options
+        "death_knight_initiate" to listOf(Ability.STR, Ability.CHA),
+        "dread_authority" to listOf(Ability.CON, Ability.CHA),
+        "harbinger_of_doom" to listOf(Ability.STR, Ability.CON, Ability.CHA),
+        "deathly_presence" to listOf(Ability.STR, Ability.CON, Ability.CHA),
+        "unholy_steed" to listOf(Ability.STR, Ability.CON),
+        "death_knight_ascension" to listOf(Ability.STR, Ability.CHA),
+        "lich_initiate" to listOf(Ability.INT, Ability.WIS, Ability.CHA),
+        "arcane_restoration" to listOf(Ability.INT, Ability.WIS, Ability.CHA),
+        "transfer_life" to listOf(Ability.INT, Ability.WIS, Ability.CHA),
+        "undead_grasp" to listOf(Ability.INT, Ability.WIS, Ability.CHA),
+        "lich_ascension" to listOf(Ability.INT, Ability.WIS, Ability.CHA),
+
         // ---------------------------------------------------------- Epic Boons
         "boon_combat_prowess" to Ability.ALL,
         "boon_dimensional_travel" to Ability.ALL,
@@ -128,6 +141,10 @@ object FeatChoiceData {
         "boon_of_the_bright_sun" to listOf(Ability.CON, Ability.WIS, Ability.CHA),
         "boon_of_the_furious_storm" to listOf(Ability.INT, Ability.WIS, Ability.CHA),
         "boon_of_the_soul_drinker" to Ability.ALL,
+        "boon_of_the_bandit_king" to Ability.ALL,
+        "boon_of_the_cleansed_heart" to Ability.ALL,
+        "boon_of_the_hunters_eye" to Ability.ALL,
+        "boon_of_unwavering_devotion" to Ability.ALL,
     )
 
     /** Which spell list each Magic Initiate feat draws from, with its spellcasting ability. */
@@ -355,9 +372,9 @@ object FeatChoiceData {
                     prompt = "Choose 1 more kind of weapon whose mastery property you can use.",
                     count = 1,
                     kind = ChoiceKind.OPTION,
-                    options = EquipmentData.WEAPONS
-                        .filter { it.mastery.isNotBlank() }
-                        .map { ChoiceOption(it.id, it.name, "Mastery: ${it.mastery}", it.mastery) },
+                    // The same list a class's Weapon Mastery draws from, so the property and
+                    // its rules text read identically wherever the choice is made.
+                    options = MasteryData.weaponOptions(),
                     source = featName,
                 )
             )

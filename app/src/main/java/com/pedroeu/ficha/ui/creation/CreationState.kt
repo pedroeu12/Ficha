@@ -3,6 +3,7 @@ package com.pedroeu.ficha.ui.creation
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.OriginChoices
+import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.ToolData
 import com.pedroeu.ficha.data.model.Ability
@@ -51,6 +52,12 @@ data class CreationState(
     val classSkillChoices: Set<Skill> = emptySet(),
     /** ClassChoice.id -> selected option ids (feature options and spell picks). */
     val classSelections: Map<String, List<String>> = emptyMap(),
+    /**
+     * Choice.id -> selected option ids for level 1 features off the class table, such as a
+     * martial class's Weapon Mastery. These are stored against level 1 on the character, so
+     * the sheet and every later level read them the same way.
+     */
+    val classFeatureSelections: Map<String, List<String>> = emptyMap(),
     val expertiseChoices: Set<Skill> = emptySet(),
 
     val backgroundId: String? = null,
@@ -76,6 +83,41 @@ data class CreationState(
     val species get() = speciesId?.let { SpeciesData.byId(it) }
     val charClass get() = classId?.let { ClassData.byId(it) }
     val background get() = backgroundId?.let { BackgroundData.byId(it) }
+
+    /**
+     * Decisions the class table's level 1 features force, beyond the ones [charClass] already
+     * models. Weapon Mastery is the case that matters: the class hands it out at level 1 and
+     * nothing in the creation flow ever asked which weapons, so a Fighter reached the table
+     * with three masteries they had never chosen.
+     *
+     * Anything the wizard already asks for another way is filtered out: by id for the older
+     * [ClassChoice] shape, so a Fighter isn't asked for their Fighting Style twice, and by
+     * kind for Expertise, which a Rogue picks through its own dedicated step.
+     */
+    val classFeatureChoices: List<Choice>
+        get() {
+            val classId = classId ?: return emptyList()
+            val alreadyAsked = charClass?.choices.orEmpty().map { it.id }.toSet()
+            return ProgressionData.forClass(classId)
+                ?.featuresAt(1)
+                ?.flatMap { it.choices }
+                ?.filterNot { it.id in alreadyAsked || it.kind == ChoiceKind.EXPERTISE }
+                .orEmpty()
+        }
+
+    /**
+     * Level 1 Expertise choices off the class table, which the wizard answers through its own
+     * picker. Naming them here lets the finished character record the answer against the
+     * feature that asked, so the sheet doesn't show a Rogue's Expertise as still unchosen.
+     */
+    val level1ExpertiseChoiceIds: List<String>
+        get() = classId
+            ?.let { ProgressionData.forClass(it) }
+            ?.featuresAt(1)
+            ?.flatMap { it.choices }
+            ?.filter { it.kind == ChoiceKind.EXPERTISE }
+            ?.map { it.id }
+            .orEmpty()
 
     /** Skills already granted by species or background, which class picks must not duplicate. */
     val grantedSkills: Set<Skill>
@@ -238,6 +280,10 @@ data class CreationState(
             }
         }
         if (c.id == "rogue" && expertiseChoices.size != 2) return false
+        // Level 1 features off the class table, e.g. which weapons you have mastery with.
+        if (classFeatureChoices.any { classFeatureSelections[it.id]?.size != it.count }) {
+            return false
+        }
         return true
     }
 

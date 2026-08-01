@@ -59,9 +59,25 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             classId = id,
             classSkillChoices = emptySet(),
             classSelections = emptyMap(),
+            classFeatureSelections = emptyMap(),
             expertiseChoices = emptySet(),
         )
     }
+
+    /** Toggles an option inside a level 1 class feature choice, e.g. Weapon Mastery. */
+    fun toggleClassFeatureChoice(choiceId: String, optionId: String, max: Int) =
+        _state.update { current ->
+            val selected = current.classFeatureSelections[choiceId].orEmpty()
+            val next = when {
+                selected.contains(optionId) -> selected - optionId
+                selected.size < max -> selected + optionId
+                max == 1 -> listOf(optionId)
+                else -> selected.drop(1) + optionId
+            }
+            current.copy(
+                classFeatureSelections = current.classFeatureSelections + (choiceId to next)
+            )
+        }
 
     fun toggleClassSkill(skill: Skill) = _state.update { current ->
         val choice = current.charClass?.choices
@@ -297,6 +313,14 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             weaponProficiencies = charClass?.weaponProficiencies.orEmpty(),
             classChoiceSelections = state.classSelections,
             originChoiceSelections = state.originSelections,
+            // Level 1 feature picks are keyed by the level that granted them, matching how
+            // every later level records its own, so the sheet reads them all the same way.
+            // The Rogue's Expertise is answered through its own picker, so it's recorded
+            // against the feature that asked rather than left looking unchosen.
+            levelSelections = state.classFeatureSelections.mapKeys { (id, _) -> "1:$id" } +
+                state.level1ExpertiseChoiceIds.associate { choiceId ->
+                    "1:$choiceId" to state.expertiseChoices.map { it.name }
+                },
             // The background's feat, plus any feat picked through an origin choice — the
             // Human's Versatile trait grants one the same way.
             featIds = (

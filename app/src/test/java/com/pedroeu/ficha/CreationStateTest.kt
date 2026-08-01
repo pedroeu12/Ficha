@@ -49,8 +49,16 @@ class CreationStateTest {
         // Fighting Style is still unchosen.
         assertFalse(withSkills.canAdvance)
 
-        val complete = withSkills.copy(
+        val withStyle = withSkills.copy(
             classSelections = mapOf("fighting_style" to listOf("defense"))
+        )
+        // Weapon Mastery is a level 1 class feature, and a Fighter has three of them.
+        assertFalse("the Fighter must still choose which weapons", withStyle.canAdvance)
+
+        val complete = withStyle.copy(
+            classFeatureSelections = mapOf(
+                "class:fighter:weapon_mastery" to listOf("longsword", "greataxe", "shortbow")
+            )
         )
         assertTrue(complete.canAdvance)
     }
@@ -95,7 +103,12 @@ class CreationStateTest {
         )
         assertFalse(rogue.canAdvance)
         assertTrue(
-            rogue.copy(expertiseChoices = setOf(Skill.STEALTH, Skill.PERCEPTION)).canAdvance
+            rogue.copy(
+                expertiseChoices = setOf(Skill.STEALTH, Skill.PERCEPTION),
+                classFeatureSelections = mapOf(
+                    "class:rogue:weapon_mastery" to listOf("dagger", "shortsword")
+                ),
+            ).canAdvance
         )
     }
 

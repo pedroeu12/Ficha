@@ -46,6 +46,19 @@ object SaveDcData {
 
     /** Subclasses whose save DC comes from an ability other than the class's usual one. */
     private val BY_SUBCLASS: Map<String, DcSource> = mapOf(
+        // Subclasses whose features force a save from an ability the class doesn't cast with.
+        "hell_knight" to DcSource(
+            "hell_knight", "Hellfire Surge", Ability.CON,
+            "Hellfire Surge, which uses 8 plus your Constitution modifier and Proficiency Bonus.",
+        ),
+        "hollow_warden" to DcSource(
+            "hollow_warden", "Unnerving Aura", Ability.WIS,
+            "Wrath of the Wild's Unnerving Aura, using your Ranger spell save DC.",
+        ),
+        "phantom" to DcSource(
+            "phantom", "Phantom", Ability.DEX,
+            "Spirit Query and Voice of Death, which use Dexterity as the spellcasting modifier.",
+        ),
         "psi_warrior" to DcSource(
             "psi_warrior", "Psi Warrior", Ability.INT,
             "Psionic Power features that force a saving throw.",

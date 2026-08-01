@@ -1160,6 +1160,223 @@ object ResourceData {
                 )
             )
 
+            // ------------------------------------------ UA 2026: Villainous Options
+
+            "pestilence_domain" -> buildList {
+                if (level >= 6) add(
+                    ResourceDef(
+                        id = "pestilence_domain:virulent_burst",
+                        name = "Virulent Burst",
+                        max = c.modAtLeastOne(Ability.WIS),
+                        recharge = Recharge.LONG_REST,
+                        source = "Pestilence Domain",
+                    )
+                )
+                if (level >= 17) add(
+                    ResourceDef(
+                        id = "pestilence_domain:vermin_form",
+                        name = "Vermin Form",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Pestilence Domain",
+                        notes = "Or expend a level 5+ spell slot to restore it.",
+                    )
+                )
+            }
+
+            "hell_knight" -> buildList {
+                if (level >= 3) add(
+                    ResourceDef(
+                        id = "hell_knight:infernal_wound",
+                        name = "Infernal Wound",
+                        max = c.modAtLeastOne(Ability.CON),
+                        recharge = Recharge.SHORT_REST,
+                        source = "Hell Knight",
+                        notes = "Your Infernal Wound Die is a d6.",
+                    )
+                )
+            }
+
+            // ------------------------------------------ UA 2025: Horror Subclasses
+
+            "reanimator" -> buildList {
+                if (level >= 3) {
+                    add(
+                        ResourceDef(
+                            id = "reanimator:jolt_to_life",
+                            name = "Jolt to Life",
+                            max = c.modAtLeastOne(Ability.INT),
+                            recharge = Recharge.LONG_REST,
+                            source = "Reanimator",
+                        )
+                    )
+                    add(
+                        ResourceDef(
+                            id = "reanimator:companion",
+                            name = "Reanimated Companion",
+                            max = 1,
+                            recharge = Recharge.LONG_REST,
+                            source = "Reanimator",
+                            notes = "Or expend a spell slot to create another.",
+                        )
+                    )
+                }
+            }
+
+            "grave_domain" -> buildList {
+                if (level >= 6) add(
+                    ResourceDef(
+                        id = "grave_domain:sentinel",
+                        name = "Sentinel at Death's Door",
+                        max = c.modAtLeastOne(Ability.WIS),
+                        recharge = Recharge.LONG_REST,
+                        source = "Grave Domain",
+                    )
+                )
+                if (level >= 17) add(
+                    ResourceDef(
+                        id = "grave_domain:keeper_of_souls",
+                        name = "Keeper of Souls",
+                        max = 1,
+                        recharge = Recharge.SHORT_REST,
+                        source = "Grave Domain",
+                        description = "When an enemy dies within 60 feet of you, you or " +
+                            "one creature you can see within 60 feet of yourself regains " +
+                            "Hit Points equal to three times your Cleric level. You can't " +
+                            "use this if you have the Incapacitated condition.",
+                    )
+                )
+            }
+
+            "phantom" -> buildList {
+                if (level >= 3) add(
+                    ResourceDef(
+                        id = "phantom:wails",
+                        name = "Wails from the Grave",
+                        max = c.modAtLeastOne(Ability.DEX),
+                        recharge = Recharge.LONG_REST,
+                        source = "Phantom",
+                    )
+                )
+                if (level >= 9) add(
+                    ResourceDef(
+                        id = "phantom:soul_trinkets",
+                        name = "Soul Trinkets",
+                        max = when {
+                            level >= 17 -> 4
+                            level >= 13 -> 3
+                            else -> 2
+                        },
+                        recharge = Recharge.LONG_REST,
+                        source = "Phantom",
+                        isPointPool = true,
+                        description = "Tiny objects holding the echoes of the dead. Spend " +
+                            "one to use Wails from the Grave without expending a use of " +
+                            "that feature, or to cast Augury as a Magic action. While you " +
+                            "hold at least one, you have Advantage on Death Saving Throws " +
+                            "and Constitution saving throws.",
+                        notes = "Regain one as a Reaction when a creature dies within 30 feet.",
+                    )
+                )
+                if (level >= 13) add(
+                    ResourceDef(
+                        id = "phantom:ghost_walk",
+                        name = "Ghost Walk",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Phantom",
+                        notes = "Or destroy a soul trinket to restore it.",
+                    )
+                )
+            }
+
+            "shadow_sorcery" -> buildList {
+                if (level >= 6) add(
+                    ResourceDef(
+                        id = "shadow_sorcery:spirits_of_ill_omen",
+                        name = "Summon Undead (free casting)",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Shadow Sorcery",
+                    )
+                )
+                if (level >= 18) add(
+                    ResourceDef(
+                        id = "shadow_sorcery:umbral_form",
+                        name = "Umbral Form",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Shadow Sorcery",
+                        notes = "Or spend 6 Sorcery Points to restore it.",
+                    )
+                )
+            }
+
+            "hexblade_patron" -> buildList {
+                if (level >= 3) add(
+                    ResourceDef(
+                        id = "hexblade_patron:curse",
+                        name = "Hexblade's Curse",
+                        max = c.modAtLeastOne(Ability.CHA),
+                        recharge = Recharge.LONG_REST,
+                        source = "Hexblade Patron",
+                        description = "Cast Hex without expending a spell slot. When you " +
+                            "do, a spectral weapon resembling your patron orbits the " +
+                            "cursed target.",
+                    )
+                )
+                if (level >= 10) add(
+                    ResourceDef(
+                        id = "hexblade_patron:armor_of_hexes",
+                        name = "Armor of Hexes",
+                        max = c.modAtLeastOne(Ability.CHA),
+                        recharge = Recharge.LONG_REST,
+                        source = "Hexblade Patron",
+                    )
+                )
+            }
+
+            "undead_patron" -> buildList {
+                if (level >= 3) add(
+                    ResourceDef(
+                        id = "undead_patron:form_of_dread",
+                        name = "Form of Dread",
+                        max = c.modAtLeastOne(Ability.CHA),
+                        recharge = Recharge.LONG_REST,
+                        source = "Undead Patron",
+                    )
+                )
+                if (level >= 10) add(
+                    ResourceDef(
+                        id = "undead_patron:unholy_resuscitation",
+                        name = "Unholy Resuscitation",
+                        max = 1,
+                        recharge = Recharge.SHORT_REST,
+                        source = "Undead Patron",
+                        description = "If you drop to 0 Hit Points and don't die outright, " +
+                            "your body erupts with deathly energy. Each creature of your " +
+                            "choice in a 30-foot Emanation makes a Constitution saving " +
+                            "throw, taking 2d10 plus your Warlock level Necrotic damage on " +
+                            "a failure. Your Hit Points then change to 10 times your " +
+                            "Charisma modifier, and you gain 1 Exhaustion level.",
+                    )
+                )
+            }
+
+            "college_of_spirits" -> buildList {
+                if (level >= 6) add(
+                    ResourceDef(
+                        id = "college_of_spirits:spiritual_manifestation",
+                        name = "Spirit Guardians (free casting)",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "College of Spirits",
+                    )
+                )
+            }
+
+            "hollow_warden" -> emptyList()
+
             else -> emptyList()
         }
     }

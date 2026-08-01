@@ -37,6 +37,7 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.EditableText
+import com.pedroeu.ficha.ui.components.ExpandableOption
 import com.pedroeu.ficha.ui.components.SectionHeader
 
 @Composable
@@ -106,6 +107,15 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                                     text = attack.notes,
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            // A mastery the character can actually use opens to its full
+                            // rules text — knowing a weapon has Topple is no use without
+                            // knowing what Topple does at the moment you hit.
+                            if (attack.masteryProperty.isNotBlank()) {
+                                ExpandableOption(
+                                    name = "Mastery: ${attack.masteryProperty}",
+                                    description = attack.masteryDescription,
                                 )
                             }
                         }

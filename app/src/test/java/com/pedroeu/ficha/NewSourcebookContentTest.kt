@@ -105,7 +105,11 @@ class NewSourcebookContentTest {
 
     @Test
     fun `the artificer has all five subclasses`() {
-        val names = SubclassData.forClass("artificer").map { it.name }.sorted()
+        // The playtest Reanimator sits alongside them and is labelled as such.
+        val names = SubclassData.forClass("artificer")
+            .filterNot { it.isPlaytest }
+            .map { it.name }
+            .sorted()
         assertEquals(
             listOf("Alchemist", "Armorer", "Artillerist", "Battle Smith", "Cartographer"),
             names,

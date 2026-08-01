@@ -12,10 +12,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -47,6 +52,8 @@ import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.ui.theme.LocalThemeController
+import com.pedroeu.ficha.ui.theme.ThemeMode
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,9 +82,11 @@ fun HomeScreen(
                         )
                     }
                 },
+                actions = { AppearanceButton() },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ),
             )
         },
@@ -217,6 +226,43 @@ private fun EmptyState(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp),
             )
+        }
+    }
+}
+
+/**
+ * Switches between the daylight and candlelight schemes, or hands the decision back to the
+ * phone. Tapping cycles the three; holding isn't discoverable enough for something a player
+ * changes when the light in the room changes, so a menu names each one.
+ */
+@Composable
+private fun AppearanceButton() {
+    val theme = LocalThemeController.current
+    var showMenu by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(
+                imageVector = if (theme.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                // The label says what tapping leads to, which is what a screen reader needs.
+                contentDescription = if (theme.isDark) "Appearance: candlelight" else "Appearance: daylight",
+            )
+        }
+        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            ThemeMode.entries.forEach { mode ->
+                DropdownMenuItem(
+                    text = { Text(mode.label) },
+                    onClick = {
+                        theme.setMode(mode)
+                        showMenu = false
+                    },
+                    trailingIcon = {
+                        if (mode == theme.mode) {
+                            Icon(Icons.Default.Check, contentDescription = "Selected")
+                        }
+                    },
+                )
+            }
         }
     }
 }

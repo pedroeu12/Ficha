@@ -2,6 +2,7 @@ package com.pedroeu.ficha.ui.theme
 
 import android.app.Activity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +12,10 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -22,105 +24,75 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 /**
- * One warm scheme for every screen. There is no dark variant on purpose: a parchment sheet
- * that flipped to grey in dark mode would defeat the look the app is going for.
+ * The app's look, in daylight or candlelight.
+ *
+ * [mode] is the player's choice; whether that actually means dark is only known once the
+ * phone's own setting is folded in, which is why the resolved answer travels down through
+ * [LocalThemeController] rather than being recomputed by each screen that cares.
  */
-private val ParchmentColors = lightColorScheme(
-    primary = CrimsonPrimary,
-    onPrimary = ParchmentPage,
-    primaryContainer = CrimsonPrimary,
-    onPrimaryContainer = ParchmentPage,
-    inversePrimary = CrimsonSoft,
-
-    secondary = GoldAccentDeep,
-    onSecondary = ParchmentPage,
-    secondaryContainer = ParchmentDeep,
-    onSecondaryContainer = InkBrown,
-
-    tertiary = CrimsonDeep,
-    onTertiary = ParchmentPage,
-    tertiaryContainer = ParchmentDeep,
-    onTertiaryContainer = InkBrown,
-
-    background = ParchmentPage,
-    onBackground = InkBrown,
-    surface = ParchmentCard,
-    onSurface = InkBrown,
-    surfaceVariant = ParchmentDeep,
-    onSurfaceVariant = InkBrownSoft,
-    surfaceTint = GoldAccent,
-
-    // Material pulls these for menus, dialogs, and text-field containers; all must stay warm
-    // or a stray white panel shows up on top of the parchment.
-    surfaceContainerLowest = ParchmentPage,
-    surfaceContainerLow = ParchmentPage,
-    surfaceContainer = ParchmentCard,
-    surfaceContainerHigh = ParchmentCard,
-    surfaceContainerHighest = ParchmentDeep,
-    surfaceBright = ParchmentPage,
-    surfaceDim = ParchmentDeep,
-    inverseSurface = InkBrown,
-    inverseOnSurface = ParchmentPage,
-
-    outline = ParchmentEdge,
-    outlineVariant = ParchmentEdge,
-
-    error = DangerRed,
-    onError = ParchmentPage,
-    errorContainer = ParchmentDeep,
-    onErrorContainer = DangerRed,
-
-    scrim = InkBrown,
-)
-
 @Composable
-fun FichaTheme(content: @Composable () -> Unit) {
+fun FichaTheme(
+    mode: ThemeMode = ThemeMode.SYSTEM,
+    onModeChange: (ThemeMode) -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    val dark = mode.isDark(isSystemInDarkTheme())
+    val colors = if (dark) CandlelightColors else ParchmentColors
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = CrimsonDeep.toArgb()
-            window.navigationBarColor = ParchmentPage.toArgb()
+            // The status bar sits under the app bar's crimson band and the navigation bar
+            // under the page, so each takes the tone of what it abuts in the active scheme.
+            window.statusBarColor = colors.primaryContainer.toArgb()
+            window.navigationBarColor = colors.background.toArgb()
             val controller = WindowCompat.getInsetsController(window, view)
-            // Crimson status bar wants light icons; the parchment nav bar wants dark ones.
+            // Both crimsons are dark enough to want light icons either way; what changes
+            // between the schemes is the page sitting behind the navigation bar.
             controller.isAppearanceLightStatusBars = false
-            controller.isAppearanceLightNavigationBars = true
+            controller.isAppearanceLightNavigationBars = !dark
         }
     }
 
-    MaterialTheme(
-        colorScheme = ParchmentColors,
-        typography = FichaTypography,
-    ) {
-        ParchmentBackdrop(content)
+    val themeController = remember(mode, dark, onModeChange) {
+        ThemeController(mode = mode, isDark = dark, setMode = onModeChange)
+    }
+
+    CompositionLocalProvider(LocalThemeController provides themeController) {
+        MaterialTheme(
+            colorScheme = colors,
+            typography = FichaTypography,
+        ) {
+            PageBackdrop(dark = dark) { content() }
+        }
     }
 }
 
 /**
- * The base page tone plus a soft top-to-bottom wash, so the paper reads as aged rather than
- * flat. Screens layered on top keep transparent containers to let this show through.
+ * The base page tone plus a soft wash, so the paper reads as aged rather than flat. Screens
+ * layered on top keep transparent containers to let this show through.
+ *
+ * Daylight washes from light at the top down to a deeper tone. Candlelight runs the other
+ * way — brightest where the page meets the app bar, falling off toward the bottom, as though
+ * lit from above.
  */
 @Composable
-private fun ParchmentBackdrop(content: @Composable () -> Unit) {
+private fun PageBackdrop(dark: Boolean, content: @Composable () -> Unit) {
+    val stops = if (dark) CandlelightBackdropStops else ParchmentBackdropStops
+    val bandColor = MaterialTheme.colorScheme.primaryContainer
+
     Box(
         Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        ParchmentPage,
-                        ParchmentCard.copy(alpha = 0.65f),
-                        ParchmentDeep.copy(alpha = 0.55f),
-                    )
-                )
-            )
+            .background(Brush.verticalGradient(stops))
     ) {
         // A crimson band behind the status bar so the app bar reads as one piece with it.
         Box(
             Modifier
                 .fillMaxWidth()
                 .windowInsetsTopHeight(WindowInsets.statusBars)
-                .background(CrimsonDeep)
+                .background(bandColor)
                 .align(Alignment.TopCenter)
         )
         Box(

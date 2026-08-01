@@ -1377,6 +1377,39 @@ object ResourceData {
 
             "hollow_warden" -> emptyList()
 
+            // ------------------------------------------ Pre-existing gaps the audit found
+
+            "demonic_sorcery" -> buildList {
+                if (level >= 18) add(
+                    ResourceDef(
+                        id = "demonic_sorcery:abyssal_explosion",
+                        name = "Abyssal Explosion",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Demonic Sorcery",
+                        description = "Fill a 30-foot-radius Sphere with Abyssal energy. " +
+                            "Each creature there makes a Constitution saving throw, taking " +
+                            "8d6 Force damage if it isn't a Fiend and gaining the " +
+                            "Incapacitated condition until the start of your next turn.",
+                        notes = "Or spend 7 Sorcery Points to restore it.",
+                    )
+                )
+            }
+
+            "draconic" -> buildList {
+                if (level >= 18) add(
+                    ResourceDef(
+                        id = "draconic:dragon_companion",
+                        name = "Summon Dragon (free casting)",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Draconic Sorcery",
+                        description = "Cast Summon Dragon without expending a spell slot, " +
+                            "and command the dragon more freely than the spell allows.",
+                    )
+                )
+            }
+
             else -> emptyList()
         }
     }
@@ -1528,6 +1561,14 @@ object ResourceData {
     }
 
     // ------------------------------------------------------------------ Feats
+
+    /**
+     * The ability a feat's "your spellcasting ability" refers to. Feats that say this are
+     * taken by casters, so the class's own ability is the right answer; a feat on a class
+     * with no spellcasting falls back to Charisma, which is what the Paths of Villainy use.
+     */
+    private fun spellcastingAbilityFor(c: Context): Ability =
+        ClassData.byId(c.classId)?.spellcastingAbility ?: Ability.CHA
 
     private fun featResources(c: Context): List<ResourceDef> = c.featIds.mapNotNull { featId ->
         when (featId) {
@@ -1799,6 +1840,87 @@ object ResourceData {
                 max = 1,
                 recharge = Recharge.LONG_REST,
                 source = "Boon of Recovery",
+            )
+
+            // ------------------------------------------ Paths of Villainy
+
+            // Death Points are the currency the whole Death Knight path spends: every feat
+            // on it casts its spell by expending them rather than a spell slot.
+            "death_knight_initiate" -> ResourceDef(
+                id = "feat:death_points",
+                name = "Death Points",
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = "Path of the Death Knight",
+                isPointPool = true,
+                description = "Spend Death Points to cast the spells your Path of the Death " +
+                    "Knight feats grant without expending a spell slot. Death Knight " +
+                    "Ascension can also spend 1 to 5 of them at once on a Hellfire Orb.",
+            )
+
+            "arcane_restoration" -> ResourceDef(
+                id = "feat:arcane_restoration",
+                name = "Essence Rejuvenation",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Arcane Restoration",
+                description = "When you use Soul Siphon to consume a soul, recover one or " +
+                    "more expended spell slots with a combined level of no more than 4.",
+            )
+
+            "lich_ascension" -> ResourceDef(
+                id = "feat:lich_ascension",
+                name = "Frightening Gaze",
+                max = c.modAtLeastOne(spellcastingAbilityFor(c)),
+                recharge = Recharge.LONG_REST,
+                source = "Lich Ascension",
+                description = "Cast Fear without expending a spell slot, using the " +
+                    "spellcasting ability you chose when you took this feat.",
+            )
+
+            // ------------------------------------------ Feats whose text limits a use
+
+            "telepathic" -> ResourceDef(
+                id = "feat:telepathic",
+                name = "Detect Thoughts (free casting)",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Telepathic",
+                description = "Cast Detect Thoughts without expending a spell slot, using " +
+                    "the ability score this feat increased.",
+            )
+
+            "boon_of_the_bandit_king" -> ResourceDef(
+                id = "feat:boon_of_the_bandit_king",
+                name = "Dastardly Charm",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Boon of the Bandit King",
+                description = "When you succeed on a check to pick a pocket, you can cause " +
+                    "the target to willingly part with the item and have the Charmed " +
+                    "condition for 1 minute or until it takes damage.",
+            )
+
+            "greater_mark_of_hospitality" -> ResourceDef(
+                id = "feat:greater_mark_of_hospitality",
+                name = "Inspired Hospitality",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Greater Mark of Hospitality",
+                description = "Modify Purify Food and Drink so each creature of your choice " +
+                    "within 30 feet has its Exhaustion reduced by 1 and gains Temporary Hit " +
+                    "Points equal to your Proficiency Bonus plus your spellcasting modifier.",
+            )
+
+            "greater_mark_of_scribing" -> ResourceDef(
+                id = "feat:greater_mark_of_scribing",
+                name = "Inspired Scribing",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Greater Mark of Scribing",
+                description = "Modify Comprehend Languages to cover up to three willing " +
+                    "creatures within 30 feet; for the duration you and they can communicate " +
+                    "telepathically within 1 mile.",
             )
 
             else -> null

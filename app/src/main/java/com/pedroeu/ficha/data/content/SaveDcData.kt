@@ -192,7 +192,46 @@ object SaveDcData {
 
     fun forLineage(lineageId: String?): DcSource? = lineageId?.let { BY_LINEAGE[it] }
 
-    fun forFeat(featId: String): DcSource? = BY_FEAT[featId] ?: dragonmark(featId)
+    fun forFeat(featId: String): DcSource? =
+        BY_FEAT[featId] ?: dragonmark(featId) ?: pathOfVillainy(featId)
+
+    /**
+     * The Paths of Villainy each cast from one ability across every feat on the path, so a
+     * character on one carries a single DC no matter how many of its feats they hold.
+     *
+     * The Death Knight's is Charisma outright. The Lich's is whichever of Intelligence,
+     * Wisdom, or Charisma the player chose, so its DC follows the class they cast with —
+     * every Lich feat requires the Spellcasting or Pact Magic feature, so there is always
+     * one to follow.
+     */
+    private fun pathOfVillainy(featId: String): DcSource? = when (featId) {
+        in DEATH_KNIGHT_FEATS -> DcSource(
+            id = "path_of_the_death_knight",
+            label = "Path of the Death Knight",
+            ability = Ability.CHA,
+            note = "Spells cast with Death Points, and Hellfire Orb.",
+        )
+
+        in LICH_FEATS -> DcSource(
+            id = "path_of_the_lich",
+            label = "Path of the Lich",
+            ability = Ability.INT,
+            note = "Paralyzing Touch and Frightening Gaze. You may use Wisdom or Charisma " +
+                "instead, whichever you chose when you took the feat.",
+        )
+
+        else -> null
+    }
+
+    private val DEATH_KNIGHT_FEATS = setOf(
+        "death_knight_initiate", "dread_authority", "harbinger_of_doom",
+        "deathly_presence", "unholy_steed", "death_knight_ascension",
+    )
+
+    private val LICH_FEATS = setOf(
+        "lich_initiate", "arcane_restoration", "transfer_life",
+        "undead_grasp", "lich_ascension",
+    )
 
     private fun dragonmark(featId: String): DcSource? =
         if (featId in DRAGONMARK_FEATS) {
@@ -209,5 +248,5 @@ object SaveDcData {
     /** Every id these tables are keyed by, so a test can check them against the real data. */
     fun sourceIds(): Set<String> =
         BY_CLASS.keys + BY_SUBCLASS.keys + BY_FEAT.keys + BY_SPECIES.keys + BY_LINEAGE.keys +
-            DRAGONMARK_FEATS
+            DRAGONMARK_FEATS + DEATH_KNIGHT_FEATS + LICH_FEATS
 }

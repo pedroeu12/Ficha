@@ -465,6 +465,37 @@ object FeatChoiceData {
                 )
             )
 
+            // Both of these say "Intelligence, Wisdom, or Charisma is your spellcasting
+            // ability for this spell (choose when you select this feat)", which is a
+            // decision separate from the score the feat raises.
+            "undead_grasp" -> listOf(
+                Choice(
+                    id = "feat:undead_grasp:casting_ability",
+                    label = "Paralyzing Touch",
+                    prompt = "Choose your spellcasting ability for Chill Touch.",
+                    count = 1,
+                    kind = ChoiceKind.ABILITY_SCORE,
+                    options = ChoiceOptions.fromAbilities(
+                        listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                    ),
+                    source = featName,
+                )
+            )
+
+            "lich_ascension" -> listOf(
+                Choice(
+                    id = "feat:lich_ascension:casting_ability",
+                    label = "Frightening Gaze",
+                    prompt = "Choose your spellcasting ability for Fear.",
+                    count = 1,
+                    kind = ChoiceKind.ABILITY_SCORE,
+                    options = ChoiceOptions.fromAbilities(
+                        listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                    ),
+                    source = featName,
+                )
+            )
+
             "aberrant_dragonmark" -> listOf(
                 Choice(
                     id = "feat:aberrant_dragonmark:cantrip",
@@ -503,5 +534,6 @@ object FeatChoiceData {
         "spell_sniper", "ritual_caster", "skill_expert", "weapon_master", "harper_agent",
         "purple_dragon_rook", "cult_of_the_dragon_initiate", "dragonscarred",
         "boon_energy_resistance", "boon_skill", "genie_magic", "aberrant_dragonmark",
+        "undead_grasp", "lich_ascension",
     )
 }

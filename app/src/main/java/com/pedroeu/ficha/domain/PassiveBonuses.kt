@@ -20,20 +20,32 @@ data class AppliedBonus(
 object PassiveBonuses {
 
     fun all(character: PlayerCharacter): List<AppliedBonus> {
-        val level = character.level
-
-        fun scale(bonus: PassiveBonusData.Bonus) = AppliedBonus(
+        /**
+         * A per-level bonus multiplies by whichever level it belongs to. Species and feat
+         * bonuses grow with the whole character; a class or subclass bonus grows only with
+         * levels in that class, so a Sorcerer 5 / Fighter 3 gets five hit points from
+         * Draconic Resilience rather than eight.
+         */
+        fun scale(bonus: PassiveBonusData.Bonus, level: Int) = AppliedBonus(
             label = bonus.label,
             target = bonus.target,
             amount = if (bonus.perLevel) bonus.amount * level else bonus.amount,
         )
 
         return buildList {
-            PassiveBonusData.forSpecies(character.speciesId).forEach { add(scale(it)) }
-            PassiveBonusData.forLineage(character.lineageId).forEach { add(scale(it)) }
-            PassiveBonusData.forClass(character.classId).forEach { add(scale(it)) }
+            val total = character.level
+            PassiveBonusData.forSpecies(character.speciesId).forEach { add(scale(it, total)) }
+            PassiveBonusData.forLineage(character.lineageId).forEach { add(scale(it, total)) }
             character.featIds.forEach { featId ->
-                PassiveBonusData.forFeat(featId).forEach { add(scale(it)) }
+                PassiveBonusData.forFeat(featId).forEach { add(scale(it, total)) }
+            }
+
+            // Every class the character has levels in, and the subclass attached to each.
+            ClassLevels.of(character).forEach { entry ->
+                PassiveBonusData.forClass(entry.classId)
+                    .forEach { add(scale(it, entry.level)) }
+                PassiveBonusData.forSubclass(entry.subclassId)
+                    .forEach { add(scale(it, entry.level)) }
             }
         }
     }

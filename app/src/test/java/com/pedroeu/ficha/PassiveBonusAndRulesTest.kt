@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.domain.CharacterCalculations
@@ -104,11 +105,12 @@ class PassiveBonusAndRulesTest {
     }
 
     @Test
-    fun `every passive bonus key matches a real species, lineage, feat, or class`() {
+    fun `every passive bonus key matches a real species, lineage, feat, class, or subclass`() {
         val known = SpeciesData.ALL.map { it.id }.toSet() +
             SpeciesData.ALL.flatMap { s -> s.lineageOptions.map { it.id } }.toSet() +
             FeatData.ALL.map { it.id }.toSet() +
-            ClassData.ALL.map { it.id }.toSet()
+            ClassData.ALL.map { it.id }.toSet() +
+            SubclassData.ALL.map { it.id }.toSet()
 
         val unknown = PassiveBonusData.sourceIds() - known
         assertTrue("these bonus keys match nothing in the data: $unknown", unknown.isEmpty())

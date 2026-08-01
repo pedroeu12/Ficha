@@ -232,6 +232,23 @@ object SpellGrantData {
         "college_of_spirits" to at(6, "spirit_guardians"),
         "phantom" to at(9, "speak_with_dead") + at(9, "augury"),
 
+        // ---- Arcane subclasses whose features name a spell they always have prepared.
+        // Each of these said so in its own text and granted nothing, which is the same gap
+        // that left Cleric domains empty — a promise in prose that reached no spell list.
+        "glamour" to at(3, "charm_person", "mirror_image"),
+        "illusionist" to at(6, "summon_beast", "summon_fey"),
+        "enchanter" to at(14, "modify_memory"),
+        "necromancer" to at(6, "animate_dead"),
+        "transmuter" to at(3, "alter_self") + at(10, "polymorph"),
+        "aberrant" to at(
+            3, "arms_of_hadar", "dissonant_whispers", "calm_emotions", "detect_thoughts",
+        ),
+        "elements" to at(6, "elementalism"),
+        "sea" to at(3, "fog_cloud", "gust_of_wind") +
+            at(5, "water_breathing") +
+            at(7, "control_water") +
+            at(9, "conjure_elemental"),
+
         // ---- Other subclasses that hand over a specific spell
         "college_of_the_moon" to at(6, "moonbeam"),
         "land" to emptyList(),
@@ -288,7 +305,6 @@ object SpellGrantData {
         "spellfire_spark" to at(1, "sacred_flame"),
         "cold_caster" to at(1, "ray_of_frost"),
         "boon_of_revelry" to at(1, "ottos_irresistible_dance"),
-        "boon_of_the_furious_storm" to emptyList(),
 
         // ---- Paths of Villainy. Each feat names one spell you always have prepared and
         // can cast by spending Death Points rather than a spell slot.

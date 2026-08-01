@@ -54,6 +54,32 @@ object PassiveBonusData {
             Bonus(Target.SPEED, 5, "Courier's Speed"),
         ),
         "lucky" to emptyList(),
+
+        // Flat numbers stated in a feat's own text and applied nowhere, which is the same
+        // gap Integrated Protection had: a bonus sitting in prose next to the stat it
+        // should be changing.
+        "speedy" to listOf(
+            Bonus(Target.SPEED, 10, "Speedy"),
+        ),
+        "boon_speed" to listOf(
+            Bonus(Target.SPEED, 30, "Boon of Speed"),
+        ),
+        "boon_fortitude" to listOf(
+            Bonus(Target.MAX_HIT_POINTS, 40, "Boon of Fortitude"),
+        ),
+    )
+
+    /**
+     * Subclass features that add a flat number. A subclass bonus only applies while the
+     * character has that subclass, which the resolver checks before adding it.
+     */
+    private val BY_SUBCLASS: Map<String, List<Bonus>> = mapOf(
+        "glory" to listOf(
+            Bonus(Target.SPEED, 10, "Aura of Alacrity"),
+        ),
+        "draconic" to listOf(
+            Bonus(Target.MAX_HIT_POINTS, 1, "Draconic Resilience", perLevel = true),
+        ),
     )
 
     private val BY_CLASS_FEATURE: Map<String, List<Bonus>> = mapOf(
@@ -69,7 +95,11 @@ object PassiveBonusData {
 
     fun forClass(classId: String): List<Bonus> = BY_CLASS_FEATURE[classId].orEmpty()
 
+    fun forSubclass(subclassId: String?): List<Bonus> =
+        subclassId?.let { BY_SUBCLASS[it] }.orEmpty()
+
     /** Every id these tables are keyed by, so a test can check them against the real data. */
     fun sourceIds(): Set<String> =
-        BY_SPECIES.keys + BY_LINEAGE.keys + BY_FEAT.keys + BY_CLASS_FEATURE.keys
+        BY_SPECIES.keys + BY_LINEAGE.keys + BY_FEAT.keys + BY_CLASS_FEATURE.keys +
+            BY_SUBCLASS.keys
 }

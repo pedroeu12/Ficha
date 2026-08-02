@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.home
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Restore
@@ -60,6 +63,8 @@ import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.ui.i18n.AppLanguage
+import com.pedroeu.ficha.ui.i18n.LocalLanguageController
 import com.pedroeu.ficha.ui.theme.LocalThemeController
 import com.pedroeu.ficha.ui.theme.ThemeMode
 import kotlinx.coroutines.launch
@@ -81,7 +86,7 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Ficha", style = MaterialTheme.typography.headlineMedium)
+                        Text(tr("Ficha"), style = MaterialTheme.typography.headlineMedium)
                         // A visible build stamp: if this doesn't match what you just installed,
                         // the device is still running an older APK.
                         Text(
@@ -91,6 +96,7 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    LanguageButton()
                     AppearanceButton()
                     BackupMenu(repository)
                 },
@@ -107,7 +113,7 @@ fun HomeScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("New Character") },
+                text = { Text(tr("New Character")) },
             )
         },
         containerColor = Color.Transparent,
@@ -139,16 +145,16 @@ fun HomeScreen(
     pendingDelete?.let { target ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("Delete ${target.name}?") },
-            text = { Text("This character will be permanently removed from this device.") },
+            title = { Text(trf("Delete {0}?", target.name)) },
+            text = { Text(tr("This character will be permanently removed from this device.")) },
             confirmButton = {
                 TextButton(onClick = {
                     scope.launch { repository.delete(target.id) }
                     pendingDelete = null
-                }) { Text("Delete") }
+                }) { Text(tr("Delete")) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { pendingDelete = null }) { Text(tr("Cancel")) }
             },
         )
     }
@@ -161,9 +167,9 @@ private fun CharacterRow(
     onClick: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val species = SpeciesData.byId(character.speciesId)?.name ?: "Unknown"
+    val species = SpeciesData.byId(character.speciesId)?.name ?: tr("Unknown")
     // "Fighter 5 / Wizard 3" once multiclassed, just the class name otherwise.
-    val charClass = ClassLevels.label(character).ifBlank { "Unknown" }
+    val charClass = ClassLevels.label(character).ifBlank { tr("Unknown") }
     val background = BackgroundData.byId(character.backgroundId)?.name ?: ""
 
     Card(
@@ -182,7 +188,7 @@ private fun CharacterRow(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "Level ${character.level} $species $charClass",
+                    text = trf("Level {0} {1} {2}", character.level, species, charClass),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -202,7 +208,7 @@ private fun CharacterRow(
                     color = MaterialTheme.colorScheme.secondary,
                 )
                 Text(
-                    text = "AC",
+                    text = tr("AC"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -226,12 +232,12 @@ private fun EmptyState(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(32.dp),
         ) {
             Text(
-                text = "No characters yet",
+                text = tr("No characters yet"),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
-                text = "Tap New Character to roll up your first adventurer: pick a species, a class, an origin, and your ability scores.",
+                text = tr("Tap New Character to roll up your first adventurer: pick a species, a class, an origin, and your ability scores."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -256,7 +262,7 @@ private fun AppearanceButton() {
             Icon(
                 imageVector = if (theme.isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
                 // The label says what tapping leads to, which is what a screen reader needs.
-                contentDescription = if (theme.isDark) "Appearance: candlelight" else "Appearance: daylight",
+                contentDescription = if (theme.isDark) tr("Appearance: candlelight") else tr("Appearance: daylight"),
             )
         }
         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -269,7 +275,48 @@ private fun AppearanceButton() {
                     },
                     trailingIcon = {
                         if (mode == theme.mode) {
-                            Icon(Icons.Default.Check, contentDescription = "Selected")
+                            Icon(Icons.Default.Check, contentDescription = tr("Selected"))
+                        }
+                    },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Switches the interface between English and Brazilian Portuguese.
+ *
+ * A menu rather than a toggle, so the language a player wants is named in that language and
+ * they can find it without reading the one they don't speak. The choice is saved, so it holds
+ * across launches — the rules text stays in English either way, since translating a rule
+ * loosely is worse than leaving it in the words the book uses.
+ */
+@Composable
+private fun LanguageButton() {
+    val languages = LocalLanguageController.current
+    var showMenu by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(
+                imageVector = Icons.Default.Language,
+                contentDescription = tr("Language") + ": " + languages.language.label,
+            )
+        }
+        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            AppLanguage.entries.forEach { language ->
+                DropdownMenuItem(
+                    // Each language names itself, so the one you want is legible whichever
+                    // is currently in force.
+                    text = { Text(language.label) },
+                    onClick = {
+                        languages.setLanguage(language)
+                        showMenu = false
+                    },
+                    trailingIcon = {
+                        if (language == languages.language) {
+                            Icon(Icons.Default.Check, contentDescription = tr("Selected"))
                         }
                     },
                 )
@@ -311,7 +358,7 @@ private fun BackupMenu(repository: CharacterRepository) {
                     val count = characters.size
                     "Backed up $count character${if (count == 1) "" else "s"}."
                 },
-                onFailure = { it.message ?: "Couldn't write that file." },
+                onFailure = { it.message ?: tr("Couldn't write that file.") },
             )
         }
     }
@@ -329,18 +376,18 @@ private fun BackupMenu(repository: CharacterRepository) {
                         repository.restore(plan.toWrite)
                         plan.summary()
                     },
-                    onFailure = { it.message ?: "Couldn't read that file." },
+                    onFailure = { it.message ?: tr("Couldn't read that file.") },
                 )
         }
     }
 
     Box {
         IconButton(onClick = { showMenu = true }) {
-            Icon(Icons.Default.MoreVert, contentDescription = "Backup and restore")
+            Icon(Icons.Default.MoreVert, contentDescription = tr("Backup and restore"))
         }
         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
             DropdownMenuItem(
-                text = { Text("Back up characters") },
+                text = { Text(tr("Back up characters")) },
                 onClick = {
                     showMenu = false
                     exportLauncher.launch(
@@ -350,7 +397,7 @@ private fun BackupMenu(repository: CharacterRepository) {
                 leadingIcon = { Icon(Icons.Default.Save, contentDescription = null) },
             )
             DropdownMenuItem(
-                text = { Text("Restore from backup") },
+                text = { Text(tr("Restore from backup")) },
                 onClick = {
                     showMenu = false
                     // Some file providers hand back a generic type for a .json file, so
@@ -365,10 +412,10 @@ private fun BackupMenu(repository: CharacterRepository) {
     result?.let { message ->
         AlertDialog(
             onDismissRequest = { result = null },
-            title = { Text("Backup") },
+            title = { Text(tr("Backup")) },
             text = { Text(message) },
             confirmButton = {
-                TextButton(onClick = { result = null }) { Text("OK") }
+                TextButton(onClick = { result = null }) { Text(tr("OK")) }
             },
         )
     }

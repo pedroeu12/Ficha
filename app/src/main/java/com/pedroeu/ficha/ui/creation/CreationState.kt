@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.OriginChoices
@@ -27,7 +28,7 @@ enum class BonusSpread(val label: String, val values: List<Int>) {
  * the character would get anyway. Origin Options stays last of the three because some of its
  * grants depend on choices made inside the class.
  */
-enum class CreationStep(val title: String, val shortLabel: String) {
+enum class CreationStep(private val titleKey: String, private val shortLabelKey: String) {
     SPECIES("Choose a Species", "Species"),
     BACKGROUND("Choose an Origin", "Origin"),
     CLASS("Choose a Class", "Class"),
@@ -35,6 +36,11 @@ enum class CreationStep(val title: String, val shortLabel: String) {
     ORIGIN_CHOICES("Origin Options", "Grants"),
     ABILITIES("Ability Scores", "Abilities"),
     DETAILS("Name & Details", "Details");
+
+    // Translated on read: an enum's constructor runs once, so translating there would pin
+    // these to whichever language was in force the first time the class was touched.
+    val title: String get() = tr(titleKey)
+    val shortLabel: String get() = tr(shortLabelKey)
 
     companion object {
         val ORDER: List<CreationStep> = entries

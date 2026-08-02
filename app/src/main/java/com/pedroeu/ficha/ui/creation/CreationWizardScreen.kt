@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -77,7 +78,7 @@ fun CreationWizardScreen(
                         IconButton(onClick = { if (!viewModel.back()) onExit() }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = tr("Back"),
                             )
                         }
                     },
@@ -195,22 +196,22 @@ private fun WizardBottomBar(state: CreationState, onNext: () -> Unit) {
                 enabled = state.canAdvance,
                 shape = RoundedCornerShape(10.dp),
             ) {
-                Text(if (state.step == CreationStep.DETAILS) "Create" else "Next")
+                Text(if (state.step == CreationStep.DETAILS) tr("Create") else tr("Next"))
             }
         }
     }
 }
 
 private fun hintFor(state: CreationState): String = when {
-    state.canAdvance && state.step == CreationStep.DETAILS -> "Ready to create your character"
-    state.canAdvance -> "Looks good"
+    state.canAdvance && state.step == CreationStep.DETAILS -> tr("Ready to create your character")
+    state.canAdvance -> tr("Looks good")
     else -> when (state.step) {
-        CreationStep.SPECIES -> "Pick a species and any options it offers"
-        CreationStep.CLASS -> "Pick a class"
-        CreationStep.CLASS_CHOICES -> "Complete every option below"
-        CreationStep.BACKGROUND -> "Pick an origin and assign its ability bonuses"
-        CreationStep.ORIGIN_CHOICES -> "Resolve every grant your origin left open"
-        CreationStep.ABILITIES -> "Assign all six ability scores"
-        CreationStep.DETAILS -> "Give your character a name"
+        CreationStep.SPECIES -> tr("Pick a species and any options it offers")
+        CreationStep.CLASS -> tr("Pick a class")
+        CreationStep.CLASS_CHOICES -> tr("Complete every option below")
+        CreationStep.BACKGROUND -> tr("Pick an origin and assign its ability bonuses")
+        CreationStep.ORIGIN_CHOICES -> tr("Resolve every grant your origin left open")
+        CreationStep.ABILITIES -> tr("Assign all six ability scores")
+        CreationStep.DETAILS -> tr("Give your character a name")
     }
 }

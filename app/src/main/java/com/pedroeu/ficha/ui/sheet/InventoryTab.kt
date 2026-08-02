@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -58,9 +60,12 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode
 
         item {
             SectionHeader(
-                "Equipment",
-                trailing = "${character.inventory.size} items • " +
-                    "${CharacterCalculations.carriedWeight(character).toInt()} lb",
+                tr("Equipment"),
+                trailing = trf(
+                    "{0} items • {1} lb",
+                    character.inventory.size,
+                    CharacterCalculations.carriedWeight(character).toInt(),
+                ),
             )
         }
 
@@ -71,7 +76,7 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
-                Text("  Add an item", style = MaterialTheme.typography.labelLarge)
+                Text(tr("  Add an item"), style = MaterialTheme.typography.labelLarge)
             }
         }
 
@@ -89,7 +94,7 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode
         if (character.inventory.isEmpty()) {
             item {
                 Text(
-                    text = "Nothing carried yet. Add gear from the rulebook, or write in your own.",
+                    text = tr("Nothing carried yet. Add gear from the rulebook, or write in your own."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -171,13 +176,19 @@ private fun InventoryRow(
                     Text(
                         text = buildString {
                             if (equippable) {
-                                append(if (item.equipped) "Equipped" else "Carried")
+                                append(if (item.equipped) tr("Equipped") else tr("Carried"))
                             }
                             catalogEntry?.let {
                                 if (isNotEmpty()) append(" • ")
                                 append(it.category)
                             }
-                        }.ifBlank { "Tap for details" },
+                            // Made rather than found, so it's clear which lines the
+                            // Artificer's daily allowance is holding.
+                            if (item.craftedFromPlanId != null) {
+                                if (isNotEmpty()) append(" • ")
+                                append(tr("Made"))
+                            }
+                        }.ifBlank { tr("Tap for details") },
                         style = MaterialTheme.typography.labelSmall,
                         color = if (item.equipped) MaterialTheme.colorScheme.secondary
                         else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -208,7 +219,7 @@ private fun InventoryRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = "Quantity",
+                        text = tr("Quantity"),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f),
@@ -236,21 +247,21 @@ private fun CoinsCard(coins: Coins, onChange: (Coins) -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionHeader("Coins")
+            SectionHeader(tr("Coins"))
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                CoinField("GP", coins.gp, Modifier.weight(1f)) { onChange(coins.copy(gp = it)) }
-                CoinField("SP", coins.sp, Modifier.weight(1f)) { onChange(coins.copy(sp = it)) }
-                CoinField("CP", coins.cp, Modifier.weight(1f)) { onChange(coins.copy(cp = it)) }
+                CoinField(tr("GP"), coins.gp, Modifier.weight(1f)) { onChange(coins.copy(gp = it)) }
+                CoinField(tr("SP"), coins.sp, Modifier.weight(1f)) { onChange(coins.copy(sp = it)) }
+                CoinField(tr("CP"), coins.cp, Modifier.weight(1f)) { onChange(coins.copy(cp = it)) }
             }
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                CoinField("PP", coins.pp, Modifier.weight(1f)) { onChange(coins.copy(pp = it)) }
-                CoinField("EP", coins.ep, Modifier.weight(1f)) { onChange(coins.copy(ep = it)) }
+                CoinField(tr("PP"), coins.pp, Modifier.weight(1f)) { onChange(coins.copy(pp = it)) }
+                CoinField(tr("EP"), coins.ep, Modifier.weight(1f)) { onChange(coins.copy(ep = it)) }
                 Spacer(Modifier.weight(1f))
             }
         }

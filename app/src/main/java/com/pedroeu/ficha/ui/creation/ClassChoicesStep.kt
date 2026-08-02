@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -35,7 +37,11 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
     ) {
         item {
             Text(
-                text = "${charClass.name} decisions. These lock in what your character is trained in and what they can do at level 1.",
+                text = trf(
+                    "{0} decisions. These lock in what your character is trained in and " +
+                        "what they can do at level 1.",
+                    charClass.name,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -50,8 +56,8 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                             trailing = "${state.classSkillChoices.size} / ${choice.count}",
                         )
                         Text(
-                            text = "Skills your species or origin already grants are shown as " +
-                                "unavailable, so a pick is never wasted on a duplicate.",
+                            text = tr("Skills your species or origin already grants are shown as " +
+                                "unavailable, so a pick is never wasted on a duplicate."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 6.dp),
@@ -78,7 +84,7 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                     ChoiceBlock {
                         SectionHeader(
                             title = choice.label,
-                            trailing = if (state.classSelections[choice.id].isNullOrEmpty()) "Choose 1" else null,
+                            trailing = if (state.classSelections[choice.id].isNullOrEmpty()) tr("Choose 1") else null,
                         )
                         Column(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -140,11 +146,11 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
             item(key = "expertise") {
                 ChoiceBlock {
                     SectionHeader(
-                        title = "Expertise",
+                        title = tr("Expertise"),
                         trailing = "${state.expertiseChoices.size} / 2",
                     )
                     Text(
-                        text = "Choose two of your skill proficiencies. Your proficiency bonus is doubled for checks with them.",
+                        text = tr("Choose two of your skill proficiencies. Your proficiency bonus is doubled for checks with them."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(vertical = 6.dp),
@@ -152,7 +158,7 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                     val eligible = state.allSkillProficiencies.sortedBy { it.displayName }
                     if (eligible.isEmpty()) {
                         Text(
-                            text = "Pick your skill proficiencies above first.",
+                            text = tr("Pick your skill proficiencies above first."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                         )

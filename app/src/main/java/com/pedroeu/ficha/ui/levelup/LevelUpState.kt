@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.levelup
 
+import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
@@ -19,7 +20,7 @@ import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.PlayerCharacter
 
-enum class LevelUpStep(val title: String, val shortLabel: String) {
+enum class LevelUpStep(private val titleKey: String, private val shortLabelKey: String) {
     /** Which class the level goes into, shown first because everything else depends on it. */
     CLASS("Choose a Class", "Class"),
     HIT_POINTS("Hit Points", "HP"),
@@ -29,21 +30,29 @@ enum class LevelUpStep(val title: String, val shortLabel: String) {
     /** What the feat taken at [ASI] leaves to decide — a spell, a skill, a damage type. */
     FEAT_CHOICES("Feat Options", "Feat"),
     SPELLS("New Spells", "Spells"),
-    SUMMARY("Review", "Review"),
+    SUMMARY("Review", "Review");
+
+    // Translated on read rather than in the constructor, which runs only once.
+    val title: String get() = tr(titleKey)
+    val shortLabel: String get() = tr(shortLabelKey)
 }
 
 /** How the player wants to determine the hit points gained this level. */
-enum class HitPointMethod(val label: String) {
+enum class HitPointMethod(private val labelKey: String) {
     AVERAGE("Take the average"),
     ROLL("Roll the die"),
-    MANUAL("Enter it yourself"),
+    MANUAL("Enter it yourself");
+
+    val label: String get() = tr(labelKey)
 }
 
 /** What an Ability Score Improvement level is being spent on. */
-enum class AsiMode(val label: String) {
+enum class AsiMode(private val labelKey: String) {
     PLUS_TWO("+2 to one ability"),
     PLUS_ONE_ONE("+1 to two abilities"),
-    FEAT("Take a feat instead"),
+    FEAT("Take a feat instead");
+
+    val label: String get() = tr(labelKey)
 }
 
 data class LevelUpState(

@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,10 +59,10 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     ) {
         item {
             CombatCard {
-                SectionHeader("Weapons & Damage Cantrips")
+                SectionHeader(tr("Weapons & Damage Cantrips"))
                 if (attacks.isEmpty()) {
                     Text(
-                        text = "Nothing to attack with yet. Add a weapon on the Inventory tab.",
+                        text = tr("Nothing to attack with yet. Add a weapon on the Inventory tab."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),
@@ -71,9 +73,9 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                             .fillMaxWidth()
                             .padding(top = 10.dp, bottom = 4.dp),
                     ) {
-                        HeaderCell("Name", Modifier.weight(2f))
-                        HeaderCell("Atk", Modifier.weight(1f))
-                        HeaderCell("Damage", Modifier.weight(2f))
+                        HeaderCell(tr("Name"), Modifier.weight(2f))
+                        HeaderCell(tr("Atk"), Modifier.weight(1f))
+                        HeaderCell(tr("Damage"), Modifier.weight(2f))
                     }
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     attacks.forEach { attack ->
@@ -114,9 +116,14 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                             // knowing what Topple does at the moment you hit.
                             if (attack.masteryProperty.isNotBlank()) {
                                 ExpandableOption(
-                                    name = "Mastery: ${attack.masteryProperty}",
+                                    name = trf("Mastery: {0}", attack.masteryProperty),
                                     description = attack.masteryDescription,
                                 )
+                            }
+                            // Properties that need a rule to be usable — Burst Fire and
+                            // Reload above all, which firearms brought in.
+                            attack.explainedProperties.forEach { (name, rule) ->
+                                ExpandableOption(name = name, description = rule)
                             }
                         }
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -128,13 +135,13 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         item {
             CombatCard {
                 SectionHeader(
-                    "Other Attacks & Actions",
+                    tr("Other Attacks & Actions"),
                     trailing = character.customAttacks.size.takeIf { it > 0 }?.toString(),
                 )
                 if (character.customAttacks.isEmpty()) {
                     Text(
-                        text = "Nothing here yet. Add a spell attack, a breath weapon, or " +
-                            "anything else you want on the sheet.",
+                        text = tr("Nothing here yet. Add a spell attack, a breath weapon, or " +
+                            "anything else you want on the sheet."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),
@@ -154,49 +161,49 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 }
                 TextButton(onClick = { addingAttack = true }) {
                     Icon(Icons.Default.Add, contentDescription = null)
-                    Text("  Add attack")
+                    Text(tr("  Add attack"))
                 }
             }
         }
 
         item {
             CombatCard {
-                SectionHeader("Equipment Training & Proficiencies")
+                SectionHeader(tr("Equipment Training & Proficiencies"))
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(top = 8.dp),
                 ) {
                     EditableLine(
-                        label = "Armor Training",
+                        label = tr("Armor Training"),
                         key = "combat:armor_training",
                         fallback = character.armorTraining
                             .ifEmpty { charClass?.armorProficiencies.orEmpty() }
-                            .takeIf { it.isNotEmpty() }?.joinToString() ?: "None",
+                            .takeIf { it.isNotEmpty() }?.joinToString() ?: tr("None"),
                         character = character,
                         viewModel = viewModel,
                         editMode = editMode,
                     )
                     EditableLine(
-                        label = "Weapons",
+                        label = tr("Weapons"),
                         key = "combat:weapons",
                         fallback = character.weaponProficiencies
                             .ifEmpty { charClass?.weaponProficiencies.orEmpty() }
-                            .takeIf { it.isNotEmpty() }?.joinToString() ?: "None",
+                            .takeIf { it.isNotEmpty() }?.joinToString() ?: tr("None"),
                         character = character,
                         viewModel = viewModel,
                         editMode = editMode,
                     )
                     EditableLine(
-                        label = "Tools",
+                        label = tr("Tools"),
                         key = "combat:tools",
                         fallback = character.toolProficiencies.takeIf { it.isNotEmpty() }
-                            ?.joinToString() ?: "None",
+                            ?.joinToString() ?: tr("None"),
                         character = character,
                         viewModel = viewModel,
                         editMode = editMode,
                     )
                     EditableLine(
-                        label = "Languages",
+                        label = tr("Languages"),
                         key = "combat:languages",
                         fallback = character.languages.joinToString(),
                         character = character,
@@ -209,36 +216,36 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 
         item {
             CombatCard {
-                SectionHeader("Defenses")
+                SectionHeader(tr("Defenses"))
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(top = 8.dp),
                 ) {
-                    ProficiencyLine("Armor Class", "${CharacterCalculations.armorClass(character)}")
+                    ProficiencyLine(tr("Armor Class"), "${CharacterCalculations.armorClass(character)}")
                     ProficiencyLine(
-                        "Initiative",
+                        tr("Initiative"),
                         CharacterCalculations.formatModifier(
                             CharacterCalculations.initiative(character)
                         ),
                     )
-                    ProficiencyLine("Speed", "${CharacterCalculations.speed(character)} ft")
+                    ProficiencyLine(tr("Speed"), "${CharacterCalculations.speed(character)} ft")
                     val equipped = character.inventory.filter { it.equipped && it.armorDefId != null }
                     ProficiencyLine(
-                        "Equipped Armor",
-                        equipped.takeIf { it.isNotEmpty() }?.joinToString { it.name } ?: "None",
+                        tr("Equipped Armor"),
+                        equipped.takeIf { it.isNotEmpty() }?.joinToString { it.name } ?: tr("None"),
                     )
                     EditableLine(
-                        label = "Resistances",
+                        label = tr("Resistances"),
                         key = "combat:resistances",
-                        fallback = "None recorded",
+                        fallback = tr("None recorded"),
                         character = character,
                         viewModel = viewModel,
                         editMode = editMode,
                     )
                     EditableLine(
-                        label = "Conditions",
+                        label = tr("Conditions"),
                         key = "combat:conditions",
-                        fallback = "None",
+                        fallback = tr("None"),
                         character = character,
                         viewModel = viewModel,
                         editMode = editMode,

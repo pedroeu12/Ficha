@@ -2,9 +2,11 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.EquipmentData
+import com.pedroeu.ficha.data.content.MagicItemData
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.data.content.WeaponPropertyData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.ArmorCategory
 import com.pedroeu.ficha.data.model.CasterType
@@ -28,6 +30,11 @@ data class AttackLine(
      */
     val masteryProperty: String = "",
     val masteryDescription: String = "",
+    /**
+     * Properties that carry a rule worth reading, paired with it. Firearms are what made
+     * this necessary: "Burst Fire" and "Reload (30 shots)" mean nothing on their own.
+     */
+    val explainedProperties: List<Pair<String, String>> = emptyList(),
 )
 
 /**
@@ -234,8 +241,15 @@ object CharacterCalculations {
         val monkUnarmoredWins =
             character.classId == "monk" && unarmoredAc != null && best == unarmoredAc
         val withShield = if (monkUnarmoredWins) best else best + shieldBonus
+        // Magic items worn or wielded add on top of whatever is underneath them: a +1 made
+        // from a breastplate is a +1 breastplate, and a Cloak of Protection helps regardless.
+        val magicBonus = character.inventory
+            .filter { it.equipped }
+            .mapNotNull { it.magicItemId?.let(MagicItemData::byId) }
+            .sumOf { it.acBonus }
+
         // A Warforged's plating and anything like it applies whatever the character wears.
-        val computed = withShield +
+        val computed = withShield + magicBonus +
             PassiveBonuses.totalFor(character, PassiveBonusData.Target.ARMOR_CLASS)
         return adjust(character, OverridableStat.ARMOR_CLASS, computed)
     }
@@ -341,20 +355,26 @@ object CharacterCalculations {
 
         return character.inventory
             .filter { it.weaponDefId != null }
-            .mapNotNull { item -> EquipmentData.weaponById(item.weaponDefId!!) }
-            .distinctBy { it.id }
-            .map { weapon ->
+            .mapNotNull { item ->
+                EquipmentData.weaponById(item.weaponDefId!!)?.let { weapon -> item to weapon }
+            }
+            // A plain longsword and a +1 longsword are two different attacks, so what makes a
+            // line unique is the weapon *and* what is magical about it — not the weapon alone.
+            .distinctBy { (item, weapon) -> weapon.id to item.magicItemId }
+            .map { (item, weapon) ->
+                val magic = item.magicItemId?.let { MagicItemData.byId(it) }
+                val magicBonus = magic?.attackBonus ?: 0
                 val abilityMod = if (weapon.usesDexOption && dex > str) dex else str
                 val proficient = isProficientWithWeapon(character, weapon)
-                val attackBonus = abilityMod + if (proficient) pb else 0
+                val attackBonus = abilityMod + magicBonus + if (proficient) pb else 0
                 // The mastery property sits alongside the ordinary properties, marked with
                 // whether this character can actually use it.
                 val masteryNote = CharacterMasteries.noteFor(character, weapon)
                 val mastery = CharacterMasteries.forWeapon(character, weapon)
                 AttackLine(
-                    name = weapon.name,
+                    name = if (magic != null) item.name else weapon.name,
                     attackBonus = attackBonus,
-                    damage = "${weapon.damageDice} ${formatModifier(abilityMod)}",
+                    damage = "${weapon.damageDice} ${formatModifier(abilityMod + magicBonus)}",
                     damageType = weapon.damageType,
                     notes = (weapon.properties + masteryNote)
                         .filter { it.isNotBlank() }
@@ -362,6 +382,10 @@ object CharacterCalculations {
                     source = AttackSource.WEAPON,
                     masteryProperty = mastery?.property.orEmpty(),
                     masteryDescription = mastery?.description.orEmpty(),
+                    // What the magic does is worth reading at the attack, for the same reason
+                    // Burst Fire is: a Flame Tongue's extra dice are rolled here or nowhere.
+                    explainedProperties = WeaponPropertyData.explain(weapon.properties) +
+                        listOfNotNull(magic?.let { it.name to it.description }),
                 )
             }
     }

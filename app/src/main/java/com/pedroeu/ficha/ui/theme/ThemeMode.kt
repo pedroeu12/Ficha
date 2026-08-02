@@ -1,13 +1,21 @@
 package com.pedroeu.ficha.ui.theme
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.runtime.staticCompositionLocalOf
 
 /** Which of the two schemes the app shows, or whether it defers to the phone. */
-enum class ThemeMode(val label: String) {
+enum class ThemeMode(private val labelKey: String) {
     /** Follow the phone's own light/dark setting. */
     SYSTEM("Follow system"),
     LIGHT("Daylight"),
     DARK("Candlelight");
+
+    /**
+     * Translated when it is read, not when the enum is built. An enum's constructor arguments
+     * run once, the first time the class is touched, which would freeze these labels in
+     * whatever language happened to be in force at the time.
+     */
+    val label: String get() = tr(labelKey)
 
     /** The next mode in the cycle, for a single-tap toggle. */
     fun next(): ThemeMode = entries[(ordinal + 1) % entries.size]

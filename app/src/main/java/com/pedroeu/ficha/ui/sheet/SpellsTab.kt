@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -71,15 +73,15 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
-                Text("  Add a spell", style = MaterialTheme.typography.labelLarge)
+                Text(tr("  Add a spell"), style = MaterialTheme.typography.labelLarge)
             }
         }
 
         if (ability == null && spells.isEmpty()) {
             item {
                 Text(
-                    text = "This character has no spellcasting from their class. You can still " +
-                        "add spells from feats, items, or anywhere else.",
+                    text = tr("This character has no spellcasting from their class. You can still " +
+                        "add spells from feats, items, or anywhere else."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -97,22 +99,22 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                     ),
                 ) {
                     Column(Modifier.padding(14.dp)) {
-                        SectionHeader("Spellcasting")
+                        SectionHeader(tr("Spellcasting"))
                         Row(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(top = 10.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                         ) {
-                            SpellStat("Ability", ability.abbreviation)
+                            SpellStat(tr("Ability"), ability.abbreviation)
                             SpellStat(
-                                label = "Save DC",
+                                label = tr("Save DC"),
                                 value = "${CharacterCalculations.spellSaveDc(character) ?: 0}",
                                 editMode = editMode,
                                 onClick = { editingStat = OverridableStat.SPELL_SAVE_DC },
                             )
                             SpellStat(
-                                label = "Attack",
+                                label = tr("Attack"),
                                 value = CharacterCalculations.formatModifier(
                                     CharacterCalculations.spellAttackBonus(character) ?: 0
                                 ),
@@ -145,7 +147,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                         Modifier.padding(14.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        SectionHeader("Save DCs by source", trailing = "${saveDcs.size}")
+                        SectionHeader(tr("Save DCs by source"), trailing = "${saveDcs.size}")
                         saveDcs.forEach { dc ->
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -157,7 +159,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                                         modifier = Modifier.weight(1f),
                                     )
                                     Text(
-                                        text = "DC ${dc.dc}",
+                                        text = trf("DC {0}", dc.dc),
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.secondary,
@@ -192,7 +194,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 
         if (cantrips.isNotEmpty()) {
             item {
-                SpellSection("Cantrips", cantrips, character, viewModel, editMode) {
+                SpellSection(tr("Cantrips"), cantrips, character, viewModel, editMode) {
                     openSpell = it
                 }
             }
@@ -200,7 +202,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         if (leveled.isNotEmpty()) {
             item {
                 SpellSection(
-                    "Prepared & Known Spells", leveled, character, viewModel, editMode,
+                    tr("Prepared & Known Spells"), leveled, character, viewModel, editMode,
                 ) { openSpell = it }
             }
         }
@@ -208,7 +210,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         if (spells.isEmpty()) {
             item {
                 Text(
-                    text = "No spells recorded yet. Level up to learn some, or add them here in Edit Mode.",
+                    text = tr("No spells recorded yet. Level up to learn some, or add them here in Edit Mode."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -275,16 +277,16 @@ private fun PreparedCountCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionHeader("Capacity")
+            SectionHeader(tr("Capacity"))
             CountRow(
-                label = "Prepared spells",
+                label = tr("Prepared spells"),
                 value = "$prepared / $maxPrepared",
                 overBudget = prepared > maxPrepared,
                 editMode = editMode,
                 onClick = { onEdit(OverridableStat.MAX_PREPARED_SPELLS) },
             )
             CountRow(
-                label = "Cantrips known",
+                label = tr("Cantrips known"),
                 value = "$cantrips / $maxCantrips",
                 overBudget = cantrips > maxCantrips,
                 editMode = editMode,
@@ -337,7 +339,7 @@ private fun SpellSlotsCard(
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SectionHeader(
-                "Spell Slots",
+                tr("Spell Slots"),
                 trailing = if (character.spellSlotOverrides.isNotEmpty()) "adjusted" else null,
             )
 
@@ -345,7 +347,7 @@ private fun SpellSlotsCard(
                 // In Edit Mode every level 1-9 is listed so slots can be granted outright.
                 (1..9).forEach { level ->
                     NumberStepper(
-                        label = "Level $level",
+                        label = trf("Level {0}", level),
                         value = slots[level] ?: 0,
                         onChange = { viewModel.setSpellSlotTotal(level, it) },
                         min = 0,
@@ -354,7 +356,7 @@ private fun SpellSlotsCard(
                 }
                 if (character.spellSlotOverrides.isNotEmpty()) {
                     TextButton(onClick = viewModel::clearSpellSlotOverrides) {
-                        Text("Reset to the class table")
+                        Text(tr("Reset to the class table"))
                     }
                 }
             } else {
@@ -362,7 +364,7 @@ private fun SpellSlotsCard(
                     val expended = character.spellSlotsExpended[level.toString()] ?: 0
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Level $level",
+                            text = trf("Level {0}", level),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f),
@@ -455,9 +457,9 @@ private fun SpellSection(
                             // A granted spell is always prepared, so there's nothing to toggle.
                             Text(
                                 text = when {
-                                    isGranted -> "Always prepared"
-                                    spell.prepared -> "Prepared"
-                                    else -> "Not prepared"
+                                    isGranted -> tr("Always prepared")
+                                    spell.prepared -> tr("Prepared")
+                                    else -> tr("Not prepared")
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = if (spell.prepared) MaterialTheme.colorScheme.secondary
@@ -473,7 +475,7 @@ private fun SpellSection(
                             )
                         }
                         Text(
-                            text = if (spell.level == 0) "Cantrip" else "Level ${spell.level}",
+                            text = if (spell.level == 0) tr("Cantrip") else "Level ${spell.level}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )

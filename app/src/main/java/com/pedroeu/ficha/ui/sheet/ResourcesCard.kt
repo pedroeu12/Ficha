@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -65,13 +67,13 @@ fun ResourcesCard(
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader(
-                "Limited Uses",
+                tr("Limited Uses"),
                 trailing = if (resources.isEmpty()) null else "${resources.size}",
             )
 
             if (resources.isEmpty()) {
                 Text(
-                    text = "Nothing with a limited number of uses yet. Level up, or add your own tracker.",
+                    text = tr("Nothing with a limited number of uses yet. Level up, or add your own tracker."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -89,7 +91,7 @@ fun ResourcesCard(
 
             TextButton(onClick = { showAdd = true }) {
                 Icon(Icons.Default.Add, contentDescription = null)
-                Text("  Track something else")
+                Text(tr("  Track something else"))
             }
         }
     }
@@ -106,7 +108,7 @@ fun ResourcesCard(
 
     editingMax?.let { state ->
         StatEditDialog(
-            title = "${state.def.name} — maximum uses",
+            title = trf("{0} — maximum uses", state.def.name),
             rulesValue = state.def.max,
             currentBonus = null,
             currentOverride = character.resourceMaxOverrides[state.def.id],
@@ -116,7 +118,7 @@ fun ResourcesCard(
                 editingMax = null
             },
             allowNegative = false,
-            supportingText = "Set a maximum of 0 to hide this tracker entirely.",
+            supportingText = tr("Set a maximum of 0 to hide this tracker entirely."),
         )
     }
 }
@@ -210,13 +212,13 @@ private fun ResourceRow(
                 TextButton(
                     onClick = { onSetSpent(state.spent + 1) },
                     enabled = state.remaining > 0,
-                ) { Text("Spend 1") }
+                ) { Text(tr("Spend 1")) }
                 TextButton(
                     onClick = { onSetSpent(state.spent - 1) },
                     enabled = state.spent > 0,
-                ) { Text("Give back") }
+                ) { Text(tr("Give back")) }
                 if (state.spent > 0) {
-                    TextButton(onClick = { onSetSpent(0) }) { Text("Reset") }
+                    TextButton(onClick = { onSetSpent(0) }) { Text(tr("Reset")) }
                 }
             }
         }
@@ -245,10 +247,10 @@ private fun ResourceRow(
                 )
                 Text(
                     text = when {
-                        optionsShown -> "  Hide details"
+                        optionsShown -> tr("  Hide details")
                         def.options.isNotEmpty() ->
                             "  What you can spend it on (${def.options.size})"
-                        else -> "  What this does"
+                        else -> tr("  What this does")
                     },
                     style = MaterialTheme.typography.labelLarge,
                 )

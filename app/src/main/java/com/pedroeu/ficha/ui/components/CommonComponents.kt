@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.components
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -81,7 +82,7 @@ fun SelectableCard(
                     )
                     if (!enabled) {
                         Text(
-                            text = "Already gained from another source",
+                            text = tr("Already gained from another source"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -104,7 +105,7 @@ fun SelectableCard(
                     ) {
                         Icon(
                             Icons.Default.Check,
-                            contentDescription = "Selected",
+                            contentDescription = tr("Selected"),
                             tint = MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.size(18.dp),
                         )
@@ -124,7 +125,7 @@ fun SelectableCard(
                 // Only worth offering when there is plausibly something hidden behind the clamp.
                 if (subtitleMaxLines != null && subtitle.length > subtitleMaxLines * 60) {
                     Text(
-                        text = if (subtitleExpanded) "Show less" else "Read more",
+                        text = if (subtitleExpanded) tr("Show less") else tr("Read more"),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.SemiBold,

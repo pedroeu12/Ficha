@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +35,7 @@ import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
+import com.pedroeu.ficha.domain.ArtificerItems
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
@@ -70,7 +73,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
     ) {
         if (charClass != null) {
             item {
-                FeatureCard("Class Features — ${charClass.name}") {
+                FeatureCard(trf("Class Features — {0}", charClass.name)) {
                     charClass.level1Features.forEach { feature ->
                         FeatureEntry(
                             name = feature.name,
@@ -116,7 +119,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
 
         if (subclass != null) {
             item {
-                FeatureCard("Subclass — ${subclass.name}") {
+                FeatureCard(trf("Subclass — {0}", subclass.name)) {
                     Text(
                         text = subclass.summary,
                         style = MaterialTheme.typography.bodyMedium,
@@ -124,7 +127,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                     )
                     if (subclass.isPlaytest) {
                         Text(
-                            text = "Playtest material — ${subclass.source}",
+                            text = trf("Playtest material — {0}", subclass.source),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -148,11 +151,17 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
             }
         }
 
+        // Which of the Artificer's plans are actually made today, which is a daily decision
+        // rather than a permanent one and so doesn't belong under the feature's text.
+        if (ArtificerItems.hasFeature(character)) {
+            item { ArtificerItemsCard(character, viewModel) }
+        }
+
         if (species != null) {
             item {
-                FeatureCard("Species Traits — ${species.name}") {
+                FeatureCard(trf("Species Traits — {0}", species.name)) {
                     FeatureEntry(
-                        name = "Size & Speed",
+                        name = tr("Size & Speed"),
                         description = "${species.size}, ${species.speed} feet of movement." +
                             if (species.darkvisionRange > 0)
                                 " Darkvision out to ${species.darkvisionRange} feet."
@@ -187,10 +196,10 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
         }
 
         item {
-            FeatureCard("Feats") {
+            FeatureCard(tr("Feats")) {
                 if (character.featIds.isEmpty()) {
                     Text(
-                        text = "No feats yet.",
+                        text = tr("No feats yet."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -210,16 +219,16 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                 }
                 TextButton(onClick = { addingFeat = true }) {
                     Icon(Icons.Default.Add, contentDescription = null)
-                    Text("  Add feat")
+                    Text(tr("  Add feat"))
                 }
             }
         }
 
         if (originChoices.isNotEmpty()) {
             item {
-                FeatureCard("Origin Choices") {
+                FeatureCard(tr("Origin Choices")) {
                     Text(
-                        text = "What you picked from your species, class, background, and feats.",
+                        text = tr("What you picked from your species, class, background, and feats."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -236,10 +245,10 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
         }
 
         item {
-            FeatureCard("Other Features") {
+            FeatureCard(tr("Other Features")) {
                 if (character.customFeatures.isEmpty()) {
                     Text(
-                        text = "Anything the app doesn't already know about goes here.",
+                        text = tr("Anything the app doesn't already know about goes here."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -258,7 +267,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                 }
                 TextButton(onClick = { addingFeature = true }) {
                     Icon(Icons.Default.Add, contentDescription = null)
-                    Text("  Add feature")
+                    Text(tr("  Add feature"))
                 }
             }
         }
@@ -277,7 +286,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
 
     if (addingFeature) {
         TextEditDialog(
-            title = "New feature",
+            title = tr("New feature"),
             initial = "",
             multiline = true,
             onDismiss = { addingFeature = false },
@@ -339,7 +348,7 @@ private fun ChoiceLine(
             )
             if (!hasRulesText) {
                 Text(
-                    text = resolved.summary.ifBlank { "not chosen yet" },
+                    text = resolved.summary.ifBlank { tr("not chosen yet") },
                     style = MaterialTheme.typography.bodySmall,
                     color = if (resolved.isAnswered) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.error,
@@ -348,7 +357,7 @@ private fun ChoiceLine(
             }
             if (editMode || !resolved.isAnswered) {
                 TextButton(onClick = onEdit) {
-                    Text(if (resolved.isAnswered) "Change" else "Choose")
+                    Text(if (resolved.isAnswered) tr("Change") else tr("Choose"))
                 }
             }
         }
@@ -384,7 +393,7 @@ private fun ChoiceEditDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Done") }
+            TextButton(onClick = onDismiss) { Text(tr("Done")) }
         },
     )
 }
@@ -433,7 +442,7 @@ private fun FeatureEntry(
                 value = nameOverride ?: name,
                 editMode = editMode,
                 onChange = { viewModel.setText(nameKey, it) },
-                label = "Feature name",
+                label = tr("Feature name"),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.SemiBold,
@@ -456,11 +465,11 @@ private fun FeatureEntry(
                 value = descOverride ?: description,
                 editMode = editMode,
                 onChange = { viewModel.setText(descKey, it) },
-                label = "Feature text",
+                label = tr("Feature text"),
                 style = MaterialTheme.typography.bodySmall,
                 multiline = true,
                 isOverridden = descOverride != null,
-                placeholder = if (editMode) "Tap to add a description" else "",
+                placeholder = if (editMode) tr("Tap to add a description") else "",
             )
         }
 

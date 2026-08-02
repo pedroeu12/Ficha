@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -35,7 +37,7 @@ fun BackgroundStep(state: CreationState, viewModel: CreationViewModel) {
     ) {
         item {
             Text(
-                text = "Your origin is the life you led before adventuring. It grants ability score increases, two skills, a tool, and an origin feat.",
+                text = tr("Your origin is the life you led before adventuring. It grants ability score increases, two skills, a tool, and an origin feat."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -63,9 +65,9 @@ private fun BackgroundDetails(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-        SectionHeader("Ability Scores", trailing = state.bonusSpread.label)
+        SectionHeader(tr("Ability Scores"), trailing = state.bonusSpread.label)
         Text(
-            text = "Choose how to spread the increase across this origin's three abilities, then tap the abilities to assign.",
+            text = tr("Choose how to spread the increase across this origin's three abilities, then tap the abilities to assign."),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -95,20 +97,20 @@ private fun BackgroundDetails(
         val remaining = state.unassignedBonuses()
         if (remaining.isNotEmpty()) {
             Text(
-                text = "Unassigned: ${remaining.joinToString { "+$it" }}",
+                text = trf("Unassigned: {0}", remaining.joinToString { "+$it" }),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.error,
             )
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        SectionHeader("What You Gain")
-        DetailLine("Skills", background.skillProficiencies.joinToString { it.displayName })
-        DetailLine("Tool", background.toolProficiency)
+        SectionHeader(tr("What You Gain"))
+        DetailLine(tr("Skills"), background.skillProficiencies.joinToString { it.displayName })
+        DetailLine(tr("Tool"), background.toolProficiency)
         FeatData.byId(background.featId)?.let { feat ->
             Column {
                 Text(
-                    text = "Origin Feat: ${feat.name}",
+                    text = trf("Origin Feat: {0}", feat.name),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -120,8 +122,8 @@ private fun BackgroundDetails(
                 )
             }
         }
-        DetailLine("Equipment", background.equipment.joinToString())
-        DetailLine("Starting Gold", "${background.startingGold} gp")
+        DetailLine(tr("Equipment"), background.equipment.joinToString())
+        DetailLine(tr("Starting Gold"), "${background.startingGold} gp")
     }
 }
 

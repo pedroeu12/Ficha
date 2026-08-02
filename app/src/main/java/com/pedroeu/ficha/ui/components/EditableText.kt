@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.components
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,7 @@ fun EditableText(
     editMode: Boolean,
     onChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
-    label: String = "Edit",
+    label: String = tr("Edit"),
     style: TextStyle = MaterialTheme.typography.bodyMedium,
     color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
     fontWeight: FontWeight? = null,
@@ -115,7 +116,7 @@ fun TextEditDialog(
                 )
                 if (canReset) {
                     Text(
-                        text = "Reset puts the original rulebook text back.",
+                        text = tr("Reset puts the original rulebook text back."),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -123,14 +124,14 @@ fun TextEditDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(text) }) { Text("Save") }
+            TextButton(onClick = { onConfirm(text) }) { Text(tr("Save")) }
         },
         dismissButton = {
             Row {
                 if (canReset) {
-                    TextButton(onClick = { onConfirm(null) }) { Text("Reset") }
+                    TextButton(onClick = { onConfirm(null) }) { Text(tr("Reset")) }
                 }
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = onDismiss) { Text(tr("Cancel")) }
             }
         },
     )

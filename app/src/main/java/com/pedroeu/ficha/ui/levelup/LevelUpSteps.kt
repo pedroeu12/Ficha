@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.levelup
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -77,17 +79,20 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
     StepColumn {
         item {
             InfoCard {
-                SectionHeader("Hit Points", trailing = "d${state.hitDie}")
+                SectionHeader(tr("Hit Points"), trailing = "d${state.hitDie}")
                 Text(
-                    text = "Reaching level ${state.targetLevel} adds a Hit Die roll plus your " +
-                        "Constitution modifier (${CharacterCalculations.formatModifier(conMod)}) " +
-                        "to your maximum hit points.",
+                    text = trf(
+                        "Reaching level {0} adds a Hit Die roll plus your Constitution " +
+                            "modifier ({1}) to your maximum hit points.",
+                        state.targetLevel,
+                        CharacterCalculations.formatModifier(conMod),
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 6.dp),
                 )
                 Text(
-                    text = "+${state.hitPointsGained + conMod} max HP",
+                    text = trf("+{0} max HP", state.hitPointsGained + conMod),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.secondary,
@@ -106,7 +111,7 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                     HitPointMethod.ROLL ->
                         "Roll a d${state.hitDie} and live with the result."
                     HitPointMethod.MANUAL ->
-                        "Enter a number yourself, for tables with their own house rule."
+                        tr("Enter a number yourself, for tables with their own house rule.")
                 },
                 selected = state.hitPointMethod == method,
                 onClick = { viewModel.setHitPointMethod(method) },
@@ -126,7 +131,7 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                             )
                             Text(
                                 text = if (state.rolledHitPoints == null) {
-                                    "Not rolled yet"
+                                    tr("Not rolled yet")
                                 } else {
                                     "Rolled on a d${state.hitDie}"
                                 },
@@ -136,7 +141,7 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                         }
                         OutlinedButton(onClick = viewModel::rollHitPoints) {
                             Icon(Icons.Default.Casino, contentDescription = null)
-                            Text("  Roll", style = MaterialTheme.typography.labelLarge)
+                            Text(tr("  Roll"), style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
@@ -153,7 +158,7 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                                 text.filter { it.isDigit() }.take(2).toIntOrNull() ?: 1
                             )
                         },
-                        label = { Text("Hit points rolled (1-${state.hitDie})") },
+                        label = { Text(trf("Hit points rolled (1-{0})", state.hitDie)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         shape = RoundedCornerShape(10.dp),
@@ -174,8 +179,10 @@ fun SubclassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
     StepColumn {
         item {
             Text(
-                text = "Your ${state.progression?.subclassLabel ?: "subclass"} shapes the rest of " +
-                    "your career. This choice is permanent.",
+                text = trf(
+                    "Your {0} shapes the rest of your career. This choice is permanent.",
+                    state.progression?.subclassLabel ?: tr("subclass"),
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -224,7 +231,7 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (classFeatures.isNotEmpty()) {
             item {
                 InfoCard {
-                    SectionHeader("New Class Features")
+                    SectionHeader(tr("New Class Features"))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.padding(top = 8.dp),
@@ -240,7 +247,7 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (subclassFeatures.isNotEmpty()) {
             item {
                 InfoCard {
-                    SectionHeader("New Subclass Features")
+                    SectionHeader(tr("New Subclass Features"))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.padding(top = 8.dp),
@@ -343,7 +350,7 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (state.grantsEpicBoon) {
             item {
                 Text(
-                    text = "Level ${state.targetLevel} grants an Epic Boon feat.",
+                    text = trf("Level {0} grants an Epic Boon feat.", state.targetLevel),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -351,7 +358,7 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         } else {
             item {
                 InfoCard {
-                    SectionHeader("How to spend it")
+                    SectionHeader(tr("How to spend it"))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.padding(top = 8.dp),
@@ -360,9 +367,9 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                             SelectableCard(
                                 title = mode.label,
                                 subtitle = when (mode) {
-                                    AsiMode.PLUS_TWO -> "Raise a single ability by 2, up to a maximum of 20."
-                                    AsiMode.PLUS_ONE_ONE -> "Raise two different abilities by 1 each."
-                                    AsiMode.FEAT -> "Skip the increase and take a feat instead."
+                                    AsiMode.PLUS_TWO -> tr("Raise a single ability by 2, up to a maximum of 20.")
+                                    AsiMode.PLUS_ONE_ONE -> tr("Raise two different abilities by 1 each.")
+                                    AsiMode.FEAT -> tr("Skip the increase and take a feat instead.")
                                 },
                                 selected = state.asiMode == mode,
                                 onClick = { viewModel.setAsiMode(mode) },
@@ -376,11 +383,11 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 item {
                     InfoCard {
                         SectionHeader(
-                            "Ability Scores",
+                            tr("Ability Scores"),
                             trailing = "${state.asiPoints.values.sum()} / 2 assigned",
                         )
                         Text(
-                            text = "Tap an ability to assign points; tap it again to take them back.",
+                            text = tr("Tap an ability to assign points; tap it again to take them back."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 6.dp),
@@ -415,8 +422,8 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             val feats = state.featOptions
             item {
                 SectionHeader(
-                    if (state.grantsEpicBoon) "Epic Boons" else "Feats",
-                    trailing = if (state.featId == null) "Choose 1" else null,
+                    if (state.grantsEpicBoon) tr("Epic Boons") else tr("Feats"),
+                    trailing = if (state.featId == null) tr("Choose 1") else null,
                 )
             }
             val blockers = state.featBlockers
@@ -448,7 +455,7 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (state.cantripsToLearn > 0) {
             item {
                 SectionHeader(
-                    "New Cantrips",
+                    tr("New Cantrips"),
                     trailing = "${state.newCantrips.size} / ${state.cantripsToLearn}",
                 )
             }
@@ -468,7 +475,7 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (state.spellsToLearn > 0) {
             item {
                 SectionHeader(
-                    "New Spells",
+                    tr("New Spells"),
                     trailing = "${state.newSpells.size + state.manualSpells.size} / ${state.spellsToLearn}",
                 )
             }
@@ -476,7 +483,7 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             if (state.manualSpells.isNotEmpty()) {
                 item {
                     InfoCard {
-                        SectionHeader("Added by hand")
+                        SectionHeader(tr("Added by hand"))
                         Column(modifier = Modifier.padding(top = 6.dp)) {
                             state.manualSpells.forEach { name ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -504,10 +511,13 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             if (state.needsManualSpellEntry) {
                 item {
                     InfoCard {
-                        SectionHeader("Add a spell not listed")
+                        SectionHeader(tr("Add a spell not listed"))
                         Text(
-                            text = "You can cast up to level ${state.maxSpellLevel}. Spells above " +
-                                "level 5 aren't in the app's catalog yet, so type the name to add it.",
+                            text = trf(
+                                "You can cast up to level {0}. Spells above level 5 aren't in " +
+                                    "the app's catalog yet, so type the name to add it.",
+                                state.maxSpellLevel,
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 6.dp),
@@ -516,7 +526,7 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                             OutlinedTextField(
                                 value = manualEntry,
                                 onValueChange = { manualEntry = it },
-                                label = { Text("Spell name") },
+                                label = { Text(tr("Spell name")) },
                                 singleLine = true,
                                 shape = RoundedCornerShape(10.dp),
                                 modifier = Modifier.weight(1f),
@@ -530,7 +540,7 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                             ) {
                                 Icon(
                                     Icons.Default.Add,
-                                    contentDescription = "Add spell",
+                                    contentDescription = tr("Add spell"),
                                     tint = MaterialTheme.colorScheme.secondary,
                                 )
                             }
@@ -564,17 +574,17 @@ fun SummaryStep(state: LevelUpState) {
     StepColumn {
         item {
             InfoCard {
-                SectionHeader("Level ${state.targetLevel}")
+                SectionHeader(trf("Level {0}", state.targetLevel))
                 Column(
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.padding(top = 8.dp),
                 ) {
                     SummaryRow(
-                        "Hit points",
+                        tr("Hit points"),
                         "+${state.hitPointsGained + (CharacterCalculations.abilityModifiers(before)[Ability.CON] ?: 0)} max",
                     )
                     SummaryRow(
-                        "Proficiency bonus",
+                        tr("Proficiency bonus"),
                         CharacterCalculations.formatModifier(
                             CharacterCalculations.proficiencyBonus(state.targetLevel)
                         ),
@@ -582,7 +592,7 @@ fun SummaryStep(state: LevelUpState) {
                     if (state.gainsSubclass) {
                         val name = state.subclassOptions
                             .find { it.id == state.activeSubclassId }?.name.orEmpty()
-                        SummaryRow("Subclass", name)
+                        SummaryRow(tr("Subclass"), name)
                     }
                     if (state.asiPoints.isNotEmpty()) {
                         state.asiPoints.forEach { (ability, points) ->
@@ -590,12 +600,12 @@ fun SummaryStep(state: LevelUpState) {
                         }
                     }
                     state.featId?.let { id ->
-                        SummaryRow("Feat", FeatData.byId(id)?.name.orEmpty())
+                        SummaryRow(tr("Feat"), FeatData.byId(id)?.name.orEmpty())
                     }
                     val slots = CharacterCalculations.spellSlots(after)
                     if (slots.isNotEmpty()) {
                         SummaryRow(
-                            "Spell slots",
+                            tr("Spell slots"),
                             slots.toSortedMap().entries.joinToString(", ") { (level, count) ->
                                 "L$level ×$count"
                             },
@@ -610,7 +620,7 @@ fun SummaryStep(state: LevelUpState) {
         if (gainedFeatures.isNotEmpty()) {
             item {
                 InfoCard {
-                    SectionHeader("Features gained")
+                    SectionHeader(tr("Features gained"))
                     Column(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.padding(top = 8.dp),
@@ -627,7 +637,7 @@ fun SummaryStep(state: LevelUpState) {
         if (learned.isNotEmpty() || state.manualSpells.isNotEmpty()) {
             item {
                 InfoCard {
-                    SectionHeader("Spells learned")
+                    SectionHeader(tr("Spells learned"))
                     Column(modifier = Modifier.padding(top = 6.dp)) {
                         learned.forEach { id ->
                             SpellData.byId(id)?.let { spell ->
@@ -688,8 +698,11 @@ fun ChooseClassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
     ) {
         item {
             Text(
-                text = "You are ${ClassLevels.label(state.character)}. Continue in one of " +
-                    "those, or start a new class if your scores allow it.",
+                text = trf(
+                    "You are {0}. Continue in one of those, or start a new class if your " +
+                        "scores allow it.",
+                    ClassLevels.label(state.character),
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -699,7 +712,7 @@ fun ChooseClassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
 
         item {
             Text(
-                text = "Classes you already have",
+                text = tr("Classes you already have"),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -718,7 +731,7 @@ fun ChooseClassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (fresh.isNotEmpty()) {
             item {
                 Text(
-                    text = "Start a new class",
+                    text = tr("Start a new class"),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(top = 8.dp),
@@ -737,7 +750,7 @@ fun ChooseClassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                         add("Tools: ${option.entry.toolProficiencies.joinToString(", ")}")
                     }
                     if (option.entry.skillCount > 0) {
-                        add("One skill of your choice")
+                        add(tr("One skill of your choice"))
                     }
                     if (option.entry.note.isNotBlank()) add(option.entry.note)
                 }
@@ -745,7 +758,7 @@ fun ChooseClassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                     title = "${option.className} 1",
                     subtitle = if (option.allowed) {
                         "Requires ${option.entry.prerequisiteLabel}. You gain: " +
-                            gained.joinToString(" • ").ifBlank { "no extra proficiencies" }
+                            gained.joinToString(" • ").ifBlank { tr("no extra proficiencies") }
                     } else {
                         option.reason
                     },

@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -59,7 +60,7 @@ fun SpellDetailSheet(spell: KnownSpell, onDismiss: () -> Unit) {
 
             Text(
                 text = listOf(
-                    if (spell.level == 0) "Cantrip" else "Level ${spell.level}",
+                    if (spell.level == 0) tr("Cantrip") else "Level ${spell.level}",
                     spell.school,
                 ).filter { it.isNotBlank() }.joinToString(" • "),
                 style = MaterialTheme.typography.titleSmall,
@@ -72,32 +73,32 @@ fun SpellDetailSheet(spell: KnownSpell, onDismiss: () -> Unit) {
                 if (catalogEntry.concentration || catalogEntry.ritual) {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (catalogEntry.concentration) {
-                            ChoiceChip("Concentration", selected = true, onClick = {})
+                            ChoiceChip(tr("Concentration"), selected = true, onClick = {})
                         }
                         if (catalogEntry.ritual) {
-                            ChoiceChip("Ritual", selected = true, onClick = {})
+                            ChoiceChip(tr("Ritual"), selected = true, onClick = {})
                         }
                     }
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DetailRow("Casting Time", catalogEntry.castingTime)
-                    DetailRow("Range", catalogEntry.range)
-                    DetailRow("Components", catalogEntry.components)
-                    DetailRow("Duration", catalogEntry.duration)
+                    DetailRow(tr("Casting Time"), catalogEntry.castingTime)
+                    DetailRow(tr("Range"), catalogEntry.range)
+                    DetailRow(tr("Components"), catalogEntry.components)
+                    DetailRow(tr("Duration"), catalogEntry.duration)
                     DetailRow(
-                        "Concentration",
-                        if (catalogEntry.concentration) "Yes" else "No",
+                        tr("Concentration"),
+                        if (catalogEntry.concentration) tr("Yes") else tr("No"),
                     )
                     if (catalogEntry.damage.isNotBlank()) {
                         DetailRow(
-                            "Damage",
+                            tr("Damage"),
                             "${catalogEntry.damage} ${catalogEntry.damageType}",
                         )
                         DetailRow(
-                            "Resolves with",
+                            tr("Resolves with"),
                             if (catalogEntry.needsAttackRoll) {
-                                "A spell attack roll"
+                                tr("A spell attack roll")
                             } else {
                                 catalogEntry.saveAbility
                                     ?.let { "${it.fullName} saving throw" }
@@ -109,21 +110,21 @@ fun SpellDetailSheet(spell: KnownSpell, onDismiss: () -> Unit) {
             }
 
             if (spell.source.isNotBlank()) {
-                DetailRow("From", spell.source)
+                DetailRow(tr("From"), spell.source)
             }
 
-            SectionHeader("Effect")
+            SectionHeader(tr("Effect"))
             Text(
                 text = catalogEntry?.description?.takeIf { it.isNotBlank() }
-                    ?: spell.description.ifBlank { "No description recorded for this spell." },
+                    ?: spell.description.ifBlank { tr("No description recorded for this spell.") },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             if (catalogEntry == null) {
                 Text(
-                    text = "This spell isn't in the rulebook data, so only what you entered is " +
-                        "shown. You can edit its text in Edit Mode.",
+                    text = tr("This spell isn't in the rulebook data, so only what you entered is " +
+                        "shown. You can edit its text in Edit Mode."),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )

@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -27,6 +29,8 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.ui.components.ChoiceChip
 import com.pedroeu.ficha.ui.components.SectionHeader
 
+// Stored on the character in English, whatever the interface language, so a sheet made in
+// one language still reads correctly in the other. Only the chip's label is translated.
 private val ALIGNMENTS = listOf(
     "Lawful Good", "Neutral Good", "Chaotic Good",
     "Lawful Neutral", "True Neutral", "Chaotic Neutral",
@@ -45,7 +49,7 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
             OutlinedTextField(
                 value = state.name,
                 onValueChange = viewModel::setName,
-                label = { Text("Character Name") },
+                label = { Text(tr("Character Name")) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp),
@@ -56,14 +60,14 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
 
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SectionHeader("Alignment")
+                SectionHeader(tr("Alignment"))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     ALIGNMENTS.forEach { alignment ->
                         ChoiceChip(
-                            label = alignment,
+                            label = tr(alignment),
                             selected = state.alignment == alignment,
                             onClick = {
                                 viewModel.setAlignment(
@@ -80,7 +84,7 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
             OutlinedTextField(
                 value = state.appearance,
                 onValueChange = viewModel::setAppearance,
-                label = { Text("Appearance (optional)") },
+                label = { Text(tr("Appearance (optional)")) },
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp),
@@ -91,7 +95,7 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
             OutlinedTextField(
                 value = state.backstory,
                 onValueChange = viewModel::setBackstory,
-                label = { Text("Backstory & Personality (optional)") },
+                label = { Text(tr("Backstory & Personality (optional)")) },
                 minLines = 4,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp),
@@ -123,7 +127,7 @@ private fun CharacterSummary(state: CreationState) {
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             Text(
-                text = "Level 1 ${species?.name.orEmpty()} ${charClass?.name.orEmpty()}",
+                text = trf("Level 1 {0} {1}", species?.name.orEmpty(), charClass?.name.orEmpty()),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
             )
@@ -165,18 +169,18 @@ private fun CharacterSummary(state: CreationState) {
             }
 
             SummaryLine(
-                "Skills",
+                tr("Skills"),
                 state.allSkillProficiencies.sortedBy { it.displayName }
                     .joinToString { it.displayName },
             )
             if (state.expertiseChoices.isNotEmpty()) {
                 SummaryLine(
-                    "Expertise",
+                    tr("Expertise"),
                     state.expertiseChoices.joinToString { it.displayName },
                 )
             }
             background?.featId?.let { featId ->
-                FeatData.byId(featId)?.let { SummaryLine("Origin Feat", it.name) }
+                FeatData.byId(featId)?.let { SummaryLine(tr("Origin Feat"), it.name) }
             }
         }
     }

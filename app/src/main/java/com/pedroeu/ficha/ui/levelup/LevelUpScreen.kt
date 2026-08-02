@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.levelup
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -87,7 +88,7 @@ fun LevelUpScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = { if (!viewModel.back()) onExit() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = tr("Back"))
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -118,7 +119,7 @@ fun LevelUpScreen(
                         enabled = loaded.canAdvance,
                         shape = RoundedCornerShape(10.dp),
                     ) {
-                        Text(if (isLastStep) "Level Up" else "Next")
+                        Text(if (isLastStep) tr("Level Up") else tr("Next"))
                     }
                 }
             }
@@ -186,16 +187,16 @@ private fun LevelUpStepIndicator(steps: List<LevelUpStep>, current: LevelUpStep)
 }
 
 private fun hintFor(state: LevelUpState): String = when {
-    state.step == LevelUpStep.SUMMARY -> "Confirm to save your new level"
-    state.canAdvance -> "Looks good"
+    state.step == LevelUpStep.SUMMARY -> tr("Confirm to save your new level")
+    state.canAdvance -> tr("Looks good")
     else -> when (state.step) {
-        LevelUpStep.CLASS -> "Put this level into a class"
-        LevelUpStep.HIT_POINTS -> "Choose how to gain hit points"
-        LevelUpStep.SUBCLASS -> "Pick your subclass"
-        LevelUpStep.FEATURES -> "Complete every choice below"
-        LevelUpStep.ASI -> "Assign both points, or choose a feat"
-        LevelUpStep.FEAT_CHOICES -> "Complete every choice your feat asks for"
-        LevelUpStep.SPELLS -> "Choose your new spells"
+        LevelUpStep.CLASS -> tr("Put this level into a class")
+        LevelUpStep.HIT_POINTS -> tr("Choose how to gain hit points")
+        LevelUpStep.SUBCLASS -> tr("Pick your subclass")
+        LevelUpStep.FEATURES -> tr("Complete every choice below")
+        LevelUpStep.ASI -> tr("Assign both points, or choose a feat")
+        LevelUpStep.FEAT_CHOICES -> tr("Complete every choice your feat asks for")
+        LevelUpStep.SPELLS -> tr("Choose your new spells")
         LevelUpStep.SUMMARY -> ""
     }
 }

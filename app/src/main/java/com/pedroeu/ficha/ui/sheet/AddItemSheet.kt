@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -76,12 +78,12 @@ fun AddItemSheet(
                 Tab(
                     selected = tabIndex == 0,
                     onClick = { tabIndex = 0 },
-                    text = { Text("From the rulebook") },
+                    text = { Text(tr("From the rulebook")) },
                 )
                 Tab(
                     selected = tabIndex == 1,
                     onClick = { tabIndex = 1 },
-                    text = { Text("Custom item") },
+                    text = { Text(tr("Custom item")) },
                 )
             }
 
@@ -106,7 +108,7 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
-            label = { Text("Search the rulebook") },
+            label = { Text(tr("Search the rulebook")) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
@@ -134,13 +136,13 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
                     modifier = Modifier.size(18.dp),
                 )
                 Text(
-                    text = "  Filter: ${category ?: "All"}",
+                    text = trf("  Filter: {0}", category ?: tr("All")),
                     style = MaterialTheme.typography.labelLarge,
                 )
             }
             Spacer(Modifier.weight(1f))
             if (category != null) {
-                TextButton(onClick = { category = null }) { Text("Clear") }
+                TextButton(onClick = { category = null }) { Text(tr("Clear")) }
             }
         }
 
@@ -151,7 +153,7 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
                 modifier = Modifier.padding(bottom = 10.dp),
             ) {
                 ChoiceChip(
-                    label = "All",
+                    label = tr("All"),
                     selected = category == null,
                     onClick = {
                         category = null
@@ -230,7 +232,7 @@ private fun CatalogRow(entry: CatalogItem, onAdd: () -> Unit) {
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Add to inventory")
+                    Text(tr("Add to inventory"))
                 }
             }
         },
@@ -251,7 +253,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Item name") },
+            label = { Text(tr("Item name")) },
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
@@ -263,7 +265,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
             OutlinedTextField(
                 value = quantity,
                 onValueChange = { quantity = it.filter { c -> c.isDigit() }.take(3) },
-                label = { Text("Quantity") },
+                label = { Text(tr("Quantity")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(10.dp),
@@ -272,7 +274,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
             OutlinedTextField(
                 value = weight,
                 onValueChange = { weight = it.filter { c -> c.isDigit() || c == '.' }.take(6) },
-                label = { Text("Weight (lb)") },
+                label = { Text(tr("Weight (lb)")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 shape = RoundedCornerShape(10.dp),
@@ -282,7 +284,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
         OutlinedTextField(
             value = notes,
             onValueChange = { notes = it },
-            label = { Text("Description or notes") },
+            label = { Text(tr("Description or notes")) },
             minLines = 3,
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
@@ -302,7 +304,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Add to inventory")
+            Text(tr("Add to inventory"))
         }
     }
 }

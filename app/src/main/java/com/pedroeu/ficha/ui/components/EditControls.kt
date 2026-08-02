@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.components
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,7 +57,7 @@ fun StatEditDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    text = "The rules give $rulesValue.",
+                    text = trf("The rules give {0}.", rulesValue),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -69,8 +71,8 @@ fun StatEditDialog(
                 OutlinedTextField(
                     value = bonusText,
                     onValueChange = { bonusText = it },
-                    label = { Text("Bonus (added to the rules)") },
-                    placeholder = { Text("e.g. 2") },
+                    label = { Text(tr("Bonus (added to the rules)")) },
+                    placeholder = { Text(tr("e.g. 2")) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = if (allowNegative) KeyboardType.Text else KeyboardType.Number
@@ -81,8 +83,8 @@ fun StatEditDialog(
                 OutlinedTextField(
                     value = overrideText,
                     onValueChange = { overrideText = it },
-                    label = { Text("Override (replaces everything)") },
-                    placeholder = { Text("Leave blank to use the rules") },
+                    label = { Text(tr("Override (replaces everything)")) },
+                    placeholder = { Text(tr("Leave blank to use the rules")) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = if (allowNegative) KeyboardType.Text else KeyboardType.Number
@@ -94,13 +96,13 @@ fun StatEditDialog(
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(parse(bonusText), parse(overrideText)) }) {
-                Text("Save")
+                Text(tr("Save"))
             }
         },
         dismissButton = {
             Row {
-                TextButton(onClick = { onConfirm(null, null) }) { Text("Clear") }
-                TextButton(onClick = onDismiss) { Text("Cancel") }
+                TextButton(onClick = { onConfirm(null, null) }) { Text(tr("Clear")) }
+                TextButton(onClick = onDismiss) { Text(tr("Cancel")) }
             }
         },
     )

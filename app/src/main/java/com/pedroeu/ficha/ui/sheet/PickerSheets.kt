@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -90,11 +91,11 @@ fun FeatPickerSheet(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            SectionHeader("Add a Feat")
+            SectionHeader(tr("Add a Feat"))
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text("Search feats") },
+                label = { Text(tr("Search feats")) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp),
@@ -142,8 +143,8 @@ fun FeatPickerSheet(
                                 ) {
                                     Text(
                                         when {
-                                            owned -> "Already taken"
-                                            !allAnswered -> "Make every choice above first"
+                                            owned -> tr("Already taken")
+                                            !allAnswered -> tr("Make every choice above first")
                                             else -> "Add ${feat.name}"
                                         }
                                     )
@@ -197,11 +198,11 @@ fun SpellPickerSheet(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            SectionHeader("Add a Spell")
+            SectionHeader(tr("Add a Spell"))
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                label = { Text("Search spells") },
+                label = { Text(tr("Search spells")) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp),
@@ -213,18 +214,18 @@ fun SpellPickerSheet(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ChoiceChip(
-                    label = "My class list",
+                    label = tr("My class list"),
                     selected = classListOnly,
                     onClick = { classListOnly = !classListOnly },
                 )
                 ChoiceChip(
-                    label = "All levels",
+                    label = tr("All levels"),
                     selected = levelFilter == null,
                     onClick = { levelFilter = null },
                 )
                 (0..SpellData.MAX_CATALOGUED_LEVEL).forEach { level ->
                     ChoiceChip(
-                        label = if (level == 0) "Cantrip" else "L$level",
+                        label = if (level == 0) tr("Cantrip") else "L$level",
                         selected = levelFilter == level,
                         onClick = { levelFilter = if (levelFilter == level) null else level },
                     )
@@ -233,7 +234,7 @@ fun SpellPickerSheet(
 
             if (results.isEmpty()) {
                 Text(
-                    text = "Nothing matches. Add it by name below.",
+                    text = tr("Nothing matches. Add it by name below."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -253,7 +254,7 @@ fun SpellPickerSheet(
                 OutlinedTextField(
                     value = customName,
                     onValueChange = { customName = it },
-                    label = { Text("Or add a spell by name") },
+                    label = { Text(tr("Or add a spell by name")) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f),
@@ -266,7 +267,7 @@ fun SpellPickerSheet(
                                 name = customName.trim(),
                                 level = levelFilter ?: 1,
                                 school = "",
-                                description = "Added by hand.",
+                                description = tr("Added by hand."),
                                 source = "Custom",
                             )
                         )
@@ -275,7 +276,7 @@ fun SpellPickerSheet(
                     enabled = customName.isNotBlank(),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.padding(start = 8.dp),
-                ) { Text("Add") }
+                ) { Text(tr("Add")) }
             }
         }
     }
@@ -287,6 +288,7 @@ private fun SpellDef.toKnownSpell() = KnownSpell(
     level = level,
     school = school,
     description = description,
+    // Stored on the character, so it stays in English whatever the interface language.
     source = "Added",
 )
 
@@ -346,12 +348,12 @@ fun AttackEditorSheet(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            SectionHeader(if (existing == null) "Add an Attack" else "Edit Attack")
+            SectionHeader(if (existing == null) tr("Add an Attack") else tr("Edit Attack"))
 
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Attack name") },
+                label = { Text(tr("Attack name")) },
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -360,7 +362,7 @@ fun AttackEditorSheet(
                 OutlinedTextField(
                     value = dice,
                     onValueChange = { dice = it },
-                    label = { Text("Damage die") },
+                    label = { Text(tr("Damage die")) },
                     placeholder = { Text("2d6") },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -369,7 +371,7 @@ fun AttackEditorSheet(
                 OutlinedTextField(
                     value = bonus,
                     onValueChange = { bonus = it },
-                    label = { Text("Attack / damage bonus") },
+                    label = { Text(tr("Attack / damage bonus")) },
                     placeholder = { Text("+7") },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -380,8 +382,8 @@ fun AttackEditorSheet(
                 OutlinedTextField(
                     value = damageType,
                     onValueChange = { damageType = it },
-                    label = { Text("Damage type") },
-                    placeholder = { Text("Fire") },
+                    label = { Text(tr("Damage type")) },
+                    placeholder = { Text(tr("Fire")) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f),
@@ -389,8 +391,8 @@ fun AttackEditorSheet(
                 OutlinedTextField(
                     value = range,
                     onValueChange = { range = it },
-                    label = { Text("Range") },
-                    placeholder = { Text("30 ft") },
+                    label = { Text(tr("Range")) },
+                    placeholder = { Text(tr("30 ft")) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f),
@@ -399,8 +401,8 @@ fun AttackEditorSheet(
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Special effects / notes") },
-                placeholder = { Text("On a hit, the target must succeed on a DC 15 save or…") },
+                label = { Text(tr("Special effects / notes")) },
+                placeholder = { Text(tr("On a hit, the target must succeed on a DC 15 save or…")) },
                 minLines = 3,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -422,7 +424,7 @@ fun AttackEditorSheet(
                 enabled = name.isNotBlank(),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(if (existing == null) "Add attack" else "Save changes") }
+            ) { Text(if (existing == null) tr("Add attack") else tr("Save changes")) }
         }
     }
 }
@@ -454,16 +456,16 @@ fun CustomResourceSheet(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            SectionHeader("Track Something Else")
+            SectionHeader(tr("Track Something Else"))
             Text(
-                text = "For any ability with a set number of uses that the app doesn't already list.",
+                text = tr("For any ability with a set number of uses that the app doesn't already list."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
+                label = { Text(tr("Name")) },
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -471,7 +473,7 @@ fun CustomResourceSheet(
             OutlinedTextField(
                 value = max,
                 onValueChange = { max = it.filter { c -> c.isDigit() }.take(3) },
-                label = { Text("Number of uses") },
+                label = { Text(tr("Number of uses")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(10.dp),
@@ -479,7 +481,7 @@ fun CustomResourceSheet(
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Comes back on",
+                    text = tr("Comes back on"),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.secondary,
                 )
@@ -487,9 +489,9 @@ fun CustomResourceSheet(
                     SelectableCard(
                         title = option.label,
                         subtitle = when (option) {
-                            Recharge.SHORT_REST -> "Refills on a Short Rest and a Long Rest."
-                            Recharge.LONG_REST -> "Refills only on a Long Rest."
-                            Recharge.SPECIAL -> "Rests leave it alone; you reset it yourself."
+                            Recharge.SHORT_REST -> tr("Refills on a Short Rest and a Long Rest.")
+                            Recharge.LONG_REST -> tr("Refills only on a Long Rest.")
+                            Recharge.SPECIAL -> tr("Rests leave it alone; you reset it yourself.")
                         },
                         selected = recharge == option,
                         onClick = { recharge = option },
@@ -499,7 +501,7 @@ fun CustomResourceSheet(
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes (optional)") },
+                label = { Text(tr("Notes (optional)")) },
                 minLines = 2,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -511,7 +513,7 @@ fun CustomResourceSheet(
                 enabled = name.isNotBlank(),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Add tracker") }
+            ) { Text(tr("Add tracker")) }
         }
     }
 }

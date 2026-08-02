@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +28,7 @@ fun ClassStep(state: CreationState, viewModel: CreationViewModel) {
     ) {
         item {
             Text(
-                text = "Your class is what you do in the world: how you fight, what magic you wield, and what you're trained in. You'll pick its options on the next step.",
+                text = tr("Your class is what you do in the world: how you fight, what magic you wield, and what you're trained in. You'll pick its options on the next step."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -51,7 +52,7 @@ private fun ClassDetails(charClass: CharClass) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-        SectionHeader("Level 1 Features")
+        SectionHeader(tr("Level 1 Features"))
         charClass.level1Features.forEach { feature ->
             Column {
                 Text(
@@ -69,15 +70,15 @@ private fun ClassDetails(charClass: CharClass) {
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        SectionHeader("Proficiencies")
-        LabeledLine("Saving Throws", charClass.savingThrows.joinToString { it.fullName })
+        SectionHeader(tr("Proficiencies"))
+        LabeledLine(tr("Saving Throws"), charClass.savingThrows.joinToString { it.fullName })
         LabeledLine(
-            "Armor",
-            charClass.armorProficiencies.takeIf { it.isNotEmpty() }?.joinToString() ?: "None",
+            tr("Armor"),
+            charClass.armorProficiencies.takeIf { it.isNotEmpty() }?.joinToString() ?: tr("None"),
         )
-        LabeledLine("Weapons", charClass.weaponProficiencies.joinToString())
+        LabeledLine(tr("Weapons"), charClass.weaponProficiencies.joinToString())
         if (charClass.toolProficiencies.isNotEmpty()) {
-            LabeledLine("Tools", charClass.toolProficiencies.joinToString())
+            LabeledLine(tr("Tools"), charClass.toolProficiencies.joinToString())
         }
     }
 }

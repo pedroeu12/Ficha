@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,15 +46,15 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                 ),
             ) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    SectionHeader("Identity")
+                    SectionHeader(tr("Identity"))
                     EditableBioLine(
-                        label = "Name",
+                        label = tr("Name"),
                         value = character.name,
                         editMode = editMode,
                         onChange = { viewModel.setName(it.orEmpty()) },
                     )
                     EditableBioLine(
-                        label = "Species",
+                        label = tr("Species"),
                         value = character.textOverrides["bio:species"] ?: species?.name.orEmpty(),
                         editMode = editMode,
                         overridden = character.textOverrides.containsKey("bio:species"),
@@ -61,7 +62,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                     )
                     species?.lineageOptions?.find { it.id == character.lineageId }?.let {
                         EditableBioLine(
-                            label = species.lineageChoiceLabel ?: "Lineage",
+                            label = species.lineageChoiceLabel ?: tr("Lineage"),
                             value = character.textOverrides["bio:lineage"] ?: it.name,
                             editMode = editMode,
                             overridden = character.textOverrides.containsKey("bio:lineage"),
@@ -69,29 +70,29 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                         )
                     }
                     EditableBioLine(
-                        label = "Class",
+                        label = tr("Class"),
                         value = character.textOverrides["bio:class"] ?: charClass?.name.orEmpty(),
                         editMode = editMode,
                         overridden = character.textOverrides.containsKey("bio:class"),
                         onChange = { viewModel.setText("bio:class", it) },
                     )
-                    BioLine("Level", "${character.level}")
+                    BioLine(tr("Level"), "${character.level}")
                     EditableBioLine(
-                        label = "Origin",
+                        label = tr("Origin"),
                         value = character.textOverrides["bio:origin"] ?: background?.name.orEmpty(),
                         editMode = editMode,
                         overridden = character.textOverrides.containsKey("bio:origin"),
                         onChange = { viewModel.setText("bio:origin", it) },
                     )
                     EditableBioLine(
-                        label = "Alignment",
+                        label = tr("Alignment"),
                         value = character.alignment,
                         editMode = editMode,
                         onChange = { viewModel.setAlignment(it.orEmpty()) },
-                        placeholder = "Not set",
+                        placeholder = tr("Not set"),
                     )
                     EditableBioLine(
-                        label = "Languages",
+                        label = tr("Languages"),
                         value = character.textOverrides["bio:languages"]
                             ?: character.languages.joinToString(),
                         editMode = editMode,
@@ -106,7 +107,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
             OutlinedTextField(
                 value = character.appearance,
                 onValueChange = viewModel::setAppearance,
-                label = { Text("Appearance") },
+                label = { Text(tr("Appearance")) },
                 minLines = 3,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -117,7 +118,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
             OutlinedTextField(
                 value = character.backstory,
                 onValueChange = viewModel::setBackstory,
-                label = { Text("Backstory & Personality") },
+                label = { Text(tr("Backstory & Personality")) },
                 minLines = 5,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -128,7 +129,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
             OutlinedTextField(
                 value = character.notes,
                 onValueChange = viewModel::setNotes,
-                label = { Text("Session Notes") },
+                label = { Text(tr("Session Notes")) },
                 minLines = 5,
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),

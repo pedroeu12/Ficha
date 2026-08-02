@@ -62,4 +62,17 @@ data class InventoryItem(
     /** If this line represents a known weapon/armor, its def id, else null for generic gear. */
     val weaponDefId: String? = null,
     val armorDefId: String? = null,
+    /**
+     * The magic item this line is, if any. A magic weapon is both: [weaponDefId] says what it
+     * is made of and this says what is magical about it, which is how a +1 Longsword can be a
+     * longsword on the attack line and still carry its bonus.
+     */
+    val magicItemId: String? = null,
+    /**
+     * The Artificer plan that made this item, for lines the character created rather than
+     * found. Set means the line is owned by Replicate Magic Item: it appeared when the plan
+     * was chosen for the day and it goes away when the plan is set aside, so nothing has to
+     * be tidied up by hand.
+     */
+    val craftedFromPlanId: String? = null,
 )

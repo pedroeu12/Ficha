@@ -1,6 +1,9 @@
 package com.pedroeu.ficha.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,6 +12,10 @@ import androidx.navigation.navArgument
 import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.ui.creation.CreationWizardScreen
 import com.pedroeu.ficha.ui.home.HomeScreen
+import com.pedroeu.ficha.ui.i18n.AppLanguage
+import com.pedroeu.ficha.ui.i18n.Language
+import com.pedroeu.ficha.ui.i18n.LanguageController
+import com.pedroeu.ficha.ui.i18n.LocalLanguageController
 import com.pedroeu.ficha.ui.levelup.LevelUpScreen
 import com.pedroeu.ficha.ui.sheet.CharacterSheetScreen
 
@@ -22,9 +29,33 @@ object Routes {
 }
 
 @Composable
-fun FichaApp(repository: CharacterRepository) {
+fun FichaApp(
+    repository: CharacterRepository,
+    language: AppLanguage = AppLanguage.ENGLISH,
+    onLanguageChange: (AppLanguage) -> Unit = {},
+) {
     val navController = rememberNavController()
 
+    // Read once here so the whole tree recomposes when it changes. tr() itself reads a plain
+    // value rather than a CompositionLocal — it has to be callable outside a composable — so
+    // without this the text would only change on the next navigation.
+    val languageController = remember(language, onLanguageChange) {
+        Language.current = language
+        LanguageController(language = language, setLanguage = onLanguageChange)
+    }
+
+    CompositionLocalProvider(LocalLanguageController provides languageController) {
+        key(language) {
+            AppNavHost(navController, repository)
+        }
+    }
+}
+
+@Composable
+private fun AppNavHost(
+    navController: androidx.navigation.NavHostController,
+    repository: CharacterRepository,
+) {
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             HomeScreen(

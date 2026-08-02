@@ -33,9 +33,71 @@ object MagicItemData {
         attunementNote = attunementNote,
         weightLb = weightLb,
         artificerPlanLevel = plan,
+        // The numbers are filled in from the tables at the bottom of this file rather than
+        // repeated at each call site, so a test can hold them against the rules text.
+        attackBonus = ATTACK_BONUSES[id] ?: 0,
+        acBonus = AC_BONUSES[id] ?: 0,
     )
 
     private const val WONDROUS = "Wondrous Item"
+
+    /**
+     * The bonus each item gives to attack and damage rolls made with it.
+     *
+     * Kept as a table rather than parsed back out of the description, because an attack line
+     * that reads its numbers out of prose is one rewording away from being wrong. A test holds
+     * every entry here against what the item's own text says.
+     */
+    private val ATTACK_BONUSES: Map<String, Int> = mapOf(
+        "weapon_plus_1" to 1,
+        "weapon_plus_2" to 2,
+        "weapon_plus_3" to 3,
+        "berserker_axe" to 1,
+        "dagger_of_venom" to 1,
+        "dazzling_weapon" to 1,
+        "defender" to 3,
+        "dragon_slayer" to 1,
+        "repeating_shot" to 1,
+        "returning_weapon" to 1,
+        "sun_blade" to 2,
+        "wraps_unarmed_1" to 1,
+        "wraps_unarmed_2" to 2,
+        "dwarven_thrower" to 3,
+        "giant_slayer" to 1,
+        "holy_avenger" to 3,
+        "luck_blade" to 1,
+        "mace_of_smiting" to 1,
+        "nine_lives_stealer" to 1,
+        "scimitar_of_speed" to 2,
+        "vorpal_sword" to 3,
+        "rod_of_lordly_might" to 3,
+        "staff_of_striking" to 3,
+        "staff_thunder_lightning" to 2,
+        "oil_of_sharpness" to 3,
+    )
+
+    /**
+     * The bonus each item adds to Armor Class on top of whatever the character is already
+     * wearing.
+     *
+     * Deliberately narrower than the set of items whose text mentions Armor Class. A Dwarven
+     * Plate *is* the armor rather than an addition to it, and this app has no way to link one
+     * to the plate underneath, so counting it would inflate the number. The same goes for the
+     * conditional ones — Bracers of Defense want you unarmored, an Arrow-Catching Shield only
+     * helps against ranged attacks — which a single figure on the sheet cannot express. Those
+     * stay at zero and remain the player's own adjustment, which is what they were before.
+     */
+    private val AC_BONUSES: Map<String, Int> = mapOf(
+        "armor_plus_1" to 1,
+        "armor_plus_2" to 2,
+        "armor_plus_3" to 3,
+        "shield_plus_1" to 1,
+        "shield_plus_2" to 2,
+        "shield_plus_3" to 3,
+        "elven_chain" to 1,
+        "ring_of_protection" to 1,
+        "cloak_of_protection" to 1,
+    )
 
     // ------------------------------------------------------------------ Armor and shields
 

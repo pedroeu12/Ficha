@@ -171,6 +171,64 @@ object EquipmentData {
             isRanged = true, usesDexOption = true, mastery = "Slow",
             costGp = 50.0, weightLb = 2.0, range = "150/600 ft",
             description = "A tall bow of yew or elm. Years of training buy you six hundred feet of reach."),
+
+        // ---- Firearms, renaissance
+        // These two are Martial Ranged Weapons in the 2024 Player's Handbook, which is why
+        // the Dungeon Master's Guide's firearm section covers only modern and futuristic.
+        // A campaign has to allow them, but nothing else about them is special: Martial
+        // weapon proficiency covers both, and each carries a mastery property like any other.
+        WeaponDef("pistol", "Pistol", "1d10", "Piercing",
+            listOf("Ammunition (Bullet)", "Loading"), isRanged = true, usesDexOption = true,
+            mastery = "Vex", costGp = 250.0, weightLb = 3.0, range = "30/90 ft",
+            description = "A renaissance firearm: a single ball driven by black powder. Loud, slow to reload, and it does not care how good your armor is."),
+        WeaponDef("musket", "Musket", "1d12", "Piercing",
+            listOf("Ammunition (Bullet)", "Loading", "Two-Handed"), isRanged = true,
+            usesDexOption = true, mastery = "Slow", costGp = 500.0, weightLb = 10.0,
+            range = "40/120 ft",
+            description = "A long-barrelled renaissance firearm. A minute to load, a moment to fire, and a hole through most things in between."),
+
+        // ---- Firearms, modern
+        // From the Dungeon Master's Guide, which says to treat these as Rare magic items if
+        // they are ever for sale — so they carry no price here. Reload gives a shot count
+        // before you must spend an action or a Bonus Action reloading.
+        WeaponDef("semiautomatic_pistol", "Semiautomatic Pistol", "2d6", "Piercing",
+            listOf("Ammunition (Bullet)", "Reload (15 shots)"), isRanged = true,
+            usesDexOption = true, mastery = "Vex", weightLb = 3.0, range = "50/150 ft",
+            description = "A modern sidearm holding fifteen rounds. Treat as a Rare magic item if it is ever for sale."),
+        WeaponDef("revolver", "Revolver", "2d8", "Piercing",
+            listOf("Ammunition (Bullet)", "Reload (6 shots)"), isRanged = true,
+            usesDexOption = true, mastery = "Sap", weightLb = 3.0, range = "40/120 ft",
+            description = "Six chambers on a rotating cylinder. Treat as a Rare magic item if it is ever for sale."),
+        WeaponDef("hunting_rifle", "Hunting Rifle", "2d10", "Piercing",
+            listOf("Ammunition (Bullet)", "Reload (5 shots)", "Two-Handed"), isRanged = true,
+            usesDexOption = true, mastery = "Slow", weightLb = 8.0, range = "80/240 ft",
+            description = "A bolt-action rifle built for a single decisive shot. Treat as a Rare magic item if it is ever for sale."),
+        WeaponDef("automatic_rifle", "Automatic Rifle", "2d8", "Piercing",
+            listOf("Ammunition (Bullet)", "Burst Fire", "Reload (30 shots)", "Two-Handed"),
+            isRanged = true, usesDexOption = true, mastery = "Slow", weightLb = 8.0,
+            range = "80/240 ft",
+            description = "Thirty rounds, and the option to spend ten of them spraying a 10-foot Cube. Treat as a Rare magic item if it is ever for sale."),
+        WeaponDef("shotgun", "Shotgun", "2d8", "Piercing",
+            listOf("Ammunition (Bullet)", "Reload (2 shots)", "Two-Handed"), isRanged = true,
+            usesDexOption = true, mastery = "Push", weightLb = 7.0, range = "30/90 ft",
+            description = "Two barrels and a short, brutal range. Treat as a Rare magic item if it is ever for sale."),
+
+        // ---- Firearms, futuristic
+        // Very Rare rather than Rare, and they burn Energy Cells instead of Bullets.
+        WeaponDef("laser_pistol", "Laser Pistol", "3d6", "Radiant",
+            listOf("Ammunition (Energy Cell)", "Reload (50 shots)"), isRanged = true,
+            usesDexOption = true, mastery = "Vex", weightLb = 2.0, range = "40/120 ft",
+            description = "A beam weapon drawing on a rechargeable cell. Treat as a Very Rare magic item if it is ever for sale."),
+        WeaponDef("laser_rifle", "Laser Rifle", "3d8", "Radiant",
+            listOf("Ammunition (Energy Cell)", "Reload (30 shots)", "Two-Handed"),
+            isRanged = true, usesDexOption = true, mastery = "Slow", weightLb = 7.0,
+            range = "100/300 ft",
+            description = "A shouldered beam weapon with three hundred feet of reach. Treat as a Very Rare magic item if it is ever for sale."),
+        WeaponDef("antimatter_rifle", "Antimatter Rifle", "6d8", "Necrotic",
+            listOf("Ammunition (Energy Cell)", "Reload (2 shots)", "Two-Handed"),
+            isRanged = true, usesDexOption = true, mastery = "Sap", weightLb = 10.0,
+            range = "120/360 ft",
+            description = "Two shots that unmake what they touch. Treat as a Very Rare magic item if it is ever for sale."),
     )
 
     /** Packs, tools, and sundry gear the picker can search alongside weapons and armor. */

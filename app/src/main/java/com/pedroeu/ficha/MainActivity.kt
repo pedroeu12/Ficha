@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.pedroeu.ficha.ui.FichaApp
+import com.pedroeu.ficha.ui.i18n.LanguagePreference
 import com.pedroeu.ficha.ui.theme.FichaTheme
 import com.pedroeu.ficha.ui.theme.ThemePreference
 
@@ -18,11 +19,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val repository = (application as FichaApplication).repository
         val appearance = ThemePreference(this)
+        val languages = LanguagePreference(this)
 
         setContent {
             // Held here rather than inside the theme, so switching schemes redraws the whole
             // app at once and the choice outlives any one screen.
             var mode by remember { mutableStateOf(appearance.load()) }
+            // The same reasoning for the language, and for the same reason it is loaded from
+            // storage: both are settings that belong to the person, not to a character.
+            var language by remember { mutableStateOf(languages.load()) }
 
             FichaTheme(
                 mode = mode,
@@ -31,7 +36,14 @@ class MainActivity : ComponentActivity() {
                     appearance.save(it)
                 },
             ) {
-                FichaApp(repository = repository)
+                FichaApp(
+                    repository = repository,
+                    language = language,
+                    onLanguageChange = {
+                        language = it
+                        languages.save(it)
+                    },
+                )
             }
         }
     }

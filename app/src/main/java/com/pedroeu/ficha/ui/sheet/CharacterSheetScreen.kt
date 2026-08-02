@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,8 @@ import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.ui.components.EditableText
 import kotlinx.coroutines.launch
 
+// The English names double as the keys the pager switches on, so they stay untranslated
+// here and are translated where they are drawn.
 private val TABS = listOf("Stats", "Skills", "Combat", "Features", "Spells", "Inventory", "Bio")
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +99,7 @@ fun CharacterSheetScreen(
                         value = loaded.name,
                         editMode = editMode,
                         onChange = { viewModel.setName(it.orEmpty()) },
-                        label = "Character name",
+                        label = tr("Character name"),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
@@ -115,25 +118,25 @@ fun CharacterSheetScreen(
             },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = tr("Back"))
                 }
             },
             actions = {
                 if (loaded.level < 20) {
                     IconButton(onClick = onLevelUp) {
-                        Icon(Icons.Default.TrendingUp, contentDescription = "Level up")
+                        Icon(Icons.Default.TrendingUp, contentDescription = tr("Level up"))
                     }
                 }
                 IconButton(onClick = { restKind = RestKind.SHORT }) {
-                    Icon(Icons.Default.LocalCafe, contentDescription = "Short rest")
+                    Icon(Icons.Default.LocalCafe, contentDescription = tr("Short rest"))
                 }
                 IconButton(onClick = { restKind = RestKind.LONG }) {
-                    Icon(Icons.Default.Bedtime, contentDescription = "Long rest")
+                    Icon(Icons.Default.Bedtime, contentDescription = tr("Long rest"))
                 }
                 IconButton(onClick = viewModel::toggleEditMode) {
                     Icon(
                         imageVector = if (editMode) Icons.Default.Check else Icons.Default.Edit,
-                        contentDescription = if (editMode) "Finish editing" else "Edit sheet",
+                        contentDescription = if (editMode) tr("Finish editing") else tr("Edit sheet"),
                     )
                 }
             },
@@ -162,7 +165,7 @@ fun CharacterSheetScreen(
                 Tab(
                     selected = pagerState.currentPage == index,
                     onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                    text = { Text(title, style = MaterialTheme.typography.labelLarge) },
+                    text = { Text(tr(title), style = MaterialTheme.typography.labelLarge) },
                     unselectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                         .copy(alpha = 0.7f),
                 )
@@ -217,19 +220,19 @@ private fun EditModeBanner(hasOverrides: Boolean, onClearAll: () -> Unit) {
         ) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    text = "EDIT MODE",
+                    text = tr("EDIT MODE"),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.secondary,
                 )
                 Text(
-                    text = "Tap any value to override it, or add a bonus on top of the rules.",
+                    text = tr("Tap any value to override it, or add a bonus on top of the rules."),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
             if (hasOverrides) {
-                TextButton(onClick = onClearAll) { Text("Reset all") }
+                TextButton(onClick = onClearAll) { Text(tr("Reset all")) }
             }
         }
     }

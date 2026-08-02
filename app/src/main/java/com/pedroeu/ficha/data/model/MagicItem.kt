@@ -33,6 +33,14 @@ data class MagicItem(
      * null for items the feature can't reproduce.
      */
     val artificerPlanLevel: Int? = null,
+    /**
+     * The bonus this item gives to attack and damage rolls made with it, for the +N weapons
+     * and the ones that quietly include a +1. Written out rather than read back out of the
+     * description, so the attack line and the rules text can't drift apart.
+     */
+    val attackBonus: Int = 0,
+    /** The bonus this item gives to Armor Class while worn, wielded, or attuned. */
+    val acBonus: Int = 0,
 ) {
     /** The line printed under the name, e.g. "Wondrous Item, Rare (Requires Attunement)". */
     val subtitle: String

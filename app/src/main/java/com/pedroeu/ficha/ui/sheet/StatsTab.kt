@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,8 +71,8 @@ fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bo
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 SectionHeader(
-                    "Ability Scores",
-                    trailing = "Proficiency ${CharacterCalculations.formatModifier(pb)}",
+                    tr("Ability Scores"),
+                    trailing = trf("Proficiency {0}", CharacterCalculations.formatModifier(pb)),
                 )
                 Ability.ALL.forEach { ability ->
                     AbilityCard(
@@ -155,36 +157,36 @@ private fun VitalsRow(
         modifier = Modifier.fillMaxWidth(),
     ) {
         StatTile(
-            label = "Armor Class",
+            label = tr("Armor Class"),
             value = "${CharacterCalculations.armorClass(character)}",
             adjusted = character.isAdjusted(OverridableStat.ARMOR_CLASS),
             editMode = editMode,
             onClick = { onEdit(OverridableStat.ARMOR_CLASS) },
         )
         StatTile(
-            label = "Initiative",
+            label = tr("Initiative"),
             value = CharacterCalculations.formatModifier(CharacterCalculations.initiative(character)),
             adjusted = character.isAdjusted(OverridableStat.INITIATIVE),
             editMode = editMode,
             onClick = { onEdit(OverridableStat.INITIATIVE) },
         )
         StatTile(
-            label = "Speed",
+            label = tr("Speed"),
             value = "${CharacterCalculations.speed(character)} ft",
             adjusted = character.isAdjusted(OverridableStat.SPEED),
             editMode = editMode,
             onClick = { onEdit(OverridableStat.SPEED) },
         )
-        StatTile(label = "Size", value = CharacterCalculations.size(character))
+        StatTile(label = tr("Size"), value = CharacterCalculations.size(character))
         StatTile(
-            label = "Passive Perception",
+            label = tr("Passive Perception"),
             value = "${CharacterCalculations.passivePerception(character)}",
             adjusted = character.isAdjusted(OverridableStat.PASSIVE_PERCEPTION),
             editMode = editMode,
             onClick = { onEdit(OverridableStat.PASSIVE_PERCEPTION) },
         )
         StatTile(
-            label = "Proficiency",
+            label = tr("Proficiency"),
             value = CharacterCalculations.formatModifier(
                 CharacterCalculations.proficiencyBonus(character)
             ),
@@ -248,7 +250,7 @@ private fun StatTile(
             )
             if (adjusted) {
                 Text(
-                    text = "adjusted",
+                    text = tr("adjusted"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -276,14 +278,14 @@ private fun InspirationTile(active: Boolean, onToggle: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = if (active) "YES" else "NO",
+                text = if (active) tr("YES") else tr("NO"),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = if (active) MaterialTheme.colorScheme.onSecondary
                 else MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "HEROIC INSPIRATION",
+                text = tr("HEROIC INSPIRATION"),
                 style = MaterialTheme.typography.labelSmall,
                 color = if (active) MaterialTheme.colorScheme.onSecondary
                 else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -309,7 +311,7 @@ private fun HitPointsCard(
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionHeader(
-                "Hit Points",
+                tr("Hit Points"),
                 // A multiclass character has a mix, e.g. "5d10 + 3d6", so show the breakdown.
                 trailing = "Hit Dice: ${character.level - character.hitDiceSpent}/" +
                     "${character.level} ${ClassLevels.hitDiceLabel(character)}",
@@ -325,7 +327,7 @@ private fun HitPointsCard(
                 ) {
                     Icon(
                         Icons.Default.Remove,
-                        contentDescription = "Take 1 damage",
+                        contentDescription = tr("Take 1 damage"),
                         tint = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -350,14 +352,14 @@ private fun HitPointsCard(
                     )
                     if (character.temporaryHitPoints > 0) {
                         Text(
-                            text = "+${character.temporaryHitPoints} temporary",
+                            text = trf("+{0} temporary", character.temporaryHitPoints),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )
                     }
                     if (editMode) {
                         Text(
-                            text = "Tap to change max HP",
+                            text = tr("Tap to change max HP"),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -373,7 +375,7 @@ private fun HitPointsCard(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "Heal 1",
+                        contentDescription = tr("Heal 1"),
                         tint = MaterialTheme.colorScheme.secondary,
                     )
                 }
@@ -394,7 +396,7 @@ private fun HitPointsCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = "Temp HP",
+                    text = tr("Temp HP"),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
@@ -420,7 +422,7 @@ private fun HitPointsCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = "Hit Dice Spent",
+                    text = tr("Hit Dice Spent"),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
@@ -473,15 +475,15 @@ private fun DeathSavesCard(character: PlayerCharacter, viewModel: SheetViewModel
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionHeader("Death Saves")
+            SectionHeader(tr("Death Saves"))
             DeathSaveRow(
-                label = "Successes",
+                label = tr("Successes"),
                 count = character.deathSaves.successes,
                 color = MaterialTheme.colorScheme.secondary,
                 onSet = { viewModel.setDeathSaves(it, character.deathSaves.failures) },
             )
             DeathSaveRow(
-                label = "Failures",
+                label = tr("Failures"),
                 count = character.deathSaves.failures,
                 color = MaterialTheme.colorScheme.error,
                 onSet = { viewModel.setDeathSaves(character.deathSaves.successes, it) },
@@ -588,7 +590,7 @@ private fun AbilityCard(
                 }
                 Text(
                     text = "Saving Throw ${CharacterCalculations.formatModifier(saveBonus)}" +
-                        if (saveProficient) " (proficient)" else "",
+                        if (saveProficient) tr(" (proficient)") else "",
                     style = MaterialTheme.typography.bodySmall,
                     color = if (saveProficient) MaterialTheme.colorScheme.secondary
                     else MaterialTheme.colorScheme.onSurfaceVariant,

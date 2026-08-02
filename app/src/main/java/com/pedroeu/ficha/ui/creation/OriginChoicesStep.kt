@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,8 +29,8 @@ fun OriginChoicesStep(state: CreationState, viewModel: CreationViewModel) {
     if (choices.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = "Your species, class, and origin didn't leave any further choices open. " +
-                    "Continue to your ability scores.",
+                text = tr("Your species, class, and origin didn't leave any further choices open. " +
+                    "Continue to your ability scores."),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -46,7 +47,7 @@ fun OriginChoicesStep(state: CreationState, viewModel: CreationViewModel) {
     ) {
         item {
             Text(
-                text = "These come from your species, class, and origin. Each one is yours to pick.",
+                text = tr("These come from your species, class, and origin. Each one is yours to pick."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

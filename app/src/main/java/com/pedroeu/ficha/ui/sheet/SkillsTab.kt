@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -57,10 +58,10 @@ fun SkillsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         item {
             Text(
                 text = if (editMode) {
-                    "Tap a pip to cycle none, proficient, and expertise. " +
-                        "Tap a skill name to add a bonus or override its total."
+                    tr("Tap a pip to cycle none, proficient, and expertise. " +
+                        "Tap a skill name to add a bonus or override its total.")
                 } else {
-                    "Filled pips mark proficiency; a doubled pip marks expertise."
+                    tr("Filled pips mark proficiency; a doubled pip marks expertise.")
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -124,7 +125,7 @@ fun SkillsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 ),
             ) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    SectionHeader("Passive Perception")
+                    SectionHeader(tr("Passive Perception"))
                     Text(
                         text = "${CharacterCalculations.passivePerception(character)}",
                         style = MaterialTheme.typography.headlineMedium,
@@ -153,7 +154,7 @@ fun SkillsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 viewModel.setSkillOverride(skill, override)
                 editingSkill = null
             },
-            supportingText = "Use a bonus for a temporary or story award from your DM.",
+            supportingText = tr("Use a bonus for a temporary or story award from your DM."),
         )
     }
 }
@@ -195,7 +196,7 @@ private fun SkillRow(
             )
             if (editMode) {
                 Text(
-                    text = if (adjusted) "adjusted — tap to change" else "tap to add a bonus",
+                    text = if (adjusted) tr("adjusted — tap to change") else tr("tap to add a bonus"),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (adjusted) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -254,11 +255,11 @@ private fun ToolProficienciesCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            SectionHeader("Tool Proficiencies")
+            SectionHeader(tr("Tool Proficiencies"))
 
             if (character.toolProficiencies.isEmpty() && !editMode) {
                 Text(
-                    text = "None",
+                    text = tr("None"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -289,7 +290,7 @@ private fun ToolProficienciesCard(
                     OutlinedTextField(
                         value = newTool,
                         onValueChange = { newTool = it },
-                        label = { Text("Add a tool or proficiency") },
+                        label = { Text(tr("Add a tool or proficiency")) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         shape = RoundedCornerShape(10.dp),
@@ -304,7 +305,7 @@ private fun ToolProficienciesCard(
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Add tool",
+                            contentDescription = tr("Add tool"),
                             tint = MaterialTheme.colorScheme.secondary,
                         )
                     }

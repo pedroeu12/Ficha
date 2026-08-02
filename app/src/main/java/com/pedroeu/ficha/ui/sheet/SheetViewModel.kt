@@ -12,6 +12,7 @@ import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.Skill
+import com.pedroeu.ficha.domain.ArtificerItems
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.Coins
@@ -156,6 +157,21 @@ class SheetViewModel(
     }
 
     fun setCoins(coins: Coins) = update { it.copy(coins = coins) }
+
+    // ------------------------------------------------------------------ Replicate Magic Item
+
+    /**
+     * Makes one of the Artificer's known plans, which puts the item in the inventory — and
+     * from there into Attacks or Armor Class, since it carries the base item's id.
+     */
+    fun makeArtificerItem(planId: String, baseId: String = "") = update { character ->
+        ArtificerItems.make(character, planId, baseId)
+    }
+
+    /** Sets an item aside, freeing its place in the day's allowance. */
+    fun unmakeArtificerItem(planId: String, baseId: String = "") = update { character ->
+        ArtificerItems.unmake(character, planId, baseId)
+    }
 
     // ------------------------------------------------------------------ Spells
 

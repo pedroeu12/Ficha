@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +53,7 @@ fun AbilitiesStep(state: CreationState, viewModel: CreationViewModel) {
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SectionHeader("Generation Method")
+                SectionHeader(tr("Generation Method"))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -97,7 +99,7 @@ fun AbilitiesStep(state: CreationState, viewModel: CreationViewModel) {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = "Points remaining",
+                                text = tr("Points remaining"),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.weight(1f),
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -132,20 +134,20 @@ private fun PoolSection(state: CreationState, viewModel: CreationViewModel) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             SectionHeader(
-                title = "Available Scores",
+                title = tr("Available Scores"),
                 modifier = Modifier.weight(1f),
             )
             if (state.scoreMethod == ScoreMethod.ROLL) {
                 FilledTonalButton(onClick = viewModel::rerollScores) {
                     Icon(Icons.Default.Casino, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Text("Reroll", modifier = Modifier.padding(start = 6.dp))
+                    Text(tr("Reroll"), modifier = Modifier.padding(start = 6.dp))
                 }
             }
         }
         val pool = state.availablePool()
         if (pool.isEmpty()) {
             Text(
-                text = "All scores assigned.",
+                text = tr("All scores assigned."),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -195,7 +197,7 @@ private fun AssignRow(ability: Ability, state: CreationState, viewModel: Creatio
                     val bonus = state.backgroundBonuses[ability]
                     if (bonus != null) {
                         Text(
-                            text = "Origin bonus +$bonus",
+                            text = trf("Origin bonus +{0}", bonus),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.secondary,
                         )
@@ -303,7 +305,7 @@ private fun StepperRow(
                     color = MaterialTheme.colorScheme.secondary,
                 )
                 Text(
-                    text = "mod",
+                    text = tr("mod"),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -322,7 +324,7 @@ private fun FinalPreview(state: CreationState) {
         ),
     ) {
         Column(Modifier.padding(14.dp)) {
-            SectionHeader("Final Scores (with origin bonuses)")
+            SectionHeader(tr("Final Scores (with origin bonuses)"))
             Row(
                 Modifier
                     .fillMaxWidth()

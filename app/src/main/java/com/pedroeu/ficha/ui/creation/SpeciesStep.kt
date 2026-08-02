@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -33,7 +35,7 @@ fun SpeciesStep(state: CreationState, viewModel: CreationViewModel) {
     ) {
         item {
             Text(
-                text = "Your species shapes your size, speed, senses, and the traits you were born with.",
+                text = tr("Your species shapes your size, speed, senses, and the traits you were born with."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -64,7 +66,7 @@ private fun SpeciesDetails(
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-        SectionHeader("Traits")
+        SectionHeader(tr("Traits"))
         species.traits.forEach { trait ->
             Column {
                 Text(
@@ -84,8 +86,8 @@ private fun SpeciesDetails(
         if (species.lineageOptions.isNotEmpty()) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             SectionHeader(
-                title = species.lineageChoiceLabel ?: "Lineage",
-                trailing = if (state.lineageId == null) "Choose 1" else null,
+                title = species.lineageChoiceLabel ?: tr("Lineage"),
+                trailing = if (state.lineageId == null) tr("Choose 1") else null,
             )
             species.lineageOptions.forEach { option ->
                 SelectableCard(
@@ -100,7 +102,7 @@ private fun SpeciesDetails(
         if (species.bonusSkillChoiceCount > 0) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             SectionHeader(
-                title = "Skill Proficiency",
+                title = tr("Skill Proficiency"),
                 trailing = "${state.speciesSkillChoices.size} / ${species.bonusSkillChoiceCount}",
             )
             FlowRow(
@@ -124,7 +126,7 @@ private fun SpeciesDetails(
         if (species.grantedSkills.isNotEmpty()) {
             Row(Modifier.padding(top = 4.dp)) {
                 Text(
-                    text = "Granted skill: ${species.grantedSkills.joinToString { it.displayName }}",
+                    text = trf("Granted skill: {0}", species.grantedSkills.joinToString { it.displayName }),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )

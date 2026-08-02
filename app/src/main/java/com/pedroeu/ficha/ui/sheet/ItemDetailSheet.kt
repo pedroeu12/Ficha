@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,31 +54,31 @@ fun ItemDetailSheet(
                     value = item.name,
                     editMode = editMode,
                     onChange = { onRename(it.orEmpty()) },
-                    label = "Item name",
+                    label = tr("Item name"),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = catalogItem?.category ?: "Custom item",
+                    text = catalogItem?.category ?: tr("Custom item"),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                DetailStat("Quantity", "${item.quantity}")
+                DetailStat(tr("Quantity"), "${item.quantity}")
                 catalogItem?.let {
-                    DetailStat("Cost", it.costLabel)
-                    DetailStat("Weight", it.weightLabel)
+                    DetailStat(tr("Cost"), it.costLabel)
+                    DetailStat(tr("Weight"), it.weightLabel)
                 }
                 if (catalogItem == null && item.weightLb > 0) {
-                    DetailStat("Weight", "${item.weightLb} lb")
+                    DetailStat(tr("Weight"), "${item.weightLb} lb")
                 }
             }
 
             if (catalogItem != null && catalogItem.stats.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    SectionHeader("Statistics")
+                    SectionHeader(tr("Statistics"))
                     catalogItem.stats.forEach { (label, value) ->
                         Row(Modifier.fillMaxWidth()) {
                             Text(
@@ -101,11 +102,11 @@ fun ItemDetailSheet(
                 ?: item.notes.takeIf { it.isNotBlank() }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                SectionHeader("Description")
+                SectionHeader(tr("Description"))
                 Text(
                     text = description
-                        ?: "No description recorded for this item. Add one in Edit Mode, or " +
-                        "replace it with an entry from the rulebook list.",
+                        ?: tr("No description recorded for this item. Add one in Edit Mode, or " +
+                        "replace it with an entry from the rulebook list."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -113,14 +114,14 @@ fun ItemDetailSheet(
 
             if (editMode || (item.notes.isNotBlank() && item.notes != catalogItem?.description)) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    SectionHeader("Your notes")
+                    SectionHeader(tr("Your notes"))
                     EditableText(
                         value = item.notes,
                         editMode = editMode,
                         onChange = { onNotesChange(it.orEmpty()) },
-                        label = "Item notes",
+                        label = tr("Item notes"),
                         multiline = true,
-                        placeholder = if (editMode) "Tap to add your own notes" else "",
+                        placeholder = if (editMode) tr("Tap to add your own notes") else "",
                     )
                 }
             }

@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.i18n.trf
+import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,7 +45,13 @@ import com.pedroeu.ficha.domain.RestOutcome
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.SectionHeader
 
-enum class RestKind(val title: String) { SHORT("Short Rest"), LONG("Long Rest") }
+enum class RestKind(private val titleKey: String) {
+    SHORT("Short Rest"),
+    LONG("Long Rest");
+
+    /** Translated on read, since an enum's constructor runs only once. */
+    val title: String get() = tr(titleKey)
+}
 
 /**
  * Short Rest lets the player spend Hit Dice one at a time, rolling or taking the average, and
@@ -94,14 +102,14 @@ fun RestSheet(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Done") }
+                ) { Text(tr("Done")) }
                 return@Column
             }
 
             if (kind == RestKind.SHORT) {
                 RestCard {
                     SectionHeader(
-                        "Hit Dice",
+                        tr("Hit Dice"),
                         trailing = "${available} of ${character.level} left",
                     )
                     Text(
@@ -131,22 +139,22 @@ fun RestSheet(
                             modifier = Modifier.weight(1f),
                         ) {
                             Icon(Icons.Default.Casino, contentDescription = null)
-                            Text("  Roll d$hitDie")
+                            Text(trf("  Roll d{0}", hitDie))
                         }
                         OutlinedButton(
                             onClick = { rolls = rolls + (hitDie / 2 + 1) },
                             enabled = available > 0,
                             modifier = Modifier.weight(1f),
-                        ) { Text("Average") }
+                        ) { Text(tr("Average")) }
                     }
                     if (rolls.isNotEmpty()) {
-                        TextButton(onClick = { rolls = emptyList() }) { Text("Clear dice") }
+                        TextButton(onClick = { rolls = emptyList() }) { Text(tr("Clear dice")) }
                     }
                 }
             }
 
             RestCard {
-                SectionHeader("What comes back")
+                SectionHeader(tr("What comes back"))
                 val restored = CharacterResources.states(character).filter { state ->
                     state.spent > 0 && state.def.recharge.refilledBy(
                         if (kind == RestKind.SHORT) Recharge.SHORT_REST else Recharge.LONG_REST
@@ -157,21 +165,21 @@ fun RestSheet(
                     modifier = Modifier.padding(top = 8.dp),
                 ) {
                     if (kind == RestKind.LONG) {
-                        Bullet("Hit points restored to full")
+                        Bullet(tr("Hit points restored to full"))
                         Bullet(
                             "${RestEngine.hitDiceRecoveredOnLongRest(character)} Hit Dice recovered"
                         )
-                        Bullet("All spell slots")
-                        Bullet("Death saves cleared")
+                        Bullet(tr("All spell slots"))
+                        Bullet(tr("Death saves cleared"))
                     } else if (CharacterCalculations.casterType(character) ==
                         com.pedroeu.ficha.data.model.CasterType.PACT
                     ) {
-                        Bullet("Pact Magic spell slots")
+                        Bullet(tr("Pact Magic spell slots"))
                     }
                     restored.forEach { Bullet(it.def.name) }
                     if (restored.isEmpty() && kind == RestKind.SHORT) {
                         Text(
-                            text = "Nothing else is spent right now.",
+                            text = tr("Nothing else is spent right now."),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -187,13 +195,13 @@ fun RestSheet(
                     val maxPrepared = CharacterCalculations.maxPreparedSpells(character)
                     val preparedNow = preparable.count { it.prepared }
                     Text(
-                        text = "Prepared spells  $preparedNow / $maxPrepared",
+                        text = trf("Prepared spells  {0} / {1}", preparedNow, maxPrepared),
                         style = MaterialTheme.typography.labelLarge,
                         color = if (preparedNow > maxPrepared) MaterialTheme.colorScheme.error
                         else MaterialTheme.colorScheme.secondary,
                     )
                     Text(
-                        text = "Tap to swap which spells you have ready for the day.",
+                        text = tr("Tap to swap which spells you have ready for the day."),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -217,13 +225,13 @@ fun RestSheet(
                                         color = MaterialTheme.colorScheme.onSurface,
                                     )
                                     Text(
-                                        text = "Level ${spell.level}",
+                                        text = trf("Level {0}", spell.level),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.secondary,
                                     )
                                 }
                                 Text(
-                                    text = if (spell.prepared) "Prepared" else "Not prepared",
+                                    text = if (spell.prepared) tr("Prepared") else tr("Not prepared"),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = if (spell.prepared) {
                                         MaterialTheme.colorScheme.secondary
@@ -239,7 +247,7 @@ fun RestSheet(
 
             if (restChangeable.isNotEmpty()) {
                 Text(
-                    text = "You may change these while you rest",
+                    text = tr("You may change these while you rest"),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.secondary,
                 )
@@ -284,7 +292,7 @@ fun RestSheet(
             ) {
                 Text(
                     if (kind == RestKind.SHORT && rolls.isEmpty()) {
-                        "Rest without spending Hit Dice"
+                        tr("Rest without spending Hit Dice")
                     } else {
                         "Finish ${kind.title}"
                     }
@@ -297,7 +305,7 @@ fun RestSheet(
 @Composable
 private fun RestSummary(outcome: RestOutcome) {
     RestCard {
-        SectionHeader("Rest complete")
+        SectionHeader(tr("Rest complete"))
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier.padding(top = 8.dp),
@@ -308,14 +316,14 @@ private fun RestSummary(outcome: RestOutcome) {
             if (outcome.hitDiceSpent > 0) {
                 Bullet("Spent ${outcome.hitDiceSpent} Hit Dice")
             }
-            if (outcome.spellSlotsRestored) Bullet("Spell slots restored")
+            if (outcome.spellSlotsRestored) Bullet(tr("Spell slots restored"))
             outcome.resourcesRestored.forEach { Bullet("$it restored") }
             if (outcome.hitPointsRegained == 0 &&
                 outcome.resourcesRestored.isEmpty() &&
                 !outcome.spellSlotsRestored
             ) {
                 Text(
-                    text = "Nothing needed restoring.",
+                    text = tr("Nothing needed restoring."),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

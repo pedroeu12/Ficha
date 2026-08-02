@@ -53,6 +53,9 @@ object RestEngine {
             .filter { it.spent > 0 }
             .map { it.def.name }
         rested = CharacterResources.withRestored(rested, Recharge.SHORT_REST)
+        // Nothing chosen at the moment of use outlasts a rest — a cannon burns out after an
+        // hour, a Celestial Revelation after a minute — so none of those picks survive one.
+        rested = PerUseChoices.clearAll(rested)
 
         // Pact Magic is the one spellcasting that refreshes on a Short Rest.
         val isPactCaster = CharacterCalculations.casterType(rested) == CasterType.PACT
@@ -87,6 +90,7 @@ object RestEngine {
             spellSlotsExpended = emptyMap(),
         )
         rested = CharacterResources.withRestored(rested, Recharge.LONG_REST)
+        rested = PerUseChoices.clearAll(rested)
 
         return RestOutcome(
             character = rested,

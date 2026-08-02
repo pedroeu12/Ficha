@@ -181,6 +181,14 @@ data class PlayerCharacter(
     val levelSelections: Map<String, List<String>> = emptyMap(),
     /** Choice id -> selection for grants that say "of your choice" outside the class table. */
     val originChoiceSelections: Map<String, List<String>> = emptyMap(),
+    /**
+     * What the character is doing right now with a feature whose option is chosen at the
+     * moment of use — which cannon mode is running, which Celestial Revelation is up.
+     *
+     * Separate from the three maps above because it isn't a decision about who the character
+     * is: it lasts a minute or an hour and a rest clears it.
+     */
+    val perUseChoices: Map<String, String> = emptyMap(),
 
     val featIds: List<String> = emptyList(),
     val knownSpells: List<KnownSpell> = emptyList(),

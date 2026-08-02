@@ -497,7 +497,42 @@ object PortugueseStrings {
         "Leave blank to use the rules" to "Deixe em branco para usar as regras",
         "Not set" to "Não definido",
 
+        // ---------------------------------------------------------------- Chosen as you use them
+        // The feature names stay in English with the rest of the rules content; what is
+        // translated here is the question the app asks and the wording around it.
+        "Chosen As You Use Them" to "Escolhidos na Hora do Uso",
+        "These aren't settled once. Pick whichever you want each time the feature comes up; " +
+            "resting clears whatever is showing." to
+            "Estes não se decidem de uma vez. Escolha o que quiser cada vez que a " +
+            "característica entrar em jogo; descansar limpa o que estiver marcado.",
+        "What is the cannon doing? You choose again each time you activate it." to
+            "O que o canhão está fazendo? Você escolhe de novo cada vez que o ativa.",
+        "Which energy do you channel? You choose again each time." to
+            "Qual energia você canaliza? Você escolhe de novo a cada vez.",
+        "Which modification does this companion have? You choose again whenever you create a " +
+            "new one." to
+            "Qual modificação este companheiro tem? Você escolhe de novo sempre que cria um novo.",
+        "Which further modification does this companion have? You choose again whenever you " +
+            "create a new one." to
+            "Qual modificação adicional este companheiro tem? Você escolhe de novo sempre que " +
+            "cria um novo.",
+        "Which constellation do you take on? You choose each time you assume the form." to
+            "Qual constelação você assume? Você escolhe cada vez que toma a forma.",
+        "Whose power do you invoke? You choose again each time." to
+            "De quem você invoca o poder? Você escolhe de novo a cada vez.",
+        "Which effect do you unleash? You choose again each time you burst." to
+            "Qual efeito você desencadeia? Você escolhe de novo a cada explosão.",
+        "Which layer of the Abyss do you draw on? You choose again each time." to
+            "De qual camada do Abismo você puxa? Você escolhe de novo a cada vez.",
+        "Which effect does the wound take? You choose again each time you roll the die." to
+            "Qual efeito a ferida assume? Você escolhe de novo a cada rolagem do dado.",
+        "Which effect do you cause? You choose again each time you hit the cursed target." to
+            "Qual efeito você causa? Você escolhe de novo a cada acerto no alvo amaldiçoado.",
+        "Which revelation do you take on? You choose each time you transform." to
+            "Qual revelação você assume? Você escolhe cada vez que se transforma.",
+
         // ---------------------------------------------------------------- Phrases with values
+        "Use one — {0}" to "Usar um — {0}",
         // Numbered placeholders, so word order can differ from the English.
         "Level {0}" to "Nível {0}",
         "Level {0} — {1}" to "Nível {0} — {1}",

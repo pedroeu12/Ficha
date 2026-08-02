@@ -40,7 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pedroeu.ficha.domain.ActiveChoice
 import com.pedroeu.ficha.domain.CharacterResources
+import com.pedroeu.ficha.domain.PerUseChoices
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResourceState
 import com.pedroeu.ficha.ui.components.ExpandableOption
@@ -83,7 +85,17 @@ fun ResourcesCard(
                 ResourceRow(
                     state = state,
                     editMode = editMode,
+                    // The decisions the rules attach to this ability's use, asked here rather
+                    // than once at character creation.
+                    perUseChoices = PerUseChoices.forResource(character, state.def.id),
                     onSetSpent = { viewModel.setResourceSpent(state.def.id, it) },
+                    onChoose = { choiceId, optionId ->
+                        viewModel.setPerUseChoice(choiceId, optionId)
+                    },
+                    onClearChoice = { viewModel.clearPerUseChoice(it) },
+                    onUse = { choiceId, optionId ->
+                        viewModel.spendResourceOn(state.def.id, choiceId, optionId)
+                    },
                     onEditMax = { editingMax = state },
                     onDelete = { viewModel.removeCustomResource(state.def.id) },
                 )
@@ -128,7 +140,11 @@ fun ResourcesCard(
 private fun ResourceRow(
     state: ResourceState,
     editMode: Boolean,
+    perUseChoices: List<ActiveChoice>,
     onSetSpent: (Int) -> Unit,
+    onChoose: (String, String) -> Unit,
+    onClearChoice: (String) -> Unit,
+    onUse: (String, String) -> Unit,
     onEditMax: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -221,6 +237,21 @@ private fun ResourceRow(
                     TextButton(onClick = { onSetSpent(0) }) { Text(tr("Reset")) }
                 }
             }
+        }
+
+        // What this use is being spent on. Chosen here because the rules choose here — an
+        // Artillerist picks the cannon's mode when the cannon fires, not at level 3.
+        perUseChoices.forEach { active ->
+            PerUseChoiceRow(
+                active = active,
+                onChoose = { onChoose(active.choice.id, it) },
+                onClear = { onClearChoice(active.choice.id) },
+                onUse = if (state.remaining > 0) {
+                    { optionId -> onUse(active.choice.id, optionId) }
+                } else {
+                    null
+                },
+            )
         }
 
         if (def.notes.isNotBlank()) {

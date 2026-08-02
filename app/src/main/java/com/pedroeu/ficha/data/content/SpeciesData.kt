@@ -146,12 +146,11 @@ object SpeciesData {
                 Trait("Celestial Resistance", "You have resistance to necrotic damage and radiant damage."),
                 Trait("Healing Hands", "As an action, you touch a creature and it regains hit points equal to your proficiency bonus times a d4. Usable once per long rest."),
                 Trait("Light Bearer", "You know the Light cantrip (Charisma)."),
-            ),
-            lineageChoiceLabel = "Celestial Revelation (unlocks at level 3)",
-            lineageOptions = listOf(
-                LineageOption("necrotic_shroud", "Necrotic Shroud", "Your eyes turn into pools of darkness and spectral wings sprout from your back, frightening nearby foes."),
-                LineageOption("radiant_consumption", "Radiant Consumption", "You glow with an inner light that damages creatures near you and sheds light."),
-                LineageOption("astral_form", "Astral Form", "You sprout spectral wings and gain a flying speed for the duration."),
+                // Not a lineage. The three revelations are chosen at the moment you transform,
+                // once per Long Rest, which is why they live in PerUseChoiceData and not here:
+                // asking for one at character creation locked an Aasimar into a third of the
+                // trait for the rest of their career.
+                Trait("Celestial Revelation", "At level 3, when you use your Channel Divinity or as a Bonus Action, you can transform for 1 minute, choosing Necrotic Shroud, Radiant Consumption, or Radiant Soul each time. Once you transform you can't do so again until you finish a Long Rest."),
             ),
         ),
         Species(

@@ -157,6 +157,11 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
             item { ArtificerItemsCard(character, viewModel) }
         }
 
+        // Features whose option the rules have you choose at the moment of use. These used to
+        // be asked once during character creation, which turned "choose each time" into a
+        // permanent pick and hid two thirds of the feature.
+        item { PerUseChoicesCard(character, viewModel) }
+
         if (species != null) {
             item {
                 FeatureCard(trf("Species Traits — {0}", species.name)) {

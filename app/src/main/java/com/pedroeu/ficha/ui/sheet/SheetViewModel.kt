@@ -22,6 +22,7 @@ import com.pedroeu.ficha.domain.CustomResource
 import com.pedroeu.ficha.domain.DeathSaves
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
+import com.pedroeu.ficha.domain.PerUseChoices
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.RestEngine
 import com.pedroeu.ficha.domain.RestOutcome
@@ -370,6 +371,27 @@ class SheetViewModel(
             }
         )
     }
+
+    /**
+     * Records what the character is doing with a feature whose option is chosen at the moment
+     * of use — which cannon mode is running, which revelation is up. Not a permanent decision:
+     * it can be changed as often as the rules allow, and a rest clears it.
+     */
+    fun setPerUseChoice(choiceId: String, optionId: String) = update { character ->
+        PerUseChoices.choose(character, choiceId, optionId)
+    }
+
+    fun clearPerUseChoice(choiceId: String) = update { character ->
+        PerUseChoices.clear(character, choiceId)
+    }
+
+    /** Spends a use and records what it was spent on, in one step. */
+    fun spendResourceOn(resourceId: String, choiceId: String, optionId: String) =
+        update { character ->
+            val chosen = PerUseChoices.choose(character, choiceId, optionId)
+            val spent = chosen.resourceUses[resourceId] ?: 0
+            CharacterResources.withUsesChanged(chosen, resourceId, spent + 1)
+        }
 
     fun addCustomResource(name: String, max: Int, recharge: Recharge, notes: String) =
         update { character ->

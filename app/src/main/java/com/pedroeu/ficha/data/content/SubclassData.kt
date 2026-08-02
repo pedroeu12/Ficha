@@ -261,70 +261,8 @@ object SubclassData {
         changeableOnRest = true,
     )
 
-    private val CANNON_OPTIONS = listOf(
-        ChoiceOption(
-            "flamethrower", "Flamethrower",
-            "The cannon blasts fire in a 15-foot Cone. Each creature in that area makes a " +
-                "Dexterity saving throw against your spell save DC, taking 2d8 Fire damage on a " +
-                "failed save or half as much damage on a successful one. Flammable objects in " +
-                "the Cone that aren't being worn or carried start burning.",
-            "Bonus Action",
-        ),
-        ChoiceOption(
-            "force_ballista", "Force Ballista",
-            "Make a ranged spell attack originating from the cannon at one creature or object " +
-                "within 120 feet of it. On a hit, the target takes 2d8 Force damage, and if the " +
-                "target is a creature, it is pushed up to 5 feet away from the cannon.",
-            "Bonus Action",
-        ),
-        ChoiceOption(
-            "protector", "Protector",
-            "The cannon emits a burst of positive energy that grants itself and each creature of " +
-                "your choice within 10 feet of it a number of Temporary Hit Points equal to 1d8 " +
-                "plus your Intelligence modifier (minimum of +1).",
-            "Bonus Action",
-        ),
-    )
-
-    private fun cannonChoice() = Choice(
-        id = "cannon_activation",
-        label = "Activate Cannon",
-        prompt = "Note the option you use most; you choose freely each time you activate the cannon.",
-        count = 1,
-        kind = ChoiceKind.OPTION,
-        options = CANNON_OPTIONS,
-        source = "Level 3",
-        changeableOnRest = true,
-        resourceId = "artillerist:eldritch_cannon",
-    )
-
-    private val ARCANE_JOLT_OPTIONS = listOf(
-        ChoiceOption(
-            "destructive", "Destructive Energy",
-            "The target takes an extra 2d6 Force damage. This increases to 4d6 at Artificer " +
-                "level 15.",
-            "1 use",
-        ),
-        ChoiceOption(
-            "restorative", "Restorative Energy",
-            "Choose one creature or object you can see within 30 feet of the target. Healing " +
-                "energy flows into the chosen recipient, restoring 2d6 Hit Points to it. This " +
-                "increases to 4d6 at Artificer level 15.",
-            "1 use",
-        ),
-    )
-
-    private fun arcaneJoltChoice() = Choice(
-        id = "arcane_jolt",
-        label = "Arcane Jolt",
-        prompt = "Note the effect you favor; you choose freely each time you channel the energy.",
-        count = 1,
-        kind = ChoiceKind.OPTION,
-        options = ARCANE_JOLT_OPTIONS,
-        source = "Level 9",
-        changeableOnRest = true,
-        resourceId = "battle_smith:arcane_jolt",
-    )
+    // The Eldritch Cannon's modes are chosen when the cannon is activated, not once at
+    // creation, so they live in PerUseChoiceData with the other per-use decisions.
 
     private val ARCANE_SHOT_OPTIONS = listOf(
         ChoiceOption(
@@ -573,12 +511,7 @@ object SubclassData {
             "Read the constellations and take on their forms.",
             listOf(
                 f(3, "Star Map", "You carry a map granting Guidance and Guiding Bolt without expending slots."),
-                f(3, "Starry Form", "Expend a Wild Shape use to take an Archer, Chalice, or Dragon constellation form.",
-                    Choice("starry_form", "Starry Form", "Choose the constellation you favor first.", 1, ChoiceKind.OPTION, listOf(
-                        ChoiceOption("archer", "Archer", "A Bonus Action ranged attack for 1d8 + Wisdom Radiant damage."),
-                        ChoiceOption("chalice", "Chalice", "Whenever you heal, another creature nearby also regains hit points."),
-                        ChoiceOption("dragon", "Dragon", "Treat a 9 or lower as a 10 on Intelligence and Wisdom checks and Concentration saves."),
-                    ), "Level 3", changeableOnRest = true)),
+                f(3, "Starry Form", "Expend a Wild Shape use to take an Archer, Chalice, or Dragon constellation form. You choose which constellation each time you assume the form."),
                 f(6, "Cosmic Omen", "After a Long Rest, roll to determine a Weal or Woe omen you can invoke as a Reaction."),
                 f(10, "Twinkling Constellations", "Your Starry Form improves and you can change constellation each turn."),
                 f(14, "Full of Stars", "While in Starry Form you are partially incorporeal, gaining Resistance to several damage types."),
@@ -1080,8 +1013,7 @@ object SubclassData {
             listOf(
                 f(3, "Tools of the Trade", "You gain proficiency with Martial Ranged weapons and with Woodcarver's Tools; if you already have the tool proficiency, you gain another type of Artisan's Tools instead. Crafting a magic Wand also takes half the usual time."),
                 f(3, "Artillerist Spells", "You always have these prepared once you reach the listed Artificer level: Shield and Thunderwave at 3, Scorching Ray and Shatter at 5, Fireball and Wind Wall at 9, Ice Storm and Wall of Fire at 13, and Cone of Cold and Wall of Force at 17."),
-                f(3, "Eldritch Cannon", "Using Smith's Tools or Woodcarver's Tools you can take a Magic action to create a Small or Tiny Eldritch Cannon within 5 feet of yourself. It has AC 18 and Hit Points equal to five times your Artificer level, and it disappears at 0 Hit Points or after 1 hour. Once you create a cannon you can't do so again until you finish a Long Rest or expend a spell slot, and you can have only one at a time.",
-                    cannonChoice()),
+                f(3, "Eldritch Cannon", "Using Smith's Tools or Woodcarver's Tools you can take a Magic action to create a Small or Tiny Eldritch Cannon within 5 feet of yourself. It has AC 18 and Hit Points equal to five times your Artificer level, and it disappears at 0 Hit Points or after 1 hour. Once you create a cannon you can't do so again until you finish a Long Rest or expend a spell slot, and you can have only one at a time. You choose the cannon's mode — Flamethrower, Force Ballista, or Protector — each time you activate it as a Bonus Action."),
                 f(5, "Arcane Firearm", "When you finish a Long Rest you can carve sigils into a Rod, Staff, Wand, or Martial Ranged weapon with Woodcarver's Tools, making it your Arcane Firearm. You can use it as a Spellcasting Focus, and when you cast an Artificer spell through it you roll 1d8 and add the result to one of the spell's damage rolls."),
                 f(9, "Explosive Cannon", "Detonate lets you take a Reaction when your cannon takes damage to destroy it, forcing each creature within 20 feet to make a Dexterity saving throw for 3d10 Force damage, or half as much on a success. Firepower increases the cannon's damage rolls and its Protector Temporary Hit Points by 1d8."),
                 f(15, "Fortified Position", "Double Firepower lets you have two cannons at once, create both with the same Magic action, and activate both with the same Bonus Action. Shimmering Field Projection gives you and your allies Half Cover while within 10 feet of a cannon."),
@@ -1096,8 +1028,7 @@ object SubclassData {
                 f(3, "Battle Ready", "Arcane Empowerment lets you use your Intelligence modifier instead of Strength or Dexterity for attack and damage rolls with a magic weapon. Weapon Knowledge grants proficiency with Martial weapons, and any weapon you're proficient with can serve as a Spellcasting Focus for your Artificer spells."),
                 f(3, "Steel Defender", "Your tinkering produces a Medium Construct companion with AC 12 plus your Intelligence modifier and Hit Points equal to 5 plus five times your Artificer level. It is Friendly to you and your allies, obeys you, and vanishes if you die. In combat it acts on your turn, taking only the Dodge action unless you spend a Bonus Action to command it. Its Force-Empowered Rend deals 1d8 + 2 plus your Intelligence modifier Force damage, it can Repair three times per day, and its Deflect Attack Reaction imposes Disadvantage on an attack against another creature."),
                 f(5, "Extra Attack", "You can attack twice instead of once whenever you take the Attack action on your turn, and you can forgo one of those attacks to command your Steel Defender to use Force-Empowered Rend."),
-                f(9, "Arcane Jolt", "When you hit with a magic weapon or your Steel Defender hits a target, you can channel magic through the strike.",
-                    arcaneJoltChoice()),
+                f(9, "Arcane Jolt", "When you hit with a magic weapon or your Steel Defender hits a target, you can channel magic through the strike, choosing Destructive Energy or Restorative Energy each time."),
                 f(15, "Improved Defender", "Improved Jolt raises both the extra damage and the healing of Arcane Jolt to 4d6. Improved Deflection makes the attacker take 1d4 plus your Intelligence modifier Force damage whenever your Steel Defender uses Deflect Attack."),
             ),
             source = EFOTA),
@@ -1159,13 +1090,7 @@ object SubclassData {
         Subclass("noble_genies", "paladin", "Oath of the Noble Genies",
             "A Paladin who reveres the Elemental Planes and the four noble genies, brandishing their elemental splendor.",
             listOf(
-                f(3, "Elemental Smite", "Immediately after you cast Divine Smite, you can expend one use of your Channel Divinity to invoke one of four genie effects.",
-                    Choice("elemental_smite", "Elemental Smite", "Note the genie whose power you invoke most; you choose freely each time.", 1, ChoiceKind.OPTION, listOf(
-                        ChoiceOption("dao", "Dao's Crush", "Earth rises up around the target of your Divine Smite. The target has the Grappled condition, with an escape DC equal to your spell save DC. While Grappled this way, the target also has the Restrained condition.", "1 Channel Divinity"),
-                        ChoiceOption("djinni", "Djinni's Escape", "You teleport to an unoccupied space you can see within 30 feet of yourself and take on a semi-incorporeal form until the end of your next turn. While in this form you have Resistance to Bludgeoning, Piercing, and Slashing damage, and Immunity to the Grappled, Prone, and Restrained conditions.", "1 Channel Divinity"),
-                        ChoiceOption("efreeti", "Efreeti's Fury", "The target of your Divine Smite takes an extra 2d4 Fire damage, and fire jumps from the target to another creature you can see within 30 feet of yourself. That second creature also takes 2d4 Fire damage.", "1 Channel Divinity"),
-                        ChoiceOption("marid", "Marid's Surge", "The target of your Divine Smite and each creature of your choice in a 10-foot Emanation originating from you make a Strength saving throw against your spell save DC. On a failed save, a creature is pushed 15 feet straight away from you and has the Prone condition.", "1 Channel Divinity"),
-                    ), "Level 3", changeableOnRest = true, resourceId = "paladin:channel_divinity")),
+                f(3, "Elemental Smite", "Immediately after you cast Divine Smite, you can expend one use of your Channel Divinity to invoke one of four genie effects — Dao's Crush, Djinni's Escape, Efreeti's Fury, or Marid's Surge — choosing which one each time."),
                 f(3, "Genie Spells", "You always have these prepared once you reach the listed Paladin level: Chromatic Orb, Elementalism, and Thunderous Smite at 3; Mirror Image and Phantasmal Force at 5; Fly and Gaseous Form at 9; Conjure Minor Elementals and Summon Elemental at 13; and Banishing Smite and Contact Other Plane at 17."),
                 f(3, "Genie's Splendor", "When you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Charisma modifiers. You can use a Shield and still gain this benefit.",
                     Choice("genie_skill", "Genie's Splendor", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
@@ -1209,11 +1134,7 @@ object SubclassData {
         Subclass("spellfire_sorcery", "sorcerer", "Spellfire Sorcery",
             "A Sorcerer born with the ability to manipulate spellfire, the raw radiant power of the Weave itself.",
             listOf(
-                f(3, "Spellfire Burst", "When you spend at least 1 Sorcery Point as part of a Magic action or a Bonus Action on your turn, you can unleash one of these effects. You can do so only once per turn.",
-                    Choice("spellfire_burst", "Spellfire Burst", "Note the effect you favor; you choose freely each time you burst.", 1, ChoiceKind.OPTION, listOf(
-                        ChoiceOption("bolstering_flames", "Bolstering Flames", "You or one creature you can see within 30 feet of yourself gains Temporary Hit Points equal to 1d4 plus your Charisma modifier. At Sorcerer level 14 you add your Sorcerer level to these Temporary Hit Points.", "No extra cost"),
-                        ChoiceOption("radiant_fire", "Radiant Fire", "One creature you can see within 30 feet of yourself takes 1d4 Fire or Radiant damage (your choice). At Sorcerer level 14 this damage increases to 1d8.", "No extra cost"),
-                    ), "Level 3", changeableOnRest = true, resourceId = "sorcerer:sorcery_points")),
+                f(3, "Spellfire Burst", "When you spend at least 1 Sorcery Point as part of a Magic action or a Bonus Action on your turn, you can unleash Bolstering Flames or Radiant Fire, choosing which one each time. You can do so only once per turn."),
                 f(3, "Spellfire Spells", "You always have these prepared once you reach the listed Sorcerer level: Cure Wounds, Guiding Bolt, Lesser Restoration, and Scorching Ray at 3; Aura of Vitality and Dispel Magic at 5; Fire Shield and Wall of Fire at 7; and Greater Restoration and Flame Strike at 9."),
                 f(6, "Absorb Spells", "You always have the Counterspell spell prepared. Additionally, whenever a target fails the saving throw against a Counterspell you cast, you regain 1d4 Sorcery Points."),
                 f(14, "Honed Spellfire", "Your Spellfire Burst improves. You add your Sorcerer level to the Temporary Hit Points gained from Bolstering Flames, and the damage of your Radiant Fire increases to 1d8."),
@@ -1282,13 +1203,7 @@ object SubclassData {
                 f(3, "Hell-Forged Weapon", "When you take the Attack action, you can imbue each weapon you are holding with hellfire, transforming it into a Hell-Forged Weapon. It stays transformed until you use this feature again, you have the Unconscious condition, or the weapon is more than 5 feet away from you for 1 minute or more; you can also end the effect early (no action required). A Hell-Forged Weapon sheds Dim Light in a 5-foot radius, and whenever you deal damage with it, it can deal your choice of Cold, Fire, or Necrotic damage or its normal damage type (choose when you imbue the weapon).",
                     damageTypeChoice("hellfire_damage", "Hellfire", "Level 3", listOf("Cold", "Fire", "Necrotic"), changeableOnRest = true)),
                 f(3, "Infernal Wound", "You have an Infernal Wound Die, which is a d6. When you hit a creature with your Hell-Forged Weapon, you can deal extra damage equal to one roll of that die, of the type you chose when you imbued the weapon, and you give the target an infernal wound if it doesn't already have one. While wounded this way the target takes damage of the chosen type equal to one roll of your Infernal Wound Die at the start of each of its turns. The wound lasts for 1 minute, until the target regains Hit Points, or until the target or a creature within 5 feet of it takes an action to stanch the wound. You can use this feature a number of times equal to your Constitution modifier (minimum of once), regaining all expended uses on a Short or Long Rest."),
-                f(7, "Advanced Wounds", "When you roll your Infernal Wound Die, you can apply one of the following effects. If you roll a 6, the effect you choose has an additional Devil's Luck effect; once you use that, you can't do so again until the start of your next turn. Purulence of Minauros: caustic pus erupts from the wound, and each enemy in a 5-foot Emanation originating from the target takes Acid damage equal to your Constitution modifier, and the target has the Poisoned condition until the end of its next turn (Devil's Luck: each creature that takes this Acid damage has a -1 penalty to its AC until the end of your next turn). Rupture of Cania: the wound ruptures for Force damage equal to your Constitution modifier (Devil's Luck: the target subtracts 1d6 from its next saving throw before the end of your next turn). Stygian Gangrene: infernal rime spreads for Cold damage equal to your Constitution modifier, and the target can't take Reactions until the start of its next turn (Devil's Luck: the target's Speed is halved until the end of its next turn).",
-                    Choice("advanced_wound", "Advanced Wounds", "Choose which infernal wound you favour. You may apply a different one each time you roll the die.", 1, ChoiceKind.OPTION,
-                        listOf(
-                            ChoiceOption("purulence", "Purulence of Minauros", "Caustic pus erupts from the wound. Each enemy in a 5-foot Emanation originating from the target takes Acid damage equal to your Constitution modifier, and the target has the Poisoned condition until the end of its next turn. Devil's Luck: each creature that takes this Acid damage has a -1 penalty to its AC until the end of your next turn.", "Acid"),
-                            ChoiceOption("rupture", "Rupture of Cania", "The wound ruptures with a spurt of arcane energy. The target takes Force damage equal to your Constitution modifier. Devil's Luck: the target subtracts 1d6 from the next saving throw it makes before the end of your next turn.", "Force"),
-                            ChoiceOption("gangrene", "Stygian Gangrene", "Infernal rime spreads from the wound. The target takes Cold damage equal to your Constitution modifier and can't take Reactions until the start of its next turn. Devil's Luck: the target's Speed is halved until the end of its next turn.", "Cold"),
-                        ), "Level 7", changeableOnRest = true)),
+                f(7, "Advanced Wounds", "When you roll your Infernal Wound Die, you can apply one of the following effects. If you roll a 6, the effect you choose has an additional Devil's Luck effect; once you use that, you can't do so again until the start of your next turn. Purulence of Minauros: caustic pus erupts from the wound, and each enemy in a 5-foot Emanation originating from the target takes Acid damage equal to your Constitution modifier, and the target has the Poisoned condition until the end of its next turn (Devil's Luck: each creature that takes this Acid damage has a -1 penalty to its AC until the end of your next turn). Rupture of Cania: the wound ruptures for Force damage equal to your Constitution modifier (Devil's Luck: the target subtracts 1d6 from its next saving throw before the end of your next turn). Stygian Gangrene: infernal rime spreads for Cold damage equal to your Constitution modifier, and the target can't take Reactions until the start of its next turn (Devil's Luck: the target's Speed is halved until the end of its next turn)."),
                 f(7, "Infernal Equipment", "Infernal Resilience: whenever you finish a Short or Long Rest, choose Cold, Fire, or Necrotic damage; while wearing Heavy armor or wielding a Shield you have Resistance to that damage type until you choose a different one. Unholy Power: when you roll your Infernal Wound Die, you can treat a roll of 1 as a 6.",
                     damageTypeChoice("infernal_resilience", "Infernal Resilience", "Level 7", listOf("Cold", "Fire", "Necrotic"), changeableOnRest = true)),
                 f(10, "Hellfire Surge", "When you use your Action Surge while holding a Hell-Forged Weapon, you erupt with hellfire in a 20-foot Emanation originating from you that lasts until the end of your next turn. Whenever a creature suffering an infernal wound starts its turn within the Emanation, it takes damage equal to two rolls of your Infernal Wound Die instead of one."),
@@ -1311,13 +1226,7 @@ object SubclassData {
                             ChoiceOption("second_head", "A Second Head", "You grow a second head. This has no impact on your game statistics."),
                         ), "Level 3")),
                 f(3, "Demonic Spells", "You always have these prepared once you reach the listed Sorcerer level: Bane, Dissonant Whispers, Spike Growth, and Web at 3; Bestow Curse and Dispel Magic at 5; Giant Insect and Hallucinatory Terrain at 7; and Contact Other Plane and Modify Memory at 9."),
-                f(6, "Abyssal Realm", "When you spend at least 1 Sorcery Point as part of a Magic action or a Bonus Action on your turn, you can pull influence from the Abyss, creating a 10-foot Emanation originating from you or filling the Sphere of your Abyssal Rupture with magic from one of the following layers. If an effect requires a saving throw, the DC equals your spell save DC. Gaping Maw's Frenzy: designate a horizontal direction; each creature in the area that fails a Charisma saving throw must use as much of its movement as possible to move that way at the start of its next turn, taking the safest route. Maze of Azzatar: each creature in the area makes an Intelligence saving throw, and on a failure you gain the benefits of the Invisible condition against it until the start of your next turn. Slime Pits' Haze: each creature in the area makes a Constitution saving throw, and on a failure has your choice of the Charmed or Poisoned condition until the start of your next turn.",
-                    Choice("abyssal_layer", "Abyssal Realm", "Choose which layer of the Abyss you draw on. You may choose a different one each time you use the feature.", 1, ChoiceKind.OPTION,
-                        listOf(
-                            ChoiceOption("gaping_maw", "Gaping Maw's Frenzy", "Designate a direction that is horizontal to you. Each creature in the area that fails a Charisma saving throw must use as much of its movement as possible to move in that direction at the start of its next turn, taking the safest route.", "Charisma save"),
-                            ChoiceOption("maze_of_azzatar", "Maze of Azzatar", "Each creature in the area makes an Intelligence saving throw. On a failed save, you gain the benefits of the Invisible condition against the target until the start of your next turn.", "Intelligence save"),
-                            ChoiceOption("slime_pits", "Slime Pits' Haze", "Each creature in the area makes a Constitution saving throw. On a failed save, the target has your choice of the Charmed or Poisoned condition until the start of your next turn.", "Constitution save"),
-                        ), "Level 6", changeableOnRest = true)),
+                f(6, "Abyssal Realm", "When you spend at least 1 Sorcery Point as part of a Magic action or a Bonus Action on your turn, you can pull influence from the Abyss, creating a 10-foot Emanation originating from you or filling the Sphere of your Abyssal Rupture with magic from one of the following layers. If an effect requires a saving throw, the DC equals your spell save DC. Gaping Maw's Frenzy: designate a horizontal direction; each creature in the area that fails a Charisma saving throw must use as much of its movement as possible to move that way at the start of its next turn, taking the safest route. Maze of Azzatar: each creature in the area makes an Intelligence saving throw, and on a failure you gain the benefits of the Invisible condition against it until the start of your next turn. Slime Pits' Haze: each creature in the area makes a Constitution saving throw, and on a failure has your choice of the Charmed or Poisoned condition until the start of your next turn."),
                 f(14, "Abyssal Conduit", "Rupture Expansion: your Abyssal Rupture is now a 30-foot-radius Sphere, and the area is Difficult Terrain for your enemies. Fiendish Servant: you always have the Summon Fiend spell prepared. When you cast it you can modify it so that it doesn't require Concentration; if you do, the spell's duration becomes 1 minute for that casting and you must choose Demon when you summon the Fiend. In addition, the Fiend has Advantage on attack rolls while within your Abyssal Rupture."),
                 f(18, "Abyssal Explosion", "As a Magic action, you fill a 30-foot-radius Sphere with an explosion of Abyssal energy. Each creature in the Sphere makes a Constitution saving throw against your spell save DC. On a failed save, a creature takes 8d6 Force damage if it isn't a Fiend, and it has the Incapacitated condition until the start of your next turn. Once you use this feature you can't do so again until you finish a Long Rest, unless you spend 7 Sorcery Points (no action required) to restore your use of it."),
             ),
@@ -1331,19 +1240,8 @@ object SubclassData {
                 f(3, "Reanimator Spells", "You always have these prepared once you reach the listed Artificer level: False Life, Spare the Dying, and Witch Bolt at 3; Blindness/Deafness and Enhance Ability at 5; Animate Dead and Lightning Bolt at 9; Blight and Death Ward at 13; and Antilife Shell and Raise Dead at 17."),
                 f(3, "Jolt to Life", "When you cast Spare the Dying, you can modify the spell so that it sends a jolt of electricity through the target, reviving it. The target regains 1 Hit Point, and each creature in a 10-foot Emanation originating from the target makes a Dexterity saving throw against your spell save DC, taking Lightning damage equal to 1d4 plus half your Artificer level (round up) on a failed save or half as much on a success. You can modify the spell this way a number of times equal to your Intelligence modifier, regaining all expended uses when you finish a Long Rest."),
                 f(3, "Reanimated Companion", "Using Tinker's Tools or another type of Artisan's Tools with which you have proficiency, you can take a Magic action to create a Reanimated Companion in an unoccupied space within 5 feet of you. It is a Small Undead with AC 10 plus your Intelligence modifier, Hit Points equal to 4 plus four times your Artificer level, Speed 30 feet, Resistance to Necrotic and Poison damage, Immunity to Lightning damage and the Charmed, Exhaustion, and Poisoned conditions, and Blindsight 60 feet. Death Burst: when it dies it explodes, and each creature in a 10-foot Emanation makes a Dexterity saving throw against your spell save DC, taking 2d6 Necrotic damage on a failure. Lightning Absorption: whenever it is subjected to Lightning damage it instead regains that many Hit Points. Dreadful Swipe: a melee attack using your spell attack modifier, reach 5 feet, for 1d4 plus 2 plus your Intelligence modifier Necrotic damage, and the target can't take Opportunity Attacks until the start of its next turn. It is Friendly to you and your allies, lasts until you finish a Long Rest or dismiss it, takes only the Dodge action unless you spend a Bonus Action to command it, and can't be recreated until you finish a Long Rest or expend a spell slot."),
-                f(5, "Strange Modifications", "Whenever you create a Reanimated Companion it gains one of the following options of your choice. Arcane Conduit: you can cast spells as though you were in the companion's space, but you must use your own senses; once per turn, when you cast an Artificer spell from the Evocation or Necromancy schools and deal damage while your companion is within 120 feet of you, you can add your Intelligence modifier to one damage roll of that spell. Ferocity: when you command your companion to take the Dreadful Swipe action, it can use it twice.",
-                    Choice("reanimator_mod_5", "Strange Modifications", "Choose the modification your companion is built with. You choose again whenever you create a new companion.", 1, ChoiceKind.OPTION,
-                        listOf(
-                            ChoiceOption("arcane_conduit", "Arcane Conduit", "You can cast spells as though you were in the companion's space, but you must use your own senses. Once per turn, when you cast an Artificer spell from the Evocation or Necromancy schools and deal damage while your companion is within 120 feet of you, you can add your Intelligence modifier to one damage roll of that spell."),
-                            ChoiceOption("ferocity", "Ferocity", "When you command your companion to take the Dreadful Swipe action, the companion can use it twice."),
-                        ), "Level 5", changeableOnRest = true)),
-                f(9, "Improved Reanimation", "Whenever you create a Reanimated Companion it gains one more of the following options of your choice. Bloated: the companion becomes Large or Medium (your choice); whenever it hits a Large or smaller creature with its Dreadful Swipe, that creature can also be pushed up to 10 feet away, and you add your Intelligence modifier to the damage dealt by its Death Burst. Gaunt: its Speed increases to 45 feet and it gains a Climb Speed equal to its Speed, able to climb difficult surfaces including ceilings without an ability check; whenever a creature of your choice starts its turn within a 10-foot Emanation originating from your companion, it must succeed on a Wisdom saving throw against your spell save DC or have the Frightened condition until the start of its next turn. Moist: it gains a Swim Speed equal to its Speed, and whenever it is hit by an attack roll from a creature within 10 feet of it, the attacker takes Acid damage equal to your Intelligence modifier.",
-                    Choice("reanimator_mod_9", "Improved Reanimation", "Choose the further modification your companion is built with.", 1, ChoiceKind.OPTION,
-                        listOf(
-                            ChoiceOption("bloated", "Bloated", "The companion becomes Large or Medium (your choice). Whenever it hits a Large or smaller creature with the Dreadful Swipe action, that creature can also be pushed up to 10 feet away from the companion. Additionally, you can add your Intelligence modifier to the damage dealt by the companion's Death Burst."),
-                            ChoiceOption("gaunt", "Gaunt", "The companion's Speed increases to 45 feet, and it gains a Climb Speed equal to its Speed, able to climb difficult surfaces including ceilings without an ability check. Whenever a creature of your choice starts its turn within a 10-foot Emanation originating from your companion, the creature must succeed on a Wisdom saving throw against your spell save DC or have the Frightened condition until the start of its next turn."),
-                            ChoiceOption("moist", "Moist", "The companion gains a Swim Speed equal to its Speed. In addition, whenever it is hit by an attack roll from a creature within 10 feet of it, the attacker takes Acid damage equal to your Intelligence modifier."),
-                        ), "Level 9", changeableOnRest = true)),
+                f(5, "Strange Modifications", "Whenever you create a Reanimated Companion it gains one of the following options of your choice. Arcane Conduit: you can cast spells as though you were in the companion's space, but you must use your own senses; once per turn, when you cast an Artificer spell from the Evocation or Necromancy schools and deal damage while your companion is within 120 feet of you, you can add your Intelligence modifier to one damage roll of that spell. Ferocity: when you command your companion to take the Dreadful Swipe action, it can use it twice."),
+                f(9, "Improved Reanimation", "Whenever you create a Reanimated Companion it gains one more of the following options of your choice. Bloated: the companion becomes Large or Medium (your choice); whenever it hits a Large or smaller creature with its Dreadful Swipe, that creature can also be pushed up to 10 feet away, and you add your Intelligence modifier to the damage dealt by its Death Burst. Gaunt: its Speed increases to 45 feet and it gains a Climb Speed equal to its Speed, able to climb difficult surfaces including ceilings without an ability check; whenever a creature of your choice starts its turn within a 10-foot Emanation originating from your companion, it must succeed on a Wisdom saving throw against your spell save DC or have the Frightened condition until the start of its next turn. Moist: it gains a Swim Speed equal to its Speed, and whenever it is hit by an attack roll from a creature within 10 feet of it, the attacker takes Acid damage equal to your Intelligence modifier."),
                 f(15, "Promethean Reanimation", "Facilitated Revival: when you cast Revivify or Raise Dead, the cost of any Material components needed for that spell is halved. Improved Companion: the damage of your Reanimated Companion's Death Burst increases to 4d6, and Necrotic damage dealt by your companion ignores Resistance. Life Transfer: when you take damage, you can take a Reaction to cause your Reanimated Companion to drop to 0 Hit Points. The companion immediately dies, triggering its Death Burst, and you regain a number of Hit Points equal to your Artificer level."),
             ),
             source = HORROR),
@@ -1424,13 +1322,7 @@ object SubclassData {
             "A Warlock bound to a sentient magic weapon and the cursed forces within its blade, which bestows malignant curses and punishing blows.",
             listOf(
                 f(3, "Hexblade Spells", "You always have these prepared once you reach the listed Warlock level: Arcane Vigor, Hex, Magic Weapon, Shield, and Wrathful Smite at 3; Conjure Barrage and Dispel Magic at 5; Freedom of Movement and Staggering Smite at 7; and Animate Objects and Steel Wind Strike at 9."),
-                f(3, "Hexblade Manifest", "Hexblade's Curse: you can cast Hex without expending a spell slot a number of times equal to your Charisma modifier (minimum of once), regaining all expended uses when you finish a Long Rest. When you cast Hex, a spectral weapon resembling your patron orbits the cursed target. Hexblade's Maneuvers: once per turn, when you hit a target cursed by your Hex with an attack roll, you can cause one of these additional effects. Draining Slash: Constitution saving throw against your spell save DC; on a failed save the target can't make Opportunity Attacks and its Speed is halved until the start of your next turn. Harrowing Blade: Wisdom saving throw; on a failed save, the next time the target makes an attack roll against a creature other than you before the start of your next turn, the target takes Necrotic damage equal to your Charisma modifier. Stymying Mark: the target has Disadvantage on the next saving throw it makes before the start of your next turn.",
-                    Choice("hexblade_maneuver", "Hexblade's Maneuvers", "Choose the effect you favour. You may use a different one each time you hit the cursed target.", 1, ChoiceKind.OPTION,
-                        listOf(
-                            ChoiceOption("draining_slash", "Draining Slash", "The target makes a Constitution saving throw against your spell save DC. On a failed save, the target can't make Opportunity Attacks and its Speed is halved until the start of your next turn.", "Constitution save"),
-                            ChoiceOption("harrowing_blade", "Harrowing Blade", "The target makes a Wisdom saving throw against your spell save DC. On a failed save, the next time the target makes an attack roll against a creature other than you before the start of your next turn, the target takes Necrotic damage equal to your Charisma modifier.", "Wisdom save"),
-                            ChoiceOption("stymying_mark", "Stymying Mark", "The target has Disadvantage on the next saving throw it makes before the start of your next turn.", "No save"),
-                        ), "Level 3", changeableOnRest = true)),
+                f(3, "Hexblade Manifest", "Hexblade's Curse: you can cast Hex without expending a spell slot a number of times equal to your Charisma modifier (minimum of once), regaining all expended uses when you finish a Long Rest. When you cast Hex, a spectral weapon resembling your patron orbits the cursed target. Hexblade's Maneuvers: once per turn, when you hit a target cursed by your Hex with an attack roll, you can cause one of these additional effects. Draining Slash: Constitution saving throw against your spell save DC; on a failed save the target can't make Opportunity Attacks and its Speed is halved until the start of your next turn. Harrowing Blade: Wisdom saving throw; on a failed save, the next time the target makes an attack roll against a creature other than you before the start of your next turn, the target takes Necrotic damage equal to your Charisma modifier. Stymying Mark: the target has Disadvantage on the next saving throw it makes before the start of your next turn."),
                 f(6, "Life Stealer", "Hungering Hex: whenever the target cursed by your Hex drops to 0 Hit Points, you regain Hit Points equal to 1d8 plus your Charisma modifier. Inevitable Blade: once per turn, if you make an attack roll against the target cursed by your Hex and miss, you can deal Necrotic damage to that creature equal to your Charisma modifier (minimum of 1 Necrotic damage)."),
                 f(10, "Armor of Hexes", "When you take damage from the cursed target of your Hex, you can take a Reaction to reduce the damage taken by an amount equal to 2d8 plus your Charisma modifier. You can use this feature a number of times equal to your Charisma modifier, regaining all expended uses when you finish a Long Rest."),
                 f(14, "Masterful Hex", "Accursed Critical: any attack roll you make against the target cursed by your Hex scores a Critical Hit on a roll of 19 or 20 on the d20. Infectious Hex: when you use one of your Hexblade's Maneuvers, you can target one additional creature within 30 feet of the cursed target, and that additional target takes 1d6 Necrotic damage. Resilient Hex: taking damage can't break your Concentration on Hex."),

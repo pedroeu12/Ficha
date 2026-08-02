@@ -4,6 +4,7 @@ import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,6 +51,7 @@ import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.ui.components.EditableText
+import com.pedroeu.ficha.ui.layout.LocalLayoutController
 import kotlinx.coroutines.launch
 
 // The English names double as the keys the pager switches on, so they stay untranslated
@@ -71,6 +73,7 @@ fun CharacterSheetScreen(
     val editMode by viewModel.editMode.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState(pageCount = { TABS.size })
     val scope = rememberCoroutineScope()
+    val layout = LocalLayoutController.current
     var restKind by remember { mutableStateOf<RestKind?>(null) }
 
     // Coming back from the level-up flow, the stored character has changed underneath us.
@@ -155,6 +158,43 @@ fun CharacterSheetScreen(
             )
         }
 
+        // Given the width, the sheet is laid out like the printed one rather than paged
+        // through. Which happens is the player's choice, defaulting to whatever fits.
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            if (layout.mode.isWide(maxWidth)) {
+                TabletSheet(loaded, viewModel, editMode)
+                return@BoxWithConstraints
+            }
+
+            PhoneSheet(
+                character = loaded,
+                viewModel = viewModel,
+                editMode = editMode,
+                pagerState = pagerState,
+                onSelectTab = { index -> scope.launch { pagerState.animateScrollToPage(index) } },
+            )
+        }
+    }
+
+    RestSheetHost(
+        restKind = restKind,
+        character = loaded,
+        viewModel = viewModel,
+        onDismiss = { restKind = null },
+    )
+}
+
+/** The narrow layout: one column at a time, chosen from a row of tabs. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PhoneSheet(
+    character: com.pedroeu.ficha.domain.PlayerCharacter,
+    viewModel: SheetViewModel,
+    editMode: Boolean,
+    pagerState: androidx.compose.foundation.pager.PagerState,
+    onSelectTab: (Int) -> Unit,
+) {
+    Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -164,7 +204,7 @@ fun CharacterSheetScreen(
             TABS.forEachIndexed { index, title ->
                 Tab(
                     selected = pagerState.currentPage == index,
-                    onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                    onClick = { onSelectTab(index) },
                     text = { Text(tr(title), style = MaterialTheme.typography.labelLarge) },
                     unselectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                         .copy(alpha = 0.7f),
@@ -177,23 +217,16 @@ fun CharacterSheetScreen(
             modifier = Modifier.fillMaxSize(),
         ) { page ->
             when (TABS[page]) {
-                "Stats" -> StatsTab(loaded, viewModel, editMode)
-                "Skills" -> SkillsTab(loaded, viewModel, editMode)
-                "Combat" -> CombatTab(loaded, viewModel, editMode)
-                "Features" -> FeaturesTab(loaded, viewModel, editMode)
-                "Spells" -> SpellsTab(loaded, viewModel, editMode)
-                "Inventory" -> InventoryTab(loaded, viewModel, editMode)
-                "Bio" -> BioTab(loaded, viewModel, editMode)
+                "Stats" -> StatsTab(character, viewModel, editMode)
+                "Skills" -> SkillsTab(character, viewModel, editMode)
+                "Combat" -> CombatTab(character, viewModel, editMode)
+                "Features" -> FeaturesTab(character, viewModel, editMode)
+                "Spells" -> SpellsTab(character, viewModel, editMode)
+                "Inventory" -> InventoryTab(character, viewModel, editMode)
+                "Bio" -> BioTab(character, viewModel, editMode)
             }
         }
     }
-
-    RestSheetHost(
-        restKind = restKind,
-        character = loaded,
-        viewModel = viewModel,
-        onDismiss = { restKind = null },
-    )
 }
 
 @Composable

@@ -497,6 +497,14 @@ object PortugueseStrings {
         "Leave blank to use the rules" to "Deixe em branco para usar as regras",
         "Not set" to "Não definido",
 
+        // ---------------------------------------------------------------- Sheet layout
+        "Sheet layout" to "Formato da ficha",
+        "Match the screen" to "Acompanhar a tela",
+        "Phone — tabs" to "Celular — abas",
+        "Tablet — full sheet" to "Tablet — ficha inteira",
+        "Character" to "Personagem",
+        "Magic & Gear" to "Magias e Equipamento",
+
         // ---------------------------------------------------------------- Chosen as you use them
         // The feature names stay in English with the rest of the rules content; what is
         // translated here is the question the app asks and the wording around it.

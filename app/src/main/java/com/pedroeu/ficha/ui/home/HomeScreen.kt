@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,6 +67,8 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.i18n.AppLanguage
 import com.pedroeu.ficha.ui.i18n.LocalLanguageController
+import com.pedroeu.ficha.ui.layout.LayoutMode
+import com.pedroeu.ficha.ui.layout.LocalLayoutController
 import com.pedroeu.ficha.ui.theme.LocalThemeController
 import com.pedroeu.ficha.ui.theme.ThemeMode
 import kotlinx.coroutines.launch
@@ -120,12 +124,16 @@ fun HomeScreen(
     ) { padding ->
         if (characters.isEmpty()) {
             EmptyState(Modifier.fillMaxSize().padding(padding))
-        } else {
+        } else BoxWithConstraints(Modifier.fillMaxSize()) {
+            // On a tablet a full-width list of two characters looks like a mistake, so the
+            // column stops growing and centres instead of stretching to the glass.
+            val side = ((maxWidth - 720.dp) / 2).coerceAtLeast(16.dp)
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
+                    start = side,
+                    end = side,
                     top = padding.calculateTopPadding() + 12.dp,
                     bottom = padding.calculateBottomPadding() + 96.dp,
                 ),
@@ -255,6 +263,7 @@ private fun EmptyState(modifier: Modifier = Modifier) {
 @Composable
 private fun AppearanceButton() {
     val theme = LocalThemeController.current
+    val layout = LocalLayoutController.current
     var showMenu by remember { mutableStateOf(false) }
 
     Box {
@@ -275,6 +284,30 @@ private fun AppearanceButton() {
                     },
                     trailingIcon = {
                         if (mode == theme.mode) {
+                            Icon(Icons.Default.Check, contentDescription = tr("Selected"))
+                        }
+                    },
+                )
+            }
+
+            // How the sheet itself is laid out belongs with the other things about how the
+            // app looks, rather than in a menu of its own.
+            HorizontalDivider()
+            Text(
+                text = tr("Sheet layout"),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+            LayoutMode.entries.forEach { mode ->
+                DropdownMenuItem(
+                    text = { Text(mode.label) },
+                    onClick = {
+                        layout.setMode(mode)
+                        showMenu = false
+                    },
+                    trailingIcon = {
+                        if (mode == layout.mode) {
                             Icon(Icons.Default.Check, contentDescription = tr("Selected"))
                         }
                     },

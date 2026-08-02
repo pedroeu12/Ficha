@@ -16,6 +16,9 @@ import com.pedroeu.ficha.ui.i18n.AppLanguage
 import com.pedroeu.ficha.ui.i18n.Language
 import com.pedroeu.ficha.ui.i18n.LanguageController
 import com.pedroeu.ficha.ui.i18n.LocalLanguageController
+import com.pedroeu.ficha.ui.layout.LayoutController
+import com.pedroeu.ficha.ui.layout.LayoutMode
+import com.pedroeu.ficha.ui.layout.LocalLayoutController
 import com.pedroeu.ficha.ui.levelup.LevelUpScreen
 import com.pedroeu.ficha.ui.sheet.CharacterSheetScreen
 
@@ -33,6 +36,8 @@ fun FichaApp(
     repository: CharacterRepository,
     language: AppLanguage = AppLanguage.ENGLISH,
     onLanguageChange: (AppLanguage) -> Unit = {},
+    layout: LayoutMode = LayoutMode.AUTOMATIC,
+    onLayoutChange: (LayoutMode) -> Unit = {},
 ) {
     val navController = rememberNavController()
 
@@ -44,7 +49,14 @@ fun FichaApp(
         LanguageController(language = language, setLanguage = onLanguageChange)
     }
 
-    CompositionLocalProvider(LocalLanguageController provides languageController) {
+    val layoutController = remember(layout, onLayoutChange) {
+        LayoutController(mode = layout, setMode = onLayoutChange)
+    }
+
+    CompositionLocalProvider(
+        LocalLanguageController provides languageController,
+        LocalLayoutController provides layoutController,
+    ) {
         key(language) {
             AppNavHost(navController, repository)
         }

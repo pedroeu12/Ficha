@@ -68,6 +68,36 @@ class ArtificerItemsTest {
     }
 
     @Test
+    fun `no other class ever has Replicate Magic Item`() {
+        // A Monk was shown the Artificer's Replicate Magic Item because one screen rendered
+        // the section without asking whether the character had it. The section refuses now,
+        // and this is the sweep across every class rather than the one that was reported.
+        com.pedroeu.ficha.data.content.ClassData.ALL
+            .filterNot { it.id == "artificer" }
+            .forEach { charClass ->
+                val character = artificer(20).copy(
+                    classId = charClass.id,
+                    subclassId = null,
+                    levelSelections = mapOf(
+                        // Even carrying a stored selection from a mis-built character, which
+                        // is the state a real sheet would be in after the bug.
+                        "2:replicate_plans_2" to listOf("bag_of_holding"),
+                    ),
+                )
+
+                assertFalse(
+                    "${charClass.name} must not have Replicate Magic Item",
+                    ArtificerItems.hasFeature(character),
+                )
+                assertEquals(0, ArtificerItems.allowance(character))
+                assertTrue(
+                    "${charClass.name} is being offered Artificer plans",
+                    ArtificerItems.knownPlans(character).isEmpty(),
+                )
+            }
+    }
+
+    @Test
     fun `the allowance follows Artificer levels, not total levels`() {
         // A level 12 character with only 2 levels of Artificer still makes 2 items.
         val multiclass = artificer(12).copy(

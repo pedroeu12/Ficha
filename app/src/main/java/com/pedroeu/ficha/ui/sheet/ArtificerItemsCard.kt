@@ -54,6 +54,11 @@ fun ArtificerItemsCard(
     /** False drops the card, for the tablet sheet's single sheet of paper. */
     framed: Boolean = true,
 ) {
+    // Guarded here rather than only at the call sites. A Monk was being shown Replicate Magic
+    // Item because one of two callers forgot to ask — and a feature that leaks across classes
+    // is a rules error, not a layout one, so the answer belongs with the feature.
+    if (!ArtificerItems.hasFeature(character)) return
+
     val plans = ArtificerItems.knownPlans(character)
     val made = ArtificerItems.madeItems(character)
     val allowance = ArtificerItems.allowance(character)

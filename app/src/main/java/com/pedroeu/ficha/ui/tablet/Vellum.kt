@@ -30,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -261,6 +262,7 @@ fun Caption(
     modifier: Modifier = Modifier,
     color: Color? = null,
     align: TextAlign = TextAlign.Start,
+    maxLines: Int = 2,
 ) {
     val v = LocalVellum.current
     Text(
@@ -268,6 +270,10 @@ fun Caption(
         style = EngravedLabel,
         color = color ?: v.inkFaint,
         textAlign = align,
+        // Capped, so a caption in a container that measured narrower than expected clips
+        // rather than turning into a column of single letters.
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier,
     )
 }
@@ -301,6 +307,7 @@ fun RuledField(
             style = valueStyle,
             color = if (adjusted) v.accent else v.ink,
             textAlign = TextAlign.Center,
+            maxLines = 1,
         )
         Box(
             Modifier
@@ -458,6 +465,7 @@ fun InkedValue(
     text: String,
     modifier: Modifier = Modifier,
     emphasis: Boolean = false,
+    maxLines: Int = 2,
 ) {
     val v = LocalVellum.current
     Text(
@@ -467,6 +475,8 @@ fun InkedValue(
             fontWeight = if (emphasis) FontWeight.SemiBold else FontWeight.Normal,
         ),
         color = v.ink,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
         modifier = modifier,
     )
 }

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pedroeu.ficha.data.content.BackgroundData
@@ -57,11 +57,17 @@ fun Masthead(handle: SheetHandle) {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            // The name, written large on its rule, the way a sheet's first line reads.
+        // Both halves are weighted. With only one of them weighted, the vitals could measure
+        // as wide as their longest caption and leave the name nothing — which is exactly what
+        // happened: a name column squeezed to a few pixels renders one letter per line.
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
             Column(
                 Modifier
                     .weight(1f)
@@ -77,6 +83,8 @@ fun Masthead(handle: SheetHandle) {
                         fontFamily = FontFamily.Serif,
                     ),
                     color = v.ink,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(Modifier.height(2.dp))
                 Box(
@@ -85,8 +93,11 @@ fun Masthead(handle: SheetHandle) {
                         .height(if (handle.editMode) 1.5.dp else 1.dp)
                         .background(if (handle.editMode) v.accent.copy(alpha = 0.7f) else v.rule)
                 )
-                Spacer(Modifier.height(4.dp))
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Spacer(Modifier.height(5.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     Particular(tr("Species"), species)
                     Particular(tr("Class"), classes)
                     if (subclass.isNotBlank()) Particular(tr("Subclass"), subclass)
@@ -95,10 +106,13 @@ fun Masthead(handle: SheetHandle) {
                 }
             }
 
-            Gutter(24.dp)
-
-            // The numbers that get looked at every round.
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // The numbers looked at every round. A FlowRow so a narrower tablet wraps them
+            // onto a second line instead of crushing the name beside them.
+            FlowRow(
+                Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 VitalStone(
                     handle = handle,
                     stat = OverridableStat.ARMOR_CLASS,
@@ -133,15 +147,16 @@ fun Masthead(handle: SheetHandle) {
                     value = "${CharacterCalculations.passivePerception(character)}",
                     label = tr("Passive Perception"),
                 )
-                Stone {
+                Stone(modifier = Modifier.width(STONE_WIDTH)) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = CharacterCalculations.size(character),
                             style = NumeralMedium.copy(fontSize = 15.sp),
                             color = v.ink,
                             textAlign = TextAlign.Center,
+                            maxLines = 1,
                         )
-                        Caption(tr("Size"))
+                        Caption(tr("Size"), align = TextAlign.Center)
                     }
                 }
             }
@@ -150,6 +165,14 @@ fun Masthead(handle: SheetHandle) {
         InkRule(strong = true)
     }
 }
+
+/**
+ * Every boxed number is the same width.
+ *
+ * Left to size themselves, the widest caption decides — "Passive Perception" is four times
+ * the width of "Speed" — and the row grows until it has eaten the name beside it.
+ */
+private val STONE_WIDTH = 92.dp
 
 /** One of the small facts printed under the name. */
 @Composable
@@ -164,6 +187,8 @@ private fun Particular(label: String, value: String) {
                 fontWeight = FontWeight.SemiBold,
             ),
             color = v.inkSoft,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -184,7 +209,7 @@ private fun VitalStone(
 ) {
     val v = LocalVellum.current
     Stone(
-        modifier = Modifier.widthIn(min = 74.dp),
+        modifier = Modifier.width(STONE_WIDTH),
         onClick = { handle.editStat(stat) },
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -193,8 +218,9 @@ private fun VitalStone(
                 style = NumeralMedium,
                 color = if (handle.isAdjusted(stat)) v.accent else v.ink,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
             )
-            Caption(label, align = TextAlign.Center)
+            Caption(label, align = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
     }
 }

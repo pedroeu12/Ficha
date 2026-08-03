@@ -43,20 +43,22 @@ fun WrittenLine(
     val override = handle.character.textOverrides[key]
     val value = override ?: fallback
 
-    Row(
+    // Stacked, not side by side. These sit in half-width columns and their values are lists —
+    // "Simple weapons, Martial weapons, Shortswords" — which a label sharing the row turns
+    // into a ragged two-word-per-line mess.
+    Column(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(6.dp))
             .clickable { handle.editText(key, label, override ?: "") }
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.Top,
+            .padding(vertical = 5.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Caption(label, modifier = Modifier.padding(end = 10.dp).weight(0.9f))
+        Caption(label)
         Text(
             text = value.ifBlank { "—" },
             style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Serif),
             color = if (override != null) v.accent else v.inkSoft,
-            modifier = Modifier.weight(2f),
         )
     }
 }

@@ -278,28 +278,60 @@ private fun FeatureLine(
     }
 }
 
-/** What was picked inside a feature, and the mark that changes it. */
+/**
+ * What was picked inside a feature.
+ *
+ * Two lines rather than one. Squeezing a label, its answer and a control onto a single row
+ * works when the answer is a word and falls apart when it is three — "Skill Proficiency —
+ * Acrobatics, Stealth, Sleight of Hand" ends up wrapping mid-phrase in a half-width column.
+ * The label goes above in small capitals, the answers go beneath, one per line, and the mark
+ * that changes them sits beside the label where it can't be squeezed out.
+ */
 @Composable
 private fun ChoiceLine(resolved: ResolvedChoice, handle: SheetHandle) {
     val v = LocalVellum.current
-    Row(
+    val answers = resolved.selectedNames.filter { it.isNotBlank() }
+
+    Column(
         Modifier
             .fillMaxWidth()
-            .padding(start = 18.dp, top = 2.dp, bottom = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(start = 18.dp, top = 6.dp, bottom = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Caption(resolved.choice.label, modifier = Modifier.padding(end = 8.dp))
-        Text(
-            text = resolved.summary.ifBlank { tr("not chosen yet") },
-            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Serif),
-            color = if (resolved.isAnswered) v.inkSoft else v.danger,
-            modifier = Modifier.weight(1f),
-        )
-        if (handle.editMode || !resolved.isAnswered) {
-            PenMark(
-                description = if (resolved.isAnswered) tr("Change") else tr("Choose"),
-                glyph = "✎",
-            ) { handle.open(SheetOverlay.EditChoice(resolved)) }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Caption(resolved.choice.label, color = v.accent, modifier = Modifier.weight(1f))
+            if (handle.editMode || !resolved.isAnswered) {
+                PenMark(
+                    description = if (resolved.isAnswered) tr("Change") else tr("Choose"),
+                    glyph = "✎",
+                ) { handle.open(SheetOverlay.EditChoice(resolved)) }
+            }
+        }
+
+        if (answers.isEmpty()) {
+            Text(
+                text = tr("not chosen yet"),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Serif),
+                color = v.danger,
+            )
+        } else {
+            answers.forEach { answer ->
+                Row(verticalAlignment = Alignment.Top) {
+                    Text(
+                        text = "·  ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = v.inkFaint,
+                    )
+                    Text(
+                        text = answer,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = FontFamily.Serif,
+                        ),
+                        color = v.ink,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
         }
     }
 }

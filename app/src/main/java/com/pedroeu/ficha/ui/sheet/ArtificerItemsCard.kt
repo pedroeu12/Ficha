@@ -48,7 +48,12 @@ import com.pedroeu.ficha.ui.components.SelectableCard
  * made shield in the Armor Class — and setting it aside takes it straight back out.
  */
 @Composable
-fun ArtificerItemsCard(character: PlayerCharacter, viewModel: SheetViewModel) {
+fun ArtificerItemsCard(
+    character: PlayerCharacter,
+    viewModel: SheetViewModel,
+    /** False drops the card, for the tablet sheet's single sheet of paper. */
+    framed: Boolean = true,
+) {
     val plans = ArtificerItems.knownPlans(character)
     val made = ArtificerItems.madeItems(character)
     val allowance = ArtificerItems.allowance(character)
@@ -57,12 +62,9 @@ fun ArtificerItemsCard(character: PlayerCharacter, viewModel: SheetViewModel) {
     // The plan whose base item the player is choosing, if the picker is open.
     var choosingBaseFor by remember { mutableStateOf<KnownPlan?>(null) }
 
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
+    PlansContainer(framed) {
         Column(
-            Modifier.padding(14.dp),
+            if (framed) Modifier.padding(14.dp) else Modifier,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SectionHeader(tr("Replicate Magic Item"))
@@ -247,4 +249,17 @@ fun ReplicaBasePickerSheet(
             }
         }
     }
+}
+
+/** A card on the phone, bare content on the tablet's single sheet of paper. */
+@Composable
+private fun PlansContainer(framed: Boolean, content: @Composable () -> Unit) {
+    if (!framed) {
+        content()
+        return
+    }
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) { content() }
 }

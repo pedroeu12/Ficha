@@ -108,18 +108,20 @@ fun PerUseChoiceRow(
  * card they would have nowhere to live.
  */
 @Composable
-fun PerUseChoicesCard(character: PlayerCharacter, viewModel: SheetViewModel) {
+fun PerUseChoicesCard(
+    character: PlayerCharacter,
+    viewModel: SheetViewModel,
+    /** False drops the card, for the tablet sheet's single sheet of paper. */
+    framed: Boolean = true,
+) {
     val choices = PerUseChoices.all(character)
     if (choices.isEmpty()) return
 
     val remaining = CharacterResources.states(character).associate { it.def.id to it.remaining }
 
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
+    UnframedOrCard(framed) {
         Column(
-            Modifier.padding(14.dp),
+            if (framed) Modifier.padding(14.dp) else Modifier,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SectionHeader(tr("Chosen As You Use Them"))
@@ -146,4 +148,17 @@ fun PerUseChoicesCard(character: PlayerCharacter, viewModel: SheetViewModel) {
             }
         }
     }
+}
+
+/** A card on the phone, bare content on the tablet's single sheet of paper. */
+@Composable
+private fun UnframedOrCard(framed: Boolean, content: @Composable () -> Unit) {
+    if (!framed) {
+        content()
+        return
+    }
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) { content() }
 }

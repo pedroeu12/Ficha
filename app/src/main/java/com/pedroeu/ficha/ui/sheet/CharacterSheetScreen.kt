@@ -52,6 +52,7 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.ui.layout.LocalLayoutController
+import com.pedroeu.ficha.ui.tablet.TabletSheetScreen
 import kotlinx.coroutines.launch
 
 // The English names double as the keys the pager switches on, so they stay untranslated
@@ -162,7 +163,7 @@ fun CharacterSheetScreen(
         // through. Which happens is the player's choice, defaulting to whatever fits.
         BoxWithConstraints(Modifier.fillMaxSize()) {
             if (layout.mode.isWide(maxWidth)) {
-                TabletSheet(loaded, viewModel, editMode)
+                TabletSheetScreen(loaded, viewModel, editMode)
                 return@BoxWithConstraints
             }
 

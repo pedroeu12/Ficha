@@ -72,6 +72,18 @@ class LanguageTest {
     // ------------------------------------------------------------- The table itself
 
     @Test
+    fun `no phrase is translated twice`() {
+        // A map keeps the last of any repeated key, so a second translation of the same
+        // phrase is invisible — it just quietly never applies.
+        val repeated = PortugueseStrings.entries()
+            .groupBy { it.first }
+            .filterValues { it.size > 1 }
+            .keys
+
+        assertTrue("these phrases appear twice in the table: $repeated", repeated.isEmpty())
+    }
+
+    @Test
     fun `no entry is blank`() {
         PortugueseStrings.knownKeys().forEach { key ->
             assertTrue("the key '$key' is empty", key.isNotBlank())

@@ -58,16 +58,21 @@ fun ResourcesCard(
     character: PlayerCharacter,
     viewModel: SheetViewModel,
     editMode: Boolean,
+    /**
+     * False drops the card around the content, for the tablet sheet — which is one page of
+     * paper, and a card floating on it would be the only thing casting a shadow.
+     */
+    framed: Boolean = true,
 ) {
     val resources = CharacterResources.states(character)
     var showAdd by remember { mutableStateOf(false) }
     var editingMax by remember { mutableStateOf<ResourceState?>(null) }
 
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    MaybeCard(framed) {
+        Column(
+            if (framed) Modifier.padding(14.dp) else Modifier,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
             SectionHeader(
                 tr("Limited Uses"),
                 trailing = if (resources.isEmpty()) null else "${resources.size}",
@@ -311,4 +316,23 @@ private fun ResourceRow(
             }
         }
     }
+}
+
+/**
+ * A card, or nothing at all.
+ *
+ * The phone wants each of these surfaces bounded — it shows one at a time and the boundary is
+ * what says where it ends. The tablet sheet is one page of paper, where the same boundary
+ * would be the only thing on screen casting a shadow.
+ */
+@Composable
+private fun MaybeCard(framed: Boolean, content: @Composable () -> Unit) {
+    if (!framed) {
+        content()
+        return
+    }
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) { content() }
 }

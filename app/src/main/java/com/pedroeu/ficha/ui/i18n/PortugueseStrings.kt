@@ -20,7 +20,18 @@ object PortugueseStrings {
     /** Every phrase the interface can show, for a test that checks none has been missed. */
     fun knownKeys(): Set<String> = TABLE.keys
 
-    private val TABLE: Map<String, String> = mapOf(
+    /**
+     * The table as written, before it becomes a map.
+     *
+     * A map silently keeps the last of any repeated key, which is how the same phrase ends up
+     * translated twice with only one of them taking effect. Keeping the source as a list means
+     * a test can see the repeat.
+     */
+    fun entries(): List<Pair<String, String>> = ENTRIES
+
+    private val TABLE: Map<String, String> by lazy { ENTRIES.toMap() }
+
+    private val ENTRIES: List<Pair<String, String>> = listOf(
         // ---------------------------------------------------------------- App and home
         "Ficha" to "Ficha",
         "New Character" to "Novo Personagem",
@@ -496,6 +507,17 @@ object PortugueseStrings {
         "Override (replaces everything)" to "Substituição (troca tudo)",
         "Leave blank to use the rules" to "Deixe em branco para usar as regras",
         "Not set" to "Não definido",
+
+        // ---------------------------------------------------------------- The paper sheet
+        "Gear & Story" to "Equipamento e História",
+        "Attacks" to "Ataques",
+        "Written by hand" to "Escritos à mão",
+        "Hit Die" to "Dado de Vida",
+        "Inspiration" to "Inspiração",
+        "of {0} maximum" to "de {0} no máximo",
+        "Hit Dice — {0} of {1} left" to "Dados de Vida — {0} de {1} restantes",
+        "{0} — saving throw" to "{0} — teste de resistência",
+        "{0} • Attack {1}" to "{0} • Ataque {1}",
 
         // ---------------------------------------------------------------- Sheet layout
         "Sheet layout" to "Formato da ficha",

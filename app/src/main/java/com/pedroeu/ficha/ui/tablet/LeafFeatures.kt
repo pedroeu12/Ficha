@@ -35,6 +35,7 @@ import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.sheet.ArtificerItemsCard
+import com.pedroeu.ficha.ui.sheet.PoolFeaturesCard
 
 /**
  * Everything the character can do that isn't an attack or a spell.
@@ -116,6 +117,10 @@ fun LeafFeatures(handle: SheetHandle) {
             }
 
             item { ArtificerItemsCard(character, handle.viewModel, framed = false) }
+
+            if (handle.editMode) {
+                item { PoolFeaturesCard(character, handle.viewModel, framed = false) }
+            }
         }
 
         Fold()

@@ -19,10 +19,12 @@ object ClassData {
     /**
      * The class's whole list at one spell level, straight from the spell catalog.
      *
-     * The older hand-written stubs above carry their own ids (`sorc_shield`), which is why
-     * duplicate detection has to fall back on matching names. Anything added from here uses
-     * the catalog's own id, so a spell picked at creation and the same spell granted by a
-     * feature are recognisably the same entry.
+     * Every caster below chooses from this. The alternative — a curated handful written out
+     * here — is what shipped first, and it was wrong twice over: it silently made a class's
+     * spell list shorter than the rules say, and its private ids (`sorc_shield`) meant the
+     * same spell picked at creation and granted by a feature looked like two different
+     * entries. Reading the catalog fixes both, and a spell added there reaches every class
+     * that lists it without a second edit here.
      */
     private fun catalogSpells(classId: String, level: Int): List<SpellStub> =
         SpellData.forClass(classId, level).map { spell ->
@@ -64,24 +66,8 @@ object ClassData {
             ),
             choices = listOf(
                 skillChoice(3, Skill.ALL),
-                cantrips("cantrips", "Cantrips Known", 2, listOf(
-                    SpellStub("bard_vicious_mockery", "Vicious Mockery", 0, "Enchantment", "Unleash a string of insults that deals psychic damage and gives disadvantage on the target's next attack."),
-                    SpellStub("bard_minor_illusion", "Minor Illusion", 0, "Illusion", "Create a small sound or image illusion within range."),
-                    SpellStub("bard_dancing_lights", "Dancing Lights", 0, "Evocation", "Create up to four torch-sized lights that you can move around the battlefield."),
-                    SpellStub("bard_mage_hand", "Mage Hand", 0, "Conjuration", "Conjure a spectral hand to manipulate objects at range."),
-                    SpellStub("bard_prestidigitation", "Prestidigitation", 0, "Transmutation", "A minor magical trick: clean, chill, warm, flavor, or light a small object."),
-                    SpellStub("bard_true_strike", "True Strike", 0, "Divination", "Briefly glimpse the future to gain insight into your next attack."),
-                )),
-                cantrips("spells1", "1st-Level Spells Known", 4, listOf(
-                    SpellStub("bard_healing_word", "Healing Word", 1, "Evocation", "A word of power that heals a creature at range."),
-                    SpellStub("bard_faerie_fire", "Faerie Fire", 1, "Evocation", "Outline creatures in colorful light, making them easier to hit."),
-                    SpellStub("bard_dissonant_whispers", "Dissonant Whispers", 1, "Enchantment", "Whisper a discordant melody that deals psychic damage and forces the target to flee."),
-                    SpellStub("bard_charm_person", "Charm Person", 1, "Enchantment", "Attempt to charm a humanoid into regarding you as a friend."),
-                    SpellStub("bard_tashas", "Tasha's Hideous Laughter", 1, "Enchantment", "Send a creature into fits of laughter, incapacitating it."),
-                    SpellStub("bard_thunderwave", "Thunderwave", 1, "Evocation", "A wave of thunderous force pushes creatures away from you."),
-                    SpellStub("bard_comprehend", "Comprehend Languages", 1, "Divination", "Understand any spoken or written language for the duration."),
-                    SpellStub("bard_disguise_self", "Disguise Self", 1, "Illusion", "Change your appearance, including clothing and gear."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 2, catalogSpells("bard", 0)),
+                cantrips("spells1", "1st-Level Spells Known", 4, catalogSpells("bard", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.CHA,
@@ -106,14 +92,7 @@ object ClassData {
                     FeatureChoiceOption("protector", "Protector", "You gain proficiency with martial weapons and heavy armor."),
                     FeatureChoiceOption("thaumaturge", "Thaumaturge", "You learn an extra cantrip from the Cleric list and add your Wisdom modifier to Religion checks."),
                 )),
-                cantrips("cantrips", "Cantrips Known", 3, listOf(
-                    SpellStub("cleric_guidance", "Guidance", 0, "Divination", "Touch a creature to add a d4 to one ability check."),
-                    SpellStub("cleric_light", "Light", 0, "Evocation", "Cause an object to shed bright light in a 20-foot radius."),
-                    SpellStub("cleric_sacred_flame", "Sacred Flame", 0, "Evocation", "Radiant flame descends on a target, ignoring cover."),
-                    SpellStub("cleric_spare_dying", "Spare the Dying", 0, "Necromancy", "Stabilize a dying creature with a touch."),
-                    SpellStub("cleric_thaumaturgy", "Thaumaturgy", 0, "Transmutation", "Manifest a minor, wondrous sign of divine power."),
-                    SpellStub("cleric_toll_dead", "Toll the Dead", 0, "Necromancy", "A dolorous bell tolls, dealing necrotic damage."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 3, catalogSpells("cleric", 0)),
                 cantrips("spells1", "Prepared Spells (Level 1)", 4, catalogSpells("cleric", 1)),
             ),
             isSpellcaster = true,
@@ -139,14 +118,7 @@ object ClassData {
                     FeatureChoiceOption("magician", "Magician", "You learn an extra cantrip from the Wizard list and add your Wisdom modifier to Arcana or Nature checks."),
                     FeatureChoiceOption("warden", "Warden", "You gain proficiency with martial weapons and medium armor."),
                 )),
-                cantrips("cantrips", "Cantrips Known", 2, listOf(
-                    SpellStub("druid_druidcraft", "Druidcraft", 0, "Transmutation", "A small, harmless nature-themed effect: predict weather, sprout a seed, or clean a small object."),
-                    SpellStub("druid_guidance", "Guidance", 0, "Divination", "Touch a creature to add a d4 to one ability check."),
-                    SpellStub("druid_poison_spray", "Poison Spray", 0, "Conjuration", "Project a puff of noxious gas that deals poison damage."),
-                    SpellStub("druid_produce_flame", "Produce Flame", 0, "Conjuration", "Conjure a flickering flame that lights the way or can be hurled at a foe."),
-                    SpellStub("druid_shillelagh", "Shillelagh", 0, "Transmutation", "Imbue a club or quarterstaff with power, using Wisdom for its attacks."),
-                    SpellStub("druid_thorn_whip", "Thorn Whip", 0, "Transmutation", "A vine-like whip drags a creature closer to you and deals damage."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 2, catalogSpells("druid", 0)),
                 cantrips("spells1", "Prepared Spells (Level 1)", 4, catalogSpells("druid", 1)),
             ),
             isSpellcaster = true,
@@ -275,22 +247,8 @@ object ClassData {
             ),
             choices = listOf(
                 skillChoice(2, listOf(Skill.ARCANA, Skill.DECEPTION, Skill.INSIGHT, Skill.INTIMIDATION, Skill.PERSUASION, Skill.RELIGION)),
-                cantrips("cantrips", "Cantrips Known", 4, listOf(
-                    SpellStub("sorc_fire_bolt", "Fire Bolt", 0, "Evocation", "Hurl a mote of fire that deals fire damage on a hit."),
-                    SpellStub("sorc_mage_hand", "Mage Hand", 0, "Conjuration", "Conjure a spectral hand to manipulate objects at range."),
-                    SpellStub("sorc_minor_illusion", "Minor Illusion", 0, "Illusion", "Create a small sound or image illusion within range."),
-                    SpellStub("sorc_prestidigitation", "Prestidigitation", 0, "Transmutation", "A minor magical trick: clean, chill, warm, flavor, or light a small object."),
-                    SpellStub("sorc_ray_of_frost", "Ray of Frost", 0, "Evocation", "A ray of cold deals damage and reduces the target's speed."),
-                    SpellStub("sorc_shocking_grasp", "Shocking Grasp", 0, "Evocation", "Melee spell attack that deals lightning damage and prevents reactions."),
-                )),
-                cantrips("spells1", "1st-Level Spells Known", 2, listOf(
-                    SpellStub("sorc_magic_missile", "Magic Missile", 1, "Evocation", "Three darts of magical force automatically strike their targets."),
-                    SpellStub("sorc_shield", "Shield", 1, "Abjuration", "An invisible barrier grants +5 AC until your next turn as a reaction."),
-                    SpellStub("sorc_chromatic_orb", "Chromatic Orb", 1, "Evocation", "Hurl an orb of energy in a damage type of your choice."),
-                    SpellStub("sorc_burning_hands", "Burning Hands", 1, "Evocation", "A thin sheet of flame sweeps out from your hands."),
-                    SpellStub("sorc_feather_fall", "Feather Fall", 1, "Transmutation", "Slow the descent of falling creatures."),
-                    SpellStub("sorc_mage_armor", "Mage Armor", 1, "Abjuration", "A protective magical field sets your base AC to 13 + Dexterity modifier."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 4, catalogSpells("sorcerer", 0)),
+                cantrips("spells1", "1st-Level Spells Known", 2, catalogSpells("sorcerer", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.CHA,
@@ -311,22 +269,8 @@ object ClassData {
             ),
             choices = listOf(
                 skillChoice(2, listOf(Skill.ARCANA, Skill.DECEPTION, Skill.HISTORY, Skill.INTIMIDATION, Skill.INVESTIGATION, Skill.NATURE, Skill.RELIGION)),
-                cantrips("cantrips", "Cantrips Known", 2, listOf(
-                    SpellStub("wlk_eldritch_blast", "Eldritch Blast", 0, "Evocation", "A beam of crackling energy deals force damage to a target."),
-                    SpellStub("wlk_chill_touch", "Chill Touch", 0, "Necromancy", "A ghostly skeletal hand deals necrotic damage and prevents healing."),
-                    SpellStub("wlk_minor_illusion", "Minor Illusion", 0, "Illusion", "Create a small sound or image illusion within range."),
-                    SpellStub("wlk_prestidigitation", "Prestidigitation", 0, "Transmutation", "A minor magical trick: clean, chill, warm, flavor, or light a small object."),
-                    SpellStub("wlk_poison_spray", "Poison Spray", 0, "Conjuration", "Project a puff of noxious gas that deals poison damage."),
-                    SpellStub("wlk_toll_dead", "Toll the Dead", 0, "Necromancy", "A dolorous bell tolls, dealing necrotic damage."),
-                )),
-                cantrips("spells1", "1st-Level Spells Known", 2, listOf(
-                    SpellStub("wlk_hex", "Hex", 1, "Enchantment", "Curse a creature, dealing extra necrotic damage to it with your attacks."),
-                    SpellStub("wlk_armor_agathys", "Armor of Agathys", 1, "Abjuration", "Frosty magic gives you temporary hit points and damages attackers who hit you in melee."),
-                    SpellStub("wlk_charm_person", "Charm Person", 1, "Enchantment", "Attempt to charm a humanoid into regarding you as a friend."),
-                    SpellStub("wlk_arms_hadar", "Arms of Hadar", 1, "Conjuration", "Tendrils of dark energy erupt from you, damaging nearby foes."),
-                    SpellStub("wlk_witch_bolt", "Witch Bolt", 1, "Evocation", "A beam of lightning strikes a target and can be sustained for continued damage."),
-                    SpellStub("wlk_comprehend", "Comprehend Languages", 1, "Divination", "Understand any spoken or written language for the duration."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 2, catalogSpells("warlock", 0)),
+                cantrips("spells1", "1st-Level Spells Known", 2, catalogSpells("warlock", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.CHA,
@@ -347,26 +291,8 @@ object ClassData {
             ),
             choices = listOf(
                 skillChoice(2, listOf(Skill.ARCANA, Skill.HISTORY, Skill.INSIGHT, Skill.INVESTIGATION, Skill.MEDICINE, Skill.RELIGION)),
-                cantrips("cantrips", "Cantrips Known", 3, listOf(
-                    SpellStub("wiz_fire_bolt", "Fire Bolt", 0, "Evocation", "Hurl a mote of fire that deals fire damage on a hit."),
-                    SpellStub("wiz_mage_hand", "Mage Hand", 0, "Conjuration", "Conjure a spectral hand to manipulate objects at range."),
-                    SpellStub("wiz_minor_illusion", "Minor Illusion", 0, "Illusion", "Create a small sound or image illusion within range."),
-                    SpellStub("wiz_prestidigitation", "Prestidigitation", 0, "Transmutation", "A minor magical trick: clean, chill, warm, flavor, or light a small object."),
-                    SpellStub("wiz_ray_of_frost", "Ray of Frost", 0, "Evocation", "A ray of cold deals damage and reduces the target's speed."),
-                    SpellStub("wiz_shocking_grasp", "Shocking Grasp", 0, "Evocation", "Melee spell attack that deals lightning damage and prevents reactions."),
-                )),
-                cantrips("spellbook", "Spellbook (1st-Level Spells)", 6, listOf(
-                    SpellStub("wiz_magic_missile", "Magic Missile", 1, "Evocation", "Three darts of magical force automatically strike their targets."),
-                    SpellStub("wiz_shield", "Shield", 1, "Abjuration", "An invisible barrier grants +5 AC until your next turn as a reaction."),
-                    SpellStub("wiz_detect_magic", "Detect Magic", 1, "Divination", "Sense the presence of magic within 30 feet."),
-                    SpellStub("wiz_identify", "Identify", 1, "Divination", "Learn the properties of a magic item or effect."),
-                    SpellStub("wiz_mage_armor", "Mage Armor", 1, "Abjuration", "A protective magical field sets your base AC to 13 + Dexterity modifier."),
-                    SpellStub("wiz_sleep", "Sleep", 1, "Enchantment", "Weak-willed creatures nearby fall into a magical slumber."),
-                    SpellStub("wiz_burning_hands", "Burning Hands", 1, "Evocation", "A thin sheet of flame sweeps out from your hands."),
-                    SpellStub("wiz_comprehend", "Comprehend Languages", 1, "Divination", "Understand any spoken or written language for the duration."),
-                    SpellStub("wiz_feather_fall", "Feather Fall", 1, "Transmutation", "Slow the descent of falling creatures."),
-                    SpellStub("wiz_thunderwave", "Thunderwave", 1, "Evocation", "A wave of thunderous force pushes creatures away from you."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 3, catalogSpells("wizard", 0)),
+                cantrips("spellbook", "Spellbook (1st-Level Spells)", 6, catalogSpells("wizard", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.INT,
@@ -411,29 +337,8 @@ object ClassData {
                     Skill.ARCANA, Skill.HISTORY, Skill.INVESTIGATION,
                     Skill.MEDICINE, Skill.NATURE, Skill.PERCEPTION, Skill.SLEIGHT_OF_HAND,
                 )),
-                cantrips("cantrips", "Cantrips Known", 2, listOf(
-                    SpellStub("art_acid_splash", "Acid Splash", 0, "Evocation", "Hurl a bubble of acid that splashes one or two creatures you can see."),
-                    SpellStub("art_prestidigitation", "Prestidigitation", 0, "Transmutation", "A minor magical trick: clean, chill, warm, flavor, or light a small object."),
-                    SpellStub("art_dancing_lights", "Dancing Lights", 0, "Illusion", "Create up to four torch-sized lights that you can move around the battlefield."),
-                    SpellStub("art_fire_bolt", "Fire Bolt", 0, "Evocation", "Hurl a mote of fire at a creature or object within range."),
-                    SpellStub("art_guidance", "Guidance", 0, "Divination", "Touch a willing creature; it adds 1d4 to one ability check of its choice."),
-                    SpellStub("art_light", "Light", 0, "Evocation", "An object you touch sheds Bright Light in a 20-foot radius."),
-                    SpellStub("art_ray_of_frost", "Ray of Frost", 0, "Evocation", "A ray of cold deals damage and reduces the target's speed."),
-                    SpellStub("art_spare_the_dying", "Spare the Dying", 0, "Necromancy", "Stabilize a creature that has 0 Hit Points, without needing a Medicine check."),
-                    SpellStub("art_thorn_whip", "Thorn Whip", 0, "Transmutation", "A vine-like whip lashes out, dealing damage and pulling the target toward you."),
-                )),
-                cantrips("spells1", "Prepared Spells (Level 1)", 2, listOf(
-                    SpellStub("art_cure_wounds", "Cure Wounds", 1, "Abjuration", "A touch restores hit points to a creature."),
-                    SpellStub("art_grease", "Grease", 1, "Conjuration", "Slick grease covers the ground, knocking creatures Prone."),
-                    SpellStub("art_faerie_fire", "Faerie Fire", 1, "Evocation", "Outline creatures in colorful light, making them easier to hit."),
-                    SpellStub("art_absorb_elements", "Absorb Elements", 1, "Abjuration", "As a Reaction, gain Resistance to the triggering damage type and add damage to your next hit."),
-                    SpellStub("art_detect_magic", "Detect Magic", 1, "Divination", "Sense the presence of magic within 30 feet."),
-                    SpellStub("art_identify", "Identify", 1, "Divination", "Learn the properties of a magic item or effect."),
-                    SpellStub("art_jump", "Jump", 1, "Transmutation", "A creature you touch has its Jump distance tripled."),
-                    SpellStub("art_longstrider", "Longstrider", 1, "Transmutation", "A creature you touch gains 10 feet of Speed for an hour."),
-                    SpellStub("art_purify_food", "Purify Food and Drink", 1, "Transmutation", "Remove poison and rot from food and drink in a 5-foot Sphere."),
-                    SpellStub("art_tashas_caustic", "Tasha's Caustic Brew", 1, "Evocation", "A line of acid clings to creatures, dealing damage each turn."),
-                )),
+                cantrips("cantrips", "Cantrips Known", 2, catalogSpells("artificer", 0)),
+                cantrips("spells1", "Prepared Spells (Level 1)", 2, catalogSpells("artificer", 1)),
             ),
             isSpellcaster = true,
             spellcastingAbility = Ability.INT,

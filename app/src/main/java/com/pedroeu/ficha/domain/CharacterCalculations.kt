@@ -335,13 +335,18 @@ object CharacterCalculations {
         return adjust(character, OverridableStat.MAX_PREPARED_SPELLS, total)
     }
 
+    /**
+     * How many cantrips the character knows, summed across their classes.
+     *
+     * Like [maxPreparedSpells], each class reads its own table at its own level. Reading a
+     * single table at total character level was giving a Wizard 5 / Cleric 3 the cantrips of
+     * a level 8 Wizard and none of the Cleric's.
+     */
     fun maxCantripsKnown(character: PlayerCharacter): Int {
-        val progression = ProgressionData.forClass(character.classId) ?: return 0
-        return adjust(
-            character,
-            OverridableStat.CANTRIPS_KNOWN,
-            progression.cantripsKnownAt(character.level),
-        )
+        val total = ClassLevels.of(character).sumOf { entry ->
+            ProgressionData.forClass(entry.classId)?.cantripsKnownAt(entry.level) ?: 0
+        }
+        return adjust(character, OverridableStat.CANTRIPS_KNOWN, total)
     }
 
     // ------------------------------------------------------------------ Attacks & load

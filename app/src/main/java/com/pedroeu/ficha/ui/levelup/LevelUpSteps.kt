@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -452,11 +453,64 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
     var manualEntry by remember { mutableStateOf("") }
 
     StepColumn {
-        if (state.cantripsToLearn > 0) {
+        // The trade comes first: what you give up decides how many places there are to fill,
+        // and reading it the other way round means picking spells you then have to unpick.
+        if (state.canReplaceCantrip) {
+            item {
+                ReplacementHeader(
+                    title = tr("Trade a Cantrip"),
+                    explanation = tr(
+                        "Gaining a level lets you swap one cantrip for another. Pick the one " +
+                            "to give up, or leave this alone to keep them all."
+                    ),
+                    chosen = state.replacedCantripId,
+                    onClear = { state.replacedCantripId?.let(viewModel::toggleReplacedCantrip) },
+                )
+            }
+            val replaceable = state.replaceableCantrips
+            items(replaceable.size, key = { "drop-cantrip-${replaceable[it].id}" }) { index ->
+                val spell = replaceable[index]
+                SelectableCard(
+                    title = spell.name,
+                    subtitle = spell.description,
+                    selected = state.replacedCantripId == spell.id,
+                    onClick = { viewModel.toggleReplacedCantrip(spell.id) },
+                    trailingLabel = tr("Give up"),
+                )
+            }
+        }
+
+        if (state.canReplaceSpell) {
+            item {
+                ReplacementHeader(
+                    title = tr("Trade a Spell"),
+                    explanation = tr(
+                        "Gaining a level lets you replace one spell you know with another " +
+                            "from your class list. Pick the one to give up, or leave this " +
+                            "alone to keep them all."
+                    ),
+                    chosen = state.replacedSpellId,
+                    onClear = { state.replacedSpellId?.let(viewModel::toggleReplacedSpell) },
+                )
+            }
+            val replaceable = state.replaceableSpells
+            items(replaceable.size, key = { "drop-spell-${replaceable[it].id}" }) { index ->
+                val spell = replaceable[index]
+                SelectableCard(
+                    title = spell.name,
+                    subtitle = spell.description,
+                    selected = state.replacedSpellId == spell.id,
+                    onClick = { viewModel.toggleReplacedSpell(spell.id) },
+                    trailingLabel = trf("Level {0}", spell.level),
+                )
+            }
+        }
+
+        if (state.cantripsWanted > 0) {
             item {
                 SectionHeader(
                     tr("New Cantrips"),
-                    trailing = "${state.newCantrips.size} / ${state.cantripsToLearn}",
+                    trailing = "${state.newCantrips.size} / ${state.cantripsWanted}",
                 )
             }
             val cantrips = state.cantripOptions
@@ -472,11 +526,11 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             }
         }
 
-        if (state.spellsToLearn > 0) {
+        if (state.spellsWanted > 0) {
             item {
                 SectionHeader(
                     tr("New Spells"),
-                    trailing = "${state.newSpells.size + state.manualSpells.size} / ${state.spellsToLearn}",
+                    trailing = "${state.newSpells.size + state.manualSpells.size} / ${state.spellsWanted}",
                 )
             }
 
@@ -560,6 +614,34 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                     trailingLabel = spell.subtitle,
                 )
             }
+        }
+    }
+}
+
+/**
+ * The heading over an optional trade, with a way out of one already made.
+ *
+ * Optional is the whole point: the rules offer the swap, they never require it, so the step
+ * has to read as an invitation rather than a question that must be answered before you can
+ * move on.
+ */
+@Composable
+private fun ReplacementHeader(
+    title: String,
+    explanation: String,
+    chosen: String?,
+    onClear: () -> Unit,
+) {
+    Column {
+        SectionHeader(title, trailing = if (chosen == null) tr("Optional") else tr("1 traded"))
+        Text(
+            text = explanation,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        if (chosen != null) {
+            TextButton(onClick = onClear) { Text(tr("Keep it after all")) }
         }
     }
 }

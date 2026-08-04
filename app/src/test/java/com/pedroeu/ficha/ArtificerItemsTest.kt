@@ -120,7 +120,9 @@ class ArtificerItemsTest {
     }
 
     @Test
-    fun `plans accumulate across levels rather than replacing each other`() {
+    fun `plans saved under the old per-tier keys still accumulate`() {
+        // How the question used to be asked, before a tier restated the whole set. A
+        // character levelled then must open the app with their plans intact.
         val character = artificer(10, listOf("bag_of_holding")).copy(
             levelSelections = mapOf(
                 "2:replicate_plans_2" to listOf("bag_of_holding", "weapon_plus_1"),
@@ -130,6 +132,36 @@ class ArtificerItemsTest {
         )
 
         assertEquals(4, ArtificerItems.knownPlans(character).size)
+    }
+
+    @Test
+    fun `a new tier replaces the whole set rather than adding to it`() {
+        // Reaching level 6 is a chance to give up a plan taken at level 2. The level 6 answer
+        // is the whole set, so Bag of Holding is gone — not quietly kept alongside.
+        val character = artificer(6).copy(
+            levelSelections = mapOf(
+                "2:replicate_plans" to listOf(
+                    "shield_plus_1", "weapon_plus_1", "repeating_shot", "returning_weapon",
+                ),
+                "6:replicate_plans" to listOf(
+                    "weapon_plus_1", "repeating_shot", "returning_weapon",
+                    "dazzling_weapon", "sentinel_shield",
+                ),
+            )
+        )
+
+        val ids = ArtificerItems.knownPlans(character).map { it.plan.id }
+        assertEquals(5, ids.size)
+        assertTrue("the level 2 pick was traded away", "shield_plus_1" !in ids)
+    }
+
+    @Test
+    fun `the plans known column matches the class table`() {
+        // Forge of the Artificer, Plans Known: 4 at level 2, then 5, 6, 7, 8.
+        listOf(0 to 1, 4 to 2, 4 to 5, 5 to 6, 5 to 9, 6 to 10, 6 to 13, 7 to 14, 7 to 17, 8 to 18, 8 to 20)
+            .forEach { (expected, level) ->
+                assertEquals("plans known at level $level", expected, ArtificerItems.maxPlans(level))
+            }
     }
 
     @Test

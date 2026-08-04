@@ -58,19 +58,9 @@ object CharacterMasteries {
     private fun latestSelection(
         character: PlayerCharacter,
         classId: String,
-        level: Int,
-    ): List<String> {
-        val choiceId = "class:$classId:weapon_mastery"
-        for (candidate in level downTo 1) {
-            character.levelSelections["$candidate:$choiceId"]
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { return it }
-        }
-        // Characters made before the choice was keyed by level fall back to the flat maps.
-        return character.classChoiceSelections[choiceId]
-            ?: character.originChoiceSelections[choiceId]
-            ?: emptyList()
-    }
+        @Suppress("UNUSED_PARAMETER") level: Int,
+    ): List<String> =
+        ChoiceResolver.latestSelectionFor(character, "class:$classId:weapon_mastery")
 
     private fun MutableList<WeaponMastery>.addMastery(weaponId: String, source: String) {
         val weapon = EquipmentData.weaponById(weaponId) ?: return

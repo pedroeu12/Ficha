@@ -20,6 +20,8 @@ import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.CustomFeature
 import com.pedroeu.ficha.domain.CustomResource
 import com.pedroeu.ficha.domain.DeathSaves
+import com.pedroeu.ficha.data.model.SpellDef
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PerUseChoices
@@ -196,6 +198,46 @@ class SheetViewModel(
             knownSpells = character.knownSpells.map { spell ->
                 if (spell.id == spellId) spell.copy(prepared = !spell.prepared) else spell
             }
+        )
+    }
+
+    /**
+     * Prepare or set aside one spell, including one the character has never written down.
+     *
+     * A prepared caster picks from the whole class list, so most of what it can prepare is
+     * not on the sheet yet — preparing is what puts it there, and setting it aside takes it
+     * back off. Spells the player added by hand, and spells on a Wizard's spellbook, only
+     * have the flag flipped; those are theirs whether prepared or not.
+     */
+    fun setSpellPrepared(spell: KnownSpell, prepared: Boolean) = update { character ->
+        val onSheet = character.knownSpells.any { it.id == spell.id }
+        when {
+            prepared && !onSheet ->
+                character.copy(knownSpells = character.knownSpells + spell.copy(prepared = true))
+
+            !prepared && onSheet && CharacterSpells.isOnPreparedClassList(character, spell.id) ->
+                character.copy(knownSpells = character.knownSpells.filterNot { it.id == spell.id })
+
+            else -> character.copy(
+                knownSpells = character.knownSpells.map {
+                    if (it.id == spell.id) it.copy(prepared = prepared) else it
+                }
+            )
+        }
+    }
+
+    /** Trade one cantrip for another, keeping the count exactly where it was. */
+    fun swapCantrip(giveUpId: String, take: SpellDef, source: String) = update { character ->
+        character.copy(
+            knownSpells = character.knownSpells.filterNot { it.id == giveUpId } +
+                KnownSpell(
+                    id = take.id,
+                    name = take.name,
+                    level = take.level,
+                    school = take.school,
+                    description = take.description,
+                    source = source,
+                )
         )
     }
 

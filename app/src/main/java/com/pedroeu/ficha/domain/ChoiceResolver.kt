@@ -59,6 +59,27 @@ object ChoiceResolver {
         return emptyList()
     }
 
+    /**
+     * The answer given at the highest level, for a choice that restates its whole list.
+     *
+     * Weapon Mastery and the Artificer's arcane plans are asked again each time the count
+     * grows, and each asking replaces the previous answer rather than adding to it. Unioning
+     * every level's answer — which is what [selectionsFor] does, correctly, for a Battle
+     * Master's maneuvers — would leave a character who changed their mind holding both the
+     * old pick and the new one.
+     */
+    fun latestSelectionFor(character: PlayerCharacter, choiceId: String): List<String> {
+        val fromLevels = character.levelSelections
+            .filterKeys { it.substringAfter(':') == choiceId }
+            .filterValues { it.isNotEmpty() }
+            .maxByOrNull { it.key.substringBefore(':').toIntOrNull() ?: 0 }
+        if (fromLevels != null) return fromLevels.value
+        // Characters made before the choice was keyed by level fall back to the flat maps.
+        return character.classChoiceSelections[choiceId]
+            ?: character.originChoiceSelections[choiceId]
+            ?: emptyList()
+    }
+
     /** Turns stored option ids into names the sheet can print. */
     fun nameFor(choice: Choice, optionId: String): String {
         choice.options.find { it.id == optionId }?.let { return it.name }
@@ -153,6 +174,27 @@ object ChoiceResolver {
             subclassFeatureChoices(character) +
             originChoices(character))
             .distinctBy { it.choice.id to it.level }
+
+    /**
+     * The "pick some from a pool" features, gathered for Edit Mode to work on directly.
+     *
+     * Eldritch Invocations, Artificer plans, Fighting Styles, Weapon Masteries, Metamagic,
+     * Battle Master maneuvers — all the same shape: a list the class hands you and a number
+     * you may hold from it. They are normally decided during creation or a level up and only
+     * revisited through the feature that granted them, which is a long way to walk when what
+     * you want is to swap one invocation. This is the short way.
+     *
+     * A subclass isn't one of these — choosing it opens a whole flow of its own — and neither
+     * is a choice with nothing to weigh, where the pool is no bigger than the pick.
+     */
+    fun poolChoices(character: PlayerCharacter): List<ResolvedChoice> =
+        all(character)
+            .filter { it.choice.kind != ChoiceKind.SUBCLASS }
+            .filter { it.choice.options.size > it.choice.count }
+            .groupBy { it.choice.id }
+            // A choice asked at several levels is one decision; its newest form is current.
+            .map { (_, versions) -> versions.maxBy { it.level } }
+            .sortedWith(compareBy({ it.featureName }, { it.choice.label }))
 
     /**
      * Choices the rules let you revisit when you rest.

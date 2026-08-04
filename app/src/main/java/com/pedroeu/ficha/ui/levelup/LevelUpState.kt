@@ -16,6 +16,7 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.FeatPrerequisites
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -83,6 +84,14 @@ data class LevelUpState(
     val newSpells: List<String> = emptyList(),
     /** Spells typed in by hand, for levels the catalog doesn't cover. */
     val manualSpells: List<String> = emptyList(),
+    /**
+     * The one spell and the one cantrip being traded away this level, if any.
+     *
+     * Both are optional — the rules grant the swap, they don't require it — so neither ever
+     * blocks the step from advancing.
+     */
+    val replacedSpellId: String? = null,
+    val replacedCantripId: String? = null,
     /**
      * The class this level goes into. Defaults to the starting class, and is set to something
      * else when the player multiclasses.
@@ -218,6 +227,45 @@ data class LevelUpState(
         get() = SpellData.forClassUpTo(classId, maxSpellLevelForThisClass)
             .filter { it.level > 0 && it.id !in knownSpellIds }
 
+    // ------------------------------------------------- Replacing what you already know
+
+    /**
+     * Whether this level offers to trade one spell, or one cantrip, for another.
+     *
+     * The spell trade belongs to the classes with a fixed list — a Bard, Sorcerer, or
+     * Warlock has no other way to shed a spell that stopped earning its place. The cantrip
+     * trade belongs to everyone who has cantrips at all, except the Artificer, which does
+     * it on a Long Rest instead.
+     */
+    val canReplaceSpell: Boolean
+        get() = CharacterSpells.swapsSpellOnLevelUp(classId) && replaceableSpells.isNotEmpty()
+
+    val canReplaceCantrip: Boolean
+        get() = CharacterSpells.swapsCantripOnLevelUp(classId) && replaceableCantrips.isNotEmpty()
+
+    /** Spells the character actually chose for this class, which are the ones it may trade. */
+    val replaceableSpells: List<KnownSpell>
+        get() = ownSpells { it.level > 0 }
+
+    val replaceableCantrips: List<KnownSpell>
+        get() = ownSpells { it.level == 0 }
+
+    /**
+     * Spells belonging to the class being levelled and picked by the player.
+     *
+     * A spell the rules hand out — a subclass's always-prepared list, a feat's — isn't the
+     * character's to trade away, and it would come straight back on the next redraw anyway.
+     */
+    private fun ownSpells(predicate: (KnownSpell) -> Boolean): List<KnownSpell> {
+        val granted = CharacterSpells.granted(character).map { it.spell.id }.toSet()
+        val mine = character.knownSpells.filter(predicate).filterNot { it.id in granted }
+        // On a single-class sheet everything belongs to that class, including spells saved
+        // before the source label existed — the same rule [knownFromThisClass] counts by.
+        if (!ClassLevels.isMulticlassed(character) && !isNewClass) return mine
+        val className = ClassData.byId(classId)?.name ?: classId
+        return mine.filter { it.source.equals(className, ignoreCase = true) }
+    }
+
     /**
      * True when the catalog can't satisfy this level on its own, so the player is offered a
      * free-text box. That covers spells above the catalogued range and the case where an
@@ -244,7 +292,11 @@ data class LevelUpState(
             }
             if (grantsAsi || grantsEpicBoon) add(LevelUpStep.ASI)
             if (featChoices.isNotEmpty()) add(LevelUpStep.FEAT_CHOICES)
-            if (cantripsToLearn > 0 || spellsToLearn > 0) add(LevelUpStep.SPELLS)
+            // The swap is offered at every level of a fixed-list caster, not only the levels
+            // that hand out something new, so the step has to appear for it alone.
+            if (cantripsToLearn > 0 || spellsToLearn > 0 || canReplaceSpell || canReplaceCantrip) {
+                add(LevelUpStep.SPELLS)
+            }
             add(LevelUpStep.SUMMARY)
         }
 
@@ -274,16 +326,27 @@ data class LevelUpState(
     }
 
     private fun spellsValid(): Boolean {
-        val cantripsOk = newCantrips.size == cantripsToLearn
+        // A traded-away spell leaves a place to fill, so the counts this step must satisfy
+        // grow by one for each replacement the player has chosen to make.
+        val cantripsOk = newCantrips.size == cantripsToLearn + replacedCount(replacedCantripId)
         val totalSpells = newSpells.size + manualSpells.size
+        val spellsWanted = spellsToLearn + replacedCount(replacedSpellId)
         // Manual entry covers levels the catalog lacks, so accept at least the required count.
         val spellsOk = if (needsManualSpellEntry) {
-            totalSpells >= spellsToLearn || spellOptions.isEmpty()
+            totalSpells >= spellsWanted || spellOptions.isEmpty()
         } else {
-            totalSpells == spellsToLearn
+            totalSpells == spellsWanted
         }
         return cantripsOk && spellsOk
     }
+
+    private fun replacedCount(id: String?) = if (id == null) 0 else 1
+
+    /** How many cantrips this step is waiting for, counting one traded away. */
+    val cantripsWanted: Int get() = cantripsToLearn + replacedCount(replacedCantripId)
+
+    /** How many level 1+ spells this step is waiting for, counting one traded away. */
+    val spellsWanted: Int get() = spellsToLearn + replacedCount(replacedSpellId)
 
     /**
      * The feats on offer. A feat already taken is left out entirely rather than shown and

@@ -612,5 +612,43 @@ object PortugueseStrings {
         "You are {0}. Continue in one of those, or start a new class if your scores allow it." to
             "Você é {0}. Continue em uma dessas, ou comece uma nova classe se seus valores " +
             "permitirem.",
+        // ---- Preparing spells, trading spells, and the pool-feature editor
+        "Choose the spells you have ready for the day. Tap one to prepare or set it aside." to
+            "Escolha as magias que você deixa prontas para o dia. Toque em uma para prepará-la " +
+            "ou guardá-la.",
+        "Prepare" to "Preparar",
+        "Swap a {0} Cantrip" to "Trocar um Truque de {0}",
+        "You may trade one cantrip for another as you rest. Optional." to
+            "Você pode trocar um truque por outro durante o descanso. Opcional.",
+        "Trade" to "Trocar",
+        "Setting down {0}. Choose what to learn instead." to
+            "Deixando {0} de lado. Escolha o que aprender no lugar.",
+        "Keep it after all" to "Continuar com ele",
+        "Learn" to "Aprender",
+        "Trade a Cantrip" to "Trocar um Truque",
+        "Trade a Spell" to "Trocar uma Magia",
+        "Gaining a level lets you swap one cantrip for another. Pick the one to give up, or " +
+            "leave this alone to keep them all." to
+            "Subir de nível permite trocar um truque por outro. Escolha qual abrir mão, ou " +
+            "deixe como está para manter todos.",
+        "Gaining a level lets you replace one spell you know with another from your class " +
+            "list. Pick the one to give up, or leave this alone to keep them all." to
+            "Subir de nível permite substituir uma magia que você conhece por outra da lista " +
+            "da sua classe. Escolha qual abrir mão, ou deixe como está para manter todas.",
+        "Optional" to "Opcional",
+        "1 traded" to "1 trocada",
+        "Give up" to "Abrir mão",
+        "Chosen Features" to "Características Escolhidas",
+        "Everything you pick from a list — invocations, plans, styles, masteries. Add or " +
+            "remove any of them freely here." to
+            "Tudo o que você escolhe de uma lista — invocações, planos, estilos, maestrias. " +
+            "Adicione ou remova qualquer um deles livremente aqui.",
+        "{0} • {1} of {2} chosen" to "{0} • {1} de {2} escolhidos",
+        "Nothing chosen yet." to "Nada escolhido ainda.",
+        "{0} of {1} chosen. Tap to take one up or set one down." to
+            "{0} de {1} escolhidos. Toque para pegar um ou deixar um de lado.",
+        "Change {0}" to "Mudar {0}",
+        "Remove {0}" to "Remover {0}",
+        "Add {0}" to "Adicionar {0}",
     )
 }

@@ -233,8 +233,15 @@ class AttacksAndDcsTest {
 
         assertTrue("cantrips must be offered", cantrips.isNotEmpty())
         assertTrue("level 1 spells must be offered", level1.isNotEmpty())
-        assertTrue(cantrips.any { it.name == "Mending" })
+        assertTrue(cantrips.any { it.name == "Mage Hand" })
         assertTrue(level1.any { it.name == "Cure Wounds" })
+
+        // Tinker's Magic hands the Artificer Mending outright. Putting it on the list too
+        // would offer, as a choice, a cantrip they already have and can't decline.
+        assertTrue(
+            "Mending is granted by Tinker's Magic, not chosen from the list",
+            cantrips.none { it.name == "Mending" },
+        )
     }
 
     @Test

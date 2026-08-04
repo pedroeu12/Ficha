@@ -53,7 +53,9 @@ class LevelUpViewModel(
      */
     private fun LevelUpState.withExistingAnswers(): LevelUpState {
         val seeded = featureChoices.mapNotNull { choice ->
-            ChoiceResolver.selectionsFor(character, choice.id)
+            // The latest answer, not every level's — a choice that restates its whole list
+            // should show what is currently held, and unioning would show what was ever held.
+            ChoiceResolver.latestSelectionFor(character, choice.id)
                 .takeIf { it.isNotEmpty() }
                 ?.take(choice.count)
                 ?.let { choice.id to it }
@@ -103,6 +105,8 @@ class LevelUpViewModel(
                 newCantrips = emptyList(),
                 newSpells = emptyList(),
                 manualSpells = emptyList(),
+                replacedSpellId = null,
+                replacedCantripId = null,
                 rolledHitPoints = null,
             )
         }
@@ -158,18 +162,43 @@ class LevelUpViewModel(
 
     fun toggleCantrip(spellId: String) = edit { current ->
         val selected = current.newCantrips
+        val wanted = current.cantripsWanted
         val next = when {
             selected.contains(spellId) -> selected - spellId
-            selected.size < current.cantripsToLearn -> selected + spellId
-            current.cantripsToLearn == 1 -> listOf(spellId)
+            selected.size < wanted -> selected + spellId
+            wanted == 1 -> listOf(spellId)
+            wanted == 0 -> selected
             else -> selected.drop(1) + spellId
         }
         current.copy(newCantrips = next)
     }
 
+    /**
+     * Choose, or unchoose, the one spell traded away this level.
+     *
+     * Dropping the replacement also drops whatever was picked to fill its place, because the
+     * pick only existed on account of the trade — leaving it behind would quietly hand the
+     * character a spell it hadn't earned.
+     */
+    fun toggleReplacedSpell(spellId: String) = edit { current ->
+        if (current.replacedSpellId == spellId) {
+            current.copy(replacedSpellId = null, newSpells = current.newSpells.dropLast(1))
+        } else {
+            current.copy(replacedSpellId = spellId)
+        }
+    }
+
+    fun toggleReplacedCantrip(spellId: String) = edit { current ->
+        if (current.replacedCantripId == spellId) {
+            current.copy(replacedCantripId = null, newCantrips = current.newCantrips.dropLast(1))
+        } else {
+            current.copy(replacedCantripId = spellId)
+        }
+    }
+
     fun toggleSpell(spellId: String) = edit { current ->
         val selected = current.newSpells
-        val limit = (current.spellsToLearn - current.manualSpells.size).coerceAtLeast(0)
+        val limit = (current.spellsWanted - current.manualSpells.size).coerceAtLeast(0)
         val next = when {
             selected.contains(spellId) -> selected - spellId
             selected.size < limit -> selected + spellId
@@ -339,7 +368,11 @@ class LevelUpViewModel(
                 ).distinct(),
             abilityScoreImprovements = abilityImprovements,
             featIds = character.featIds + listOfNotNull(state.featId),
-            knownSpells = (character.knownSpells + learnedSpells).distinctBy { it.id },
+            knownSpells = (
+                character.knownSpells
+                    .filterNot { it.id == state.replacedSpellId || it.id == state.replacedCantripId } +
+                    learnedSpells
+                ).distinctBy { it.id },
             levelSelections = character.levelSelections + choiceSelections,
             originChoiceSelections = character.originChoiceSelections + featSelections,
         ).let { updated ->

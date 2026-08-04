@@ -74,18 +74,18 @@ class CreationStateTest {
 
         val partial = base.copy(
             classSelections = mapOf(
-                "cantrips" to listOf("wiz_fire_bolt", "wiz_mage_hand", "wiz_minor_illusion"),
-                "spellbook" to listOf("wiz_magic_missile"),
+                "cantrips" to listOf("fire_bolt", "mage_hand", "minor_illusion"),
+                "spellbook" to listOf("magic_missile"),
             )
         )
         assertFalse(partial.canAdvance)
 
         val complete = base.copy(
             classSelections = mapOf(
-                "cantrips" to listOf("wiz_fire_bolt", "wiz_mage_hand", "wiz_minor_illusion"),
+                "cantrips" to listOf("fire_bolt", "mage_hand", "minor_illusion"),
                 "spellbook" to listOf(
-                    "wiz_magic_missile", "wiz_shield", "wiz_detect_magic",
-                    "wiz_identify", "wiz_mage_armor", "wiz_sleep",
+                    "magic_missile", "shield", "detect_magic",
+                    "identify", "mage_armor", "sleep",
                 ),
             )
         )

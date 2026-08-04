@@ -162,6 +162,12 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
         // permanent pick and hid two thirds of the feature.
         item { PerUseChoicesCard(character, viewModel) }
 
+        // Edit Mode's shortcut to every pick-from-a-pool feature at once, so swapping an
+        // invocation doesn't mean walking back through the feature that granted it.
+        if (editMode) {
+            item { PoolFeaturesCard(character, viewModel) }
+        }
+
         if (species != null) {
             item {
                 FeatureCard(trf("Species Traits — {0}", species.name)) {

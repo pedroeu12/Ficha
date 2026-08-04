@@ -2,6 +2,7 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.EquipmentData
 import com.pedroeu.ficha.data.content.MagicItemData
+import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.ReplicaData
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.MagicItem
@@ -44,8 +45,17 @@ object ArtificerItems {
 
     private const val CLASS_ID = "artificer"
 
-    /** The choice ids the class table uses to ask which plans are learned. */
-    private const val PLAN_CHOICE_PREFIX = "replicate_plans_"
+    /** The key the class table asks its plan question under, at every tier. */
+    private val PLAN_CHOICE_ID = ProgressionData.PLAN_CHOICE_ID
+
+    /**
+     * How the question used to be asked: one key per tier, each adding a plan.
+     *
+     * Characters levelled before the tiers restated the whole set still carry these, so they
+     * are read when there is no answer under the single key — otherwise a level 10 Artificer
+     * would open the app to find their plans gone.
+     */
+    private const val LEGACY_PLAN_PREFIX = "replicate_plans_"
 
     /**
      * The Infused Items column: how many made items can exist at once.
@@ -72,25 +82,35 @@ object ArtificerItems {
     fun allowance(character: PlayerCharacter): Int = maxMadeItems(artificerLevel(character))
 
     /**
+     * How many plans the character knows, from the Plans Known column.
+     *
+     * Four at level 2, then one more at each of 6, 10, 14, and 18 — but the whole set is
+     * chosen afresh at each of those levels rather than added to, which is what lets a plan
+     * taken at level 2 ever be given up.
+     */
+    fun maxPlans(artificerLevel: Int): Int = when {
+        artificerLevel >= 18 -> 8
+        artificerLevel >= 14 -> 7
+        artificerLevel >= 10 -> 6
+        artificerLevel >= 6 -> 5
+        artificerLevel >= 2 -> 4
+        else -> 0
+    }
+
+    /**
      * Every plan the character has learned, in name order.
      *
-     * The plans are chosen at several levels and each choice is stored under its own key, so
-     * they accumulate rather than replacing each other — unlike weapon mastery, where each
-     * asking restates the whole list.
+     * The newest answer wins outright. Each tier asks the question again with the whole set
+     * on the table, so merging the tiers would leave an Artificer who traded a plan away at
+     * level 6 still holding it.
      */
     fun knownPlans(character: PlayerCharacter): List<KnownPlan> {
         if (!hasFeature(character)) return emptyList()
 
-        val fromLevels = character.levelSelections
-            .filterKeys { it.substringAfter(':').startsWith(PLAN_CHOICE_PREFIX) }
-            .values
-            .flatten()
-        val fromFlatMaps = (character.classChoiceSelections + character.originChoiceSelections)
-            .filterKeys { it.startsWith(PLAN_CHOICE_PREFIX) }
-            .values
-            .flatten()
+        val current = ChoiceResolver.latestSelectionFor(character, PLAN_CHOICE_ID)
+        val chosen = current.ifEmpty { legacyPlans(character) }
 
-        return (fromLevels + fromFlatMaps)
+        return chosen
             .distinct()
             .mapNotNull { planId -> MagicItemData.byId(planId) }
             // A plan learned above the character's current level — after losing a level, say —
@@ -98,6 +118,19 @@ object ArtificerItems {
             .filter { plan -> (plan.artificerPlanLevel ?: 0) <= artificerLevel(character) }
             .sortedBy { it.name }
             .map { plan -> KnownPlan(plan = plan, base = ReplicaData.baseChoiceFor(plan)) }
+    }
+
+    /** Plans recorded under the old per-tier keys, unioned as they were then meant to be. */
+    private fun legacyPlans(character: PlayerCharacter): List<String> {
+        val fromLevels = character.levelSelections
+            .filterKeys { it.substringAfter(':').startsWith(LEGACY_PLAN_PREFIX) }
+            .values
+            .flatten()
+        val fromFlatMaps = (character.classChoiceSelections + character.originChoiceSelections)
+            .filterKeys { it.startsWith(LEGACY_PLAN_PREFIX) }
+            .values
+            .flatten()
+        return fromLevels + fromFlatMaps
     }
 
     /** The items currently made, in inventory order. */

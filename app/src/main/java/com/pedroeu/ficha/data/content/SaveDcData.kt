@@ -51,6 +51,13 @@ object SaveDcData {
             "hell_knight", "Hellfire Surge", Ability.CON,
             "Hellfire Surge, which uses 8 plus your Constitution modifier and Proficiency Bonus.",
         ),
+        // A Barbarian's own DC is Strength-based; these two are not, and a player reading
+        // one number off the sheet for both would be wrong every time.
+        "path_of_lament" to DcSource(
+            "path_of_lament", "Path of Lament", Ability.CON,
+            "Banshee's Wail and Horrifying Strike, which use 8 plus your Constitution " +
+                "modifier and Proficiency Bonus.",
+        ),
         "hollow_warden" to DcSource(
             "hollow_warden", "Unnerving Aura", Ability.WIS,
             "Wrath of the Wild's Unnerving Aura, using your Ranger spell save DC.",

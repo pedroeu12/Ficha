@@ -60,6 +60,63 @@ object ProgressionData {
     /** The single key every tier of the Artificer's plan choice is stored under. */
     const val PLAN_CHOICE_ID = "replicate_plans"
 
+    /**
+     * Every Eldritch Invocation on offer, including the two that came with the Primordial
+     * Patron. Both of those name a damage type, which is asked separately once the invocation
+     * is held — see [OriginChoices.forClass].
+     */
+    private val INVOCATION_OPTIONS = listOf(
+        ChoiceOption("agonizing_blast", "Agonizing Blast", "Choose one of your known Warlock cantrips that deals damage. You add your Charisma modifier to that spell's damage against any target it hits. Prerequisite: a Warlock cantrip that deals damage."),
+        ChoiceOption("armor_of_shadows", "Armor of Shadows", "You can cast Mage Armor on yourself without expending a spell slot or material components."),
+        ChoiceOption("devils_sight", "Devil's Sight", "You can see normally in Dim Light and Darkness, both magical and nonmagical, within 120 feet of yourself."),
+        ChoiceOption("eldritch_mind", "Eldritch Mind", "You have Advantage on Constitution saving throws that you make to maintain Concentration."),
+        ChoiceOption("mask_of_many_faces", "Mask of Many Faces", "You can cast Disguise Self without expending a spell slot."),
+        ChoiceOption("pact_blade", "Pact of the Blade", "As a Bonus Action, you can conjure a pact weapon in your hand — a Simple or Martial Melee weapon of your choice with which you bond. You have proficiency with it while you wield it, and it counts as Magical. You can use your Charisma modifier instead of Strength or Dexterity for its attack and damage rolls."),
+        ChoiceOption("pact_chain", "Pact of the Chain", "You learn Find Familiar and can cast it as a Magic action without expending a spell slot. Your familiar can take the form of an Imp, Pseudodragon, Quasit, Skeleton, Slaad Tadpole, Sphinx of Wonder, Sprite, or Venomous Snake, and when you take the Attack action you can forgo one attack to let your familiar make one attack of its own."),
+        ChoiceOption("pact_tome", "Pact of the Tome", "Choose three cantrips and one level 1 spell with the Ritual tag from any class's spell list. They are written in a Book of Shadows, and you can cast the spells in it as Rituals. The book is your Spellcasting Focus, and if it is lost you can perform a 1-hour ceremony to replace it."),
+        ChoiceOption("elemental_overflow", "Elemental Overflow", "Choose a damage type: Acid, Cold, Fire, Lightning, or Thunder. Whenever you cast a spell that deals the chosen damage type, you can cause elemental energy to wreathe you until the end of your next turn. For the duration, whenever a creature within 5 feet of you hits you with a melee attack roll, that creature takes 1d4 damage of the chosen damage type. Repeatable: you can gain this invocation more than once, choosing a different damage type each time — hold one damage type per taking in the Elemental Overflow choice this raises. Prerequisite: Level 5+ Warlock."),
+        ChoiceOption("elemental_transmutation", "Elemental Transmutation", "Choose a damage type: Acid, Cold, Fire, Lightning, or Thunder. Once per turn, whenever you deal damage of any of those types, you can deal the chosen damage type instead. Prerequisite: Level 2+ Warlock."),
+    )
+
+    /**
+     * How many invocations a Warlock knows, from the 2024 Eldritch Invocations column.
+     *
+     * Capped by how many the app actually offers: promising ten and listing eight would leave
+     * the level-up step unable to complete.
+     */
+    private fun invocationsKnownAt(level: Int): Int = when {
+        level >= 18 -> 10
+        level >= 15 -> 9
+        level >= 12 -> 8
+        level >= 9 -> 7
+        level >= 7 -> 6
+        level >= 5 -> 5
+        level >= 2 -> 3
+        else -> 1
+    }.coerceAtMost(INVOCATION_OPTIONS.size)
+
+    /**
+     * The invocation question, asked again at each level the count grows.
+     *
+     * One id across every level, on the same footing as Weapon Mastery and the Artificer's
+     * plans: each asking restates the whole set, the newest answer wins, and the level-up
+     * flow arrives with the current invocations already ticked.
+     */
+    private fun invocationChoice(level: Int) = Choice(
+        id = INVOCATION_CHOICE_ID,
+        label = "Eldritch Invocations",
+        prompt = "Choose your ${invocationsKnownAt(level)} Eldritch Invocation" +
+            "${if (invocationsKnownAt(level) == 1) "" else "s"}. You can keep the ones you " +
+            "have or trade any of them now.",
+        count = invocationsKnownAt(level),
+        kind = ChoiceKind.OPTION,
+        options = INVOCATION_OPTIONS,
+        source = "Level $level",
+    )
+
+    /** The single key every level of the Warlock's invocation choice is stored under. */
+    const val INVOCATION_CHOICE_ID = "invocations"
+
     private val METAMAGIC_OPTIONS = listOf(
         ChoiceOption("careful", "Careful Spell", "When you cast a spell that forces other creatures to make a saving throw, you can protect some of them. You spend 1 Sorcery Point and choose a number of those creatures up to your Charisma modifier (minimum of one). A chosen creature automatically succeeds on its saving throw against the spell, and it takes no damage if it would normally take half damage on a successful save.", "1 Sorcery Point"),
         ChoiceOption("distant", "Distant Spell", "When you cast a spell that has a range of 5 feet or greater, you can spend 1 Sorcery Point to double the spell's range. Or when you cast a spell that has a range of Touch, you can spend 1 Sorcery Point to make its range 30 feet.", "1 Sorcery Point"),
@@ -441,17 +498,15 @@ object ProgressionData {
             asiLevels = STANDARD_ASI,
             features = listOf(
                 feature(1, "Pact Magic", "You cast Warlock spells using Charisma. Your slots are always at the highest level you can cast and return on a Short Rest."),
-                feature(1, "Eldritch Invocations", "Choose Eldritch Invocations that grant passive and active magical powers.",
-                    Choice("invocations_1", "Eldritch Invocations", "Choose 1 Eldritch Invocation.", 1, ChoiceKind.OPTION, listOf(
-                        ChoiceOption("agonizing_blast", "Agonizing Blast", "Choose one of your known Warlock cantrips that deals damage. You add your Charisma modifier to that spell's damage against any target it hits. Prerequisite: a Warlock cantrip that deals damage."),
-                        ChoiceOption("armor_of_shadows", "Armor of Shadows", "You can cast Mage Armor on yourself without expending a spell slot or material components."),
-                        ChoiceOption("devils_sight", "Devil's Sight", "You can see normally in Dim Light and Darkness, both magical and nonmagical, within 120 feet of yourself."),
-                        ChoiceOption("eldritch_mind", "Eldritch Mind", "You have Advantage on Constitution saving throws that you make to maintain Concentration."),
-                        ChoiceOption("mask_of_many_faces", "Mask of Many Faces", "You can cast Disguise Self without expending a spell slot."),
-                        ChoiceOption("pact_blade", "Pact of the Blade", "As a Bonus Action, you can conjure a pact weapon in your hand — a Simple or Martial Melee weapon of your choice with which you bond. You have proficiency with it while you wield it, and it counts as Magical. You can use your Charisma modifier instead of Strength or Dexterity for its attack and damage rolls."),
-                        ChoiceOption("pact_chain", "Pact of the Chain", "You learn Find Familiar and can cast it as a Magic action without expending a spell slot. Your familiar can take the form of an Imp, Pseudodragon, Quasit, Skeleton, Slaad Tadpole, Sphinx of Wonder, Sprite, or Venomous Snake, and when you take the Attack action you can forgo one attack to let your familiar make one attack of its own."),
-                        ChoiceOption("pact_tome", "Pact of the Tome", "Choose three cantrips and one level 1 spell with the Ritual tag from any class's spell list. They are written in a Book of Shadows, and you can cast the spells in it as Rituals. The book is your Spellcasting Focus, and if it is lost you can perform a 1-hour ceremony to replace it."),
-                    ), "Level 1")),
+                feature(1, "Eldritch Invocations", "Choose Eldritch Invocations that grant passive and active magical powers. The number you know grows as you gain Warlock levels, and each time it does you choose your whole set again — so an invocation that has stopped earning its place can be given up.",
+                    invocationChoice(1)),
+                feature(2, "Eldritch Invocations", "You now know three Eldritch Invocations.", invocationChoice(2)),
+                feature(5, "Eldritch Invocations", "You now know five Eldritch Invocations.", invocationChoice(5)),
+                feature(7, "Eldritch Invocations", "You now know six Eldritch Invocations.", invocationChoice(7)),
+                feature(9, "Eldritch Invocations", "You now know seven Eldritch Invocations.", invocationChoice(9)),
+                feature(12, "Eldritch Invocations", "You now know eight Eldritch Invocations.", invocationChoice(12)),
+                feature(15, "Eldritch Invocations", "You now know nine Eldritch Invocations.", invocationChoice(15)),
+                feature(18, "Eldritch Invocations", "You now know ten Eldritch Invocations.", invocationChoice(18)),
                 feature(2, "Magical Cunning", "Once per Long Rest, spend 1 minute to regain expended Pact Magic spell slots."),
                 feature(9, "Contact Patron", "You always have Contact Other Plane prepared and can cast it once per Long Rest to reach your patron."),
                 feature(11, "Mystic Arcanum (Level 6)", "Choose a level 6 spell you can cast once per Long Rest without a slot."),

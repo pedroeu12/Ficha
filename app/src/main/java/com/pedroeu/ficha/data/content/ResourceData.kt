@@ -1197,6 +1197,75 @@ object ResourceData {
                 )
             }
 
+            // ------------------------------------------ UA 2026: Villainous Options 2
+
+            "path_of_lament" -> buildList {
+                if (level >= 3) add(
+                    ResourceDef(
+                        id = "path_of_lament:banshees_wail",
+                        name = "Banshee's Wail",
+                        max = c.modAtLeastOne(Ability.CON),
+                        recharge = Recharge.LONG_REST,
+                        source = "Path of Lament",
+                        notes = "You can also regain all uses by expending a use of your " +
+                            "Rage (no action required).",
+                    )
+                )
+                if (level >= 14) add(
+                    ResourceDef(
+                        id = "path_of_lament:sorrow_form",
+                        name = "Sorrow Form",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Path of Lament",
+                        notes = "Activated when you enter your Rage; lasts 1 minute or until " +
+                            "you drop to 0 Hit Points.",
+                    )
+                )
+            }
+
+            "primordial_patron" -> buildList {
+                if (level >= 3) add(
+                    ResourceDef(
+                        id = "primordial_patron:elemental_node",
+                        name = "Elemental Node",
+                        max = 1,
+                        recharge = Recharge.SHORT_REST,
+                        source = "Primordial Patron",
+                        notes = "Or expend a Pact Magic spell slot (no action required) to " +
+                            "restore your use of it.",
+                    )
+                )
+                if (level >= 6) add(
+                    ResourceDef(
+                        id = "primordial_patron:elemental_teleport",
+                        name = "Elemental Teleport",
+                        max = c.modAtLeastOne(Ability.CHA),
+                        recharge = Recharge.LONG_REST,
+                        source = "Elemental Haven",
+                        description = "As a Bonus Action, you can teleport into your " +
+                            "Elemental Node or the nearest unoccupied space within 5 feet " +
+                            "of it.",
+                    )
+                )
+                if (level >= 14) add(
+                    ResourceDef(
+                        id = "primordial_patron:primordial_herald",
+                        name = "Primordial Herald",
+                        max = 1,
+                        // Not a rest at all: 2d4 of them. Tracked as a use the player clears
+                        // by hand, because no rest the app knows about should refill it.
+                        recharge = Recharge.SPECIAL,
+                        source = "Elemental Harbinger",
+                        description = "While you're within your node's area, you can cast " +
+                            "the Planar Ally spell without expending a spell slot, speaking " +
+                            "the name of your patron when you do.",
+                        notes = "Once used, you can't do so again until you finish 2d4 Long " +
+                            "Rests — roll them and clear this by hand when they are done.",
+                    )
+                )
+            }
+
             // ------------------------------------------ UA 2025: Horror Subclasses
 
             "reanimator" -> buildList {

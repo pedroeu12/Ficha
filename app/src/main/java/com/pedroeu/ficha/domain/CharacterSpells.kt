@@ -226,6 +226,9 @@ object CharacterSpells {
                 speciesId = if (index == 0) character.speciesId else "",
                 lineageId = if (index == 0) character.lineageId else null,
                 featIds = if (index == 0) character.featIds else emptyList(),
+                // A grant can hang off an answer rather than a source: the Primordial
+                // Patron's list follows the element it chose, which changes on any level up.
+                selections = ChoiceResolver.answers(character),
             ).filter { (sourceId, grant) ->
                 // Species and feat grants key off total character level; class and subclass
                 // grants key off the level in that class.

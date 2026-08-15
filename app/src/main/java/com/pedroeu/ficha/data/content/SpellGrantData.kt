@@ -196,6 +196,14 @@ object SpellGrantData {
             at(7, "giant_insect", "hallucinatory_terrain") +
             at(9, "contact_other_plane", "modify_memory"),
 
+        // ---- Unearthed Arcana 2026: Villainous Options 2
+        // Commune with the Dead: a Ritual-only casting, so it belongs on the list even though
+        // the Barbarian otherwise has no spells at all.
+        "path_of_lament" to at(6, "speak_with_dead"),
+        // The Primordial Patron's list follows its chosen element and lives in BY_CHOICE.
+        // Primordial Herald is the one part that doesn't: it casts Planar Ally regardless.
+        "primordial_patron" to at(14, "planar_ally"),
+
         // ---- Unearthed Arcana 2025: Horror Subclasses
         "reanimator" to at(3, "false_life", "spare_the_dying", "witch_bolt") +
             at(5, "blindness_deafness", "enhance_ability") +
@@ -325,6 +333,59 @@ object SpellGrantData {
     fun sourceIds(): Set<String> =
         BY_CLASS.keys + BY_SUBCLASS.keys + BY_SPECIES.keys + BY_LINEAGE.keys + BY_FEAT.keys
 
+    // ------------------------------------------------------------------ Answers
+
+    /**
+     * Grants that follow an answer the player gave rather than a fixed source.
+     *
+     * The Primordial Patron is the first of these: its always-prepared list depends on the
+     * element it chose, and that element changes every time the Warlock gains a level. Since
+     * grants are derived at read time rather than written into the character, changing the
+     * element on Tuesday swaps the whole list on Tuesday — no migration, nothing left behind.
+     *
+     * [owner] is the class or subclass whose *own* level the grant's level counts against, so
+     * a Warlock 5 / Fighter 3 gets their level 5 elemental spells, not their level 8 ones.
+     */
+    private data class ChoiceGrants(val owner: String, val grants: List<Grant>)
+
+    /** The four elemental lists, keyed "<choiceId>:<optionId>". */
+    private val BY_CHOICE: Map<String, ChoiceGrants> = run {
+        // Every element shares these; only the element-specific rows differ.
+        val shared = at(3, "chromatic_orb", "darkvision") +
+            at(5, "elemental_weapon") +
+            at(7, "summon_elemental") +
+            at(9, "commune_with_nature")
+
+        fun element(vararg rows: List<Grant>) =
+            ChoiceGrants("primordial_patron", shared + rows.toList().flatten())
+
+        val choice = SubclassData.ELEMENT_CHOICE_ID
+        mapOf(
+            "$choice:air" to element(
+                at(3, "feather_fall", "shatter"), at(5, "fly"),
+                at(7, "freedom_of_movement"), at(9, "steel_wind_strike"),
+            ),
+            "$choice:earth" to element(
+                at(3, "entangle", "knock"), at(5, "plant_growth"),
+                at(7, "vitriolic_sphere"), at(9, "wall_of_stone"),
+            ),
+            "$choice:fire" to element(
+                at(3, "burning_hands", "heat_metal"), at(5, "fireball"),
+                at(7, "wall_of_fire"), at(9, "flame_strike"),
+            ),
+            "$choice:water" to element(
+                at(3, "alter_self", "ice_knife"), at(5, "water_walk"),
+                at(7, "control_water"), at(9, "cone_of_cold"),
+            ),
+        )
+    }
+
+    /** Every choice-keyed grant, so a test can hold each one against a real spell. */
+    fun choiceGrantKeys(): Set<String> = BY_CHOICE.keys
+
+    fun choiceGrantSpellIds(): Set<String> =
+        BY_CHOICE.values.flatMap { it.grants }.map { it.spellId }.toSet()
+
     /** Everything the character is handed outright, before any level filtering. */
     fun forSources(
         classId: String,
@@ -332,11 +393,22 @@ object SpellGrantData {
         speciesId: String,
         lineageId: String?,
         featIds: List<String>,
+        selections: Map<String, List<String>> = emptyMap(),
     ): List<Pair<String, Grant>> = buildList {
         BY_CLASS[classId]?.forEach { add(classId to it) }
         subclassId?.let { id -> BY_SUBCLASS[id]?.forEach { add(id to it) } }
         BY_SPECIES[speciesId]?.forEach { add(speciesId to it) }
         lineageId?.let { id -> BY_LINEAGE[id]?.forEach { add(id to it) } }
         featIds.forEach { featId -> BY_FEAT[featId]?.forEach { add(featId to it) } }
+
+        selections.forEach { (choiceId, optionIds) ->
+            optionIds.forEach { optionId ->
+                BY_CHOICE["$choiceId:$optionId"]?.let { entry ->
+                    // Filed under its owner so the level filter and the source caption both
+                    // treat it as what it is: a feature of that subclass.
+                    entry.grants.forEach { add(entry.owner to it) }
+                }
+            }
+        }
     }
 }

@@ -60,6 +60,24 @@ object ChoiceResolver {
     }
 
     /**
+     * Every question the character has answered, flattened to choice id against option ids.
+     *
+     * The three maps a selection can live in are an implementation detail of when it was
+     * made, not of what it means, and a feature that raises a follow-up question shouldn't
+     * have to know which one to look in. Where a question was answered at several levels the
+     * newest answer wins, on the same reasoning as [latestSelectionFor].
+     */
+    fun answers(character: PlayerCharacter): Map<String, List<String>> {
+        val flat = mutableMapOf<String, List<String>>()
+        flat += character.classChoiceSelections
+        flat += character.originChoiceSelections
+        character.levelSelections.entries
+            .sortedBy { it.key.substringBefore(':').toIntOrNull() ?: 0 }
+            .forEach { (key, ids) -> flat[key.substringAfter(':')] = ids }
+        return flat
+    }
+
+    /**
      * The answer given at the highest level, for a choice that restates its whole list.
      *
      * Weapon Mastery and the Artificer's arcane plans are asked again each time the count
@@ -162,7 +180,9 @@ object ChoiceResolver {
             speciesId = character.speciesId,
             lineageId = character.lineageId,
             classId = character.classId,
-            classSelections = character.classChoiceSelections,
+            // Everything answered, not only the creation-time map: an invocation picked at
+            // level 5 raises its own damage-type question, and it lives in levelSelections.
+            classSelections = answers(character),
             backgroundId = character.backgroundId,
             originSelections = character.originChoiceSelections,
             extraFeatIds = character.featIds,
@@ -195,6 +215,20 @@ object ChoiceResolver {
             // A choice asked at several levels is one decision; its newest form is current.
             .map { (_, versions) -> versions.maxBy { it.level } }
             .sortedWith(compareBy({ it.featureName }, { it.choice.label }))
+
+    /**
+     * Choices the rules let you revisit every time you gain a level.
+     *
+     * The Primordial Patron's element is the whole of it so far: it is picked at level 3 and
+     * then offered again at 4, at 5, and at every level after — so it can't be found by
+     * looking at what the new level grants, which is where the level-up flow otherwise looks.
+     * Asked here so it is re-offered from the level it was first granted onward, with the
+     * current answer standing until the player changes it.
+     */
+    fun levelUpChangeable(character: PlayerCharacter): List<ResolvedChoice> =
+        (classFeatureChoices(character) + subclassFeatureChoices(character))
+            .filter { it.choice.changeableOnLevelUp }
+            .distinctBy { it.choice.id }
 
     /**
      * Choices the rules let you revisit when you rest.

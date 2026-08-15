@@ -432,11 +432,52 @@ object ResourceOptionData {
     )
 
     /** Extra options a subclass adds to a resource its parent class already provides. */
+    /**
+     * The Warrior of Venom's uses for Focus Points.
+     *
+     * Both of these ask *which* toxin at the moment you apply it — that half lives in
+     * [PerUseChoiceData], where the tracker can put the question in front of the player. What
+     * is here is the cost and the action, which never change.
+     */
+    private val VENOM_FOCUS = listOf(
+        option(
+            "envenom_weapon", "Envenom Weapon", "1 Focus Point", "Start of your turn",
+            "At the start of your turn, you can expend 1 Focus Point to apply a toxin " +
+                "produced from your blood to one Monk weapon that you're holding. A creature " +
+                "that takes damage from the weapon is subjected to the toxin effect you chose " +
+                "when you applied it — Slowing Toxin or Venom. The toxin retains potency for " +
+                "1 minute or until a creature takes damage from the weapon.",
+            unlockLevel = 3,
+        ),
+        option(
+            "toxic_touch", "Toxic Touch", "1 Focus Point", "Magic action",
+            "As a Magic action, you can expend 1 Focus Point to apply a potent toxin to a " +
+                "creature you touch. The target makes a Constitution saving throw against " +
+                "your Monk save DC. On a failed save, the target has the Poisoned condition " +
+                "for 1 minute and suffers the effect you chose — Intoxicant, Sedative, or " +
+                "Truth Serum.",
+            unlockLevel = 6,
+        ),
+        option(
+            "hallucinogenic_breath", "Hallucinogenic Breath", "2 Focus Points", "Replaces one attack",
+            "When you take the Attack action on your turn, you can expend 2 Focus Points and " +
+                "replace one of your attacks with an exhalation of hallucinogenic vapors at " +
+                "one creature you can see within 30 feet. The target must make a Constitution " +
+                "saving throw. On a failed save, it takes Poison damage equal to three rolls " +
+                "of your Martial Arts die and has the Frightened condition for 1 minute or " +
+                "until it takes damage; while Frightened it takes the Dash action and moves " +
+                "away from you by the safest route on each of its turns. On a successful " +
+                "save, a creature takes half as much damage only.",
+            unlockLevel = 17,
+        ),
+    )
+
     private val BY_SUBCLASS: Map<String, Pair<String, List<ResourceOption>>> = mapOf(
         "mercy" to ("monk:focus" to MERCY_FOCUS),
         "shadow" to ("monk:focus" to SHADOW_FOCUS),
         "elements" to ("monk:focus" to ELEMENTS_FOCUS),
         "open_hand" to ("monk:focus" to OPEN_HAND_FOCUS),
+        "warrior_of_venom" to ("monk:focus" to VENOM_FOCUS),
     )
 
     /**

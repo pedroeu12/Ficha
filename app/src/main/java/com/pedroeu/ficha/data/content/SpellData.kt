@@ -842,6 +842,11 @@ object SpellData {
         SpellDef("hail_of_thorns", "Hail of Thorns", 1, "Conjuration", "Bonus Action", "Self", "V", "Instantaneous",
             "Cast immediately after hitting a creature with a Ranged weapon. Thorns burst out in a 5-foot Emanation around the target; each creature there makes a Dexterity saving throw, taking 1d10 Piercing damage on a failure or half as much on a success.",
             setOf(RANGER)),
+        // Above the catalogued range, but the Primordial Patron's Primordial Herald casts it
+        // outright — and a grant naming a spell the catalog lacks resolves to nothing at all.
+        SpellDef("planar_ally", "Planar Ally", 6, "Conjuration", "10 minutes", "60 feet", "V, S", "Instantaneous",
+            "You beseech an otherworldly entity for aid, and a creature of its choice appears. You must bargain with it for service, and it departs if you fail to agree terms or it is reduced to 0 Hit Points.",
+            setOf(CLERIC)),
     )
 
     private val byIdMap: Map<String, SpellDef> = ALL.associateBy { it.id }

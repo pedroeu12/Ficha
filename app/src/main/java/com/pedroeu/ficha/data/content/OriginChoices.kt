@@ -129,6 +129,9 @@ object OriginChoices {
         }
     }
 
+    /** The five types both Primordial Patron invocations choose between. */
+    private val ELEMENTAL_OVERFLOW_TYPES = listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")
+
     /** Tool and cantrip grants attached to a class at level 1 that name a group. */
     fun forClass(classId: String, classSelections: Map<String, List<String>>): List<Choice> {
         val choices = mutableListOf<Choice>()
@@ -169,6 +172,39 @@ object OriginChoices {
                 options = spellOptions("cleric", 0),
                 source = "Divine Order: Thaumaturge",
             )
+        }
+
+        // Two of the Primordial Patron's invocations name a damage type. Asked here rather
+        // than inside the invocation list, because an option can't carry a question of its
+        // own — the same route a Cleric's Thaumaturge cantrip takes.
+        if (classId == "warlock") {
+            val invocations = classSelections[ProgressionData.INVOCATION_CHOICE_ID].orEmpty()
+            if ("elemental_overflow" in invocations) {
+                choices += Choice(
+                    id = "invocation:elemental_overflow:damage",
+                    label = "Elemental Overflow",
+                    // Repeatable in the rules — "each time you do so, choose a different
+                    // damage type" — so each type held here is one taking of the invocation.
+                    // Edit Mode's pool editor is where a second taking gets added.
+                    prompt = "Choose the damage type your overflow wreathes you in. If you " +
+                        "have taken this invocation more than once, hold one type per taking.",
+                    count = 1,
+                    kind = ChoiceKind.DAMAGE_TYPE,
+                    options = ChoiceOptions.fromStrings(ELEMENTAL_OVERFLOW_TYPES),
+                    source = "Elemental Overflow",
+                )
+            }
+            if ("elemental_transmutation" in invocations) {
+                choices += Choice(
+                    id = "invocation:elemental_transmutation:damage",
+                    label = "Elemental Transmutation",
+                    prompt = "Choose the damage type you convert your damage into.",
+                    count = 1,
+                    kind = ChoiceKind.DAMAGE_TYPE,
+                    options = ChoiceOptions.fromStrings(ELEMENTAL_OVERFLOW_TYPES),
+                    source = "Elemental Transmutation",
+                )
+            }
         }
 
         val primalOrder = classSelections["primal_order"]?.firstOrNull()

@@ -1,6 +1,7 @@
 package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.SpellData
+import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 
 /** Where an attack line came from, so the sheet can group and label them. */
@@ -141,6 +142,82 @@ object CharacterAttacks {
                         "Steel Defender: Force-Empowered Rend", Ability.INT, "1d8 + 2", "Force",
                         "Your companion's attack, using your spell attack modifier",
                     )
+                )
+            }
+
+            // A feature that forces a save rather than rolling to hit still belongs here —
+            // it is damage the player rolls on their turn. Written the same way a save
+            // cantrip is: the DC in the notes, and the source's attack bonus on the line so
+            // the number beside it means something.
+            fun saveLine(
+                name: String,
+                dcId: String,
+                damage: String,
+                type: String,
+                saveAbility: Ability,
+                notes: String,
+            ) {
+                val dc = CharacterDcs.all(character).firstOrNull { it.id == dcId }
+                add(
+                    AttackLine(
+                        name = name,
+                        attackBonus = dc?.attackBonus ?: 0,
+                        damage = damage,
+                        damageType = type,
+                        notes = "${saveAbility.fullName} save DC ${dc?.dc ?: "—"} • $notes",
+                        source = AttackSource.FEATURE,
+                    )
+                )
+            }
+
+            val classLevel = { classId: String -> ClassLevels.levelIn(character, classId) }
+
+            if (character.subclassId == "path_of_lament" && classLevel("barbarian") >= 3) {
+                // The wail's dice are the Rage Damage bonus, which is the one number on the
+                // Barbarian table that grows without a feature announcing it.
+                val rageDamage = when {
+                    classLevel("barbarian") >= 16 -> 4
+                    classLevel("barbarian") >= 9 -> 3
+                    else -> 2
+                }
+                saveLine(
+                    "Banshee's Wail", "subclass:path_of_lament",
+                    "${rageDamage}d12", "Psychic", Ability.CON,
+                    "30-foot Emanation • Deafened 1 minute on a failure • Half on a success",
+                )
+            }
+
+            if (character.subclassId == "warrior_of_venom" && classLevel("monk") >= 17) {
+                saveLine(
+                    "Hallucinogenic Breath", "feature:monk",
+                    "3 × Martial Arts die", "Poison", Ability.CON,
+                    "2 Focus Points • Replaces one attack • 30 feet • Frightened 1 minute",
+                )
+            }
+
+            if (character.subclassId == "primordial_patron" && classLevel("warlock") >= 3) {
+                val warlockLevel = classLevel("warlock")
+                val dice = when {
+                    warlockLevel >= 14 -> "3d6"
+                    warlockLevel >= 6 -> "2d6"
+                    else -> "1d6"
+                }
+                val element = ChoiceResolver
+                    .latestSelectionFor(character, SubclassData.ELEMENT_CHOICE_ID)
+                    .firstOrNull()
+                saveLine(
+                    "Elemental Node", "class:warlock", dice,
+                    when (element) {
+                        "air" -> "Thunder"
+                        "earth" -> "Acid"
+                        "water" -> "Cold"
+                        "fire" -> "Fire"
+                        // No element chosen yet, so no damage type to claim.
+                        else -> "—"
+                    },
+                    Ability.DEX,
+                    "Magic action • Saved against on entering, ending a turn there, or the " +
+                        "node moving in • Once per turn",
                 )
             }
 

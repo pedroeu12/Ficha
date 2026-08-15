@@ -60,6 +60,11 @@ class PerUseChoicesTest {
         )
 
         val offenders = everyChoice()
+            // A choice that already declares itself re-askable isn't the bug this guards
+            // against. The bug is a decision the rules revisit that the app asks once and
+            // files away — and one carrying changeableOnRest or changeableOnLevelUp is by
+            // definition asked again, just not at the moment of use.
+            .filterNot { it.changeableOnRest || it.changeableOnLevelUp }
             .filter { choice ->
                 perUseWording.any { choice.prompt.contains(it, ignoreCase = true) }
             }

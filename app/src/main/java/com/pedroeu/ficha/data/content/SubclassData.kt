@@ -24,7 +24,37 @@ object SubclassData {
      */
     private const val VILLAIN = "Unearthed Arcana 2026: Villainous Options"
     private const val VILLAIN_UPDATE = "Unearthed Arcana 2026: Villainous Options Update"
+    private const val VILLAIN_2 = "Unearthed Arcana 2026: Villainous Options 2"
     private const val HORROR = "Unearthed Arcana 2025: Horror Subclasses"
+
+    /** The choice id the Primordial Patron's element is stored under, at every level. */
+    const val ELEMENT_CHOICE_ID = "primordial_element"
+
+    /**
+     * The Primordial Patron's element, and the damage type that follows from it.
+     *
+     * Alone among subclass choices in being re-asked at every level: *"The capricious nature
+     * of elemental alliances extends to your pact. You can change your chosen element — and
+     * your patron — whenever you gain a level."* [Choice.changeableOnLevelUp] is what carries
+     * that, and the level-up flow shows the current answer already ticked so a Warlock who is
+     * happy with fire simply moves on.
+     */
+    private fun elementChoice() = Choice(
+        id = ELEMENT_CHOICE_ID,
+        label = "Primordial Element",
+        prompt = "Choose your element. It sets the damage type of your node and which spells " +
+            "your patron keeps ready. You choose again every time you gain a level.",
+        count = 1,
+        kind = ChoiceKind.OPTION,
+        options = listOf(
+            ChoiceOption("air", "Air", "Patrons such as Akadi or Yan-C-Bin. Your node and your features deal Thunder damage.", "Thunder"),
+            ChoiceOption("earth", "Earth", "Patrons such as Ogrémoch or Grumbar. Your node and your features deal Acid damage.", "Acid"),
+            ChoiceOption("fire", "Fire", "Patrons such as Imix, Kossuth, or Zaaman Rul. Your node and your features deal Fire damage.", "Fire"),
+            ChoiceOption("water", "Water", "Patrons such as Istishia or Olhydra. Your node and your features deal Cold damage.", "Cold"),
+        ),
+        source = "Level 3",
+        changeableOnLevelUp = true,
+    )
 
     private fun f(level: Int, name: String, description: String, vararg choices: Choice) =
         SubclassFeature(level, name, description, choices.toList())
@@ -1231,6 +1261,52 @@ object SubclassData {
                 f(18, "Abyssal Explosion", "As a Magic action, you fill a 30-foot-radius Sphere with an explosion of Abyssal energy. Each creature in the Sphere makes a Constitution saving throw against your spell save DC. On a failed save, a creature takes 8d6 Force damage if it isn't a Fiend, and it has the Incapacitated condition until the start of your next turn. Once you use this feature you can't do so again until you finish a Long Rest, unless you spend 7 Sorcery Points (no action required) to restore your use of it."),
             ),
             source = VILLAIN_UPDATE),
+
+        // ---------------------------------------- UA 2026: Villainous Options 2
+
+        Subclass("path_of_lament", "barbarian", "Path of Lament",
+            "A Barbarian who hones regret into a weapon, channelling unresolved grief into a wail that carries beyond the realm of the living.",
+            listOf(
+                f(3, "Banshee's Wail", "When you activate your Rage or as a Bonus Action while your Rage is active, you can let out a doleful wail. Each creature of your choice in a 30-foot Emanation originating from you makes a Constitution saving throw (DC 8 plus your Constitution modifier and Proficiency Bonus). On a failed save, a creature takes Psychic damage and has the Deafened condition for 1 minute. On a successful save, a creature takes half as much damage only. To determine the Psychic damage, roll a number of d12s equal to your Rage Damage bonus, and add them together. You can use this feature a number of times equal to your Constitution modifier (minimum of once). You regain all expended uses when you finish a Long Rest. You can also regain all uses by expending a use of your Rage (no action required).",
+                    Choice("lament_origin", "Your Rage Stems from the Time…", "The root of your despair. Choose it or roll a d6. This shapes your character rather than your statistics.", 1, ChoiceKind.OPTION,
+                        listOf(
+                            ChoiceOption("loved_one", "A Lost Loved One Rose Again", "A lost loved one rose as an undead monster.", "1"),
+                            ChoiceOption("companion", "Your Animal Companion Was Slain", "Enemies slew your animal companion.", "2"),
+                            ChoiceOption("captors", "You Alone Escaped", "You — and you alone — escaped brutal captors.", "3"),
+                            ChoiceOption("charred_remains", "Your Family's Charred Remains", "You found your family's charred remains.", "4"),
+                            ChoiceOption("shipwreck", "A Devastating Shipwreck", "Your decision led to a devastating shipwreck.", "5"),
+                            ChoiceOption("banished", "Banished from Home", "Your elders banished you from your home.", "6"),
+                        ), "Level 3")),
+                f(6, "Commune with the Dead", "You can cast the Speak with Dead spell, but only as a Ritual. Wisdom is your spellcasting ability for it."),
+                f(6, "Horrifying Strike", "Once per turn when you hit a creature with a Strength-based attack roll while your Rage is active, you can attempt to horrify the target. The target must succeed on a Wisdom saving throw (DC 8 plus your Constitution modifier and Proficiency Bonus) or have the Frightened condition until the start of your next turn."),
+                f(10, "Otherworldly Anguish", "You draw power from a sorrow so deep it extends beyond the boundaries of the realm of the living. Deathly Wail: if a target fails its saving throw against your Banshee's Wail and it has Hit Points equal to twice your Barbarian level or fewer, it drops to 0 Hit Points instead of taking damage. Impenetrable Sorrow: you can't be possessed. Resistance: you have Resistance to Cold and Necrotic damage while your Rage is active."),
+                f(14, "Sorrow Form", "When you activate your Rage, you can empower yourself with undeath. You gain the benefits below for 1 minute or until you drop to 0 Hit Points. Once you use this feature, you can't do so again until you finish a Long Rest. Immunities: you have Immunity to the Charmed and Frightened conditions, and if you're Charmed or Frightened when you empower yourself, the condition ends on you; in addition, you can't gain Exhaustion levels. Life-Draining Strike: when a creature fails its saving throw against your Horrifying Strike, the creature takes 2d10 Necrotic damage, and you regain Hit Points equal to the Necrotic damage dealt. Undead: your creature type is Undead."),
+            ),
+            source = VILLAIN_2),
+
+        Subclass("warrior_of_venom", "monk", "Warrior of Venom",
+            "A Monk who pollutes their own internal reservoirs of power until a touch — or a single drop of blood — is as deadly as a viper's bite.",
+            listOf(
+                f(3, "Envenom Weapon", "At the start of your turn, you can expend 1 Focus Point to apply a toxin produced from your blood to one Monk weapon that you're holding. A creature that takes damage from the weapon is subjected to one of the toxin effects, chosen when you apply the toxin. Slowing Toxin: until the start of your next turn, the target's Speed is halved, it can't take Reactions, and it can take either an action or a Bonus Action on its turn, not both. Venom: the target takes Poison damage equal to two rolls of your Martial Arts die. The toxin retains potency for 1 minute or until a creature takes damage from the weapon."),
+                f(3, "Potent Arsenal", "You gain a Poisoner's Kit, and you have proficiency with it. When creating a Basic Poison, you can do so over the course of 1 day (8 hours of work). Additionally, whenever you deal Poison damage with a Monk feature or a Monk weapon, you can change that damage type to Acid."),
+                f(6, "Toxic Touch", "As a Magic action, you can expend 1 Focus Point to apply a potent toxin to a creature you touch. The target makes a Constitution saving throw. On a failed save, the target has the Poisoned condition for 1 minute, and while Poisoned it is affected by one of the following effects of your choice. Intoxicant: the target has the Charmed condition for the duration or until you or your allies deal damage to the target. Sedative: the creature falls asleep and has the Unconscious condition for the duration; another creature can use an action to shake it awake and remove the condition. Truth Serum: the target can't knowingly communicate a lie for the duration."),
+                f(11, "Toxin Refiner", "Your body can filter poison. You gain Immunity to Poison damage. Whenever you are subjected to Poison damage, your Envenom Weapon options each deal extra Poison damage equal to one roll of your Martial Arts die, and you can't gain this benefit again until the end of your next turn. In addition, whenever you ingest a poison, you regain a number of Hit Points equal to one roll of your Martial Arts die."),
+                f(11, "Toxic Blood", "Enemies draw your toxic blood at their own peril. Whenever a creature hits you with a melee attack roll, the attacker takes 1d6 Poison damage. If you are Bloodied, the attacker instead takes Poison damage equal to one roll of your Martial Arts die."),
+                f(17, "Hallucinogenic Breath", "When you take the Attack action on your turn, you can expend 2 Focus Points and replace one of your attacks with an exhalation of hallucinogenic vapors at one creature you can see within 30 feet. The target must make a Constitution saving throw. On a failed save, the target takes Poison damage equal to three rolls of your Martial Arts die and has the Frightened condition for 1 minute or until the target takes damage. While Frightened, the target takes the Dash action and moves away from you by the safest route on each of its turns unless there is nowhere to move. On a successful save, a creature takes half as much damage only."),
+            ),
+            source = VILLAIN_2),
+
+        Subclass("primordial_patron", "warlock", "Primordial Patron",
+            "A Warlock whose pact draws on the Inner Planes, heralding the arrival of ancient elemental powers by seeding the world with elemental nodes.",
+            listOf(
+                f(3, "Elemental Node", "As a Magic action, you can create a 5-foot-radius Sphere of elemental magic centered on a point you can see within 60 feet of yourself. The magic of this elemental node resembles your chosen element. On later turns, you can take a Bonus Action to move the node up to 30 feet. When the node appears, each creature other than you in the node makes a Dexterity saving throw against your spell save DC, taking 1d6 damage of your chosen element's type on a failed save or half as much damage on a successful one. A creature also makes this save when the node moves into its space and when it enters the node or ends its turn there. A creature makes this save only once per turn. The node lasts for 1 minute, until you dismiss it (no action required), or until you use this feature to create another node. Once you use this feature, you can't use it again until you complete a Short or Long Rest unless you expend a Pact Magic spell slot (no action required) to restore your use of it. The node's damage increases by 1d6 when you reach Warlock levels 6 (2d6) and 14 (3d6).",
+                    elementChoice()),
+                f(3, "Elemental Spells", "The magic of your patron ensures you always have certain spells ready. You always have Chromatic Orb and Darkvision prepared at Warlock level 3, Elemental Weapon at 5, Summon Elemental at 7 — the spirit's element matches your chosen element — and Commune with Nature at 9, along with the spells corresponding to your chosen element. Air: Feather Fall and Shatter at 3, Fly at 5, Freedom of Movement at 7, Steel Wind Strike at 9. Earth: Entangle and Knock at 3, Plant Growth at 5, Vitriolic Sphere at 7, Wall of Stone at 9. Fire: Burning Hands and Heat Metal at 3, Fireball at 5, Wall of Fire at 7, Flame Strike at 9. Water: Alter Self and Ice Knife at 3, Water Walk at 5, Control Water at 7, Cone of Cold at 9."),
+                f(6, "Elemental Haven", "Your Elemental Node shields you from harm. Elemental Protection: while you're within your node, you have a bonus to AC equal to your Charisma modifier (minimum of 1). Elemental Teleport: as a Bonus Action, you can teleport into your node or the nearest unoccupied space within 5 feet of it. You can use this benefit a number of times equal to your Charisma modifier (minimum of once), and you regain all expended uses when you finish a Long Rest."),
+                f(10, "Primeval Protection", "Elemental Fortitude: you have Resistance to your chosen element's damage type. Additionally, while within your Elemental Node, you have Immunity to that damage type. Node Improvement: your Elemental Node is now a 10-foot-radius Sphere."),
+                f(14, "Elemental Harbinger", "Your Elemental Node can usher in the mightiest of elementals. Elemental Vortex: whenever you expend a Pact Magic spell slot while you're within your Elemental Node, you can attempt to pull a creature into the node — one creature you choose within 30 feet of the node must succeed on a Strength saving throw or be pulled up to 15 feet toward the node's center. Node Improvement: your Elemental Node now lasts for up to 1 hour. Primordial Herald: while you're within your node's area, you can cast the Planar Ally spell without expending a spell slot, speaking the name of your patron when you do. Once you use this benefit, you can't use it again until you finish 2d4 Long Rests."),
+            ),
+            source = VILLAIN_2),
 
         // ---------------------------------------- UA 2025: Horror Subclasses
 

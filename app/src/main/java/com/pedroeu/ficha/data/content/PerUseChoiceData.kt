@@ -420,6 +420,62 @@ object PerUseChoiceData {
                 ),
             ),
         ),
+
+        // ---------------------------------------------------------------- Warrior of Venom
+        PerUseChoice(
+            id = "warrior_of_venom:envenom_weapon",
+            label = "Envenom Weapon",
+            prompt = "Which toxin do you draw? You choose again each time you apply one.",
+            source = "Envenom Weapon",
+            resourceId = "monk:focus",
+            subclassId = "warrior_of_venom",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "slowing", "Slowing Toxin",
+                    "Until the start of your next turn, the target's Speed is halved; it " +
+                        "can't take Reactions; and it can take either an action or a Bonus " +
+                        "Action on its turn, not both.",
+                    "1 Focus Point",
+                ),
+                ChoiceOption(
+                    "venom", "Venom",
+                    "The target takes Poison damage equal to two rolls of your Martial Arts " +
+                        "die. From Monk level 11, whenever you have been subjected to Poison " +
+                        "damage, this deals a further roll of your Martial Arts die.",
+                    "1 Focus Point",
+                ),
+            ),
+        ),
+        PerUseChoice(
+            id = "warrior_of_venom:toxic_touch",
+            label = "Toxic Touch",
+            prompt = "Which toxin is this? You choose again each time you use it.",
+            source = "Toxic Touch",
+            resourceId = "monk:focus",
+            subclassId = "warrior_of_venom",
+            minLevel = 6,
+            options = listOf(
+                ChoiceOption(
+                    "intoxicant", "Intoxicant",
+                    "The target has the Charmed condition for the duration or until you or " +
+                        "your allies deal damage to the target.",
+                    "1 Focus Point",
+                ),
+                ChoiceOption(
+                    "sedative", "Sedative",
+                    "The creature falls asleep and has the Unconscious condition for the " +
+                        "duration. Another creature can use an action to shake it awake and " +
+                        "remove the condition.",
+                    "1 Focus Point",
+                ),
+                ChoiceOption(
+                    "truth_serum", "Truth Serum",
+                    "The target can't knowingly communicate a lie for the duration.",
+                    "1 Focus Point",
+                ),
+            ),
+        ),
     )
 
     private val byId: Map<String, PerUseChoice> = ALL.associateBy { it.id }

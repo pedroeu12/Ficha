@@ -17,6 +17,7 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.FeatPrerequisites
 import com.pedroeu.ficha.domain.CharacterSpells
+import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -155,9 +156,23 @@ data class LevelUpState(
             SubclassData.byId(it)?.featuresAt(targetClassLevel)
         }.orEmpty()
 
-    /** Every decision the new features force, from both the class and the subclass. */
+    /**
+     * Every decision this level forces, from the class, the subclass, and anything the rules
+     * let you rethink on levelling.
+     *
+     * That last part is why this isn't simply the new features' choices. A Primordial Patron
+     * chooses its element again at every level, not only at the one that granted it, and a
+     * choice offered nowhere is a choice the player silently loses.
+     */
     val featureChoices: List<Choice>
-        get() = newClassFeatures.flatMap { it.choices } + newSubclassFeatures.flatMap { it.choices }
+        get() {
+            val fromNewFeatures =
+                newClassFeatures.flatMap { it.choices } + newSubclassFeatures.flatMap { it.choices }
+            val revisited = ChoiceResolver.levelUpChangeable(character)
+                .map { it.choice }
+                .filterNot { revisit -> fromNewFeatures.any { it.id == revisit.id } }
+            return fromNewFeatures + revisited
+        }
 
     val grantsAsi: Boolean get() = progression?.grantsAsiAt(targetClassLevel) == true
 
@@ -287,7 +302,11 @@ data class LevelUpState(
             }
             add(LevelUpStep.HIT_POINTS)
             if (gainsSubclass) add(LevelUpStep.SUBCLASS)
-            if (newClassFeatures.isNotEmpty() || newSubclassFeatures.isNotEmpty()) {
+            // Not only when the level grants something new: a choice the rules let you
+            // revisit needs the step to exist on a level that grants nothing at all.
+            if (newClassFeatures.isNotEmpty() || newSubclassFeatures.isNotEmpty() ||
+                featureChoices.isNotEmpty()
+            ) {
                 add(LevelUpStep.FEATURES)
             }
             if (grantsAsi || grantsEpicBoon) add(LevelUpStep.ASI)

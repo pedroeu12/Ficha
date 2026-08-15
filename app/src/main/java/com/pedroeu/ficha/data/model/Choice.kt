@@ -56,6 +56,15 @@ data class Choice(
      */
     val changeableOnRest: Boolean = false,
     /**
+     * True when the rules let you revisit this every time you gain a level.
+     *
+     * The Primordial Patron's element is the case that brought this in: *"You can change
+     * your chosen element — and your patron — whenever you gain a level."* That is not a
+     * decision made once at level 3, so the level-up flow asks it again at every level, with
+     * the current answer already ticked.
+     */
+    val changeableOnLevelUp: Boolean = false,
+    /**
      * The limited-use pool these options are spent from, when there is one — Metamagic is
      * paid for with Sorcery Points, maneuvers with Superiority Dice. Lets the tracker list
      * the options the character actually picked, with their rules text.

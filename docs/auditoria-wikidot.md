@@ -1,5 +1,13 @@
 # Auditoria contra dnd2024.wikidot.com
 
+> **Situação: resolvido.** Este relatório é o levantamento original, mantido como
+> registro do que foi encontrado. Tudo abaixo já foi corrigido ou importado, e o
+> app agora acompanha o wiki item a item: 419 magias (todos os níveis), 185
+> talentos, 61 antecedentes, 24 espécies, 418 itens mágicos e 68 subclasses. As
+> fontes viraram dado de primeira classe — cada opção nomeia seu livro, e um
+> personagem só recebe o que os livros escolhidos na criação permitem. O conteúdo
+> que só existia em 2014 foi removido.
+
 Comparação automatizada entre os dados do app e o wiki `dnd2024.wikidot.com`,
 feita em 22/08/2026. A referência foi baixada do wiki, convertida para JSON e
 comparada campo a campo com os arquivos de `data/content/`. Toda divergência

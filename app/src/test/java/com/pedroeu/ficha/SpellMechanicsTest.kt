@@ -30,7 +30,7 @@ class SpellMechanicsTest {
      * and means the opposite. They are named rather than the check being loosened, because
      * loosening it is how the original hundred slipped through.
      */
-    private val grantsAdvantageInstead = setOf("beacon_of_hope", "haste")
+    private val grantsAdvantageInstead = setOf("beacon_of_hope", "haste", "conjure_animals")
 
     @Test
     fun `a spell that says it is a spell attack can be rolled as one`() {

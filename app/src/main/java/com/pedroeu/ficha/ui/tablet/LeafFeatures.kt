@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.components.RulesTextSheet
+import com.pedroeu.ficha.ui.components.LONG_TEXT_THRESHOLD
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -270,13 +272,25 @@ private fun FeatureLine(
             if (onRemove != null) PenMark(tr("Delete"), glyph = "×", onClick = onRemove)
         }
 
-        AnimatedVisibility(visible = open) {
+        // Short text unfolds in place, the way the paper sheet reads. Book-length text would
+        // push the rest of the leaf off the page, so it opens in a sheet of its own instead.
+        val readInASheet = shownBody.length > LONG_TEXT_THRESHOLD
+
+        AnimatedVisibility(visible = open && !readInASheet) {
             Column(Modifier.padding(start = 18.dp, bottom = 8.dp)) {
                 SheetText(
                     shownBody,
                     soft = handle.character.textOverrides[bodyKey] == null,
                 )
             }
+        }
+
+        if (open && readInASheet) {
+            RulesTextSheet(
+                title = shownName,
+                body = shownBody,
+                onDismiss = { open = false },
+            )
         }
 
         choices.forEach { resolved -> ChoiceLine(resolved, handle) }

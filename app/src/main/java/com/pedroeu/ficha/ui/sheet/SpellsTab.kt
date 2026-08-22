@@ -28,6 +28,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.data.content.SpellData
+import com.pedroeu.ficha.ui.components.firstSentenceOf
+import com.pedroeu.ficha.ui.components.RulesTextSheet
+import com.pedroeu.ficha.ui.components.LONG_TEXT_THRESHOLD
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -500,11 +504,48 @@ private fun SpellSection(
                             color = MaterialTheme.colorScheme.secondary,
                         )
                     }
-                    Text(
-                        text = spell.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    // The catalog carries the book's own wording, which runs to paragraphs.
+                    // A spell list is a list, so long text collapses to its first line and
+                    // opens in full on a tap.
+                    if (spell.description.length > LONG_TEXT_THRESHOLD) {
+                        var showFullText by remember(spell.id) { mutableStateOf(false) }
+                        Column(Modifier.clickable { showFullText = true }) {
+                            Text(
+                                text = firstSentenceOf(spell.description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = tr("Read the full rules"),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                        if (showFullText) {
+                            val catalogue = SpellData.byId(spell.id)
+                            RulesTextSheet(
+                                title = spell.name,
+                                body = spell.description,
+                                subtitle = listOf(
+                                    if (spell.level == 0) tr("Cantrip") else "Level ${spell.level}",
+                                    spell.school,
+                                ).filter { it.isNotBlank() }.joinToString(" • "),
+                                facts = listOfNotNull(
+                                    catalogue?.let { tr("Casting Time") to it.castingTime },
+                                    catalogue?.let { tr("Range") to it.range },
+                                    catalogue?.let { tr("Components") to it.components },
+                                    catalogue?.let { tr("Duration") to it.duration },
+                                ),
+                                onDismiss = { showFullText = false },
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = spell.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }

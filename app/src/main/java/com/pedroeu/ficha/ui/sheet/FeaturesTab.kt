@@ -41,6 +41,10 @@ import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.EditableText
+import androidx.compose.foundation.clickable
+import com.pedroeu.ficha.ui.components.LONG_TEXT_THRESHOLD
+import com.pedroeu.ficha.ui.components.RulesTextSheet
+import com.pedroeu.ficha.ui.components.firstSentenceOf
 import com.pedroeu.ficha.ui.components.ExpandableOption
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.TextEditDialog
@@ -471,9 +475,40 @@ private fun FeatureEntry(
             }
         }
 
-        if (description.isNotBlank() || descOverride != null || editMode) {
+        val body = descOverride ?: description
+        // Edit Mode always shows the field, since that is the only way to change the text.
+        // Outside it, anything book-length collapses to its first line and opens in full on
+        // a tap, so a list of features stays a list rather than becoming a wall of prose.
+        val readInASheet = !editMode && body.length > LONG_TEXT_THRESHOLD
+
+        if (readInASheet) {
+            var showFullText by remember(featureId) { mutableStateOf(false) }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showFullText = true },
+            ) {
+                Text(
+                    text = firstSentenceOf(body),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = tr("Read the full rules"),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (showFullText) {
+                RulesTextSheet(
+                    title = nameOverride ?: name,
+                    body = body,
+                    onDismiss = { showFullText = false },
+                )
+            }
+        } else if (body.isNotBlank() || editMode) {
             EditableText(
-                value = descOverride ?: description,
+                value = body,
                 editMode = editMode,
                 onChange = { viewModel.setText(descKey, it) },
                 label = tr("Feature text"),

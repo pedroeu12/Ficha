@@ -130,6 +130,8 @@ class ContentCoverageTest {
 
     /** Features whose numbers are conditional, so no passive bonus applies. */
     private val notActuallyPassive = setOf(
+        // Charger's +10 feet lasts only for the Dash action that triggered it.
+        "charger",
         "defensive_duelist", "mythal_touched", "bladesinger", "circle_of_the_titan",
         "college_of_spirits", "hollow_warden", "glory", "draconic",
     )

@@ -1725,13 +1725,22 @@ object ResourceData {
             // the only thing that differs between them is the size of the pool and the rest
             // that refills it.
             "sharp_eye", "vampire_s_plaything", "gathered_whispers", "living_shadow",
-            "mist_walker", "symbiotic_being", "bloodlust",
+            "mist_walker", "symbiotic_being", "bloodlust", "infernal_bulwark",
             -> ResourceDef(
                 id = "feat:$featId",
                 name = FeatData.byId(featId)?.name ?: featId,
                 max = c.proficiencyBonus,
                 recharge = Recharge.LONG_REST,
                 source = FeatData.byId(featId)?.name ?: featId,
+            )
+
+            // Guarded Mind: turn a failed Int, Wis or Cha save into a success.
+            "mage_slayer" -> ResourceDef(
+                id = "feat:mage_slayer",
+                name = "Guarded Mind",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Mage Slayer",
             )
 
             "tireless_reveler" -> ResourceDef(

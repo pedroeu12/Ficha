@@ -12,6 +12,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.i18n.tr
+import androidx.compose.foundation.clickable
 import com.pedroeu.ficha.data.model.ChoiceOption
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -99,16 +101,38 @@ fun ChoiceSection(
 
                     @Composable
                     fun option(option: ChoiceOption) {
+                        var showFullText by rememberSaveable(option.id) { mutableStateOf(false) }
                         SelectableCard(
                             title = option.name,
                             subtitle = option.description,
                             selected = selected.contains(option.id),
                             onClick = { onToggle(option.id) },
                             trailingLabel = option.supporting.ifBlank { null },
-                            // Options now carry full rules text; clamp it so a list of
+                            // Options carry the book's full rules text; clamp it so a list of
                             // nineteen maneuvers is still something you can scroll.
                             subtitleMaxLines = 3,
                         )
+                        // Tapping the card picks the option, so reading the rest of the rules
+                        // needs its own target — otherwise the only way to read a long option
+                        // is to select it.
+                        if (option.description.length > LONG_TEXT_THRESHOLD) {
+                            Text(
+                                text = tr("Read the full rules"),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .clickable { showFullText = true }
+                                    .padding(start = 12.dp, top = 2.dp, bottom = 2.dp),
+                            )
+                        }
+                        if (showFullText) {
+                            RulesTextSheet(
+                                title = option.name,
+                                body = option.description,
+                                subtitle = option.supporting,
+                                onDismiss = { showFullText = false },
+                            )
+                        }
                     }
 
                     when {

@@ -44,6 +44,9 @@ fun ExpandableOption(
 ) {
     var expanded by remember(name) { mutableStateOf(false) }
     val hasBody = description.isNotBlank()
+    // Short text reads fine unfolded in place; book-length text gets its own sheet, so a list
+    // of nineteen maneuvers doesn't turn into nineteen pages when one is opened.
+    val readInASheet = description.length > LONG_TEXT_THRESHOLD
 
     Column(
         modifier = modifier
@@ -90,12 +93,21 @@ fun ExpandableOption(
             }
         }
 
-        if (expanded && hasBody) {
+        if (expanded && hasBody && !readInASheet) {
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+
+    if (expanded && readInASheet) {
+        RulesTextSheet(
+            title = name,
+            body = description,
+            subtitle = subtitle,
+            onDismiss = { expanded = false },
+        )
     }
 }

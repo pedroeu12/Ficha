@@ -456,7 +456,11 @@ class ArtificerItemsTest {
         MagicItemData.ALL.filter { it.attackBonus != 0 }.forEach { magicItem ->
             assertTrue(
                 "${magicItem.id} carries +${magicItem.attackBonus} but its text doesn't say so",
-                magicItem.description.contains("+${magicItem.attackBonus} bonus to attack"),
+                // The books say it two ways: "a +1 bonus to attack and damage rolls" and, for
+                // the oils and coatings, "turning it into a +3 Weapon". Both are the claim.
+                magicItem.description.contains("+${magicItem.attackBonus} bonus to attack") ||
+                    magicItem.description.contains("+${magicItem.attackBonus} Weapon") ||
+                    magicItem.description.contains("+${magicItem.attackBonus} Ammunition"),
             )
         }
     }

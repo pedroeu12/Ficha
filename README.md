@@ -17,10 +17,10 @@ stays disabled.
 
 ## The creation flow
 
-1. **Species** — 10 species. Selecting one expands its traits inline and surfaces any sub‑choice it
+1. **Species** — 24 species. Selecting one expands its traits inline and surfaces any sub‑choice it
    carries: Elven Lineage, Draconic Ancestry, Giant Ancestry, Fiendish Legacy, Gnomish Lineage, and
    the Human bonus skill.
-2. **Class** — 12 classes, each expanding to show its level‑1 features, saving throws, and armor,
+2. **Class** — 13 classes, each expanding to show its level‑1 features, saving throws, and armor,
    weapon, and tool proficiencies.
 3. **Class Options** — the in‑class decisions, generated from the class you picked:
    - skill proficiencies (skills already granted by your species or origin are shown as unavailable,
@@ -28,7 +28,7 @@ stays disabled.
    - feature options — Fighting Style, Divine Order, Primal Order,
    - cantrips and level‑1 spells for casters,
    - Expertise for the Rogue, drawn from the skills you're actually proficient in.
-4. **Origin** — 16 backgrounds, each granting two skills, a tool, an origin feat, equipment, and
+4. **Origin** — 61 backgrounds, each granting two skills, a tool, an origin feat, equipment, and
    starting gold. You choose the `+2 / +1` or `+1 / +1 / +1` ability spread and tap to assign it.
 5. **Origin Options** — everything the previous steps left open, in one place:
    - **Magic Initiate spells** — a Sage picks two Wizard cantrips and a level 1 spell, an Acolyte
@@ -45,7 +45,7 @@ stays disabled.
 ## Levelling up
 
 The **Level Up** button in the sheet toolbar runs the same guided treatment, scoped to the next level
-and driven by real class tables for all 12 classes across levels 1–20:
+and driven by real class tables for all 13 classes across levels 1–20:
 
 - **Hit points** — take the fixed average, roll the die in‑app, or type your table's house rule.
 - **Subclass** — every class chooses at level 3, from the full 2024 list plus the playtest options.
@@ -222,12 +222,13 @@ ink for text, crimson chrome, and gold section headings.
 
 ## Scope
 
-Multiclassing isn't implemented. The spell catalog covers cantrips through level 5 in full — enough to
-carry a party past level 10 — and anything beyond it can be added by name wherever spells are chosen,
-so high-level casters are never blocked. Subclass features are recorded with their names, levels, and
+The spell catalog covers all 419 spells, cantrips through level 9, and anything outside it can still be
+added by name wherever spells are chosen. Subclass features are recorded with their names, levels, and
 descriptions; their numeric effects aren't wired into the calculation engine, so a feature that changes
 a derived number is applied through Edit Mode.
 
-Game rules content is from the D&D 2024 rules, © Wizards of the Coast; the playtest subclasses are from
-Unearthed Arcana 2025 and are not official game content. This project is an unofficial personal tool and
+Game rules content is from the D&D 2024 books, © Wizards of the Coast. Every option names the book it
+came from, and a character is built from a chosen set of books — creation, level up and the sheet's
+pickers only ever offer what those books contain. The Unearthed Arcana options are playtest material and
+are not official game content. This project is an unofficial personal tool and
 is not affiliated with or endorsed by Wizards of the Coast.

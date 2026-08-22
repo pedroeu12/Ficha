@@ -1485,7 +1485,26 @@ object ResourceData {
 
     // ------------------------------------------------------------------ Species
 
+    /** A pool of Proficiency Bonus uses that comes back on a Long Rest. */
+    private fun pbPerLongRest(c: Context, speciesId: String, name: String, source: String) =
+        ResourceDef(
+            id = "$speciesId:${name.lowercase().replace(" ", "_")}",
+            name = name,
+            max = c.proficiencyBonus,
+            recharge = Recharge.LONG_REST,
+            source = source,
+        )
+
     private fun speciesResources(c: Context): List<ResourceDef> = when (c.speciesId) {
+        // Imported species whose trait text promises a Proficiency Bonus of uses per Long
+        // Rest. Same shape for all four, so they share one branch.
+        "boggart" -> listOf(pbPerLongRest(c, "boggart", "Fury of the Small", "Boggart"))
+        "dhampir" -> listOf(pbPerLongRest(c, "dhampir", "Vampiric Bite", "Dhampir"))
+        "lupin" -> listOf(pbPerLongRest(c, "lupin", "Howl", "Lupin"))
+        "reborn" -> listOf(
+            pbPerLongRest(c, "reborn", "Knowledge from a Past Life", "Reborn"),
+        )
+
         "orc" -> listOf(
             ResourceDef(
                 id = "orc:adrenaline_rush",

@@ -428,4 +428,23 @@ class SpellSystemScanTest {
             }
         }
     }
+
+    @Test
+    fun `each class list is exactly the size the 2024 books give it`() {
+        // Counted off dnd2024.wikidot.com. A spell added to or dropped from a list without
+        // checking the book moves one of these, which is how a list silently drifts.
+        val expected = mapOf(
+            "artificer" to 81, "bard" to 149, "cleric" to 126, "druid" to 142,
+            "paladin" to 53, "ranger" to 65, "sorcerer" to 163, "warlock" to 96,
+            "wizard" to 263,
+        )
+        expected.forEach { (classId, size) ->
+            assertEquals(
+                "$classId's spell list is the wrong size",
+                size,
+                SpellData.ALL.count { classId in it.classes },
+            )
+        }
+        assertEquals("the catalog is every spell in the books", 419, SpellData.ALL.size)
+    }
 }

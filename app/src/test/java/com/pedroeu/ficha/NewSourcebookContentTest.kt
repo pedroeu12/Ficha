@@ -188,9 +188,10 @@ class NewSourcebookContentTest {
             "the magic item list should be substantial, not a sample",
             MagicItemData.ALL.size >= 200,
         )
-        // Artifacts are campaign-defining one-offs a DM writes themselves, so the catalog
-        // deliberately stops at Legendary.
-        ItemRarity.entries.filter { it != ItemRarity.ARTIFACT }.forEach { rarity ->
+        // Every rarity is represented, artifacts included: the catalog used to stop at
+        // Legendary on the grounds that a DM writes those themselves, but the books print
+        // them and the import carries what the books print.
+        ItemRarity.entries.forEach { rarity ->
             assertTrue(
                 "nothing is listed at ${rarity.label}",
                 MagicItemData.ALL.any { it.rarity == rarity },
@@ -200,11 +201,14 @@ class NewSourcebookContentTest {
 
     @Test
     fun `every magic item carries rarity, a type, and real rules text`() {
+        // The floor catches stub entries. A handful of Common items really are one sentence
+        // in the book, so they are named here rather than lowering it for everything.
+        val genuinelyOneLine = setOf("armor_of_gleaming")
         MagicItemData.ALL.forEach { magicItem ->
             assertTrue("${magicItem.name} has no type", magicItem.kind.isNotBlank())
             assertTrue(
                 "${magicItem.name} needs rules text",
-                magicItem.description.length >= 40,
+                magicItem.description.length >= 40 || magicItem.id in genuinelyOneLine,
             )
             assertTrue(
                 "${magicItem.name} should describe itself in its subtitle",

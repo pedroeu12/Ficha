@@ -2,6 +2,7 @@ package com.pedroeu.ficha
 
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.data.model.SpellSlotTables
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
@@ -411,11 +412,15 @@ class SpellSystemScanTest {
     }
 
     @Test
-    fun `every class list reaches the top of the catalogued range`() {
+    fun `every class list reaches the top slot that class can actually cast`() {
         // A class whose list stops early leaves the player with an empty picker the moment
-        // they gain a slot of that level.
+        // they gain a slot of that level. Half casters stop at 5, so holding every class to
+        // the catalogue's own ceiling would demand level 9 Paladin spells that do not exist.
         ClassData.ALL.filter { it.isSpellcaster }.forEach { charClass ->
-            (1..SpellData.MAX_CATALOGUED_LEVEL).forEach { level ->
+            val top = SpellSlotTables.maxSpellLevel(
+                ProgressionData.forClass(charClass.id)!!.casterType, 20,
+            )
+            (1..top).forEach { level ->
                 assertTrue(
                     "${charClass.name} has no level $level spells in the catalog",
                     SpellData.forClass(charClass.id, level).isNotEmpty(),

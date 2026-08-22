@@ -232,13 +232,16 @@ class ProgressionTest {
     }
 
     @Test
-    fun `manual spell entry opens up when the catalog cannot cover the level`() {
-        // A level 11 wizard casts level 6 spells, past what the catalog carries.
+    fun `the catalog now covers every level a caster can reach`() {
+        // It used to stop at 5, and a level 11 wizard fell off the end into a free-text box.
         val high = LevelUpState(character = character("wizard", 10))
-        assertTrue(high.maxSpellLevel > SpellData.MAX_CATALOGUED_LEVEL)
-        assertTrue(high.needsManualSpellEntry)
+        assertTrue("a wizard reaches level 6 slots here", high.maxSpellLevel > 5)
+        assertTrue(
+            "no caster can out-level the catalog any more",
+            high.maxSpellLevel <= SpellData.MAX_CATALOGUED_LEVEL,
+        )
+        assertFalse("so the free-text box is not needed", high.needsManualSpellEntry)
 
-        // A level 3 wizard is comfortably inside it.
         val low = LevelUpState(character = character("wizard", 2))
         assertFalse(low.needsManualSpellEntry)
     }

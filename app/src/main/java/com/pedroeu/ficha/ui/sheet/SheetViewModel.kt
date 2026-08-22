@@ -8,6 +8,7 @@ import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.Recharge
@@ -84,6 +85,17 @@ class SheetViewModel(
         } else {
             character.copy(currentHitPoints = (character.currentHitPoints + delta).coerceIn(0, max))
         }
+    }
+
+    /**
+     * Changes the books this character may draw on.
+     *
+     * Only ever widens or narrows what future pickers offer — nothing already on the sheet is
+     * taken away, since a spell or feat the character has is theirs whatever the table later
+     * decides about the book it came from.
+     */
+    fun setSources(books: Set<Sourcebook>) = update { character ->
+        character.copy(enabledSourceIds = books.map { it.id }.toSet())
     }
 
     fun setCurrentHitPoints(value: Int) = update { character ->

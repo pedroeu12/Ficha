@@ -134,6 +134,20 @@ class SourcebookTest {
         }
     }
 
+    @Test
+    fun `changing books later never takes away what the character already has`() {
+        // Edit Mode can narrow the set; a spell or feat already on the sheet is still theirs.
+        val character = PlayerCharacter(
+            id = "c",
+            enabledSourceIds = setOf(Sourcebook.PHB.id, Sourcebook.LORWYN.id),
+            featIds = listOf("alert"),
+        )
+        val narrowed = character.copy(enabledSourceIds = setOf(Sourcebook.PHB.id))
+
+        assertEquals(setOf(Sourcebook.PHB), narrowed.enabledSources)
+        assertEquals("what is on the sheet stays", listOf("alert"), narrowed.featIds)
+    }
+
     // ------------------------------------------------------------------ Creation wiring
 
     @Test

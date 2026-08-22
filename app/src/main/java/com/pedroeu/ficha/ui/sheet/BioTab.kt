@@ -25,6 +25,9 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.EditableText
+import com.pedroeu.ficha.data.model.Sourcebook
+import androidx.compose.material3.Checkbox
+import androidx.compose.foundation.clickable
 import com.pedroeu.ficha.ui.components.SectionHeader
 
 @Composable
@@ -123,6 +126,59 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
+
+        if (editMode) {
+            item {
+                Card(
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                ) {
+                    Column(
+                        Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        SectionHeader(tr("Books"))
+                        Text(
+                            text = tr(
+                                "Which books this character may draw on. Changing this only " +
+                                    "changes what future pickers offer - nothing already on " +
+                                    "the sheet is taken away.",
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        val enabled = character.enabledSources
+                        Sourcebook.ALL.forEach { book ->
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.setSources(
+                                            if (book in enabled) enabled - book else enabled + book,
+                                        )
+                                    },
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Checkbox(
+                                    checked = book in enabled,
+                                    onCheckedChange = {
+                                        viewModel.setSources(
+                                            if (book in enabled) enabled - book else enabled + book,
+                                        )
+                                    },
+                                )
+                                Text(
+                                    text = book.displayName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         item {

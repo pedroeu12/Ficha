@@ -650,9 +650,9 @@ object SpellData {
         SpellDef("summon_celestial", "Summon Celestial", 5, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
             "You summon a Celestial spirit — an avenger or a defender — that fights alongside you.",
             setOf(CLERIC, PALADIN), concentration = true),
-        SpellDef("summon_dragon", "Summon Draconic Spirit", 5, "Conjuration", "Action", "60 feet", "V, S, M", "1 hour",
-            "You summon a Draconic spirit that fights alongside you and shares your choice of damage type.",
-            setOf(DRUID, SORCERER, WIZARD), concentration = true),
+        SpellDef("summon_dragon", "Summon Dragon", 5, "Conjuration", "Action", "60 feet", "V, S, M", "Concentration, up to 1 hour",
+            "You call forth a Dragon spirit that manifests in an unoccupied space you can see and uses the Draconic Spirit stat block. It is an ally to you and your allies, acts on your turn, and disappears at 0 Hit Points or when the spell ends.",
+            setOf(WIZARD), concentration = true),
         SpellDef("wind_wall", "Wind Wall", 3, "Evocation", "Action", "120 feet", "V, S, M", "1 minute",
             "A wall of strong wind deals 3d8 Bludgeoning damage to creatures that enter it and stops arrows and gases.",
             setOf(DRUID, RANGER), concentration = true),
@@ -750,9 +750,6 @@ object SpellData {
         SpellDef("tree_stride", "Tree Stride", 5, "Conjuration", "Action", "Self", "V, S", "1 minute",
             "You step into one living tree and emerge from another of the same kind within 500 feet.",
             setOf(DRUID, RANGER), concentration = true),
-        SpellDef("chaos_bolt", "Chaos Bolt", 1, "Evocation", "Action", "120 feet", "V, S", "Instantaneous",
-            "A wave of unpredictable energy deals 2d8 plus 1d6 damage of a randomly determined type, and can leap to another creature.",
-            setOf(SORCERER)),
         SpellDef("crusaders_mantle", "Crusader's Mantle", 3, "Evocation", "Action", "Self (30-foot radius)", "V", "1 minute",
             "Allies in the aura deal an extra 1d4 Radiant damage with their weapon attacks and Unarmed Strikes.",
             setOf(CLERIC, PALADIN), concentration = true),
@@ -777,9 +774,6 @@ object SpellData {
         SpellDef("summon_fey", "Summon Fey", 3, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
             "You call forth a Fey spirit that takes a Fuming, Mirthful, or Tricksy mood of your choice. It obeys your commands, acts on your turn, and can teleport a short distance as part of its move.",
             setOf(DRUID, RANGER, WARLOCK, WIZARD), concentration = true),
-        SpellDef("wall_of_water", "Wall of Water", 3, "Evocation", "Action", "60 feet", "V, S, M", "10 minutes",
-            "You conjure a wall of water up to 30 feet long, 10 feet high, and 1 foot thick, or a ring 20 feet in diameter. Ranged weapon attacks passing through it have Disadvantage, Fire damage passing through is halved, and Cold damage freezes it into difficult terrain.",
-            setOf(DRUID, SORCERER, WIZARD), concentration = true),
         // ---------------------------------------------------------------- Playtest support
         // Spells the Unearthed Arcana subclasses and Paths of Villainy grant, which the
         // catalog didn't carry. A grant naming a spell that isn't here would vanish silently.
@@ -935,9 +929,6 @@ object SpellData {
         SpellDef("evards_black_tentacles", "Evard's Black Tentacles", 4, "Conjuration", "Action", "90 feet", "V, S, M", "1 minute",
             "Writhing black tentacles fill a 20-foot square. Each creature there makes a Strength saving throw or takes 3d6 Bludgeoning damage and has the Restrained condition.",
             setOf(WIZARD), damage = "3d6", damageType = "Bludgeoning", saveAbility = Ability.STR, concentration = true),
-        SpellDef("raulothims_psychic_lance", "Raulothim's Psychic Lance", 4, "Enchantment", "Action", "120 feet", "V", "Instantaneous",
-            "You unleash a shimmering lance of psychic power at one creature you can see, or at a creature you name. It makes an Intelligence saving throw, taking 7d6 Psychic damage and gaining the Incapacitated condition until the end of your next turn on a failure, or half as much damage only on a success.",
-            setOf(BARD, SORCERER, WARLOCK, WIZARD), damage = "7d6", damageType = "Psychic", saveAbility = Ability.INT),
 
         // ---- Level 5
         SpellDef("geas", "Geas", 5, "Enchantment", "1 minute", "60 feet", "V", "30 days",
@@ -955,9 +946,6 @@ object SpellData {
         SpellDef("dream", "Dream", 5, "Illusion", "1 minute", "Special", "V, S, M", "8 hours",
             "You shape a creature's dreams. You or a willing messenger enters a trance and appears in the target's dreams, able to converse with it and, if you choose, terrify it so that it gains no benefit from the rest.",
             setOf(BARD, WARLOCK, WIZARD)),
-        SpellDef("far_step", "Far Step", 5, "Conjuration", "Bonus Action", "Self", "V", "1 minute",
-            "You teleport up to 60 feet to an unoccupied space you can see, and can do so again as a Bonus Action on each of your turns until the spell ends.",
-            setOf(SORCERER, WIZARD), concentration = true),
         SpellDef("reincarnate", "Reincarnate", 5, "Necromancy", "1 hour", "Touch", "V, S, M", "Instantaneous",
             "You touch a dead Humanoid or a piece of one. A new adult body forms for the soul, and the creature returns to life with all its Hit Points, though its species may change.",
             setOf(DRUID)),

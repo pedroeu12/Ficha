@@ -162,7 +162,6 @@ object FeatData {
         Feat("boon_speed", "Boon of Speed", "Increase one ability score by 1. Your Speed increases by 30 feet and you can Disengage as a Bonus Action."),
         Feat("boon_night_spirit", "Boon of the Night Spirit", "Increase one ability score by 1. In Dim Light or Darkness you become Invisible and deal extra Psychic damage."),
         Feat("boon_truesight", "Boon of Truesight", "Increase one ability score by 1. You gain Truesight out to 60 feet."),
-        Feat("boon_undetectability", "Boon of Undetectability", "Increase one ability score by 1. Gain +10 to Stealth and immunity to divination magic."),
 
         // ---------------------------------- Eberron: Forge of the Artificer
         Feat("boon_of_siberys", "Boon of Siberys", "Requires an Eberron campaign. Increase one ability score by 1, to a maximum of 30. Aberrant Magic: choose a level 8 or lower spell from the Sorcerer spell list, or one from the Siberys Dragonmark Spells table — Animal Shapes, Control Weather, Demiplane, Heroes' Feast, Maze, Mind Blank, Plane Shift, Project Image, Regenerate, Symbol, Teleport, or True Seeing. You always have it prepared, can cast it free without components once per Short or Long Rest, and can also cast it with any slots of the appropriate level.", Sourcebook.EBERRON),

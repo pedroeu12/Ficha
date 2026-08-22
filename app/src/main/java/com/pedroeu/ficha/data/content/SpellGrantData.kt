@@ -123,10 +123,8 @@ object SpellGrantData {
             at(5, "fear", "fly") +
             at(7, "arcane_eye", "charm_monster") +
             at(9, "legend_lore", "summon_dragon"),
-        "wild_magic" to at(3, "chaos_bolt", "confusion", "blink", "fireball") +
-            at(5, "fly", "counterspell") +
-            at(7, "polymorph", "greater_invisibility") +
-            at(9, "bigbys_hand", "mass_cure_wounds"),
+        // Wild Magic Sorcery is the one 2024 Sorcerer origin with no spell list: its level 3
+        // is Wild Magic Surge and Tides of Chaos, and nothing at any level grants spells.
         "clockwork" to at(3, "aid", "alarm", "lesser_restoration", "protection_evil_good") +
             at(5, "dispel_magic", "protection_from_energy") +
             at(7, "freedom_of_movement", "summon_construct") +
@@ -281,7 +279,6 @@ object SpellGrantData {
         // The Khoravar's Fey Gift starts as Friends and can be swapped on a Long Rest.
         "khoravar" to at(1, "friends"),
         // Control Air and Water opens up as the Triton grows into their heritage.
-        "triton" to at(1, "fog_cloud") + at(3, "gust_of_wind") + at(5, "wall_of_water"),
     )
 
     private val BY_SPECIES: Map<String, List<Grant>> = BY_SPECIES_ENTRIES.toMap()

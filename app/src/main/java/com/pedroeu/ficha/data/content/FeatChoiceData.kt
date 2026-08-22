@@ -126,7 +126,6 @@ object FeatChoiceData {
         "boon_speed" to Ability.ALL,
         "boon_night_spirit" to Ability.ALL,
         "boon_truesight" to Ability.ALL,
-        "boon_undetectability" to Ability.ALL,
         "boon_of_siberys" to Ability.ALL,
         "boon_of_bloodshed" to Ability.ALL,
         "boon_of_bountiful_health" to Ability.ALL,

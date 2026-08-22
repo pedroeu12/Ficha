@@ -1588,44 +1588,6 @@ object ResourceData {
             )
         )
 
-        // Each of the Triton's three spells is free once per Long Rest on its own, so they
-        // are tracked separately rather than sharing one pool.
-        "triton" -> buildList {
-            add(
-                ResourceDef(
-                    id = "triton:fog_cloud",
-                    name = "Fog Cloud (free casting)",
-                    max = 1,
-                    recharge = Recharge.LONG_REST,
-                    source = "Control Air and Water",
-                    description = "Cast Fog Cloud without expending a spell slot, using " +
-                        "Charisma as your spellcasting ability.",
-                )
-            )
-            if (c.characterLevel >= 3) add(
-                ResourceDef(
-                    id = "triton:gust_of_wind",
-                    name = "Gust of Wind (free casting)",
-                    max = 1,
-                    recharge = Recharge.LONG_REST,
-                    source = "Control Air and Water",
-                    description = "Cast Gust of Wind without expending a spell slot, using " +
-                        "Charisma as your spellcasting ability.",
-                )
-            )
-            if (c.characterLevel >= 5) add(
-                ResourceDef(
-                    id = "triton:wall_of_water",
-                    name = "Wall of Water (free casting)",
-                    max = 1,
-                    recharge = Recharge.LONG_REST,
-                    source = "Control Air and Water",
-                    description = "Cast Wall of Water without expending a spell slot, using " +
-                        "Charisma as your spellcasting ability.",
-                )
-            )
-        }
-
         else -> emptyList()
     }
 

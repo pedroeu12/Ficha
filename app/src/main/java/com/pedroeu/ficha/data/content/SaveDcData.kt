@@ -176,10 +176,6 @@ object SaveDcData {
             "khoravar", "Khoravar", Ability.CHA,
             "The Fey Gift cantrip. You may use Intelligence or Wisdom instead.",
         ),
-        "triton" to DcSource(
-            "triton", "Control Air and Water", Ability.CHA,
-            "Fog Cloud, Gust of Wind, and Wall of Water from your Triton heritage.",
-        ),
     )
 
     private val BY_LINEAGE: Map<String, DcSource> = mapOf(

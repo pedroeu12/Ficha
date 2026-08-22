@@ -100,7 +100,6 @@ class ContentCoverageTest {
         "boon_skill" to "no per-day limit",
         "boon_speed" to "no per-day limit",
         "boon_truesight" to "no per-day limit",
-        "boon_undetectability" to "no per-day limit",
         "boon_of_siberys" to "the free casting is the spell grant",
         "potent_dragonmark" to "grants a spell slot, which the slot table would need to model",
         "lich_initiate" to "Soul Siphon has no daily cap; the spirit jar is an object",

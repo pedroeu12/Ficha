@@ -7,6 +7,7 @@ import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SpellData
+import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.ChoiceKind
@@ -24,6 +25,7 @@ import com.pedroeu.ficha.ui.levelup.LevelUpStep
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -372,55 +374,37 @@ class FeatChoicesAndHalfCasterTest {
         }
     }
 
-    // ------------------------------------------------ New species
+    // ------------------------------------------------ Content that is not 2024
 
     @Test
-    fun `the grung is a small amphibious frog with poisonous skin`() {
-        val grung = SpeciesData.byId("grung")
-        assertNotNull("the Grung should be playable", grung)
-        assertEquals("Small", grung!!.size)
-        assertEquals(25, grung.speed)
-
-        val traits = grung.traits.map { it.name }
-        listOf("Amphibious", "Poison Immunity", "Poisonous Skin", "Standing Leap", "Water Dependency")
-            .forEach { assertTrue("the Grung is missing $it", traits.contains(it)) }
-
-        assertEquals("a caste to pick", 6, grung.lineageOptions.size)
+    fun `species with no 2024 printing are gone, and stay gone`() {
+        // Grung and Triton are 2014 species. Nothing on dnd2024.wikidot.com carries them, and
+        // a character built on one would level up against rules the app cannot show.
+        listOf("grung", "triton").forEach { id ->
+            assertNull("$id has no 2024 printing", SpeciesData.byId(id))
+        }
     }
 
     @Test
-    fun `the triton guards the depths and controls air and water`() {
-        val triton = SpeciesData.byId("triton")
-        assertNotNull("the Triton should be playable", triton)
-        assertEquals("Medium", triton!!.size)
-        assertEquals(30, triton.speed)
-        assertEquals(60, triton.darkvisionRange)
-
-        val traits = triton.traits.map { it.name }
-        listOf(
-            "Amphibious", "Control Air and Water", "Emissary of the Sea",
-            "Guardians of the Depths",
-        ).forEach { assertTrue("the Triton is missing $it", traits.contains(it)) }
+    fun `nothing still points at the species or spells that were removed`() {
+        // A dangling grant is invisible until someone rolls the character that triggers it.
+        val sources = SpellGrantData.sourceIds()
+        listOf("grung", "triton").forEach { id ->
+            assertFalse("$id still grants spells", sources.contains(id))
+        }
+        val catalogue = SpellData.ALL.map { it.id }.toSet()
+        SpellGrantData.allGrantedSpellIds().forEach { spellId ->
+            assertTrue("granted spell $spellId is not in the catalogue", spellId in catalogue)
+        }
     }
 
     @Test
-    fun `control air and water opens up as the triton levels`() {
-        fun spellsAt(level: Int) = CharacterSpells
-            .granted(character(speciesId = "triton", level = level))
-            .map { it.spell.id }
-
-        assertEquals(listOf("fog_cloud"), spellsAt(1))
-        assertTrue(spellsAt(3).containsAll(listOf("fog_cloud", "gust_of_wind")))
-        assertTrue(spellsAt(5).containsAll(listOf("fog_cloud", "gust_of_wind", "wall_of_water")))
-    }
-
-    @Test
-    fun `each of the triton's spells is tracked separately`() {
-        val triton = character(speciesId = "triton", level = 5)
-        val pools = com.pedroeu.ficha.domain.CharacterResources.definitions(triton)
-            .filter { it.id.startsWith("triton:") }
-
-        assertEquals(3, pools.size)
-        pools.forEach { assertEquals("one free casting each", 1, it.max) }
+    fun `spells with no 2024 printing are gone from the catalogue`() {
+        listOf("chaos_bolt", "wall_of_water", "raulothims_psychic_lance", "far_step")
+            .forEach { id ->
+                assertNull("$id is a 2014 spell", SpellData.ALL.firstOrNull { it.id == id })
+            }
+        // The id stays, because Draconic Sorcery grants it — but it is the 2024 spell now.
+        assertEquals("Summon Dragon", SpellData.ALL.first { it.id == "summon_dragon" }.name)
     }
 }

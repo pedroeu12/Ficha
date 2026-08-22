@@ -52,7 +52,7 @@ object ResourceOptionData {
             "stunning_strike", "Stunning Strike", "1 Focus Point", "Part of an attack",
             "Once per turn when you hit a creature with a Monk weapon or an Unarmed Strike, " +
                 "you can expend 1 Focus Point to attempt a stunning strike. The target must " +
-                "make a Constitution saving throw against your Ki save DC. On a failed save, " +
+                "make a Constitution saving throw against your Monk save DC. On a failed save, " +
                 "it has the Stunned condition until the start of your next turn. On a " +
                 "successful save, its Speed is halved until the start of your next turn, and " +
                 "the next attack roll against it has Advantage.",

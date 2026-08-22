@@ -224,7 +224,7 @@ object ClassData {
             toolProficiencies = listOf("Thieves' Tools"),
             level1Features = listOf(
                 Trait("Expertise", "Choose two of your skill proficiencies (or one skill and Thieves' Tools). Your proficiency bonus is doubled for checks using them."),
-                Trait("Sneak Attack", "Once per turn, deal an extra 1d6 damage to a creature you hit with an attack if you have advantage or an ally is within 5 feet of the target."),
+                Trait("Sneak Attack", "Once per turn you can deal an extra 1d6 damage to one creature you hit with an attack roll if you have Advantage on the roll and the attack uses a Finesse or a Ranged weapon. You don't need Advantage if an ally is within 5 feet of the target, that ally doesn't have the Incapacitated condition, and you don't have Disadvantage on the roll. The damage type matches the weapon's, and the dice grow with your Rogue level."),
                 Trait("Thieves' Cant", "You know a secret mix of dialect, jargon, and code that lets you hide messages in ordinary conversation."),
             ),
             choices = listOf(

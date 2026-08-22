@@ -334,6 +334,18 @@ object SpellGrantData {
         "undead_grasp" to at(1, "chill_touch"),
         "lich_ascension" to at(1, "fear"),
         "boon_of_the_cleansed_heart" to at(1, "dispel_evil_and_good"),
+
+        // ---- Imported feats that say "you always have X prepared"
+        "shadowmoor_hexer" to at(1, "hex"),
+        "gathered_whispers" to at(1, "augury"),
+        "second_skin" to at(1, "alter_self"),
+        "watchers" to at(1, "beast_sense", "speak_with_animals"),
+        "cloying_mists" to at(1, "fog_cloud"),
+        "treacherous_allure" to at(1, "charm_person"),
+        "fey_sentinel" to at(1, "entangle"),
+        "fey_tormentor" to at(1, "hex"),
+        "infernal_bulwark" to at(1, "armor_of_agathys"),
+        "infernal_dragoon" to at(1, "magic_weapon"),
     )
 
     private val BY_FEAT: Map<String, List<Grant>> = BY_FEAT_ENTRIES.toMap()

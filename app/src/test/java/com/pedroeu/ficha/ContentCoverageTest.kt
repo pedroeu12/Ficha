@@ -234,6 +234,15 @@ class ContentCoverageTest {
             "mark_of_detection", "mark_of_warding", "mark_of_shadow", "mark_of_storm",
             "mark_of_sentinel", "emerald_enclave_fledgling", "enclave_magic",
             "boon_of_revelry", "boon_of_the_cleansed_heart", "cold_caster",
+            // Imported feats whose granted spell forces no saving throw at all: Hex, Augury,
+            // Alter Self, Beast Sense, Speak with Animals, Fog Cloud, Armor of Agathys and
+            // Magic Weapon are all cast without the target rolling anything.
+            "shadowmoor_hexer", "gathered_whispers", "second_skin", "watchers",
+            "cloying_mists", "fey_tormentor", "infernal_bulwark", "infernal_dragoon",
+            // These two do force a save — Charm Person and Entangle — but the feat lets the
+            // player choose the ability that casts it, which SaveDcData has no way to
+            // express. Same gap as undead_grasp, and it belongs to the DC model, not here.
+            "treacherous_allure", "fey_sentinel",
         )
         val granting = SpellGrantData.sourceIds().filter { id -> FeatData.byId(id) != null }
         val missing = granting

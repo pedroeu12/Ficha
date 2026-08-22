@@ -1689,6 +1689,44 @@ object ResourceData {
                 source = "Greater Mark of Handling",
             )
 
+            // Imported feats whose text promises a per-rest allowance. Grouped by shape, since
+            // the only thing that differs between them is the size of the pool and the rest
+            // that refills it.
+            "sharp_eye", "vampire_s_plaything", "gathered_whispers", "living_shadow",
+            "mist_walker", "symbiotic_being", "bloodlust",
+            -> ResourceDef(
+                id = "feat:$featId",
+                name = FeatData.byId(featId)?.name ?: featId,
+                max = c.proficiencyBonus,
+                recharge = Recharge.LONG_REST,
+                source = FeatData.byId(featId)?.name ?: featId,
+            )
+
+            "tireless_reveler" -> ResourceDef(
+                id = "feat:tireless_reveler",
+                name = "Tireless Reveler",
+                max = c.proficiencyBonus,
+                recharge = Recharge.SHORT_REST,
+                source = "Tireless Reveler",
+            )
+
+            "vampire_hunter", "delicious_pain", "love_bites", "putrefy", "rebuke",
+            -> ResourceDef(
+                id = "feat:$featId",
+                name = FeatData.byId(featId)?.name ?: featId,
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = FeatData.byId(featId)?.name ?: featId,
+            )
+
+            "light_bringer", "fey_pact", "fey_tormentor" -> ResourceDef(
+                id = "feat:$featId",
+                name = FeatData.byId(featId)?.name ?: featId,
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = FeatData.byId(featId)?.name ?: featId,
+            )
+
             "greater_mark_of_warding" -> ResourceDef(
                 id = "feat:improved_warding",
                 name = "Improved Warding",

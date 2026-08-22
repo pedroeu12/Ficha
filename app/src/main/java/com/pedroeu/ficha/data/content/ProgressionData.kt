@@ -151,6 +151,9 @@ object ProgressionData {
         ChoiceOption("protection", "Protection", "When a creature you can see attacks a target other than you that is within 5 feet of you, you can take a Reaction to interpose your Shield if you're holding one. You impose Disadvantage on the triggering attack roll."),
         ChoiceOption("thrown_weapon", "Thrown Weapon Fighting", "When you hit with a Ranged attack using a weapon that has the Thrown property, you gain a +2 bonus to the damage roll."),
         ChoiceOption("two_weapon", "Two-Weapon Fighting", "When you make an extra attack as a result of the Light property, you can add your ability modifier to the damage of that extra attack."),
+        // D&D Beyond Drops, July 2026
+        ChoiceOption("pack_fighting", "Pack Fighting", "When you make a melee attack with a weapon or an Unarmed Strike against a creature, you gain a +1 bonus to the damage roll if at least one of your allies is within 5 feet of the creature and that ally isn't Incapacitated."),
+        ChoiceOption("prone_fighting", "Prone Fighting", "While you have the Prone condition, you don't have Disadvantage due to it on attack rolls, and it doesn't grant Advantage on attack rolls made against you."),
         ChoiceOption("unarmed", "Unarmed Fighting", "Your Unarmed Strikes can deal Bludgeoning damage equal to 1d6 plus your Strength modifier on a hit. If you're not wielding any weapons or a Shield when you make the attack roll, the d6 becomes a d8. At the start of each of your turns, you can deal 1d4 Bludgeoning damage to one creature you're Grappling."),
     )
 

@@ -44,6 +44,7 @@ enum class Sourcebook(
     UA_ARCANE("ua_arcane", "Unearthed Arcana 2025: Arcane Updates", isPlaytest = true),
     UA_HORROR("ua_horror", "Unearthed Arcana 2025: Horror Subclasses", isPlaytest = true),
     UA_VILLAINOUS("ua_villainous", "Unearthed Arcana 2026: Villainous Options", isPlaytest = true),
+    UA_SUBCLASSES("ua_subclasses", "Unearthed Arcana 2025: Updated Subclasses", isPlaytest = true),
     ;
 
     companion object {

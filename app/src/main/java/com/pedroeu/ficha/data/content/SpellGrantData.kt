@@ -74,6 +74,11 @@ object SpellGrantData {
             at(9, "legend_lore", "scrying", "synaptic_static"),
 
         // ---- Paladin oaths
+        "oathbreaker" to at(3, "hellish_rebuke", "witch_bolt") +
+            at(5, "crown_of_madness", "darkness") +
+            at(9, "fear", "summon_undead") +
+            at(13, "blight", "phantasmal_killer") +
+            at(17, "contagion", "steel_wind_strike"),
         "devotion" to at(3, "protection_evil_good", "shield_of_faith") +
             at(5, "aid", "zone_of_truth") +
             at(9, "beacon_of_hope", "dispel_magic") +

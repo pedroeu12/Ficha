@@ -27,6 +27,7 @@ object SubclassData {
      */
     private val VILLAIN = Sourcebook.UA_VILLAINOUS
     private val HORROR = Sourcebook.UA_HORROR
+    private val UA_SUB = Sourcebook.UA_SUBCLASSES
 
     // All three Villainous printings are one book to the selector, but the wording differs
     // between them, so each subclass still names the printing it carries.
@@ -729,6 +730,17 @@ object SubclassData {
             book = UA),
 
         // ================================================================= Paladin
+        Subclass("oathbreaker", "paladin", "Oathbreaker",
+            "A Paladin who fell from grace and now wields fear and undeath as tools of power.",
+            listOf(
+                f(3, "Conjure Undead", "As a Bonus Action, expend one use of Channel Divinity to summon a number of Undead equal to half your Charisma modifier (round up, minimum one). Each appears in an unoccupied space you can see within 30 feet and is a Skeleton or Zombie of your choice. They are under your control for 1 minute, then dissolve into ash. Each is an ally to you and your allies, shares your Initiative count but acts immediately after you, and obeys your verbal commands; given none, it Dodges and moves to avoid danger."),
+                f(3, "Dreadful Aspect", "Immediately after you cast Divine Smite, you can expend one use of Channel Divinity to channel a burst of magical menace. Each creature of your choice in a 30-foot Emanation originating from you must succeed on a Wisdom saving throw or have the Frightened condition for 1 minute, repeating the save at the end of each of its turns to end it."),
+                f(3, "Oathbreaker Spells", "You always have Hellish Rebuke and Witch Bolt prepared, adding Crown of Madness and Darkness at level 5, Fear and Summon Undead at level 9, Blight and Phantasmal Killer at level 13, and Contagion and Steel Wind Strike at level 17."),
+                f(7, "Aura of Hate", "When you, or any allied Fiend or Undead in your Aura of Protection, hits a creature with a melee attack, that attack deals extra Necrotic damage equal to your Charisma modifier."),
+                f(15, "Supernatural Resistance", "You gain Resistance to Bludgeoning, Piercing, and Slashing damage."),
+                f(20, "Dread Lord", "As a Bonus Action, imbue your Aura of Protection with unholy gloom for 10 minutes or until you end it. Darkness: magical Darkness fills the aura, and you and your allies in it can see through it. Fear: a Frightened creature that starts its turn in the aura takes 4d10 Psychic damage. Shadow Strike: as a Bonus Action, make a melee spell attack against one creature in the aura, dealing 3d10 Necrotic damage plus your Charisma modifier on a hit. Once used, you can't use it again until you finish a Long Rest, or until you expend a level 5 spell slot to restore it."),
+            ),
+            book = UA_SUB),
         Subclass("devotion", "paladin", "Oath of Devotion",
             "The classic knightly ideal: honesty, courage, and unwavering duty.",
             listOf(

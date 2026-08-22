@@ -886,6 +886,19 @@ object ResourceData {
                 )
             ) else emptyList()
 
+            // Dread Lord is once per Long Rest, but a level 5 spell slot buys it back, so the
+            // note says so rather than the pool silently being the only way to get it again.
+            "oathbreaker" -> if (level >= 20) listOf(
+                ResourceDef(
+                    id = "oathbreaker:dread_lord",
+                    name = "Dread Lord",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Oathbreaker",
+                    notes = "You can also restore this by expending a level 5 spell slot.",
+                )
+            ) else emptyList()
+
             "devotion" -> if (level >= 20) listOf(
                 ResourceDef(
                     id = "devotion:holy_nimbus",

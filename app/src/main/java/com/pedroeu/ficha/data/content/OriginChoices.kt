@@ -4,6 +4,8 @@ import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ChoiceOption
 import com.pedroeu.ficha.data.model.ChoiceOptions
+import com.pedroeu.ficha.data.model.FeatCategory
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.Skill
 
 /**
@@ -92,9 +94,11 @@ object OriginChoices {
      * An Origin feat granted by the species itself, as the Human's Versatile trait does. It
      * draws from the same list a background's feat comes from.
      */
-    fun forSpecies(speciesId: String?): List<Choice> {
+    fun forSpecies(speciesId: String?, books: Set<Sourcebook> = Sourcebook.EVERYTHING): List<Choice> {
         val species = speciesId?.let { SpeciesData.byId(it) } ?: return emptyList()
         if (!species.grantsOriginFeat) return emptyList()
+        val options = FeatData.inCategories(setOf(FeatCategory.ORIGIN), books)
+        if (options.isEmpty()) return emptyList()
         return listOf(
             Choice(
                 id = "species:$speciesId:origin_feat",
@@ -102,10 +106,36 @@ object OriginChoices {
                 prompt = "Choose an Origin feat. ${species.name}s gain one from Versatile.",
                 count = 1,
                 kind = ChoiceKind.FEAT,
-                options = FeatData.ORIGIN_FEATS.map {
-                    ChoiceOption(it.id, it.name, it.description)
-                },
+                options = options.map { ChoiceOption(it.id, it.name, it.description) },
                 source = species.name,
+            )
+        )
+    }
+
+    /**
+     * The origin feat a background leaves open, as five of them do.
+     *
+     * A background with a fixed feat produces nothing here — that feat is simply granted.
+     */
+    fun forBackgroundFeat(
+        backgroundId: String?,
+        books: Set<Sourcebook> = Sourcebook.EVERYTHING,
+    ): List<Choice> {
+        val background = backgroundId?.let { BackgroundData.byId(it) } ?: return emptyList()
+        val choice = background.featChoice ?: return emptyList()
+        val fromCategories = FeatData.inCategories(choice.categories, books)
+        val named = choice.alsoAllows.mapNotNull { FeatData.byId(it) }.filter { it.book in books }
+        val options = (named + fromCategories).distinctBy { it.id }
+        if (options.isEmpty()) return emptyList()
+        return listOf(
+            Choice(
+                id = "background:$backgroundId:origin_feat",
+                label = "Origin Feat",
+                prompt = "Choose your Origin feat: ${choice.label}.",
+                count = 1,
+                kind = ChoiceKind.FEAT,
+                options = options.map { ChoiceOption(it.id, it.name, it.description) },
+                source = background.name,
             )
         )
     }
@@ -242,19 +272,29 @@ object OriginChoices {
         backgroundId: String?,
         originSelections: Map<String, List<String>> = emptyMap(),
         extraFeatIds: Collection<String> = emptyList(),
+        books: Set<Sourcebook> = Sourcebook.EVERYTHING,
     ): List<Choice> {
         val choices = mutableListOf<Choice>()
 
-        choices += forSpecies(speciesId)
+        choices += forSpecies(speciesId, books)
+        choices += forBackgroundFeat(backgroundId, books)
         if (speciesId != null) choices += forLineage(speciesId, lineageId)
         if (classId != null) choices += forClass(classId, classSelections)
         if (backgroundId != null) forBackgroundTool(backgroundId)?.let { choices += it }
 
         // Every feat the character has, from wherever, followed into whatever it grants.
         val rootFeats = buildList {
-            backgroundId?.let { BackgroundData.byId(it)?.featId?.let(::add) }
+            val background = backgroundId?.let { BackgroundData.byId(it) }
+            // A background that leaves its feat open contributes what was chosen, not its
+            // fallback: granting both would hand out a feat the player never picked.
+            if (background?.featChoice == null) {
+                background?.featId?.let(::add)
+            } else {
+                forBackgroundFeat(backgroundId, books)
+                    .forEach { addAll(originSelections[it.id].orEmpty()) }
+            }
             // A species Origin feat is itself a choice, so it starts from what was selected.
-            forSpecies(speciesId).forEach { addAll(originSelections[it.id].orEmpty()) }
+            forSpecies(speciesId, books).forEach { addAll(originSelections[it.id].orEmpty()) }
             addAll(extraFeatIds)
         }.distinct()
 

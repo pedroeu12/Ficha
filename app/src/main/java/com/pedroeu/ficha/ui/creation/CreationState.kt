@@ -170,6 +170,7 @@ data class CreationState(
             classSelections = classSelections,
             backgroundId = backgroundId,
             originSelections = originSelections,
+            books = enabledSources,
         )
 
     /** Skills picked through an origin choice, such as the Skilled feat. */

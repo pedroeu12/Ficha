@@ -186,6 +186,7 @@ object ChoiceResolver {
             backgroundId = character.backgroundId,
             originSelections = character.originChoiceSelections,
             extraFeatIds = character.featIds,
+            books = character.enabledSources,
         ).map { choice -> resolve(character, choice, choice.label, 0) }
 
     /** Everything the character has decided, for the "your choices" view and rests. */

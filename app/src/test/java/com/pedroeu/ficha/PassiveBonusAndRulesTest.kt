@@ -7,6 +7,8 @@ import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.FeatCategory
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterResources
@@ -126,9 +128,24 @@ class PassiveBonusAndRulesTest {
         val choices = OriginChoices.forSpecies("human")
         assertEquals(1, choices.size)
         assertEquals(ChoiceKind.FEAT, choices.first().kind)
+        // Origin feats only: the Dragonmarks and Dark Gifts are declared in the same list,
+        // because that is when they may be taken, but Versatile does not offer them.
+        val originOnly = FeatData.ALL.count { it.category == FeatCategory.ORIGIN }
+        assertEquals("it should draw from the Origin feats", originOnly, choices.first().options.size)
+    }
+
+    @Test
+    fun `the origin feat a species grants respects the character's books`() {
+        val core = OriginChoices.forSpecies("human", Sourcebook.CORE).first()
+        assertTrue("core books alone still offer something", core.options.isNotEmpty())
         assertTrue(
-            "it should draw from the Origin feat list",
-            choices.first().options.size == FeatData.ORIGIN_FEATS.size,
+            "a supplement feat was offered to a core-only character",
+            core.options.all { FeatData.byId(it.id)!!.book in Sourcebook.CORE },
+        )
+        assertTrue(
+            "opening more books should offer more",
+            OriginChoices.forSpecies("human", Sourcebook.EVERYTHING).first().options.size >
+                core.options.size,
         )
     }
 

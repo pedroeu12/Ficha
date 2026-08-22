@@ -368,9 +368,11 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
                     "1:$choiceId" to state.expertiseChoices.map { it.name }
                 },
             // The background's feat, plus any feat picked through an origin choice — the
-            // Human's Versatile trait grants one the same way.
+            // Human's Versatile trait grants one the same way. A background that leaves its
+            // feat open contributes nothing here: its featId is only a fallback, and adding
+            // it as well would hand the character two feats for one grant.
             featIds = (
-                listOfNotNull(background?.featId) +
+                listOfNotNull(background?.takeIf { it.featChoice == null }?.featId) +
                     state.originChoices
                         .filter { it.kind == ChoiceKind.FEAT }
                         .flatMap { state.originSelections[it.id].orEmpty() }

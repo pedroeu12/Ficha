@@ -1,12 +1,13 @@
 package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.Feat
+import com.pedroeu.ficha.data.model.FeatCategory
 import com.pedroeu.ficha.data.model.Sourcebook
 
 object FeatData {
 
     /** Feats granted by a background at character creation. */
-    val ORIGIN_FEATS: List<Feat> = listOf(
+    private val RAW_ORIGIN: List<Feat> = listOf(
         Feat("alert", "Alert", "You gain a bonus to Initiative equal to your Proficiency Bonus, and you can swap your Initiative with a willing ally's."),
         Feat("crafter", "Crafter", "You gain proficiency with three Artisan's Tools, get a 20% discount on nonmagical goods, and can craft items faster during a long rest."),
         Feat("healer", "Healer", "You can use a Healer's Kit as a Utilize action to restore hit points, and rerolling a 1 on any healing die is allowed."),
@@ -72,7 +73,7 @@ object FeatData {
     )
 
     /** General feats, available in place of an Ability Score Improvement from level 4 on. */
-    val GENERAL_FEATS: List<Feat> = listOf(
+    private val RAW_GENERAL: List<Feat> = listOf(
         Feat("ability_score_improvement", "Ability Score Improvement", "Increase one ability score by 2, or two ability scores by 1 each, to a maximum of 20."),
         Feat("actor", "Actor", "Increase Charisma by 1. You have Advantage on Deception and Performance checks to pass as someone else, and can mimic voices you've heard."),
         Feat("athlete", "Athlete", "Increase Strength or Dexterity by 1. Standing from Prone costs less movement, and you can climb at your normal Speed."),
@@ -188,7 +189,7 @@ object FeatData {
     )
 
     /** Epic Boon feats, taken at level 19. */
-    val EPIC_BOONS: List<Feat> = listOf(
+    private val RAW_EPIC: List<Feat> = listOf(
         Feat("boon_combat_prowess", "Boon of Combat Prowess", "Increase one ability score by 1. Once per turn, turn a miss into a hit."),
         Feat("boon_dimensional_travel", "Boon of Dimensional Travel", "Increase one ability score by 1. After taking the Attack or Magic action, you can teleport up to 30 feet."),
         Feat("boon_energy_resistance", "Boon of Energy Resistance", "Increase one ability score by 1. Gain Resistance to two damage types and the ability to ignore Resistance."),
@@ -232,7 +233,45 @@ object FeatData {
         Feat("boon_of_misty_escape", "Boon of Misty Escape", "Epic Boon Feat (Prerequisite: Level 19+) You gain the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma score by 1, to a maximum of 30. Gaseous Form. If you drop to 0 Hit Points but aren't killed outright, you can instead drop to 1 Hit Point and cast Gaseous Form without expending a spell slot (no action required). When you cast this spell this way, you can target only yourself, your Fly Speed is 20 feet, and you regain 10 Hit Points at the start of each of your turns for the spell's duration. The spell's spellcasting ability is the ability increased by this feat. Once you use this benefit, you can't do so again until you finish a Long Rest.", Sourcebook.ASTARIONS_BOOK),
     )
 
+    /**
+     * Feats the books print under a named group rather than the list they sit in here.
+     *
+     * The Dragonmarks and Dark Gifts are declared among the origin feats and the Planar Pacts
+     * among the general ones, because that is when each may be taken. The group still has to
+     * be nameable on its own: a background that grants "a Dark Gift feat of your choice" has
+     * to be able to offer exactly those nine.
+     */
+    private val DARK_GIFTS = setOf(
+        "aberrant_anatomy", "echoing_soul", "gathered_whispers", "living_shadow",
+        "mist_walker", "second_skin", "symbiotic_being", "touch_of_death", "watchers",
+    )
+
+    private val PLANAR_PACTS = setOf(
+        "fey_pact", "infernal_pact", "fey_sentinel", "fey_tormentor",
+        "infernal_bulwark", "infernal_dragoon",
+    )
+
+    private fun List<Feat>.categorised(fallback: FeatCategory) = map { feat ->
+        val category = when {
+            feat.id in DARK_GIFTS -> FeatCategory.DARK_GIFT
+            feat.id in PLANAR_PACTS -> FeatCategory.PLANAR_PACT
+            feat.id.startsWith("mark_of_") || feat.id.startsWith("greater_mark_of_") ||
+                feat.id in setOf("aberrant_dragonmark", "greater_aberrant_mark", "potent_dragonmark")
+            -> FeatCategory.DRAGONMARK
+            else -> fallback
+        }
+        feat.copy(category = category)
+    }
+
+    val ORIGIN_FEATS: List<Feat> = RAW_ORIGIN.categorised(FeatCategory.ORIGIN)
+    val GENERAL_FEATS: List<Feat> = RAW_GENERAL.categorised(FeatCategory.GENERAL)
+    val EPIC_BOONS: List<Feat> = RAW_EPIC.categorised(FeatCategory.EPIC_BOON)
+
     val ALL: List<Feat> = ORIGIN_FEATS + GENERAL_FEATS + EPIC_BOONS
 
     fun byId(id: String): Feat? = ALL.find { it.id == id }
+
+    /** Every feat in one of [categories] that the given books allow. */
+    fun inCategories(categories: Set<FeatCategory>, books: Set<Sourcebook>): List<Feat> =
+        ALL.filter { it.category in categories && it.book in books }
 }

@@ -2,6 +2,8 @@ package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Background
+import com.pedroeu.ficha.data.model.BackgroundFeatChoice
+import com.pedroeu.ficha.data.model.FeatCategory
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.Sourcebook
 
@@ -490,6 +492,11 @@ object BackgroundData {
             skillProficiencies = listOf(Skill.ARCANA, Skill.SURVIVAL),
             toolProficiency = "Choose one kind of Gaming Set",
             featId = "survivor",
+            featChoice = BackgroundFeatChoice(
+                label = "Survivor or a Dark Gift feat",
+                categories = setOf(FeatCategory.DARK_GIFT),
+                alsoAllows = listOf("survivor"),
+            ),
             equipment = listOf("Gaming Set (same as above)", "Crowbar", "Holy Water (1 flask)", "Mirror", "Oil(2 flasks)", "Signal Whistle", "Tinderbox", "Traveler's Clothes", "5 Torches", "Waterskin"),
             startingGold = 14,
             book = Sourcebook.RAVENLOFT,
@@ -694,6 +701,11 @@ object BackgroundData {
             skillProficiencies = listOf(Skill.INSIGHT, Skill.INVESTIGATION),
             toolProficiency = "Disguise Kit",
             featId = "sharp_eye",
+            featChoice = BackgroundFeatChoice(
+                label = "Sharp Eye or a Dark Gift feat",
+                categories = setOf(FeatCategory.DARK_GIFT),
+                alsoAllows = listOf("sharp_eye"),
+            ),
             equipment = listOf("Disguise Kit", "Manacles", "Shovel", "Traveler's Clothes", "3 Vials"),
             startingGold = 16,
             book = Sourcebook.RAVENLOFT,
@@ -737,11 +749,15 @@ object BackgroundData {
         Background(
             id = "mist_wanderer",
             name = "Mist Wanderer",
-            summary = "You once knew your home. But one day, the Mists rose and drew you into a Domain of Dread. Ever since, you have wandered between domains, braving the mercurial Mists as you search for a way home. The book lets you take any Dark Gift feat here; Mist Walker is its recommendation.",
+            summary = "You once knew your home. But one day, the Mists rose and drew you into a Domain of Dread. Ever since, you have wandered between domains, braving the mercurial Mists as you search for a way home.",
             abilityOptions = listOf(Ability.DEX, Ability.CON, Ability.WIS),
             skillProficiencies = listOf(Skill.SURVIVAL, Skill.STEALTH),
             toolProficiency = "Choose one kind of Artisan's Tools",
             featId = "mist_walker",
+            featChoice = BackgroundFeatChoice(
+                label = "A Dark Gift feat",
+                categories = setOf(FeatCategory.DARK_GIFT),
+            ),
             equipment = listOf("Artisan's Tools (same as above)", "Lamp", "Oil (5 flasks)", "Pouch", "Rope", "Tinderbox", "Traveler's Clothes"),
             startingGold = 30,
             book = Sourcebook.RAVENLOFT,
@@ -785,11 +801,15 @@ object BackgroundData {
         Background(
             id = "pact_seeker",
             name = "Pact Seeker",
-            summary = "You had a purpose in mind. Perhaps you were seeking out knowledge or power. Or maybe you were in search of hidden secrets. One way or another, your journey lead you to seek out an extraplanar entity. Once you made contact, a deal was struck, and your life changed. The book lets you take any Planar Pact feat here.",
+            summary = "You had a purpose in mind. Perhaps you were seeking out knowledge or power. Or maybe you were in search of hidden secrets. One way or another, your journey lead you to seek out an extraplanar entity. Once you made contact, a deal was struck, and your life changed.",
             abilityOptions = listOf(Ability.CON, Ability.INT, Ability.CHA),
             skillProficiencies = listOf(Skill.ARCANA, Skill.PERSUASION),
             toolProficiency = "Calligrapher's Supplies",
             featId = "fey_pact",
+            featChoice = BackgroundFeatChoice(
+                label = "A Planar Pact feat",
+                categories = setOf(FeatCategory.PLANAR_PACT),
+            ),
             equipment = listOf("Book", "Calligrapher's Supplies", "Ink", "Ink Pen", "Parchment (10 sheets)", "Traveler's Clothes"),
             startingGold = 2,
             book = Sourcebook.DDB_DROPS,
@@ -857,11 +877,15 @@ object BackgroundData {
         Background(
             id = "spirit_medium",
             name = "Spirit Medium",
-            summary = "Through strange rituals and fateful encounters, you've discovered that you bear a unique connection to the spirits of the dead and damned. Your body is a conduit for such spirits, granting you prescient insight from beyond. But these spirits' intentions aren't always innocent, and their gifts come at a haunting cost. The book lets you take any Dark Gift feat here; Gathered Whispers is its recommendation.",
+            summary = "Through strange rituals and fateful encounters, you've discovered that you bear a unique connection to the spirits of the dead and damned. Your body is a conduit for such spirits, granting you prescient insight from beyond. But these spirits' intentions aren't always innocent, and their gifts come at a haunting cost.",
             abilityOptions = listOf(Ability.CON, Ability.INT, Ability.WIS),
             skillProficiencies = listOf(Skill.INSIGHT, Skill.RELIGION),
             toolProficiency = "Choose one kind of Gaming Set",
             featId = "gathered_whispers",
+            featChoice = BackgroundFeatChoice(
+                label = "A Dark Gift feat",
+                categories = setOf(FeatCategory.DARK_GIFT),
+            ),
             equipment = listOf("Dagger", "Gaming Set (same as above)", "Basket", "Bell", "8 Candles", "Ink", "Ink Pen", "Paper (5 sheets)", "Tinderbox", "Traveler's Clothes"),
             startingGold = 32,
             book = Sourcebook.RAVENLOFT,

@@ -53,23 +53,30 @@ object CharacterDcs {
             )
         }
 
+        // The headline DC uses the best of the character's casting abilities, so the entry
+        // marked primary has to be the one that produced it — not simply the starting class.
+        // A Wizard 5 / Cleric 5 with the better Wisdom shows the Cleric line as primary.
+        val headlineAbility = CharacterCalculations.spellcastingAbility(character)
+        var primaryClaimed = false
+
         return buildList {
             ClassLevels.of(character).forEach { entry ->
                 val charClass = ClassData.byId(entry.classId)
-                val isStarting = entry.classId == character.classId
 
                 charClass?.spellcastingAbility?.let { ability ->
+                    val isPrimary = !primaryClaimed && ability == headlineAbility
+                    if (isPrimary) primaryClaimed = true
                     val base = dcFor(
                         id = "class:${entry.classId}",
                         label = charClass.name,
                         ability = ability,
                         note = "${charClass.name} spells.",
-                        isPrimary = isStarting,
+                        isPrimary = isPrimary,
                     )
-                    // Edit Mode can pin the headline DC and attack bonus by hand, but only
-                    // for the starting class — the others have no stat to override.
+                    // Edit Mode can pin the headline DC and attack bonus by hand, and those
+                    // overrides belong to whichever line is the headline.
                     add(
-                        if (isStarting) {
+                        if (isPrimary) {
                             base.copy(
                                 dc = CharacterCalculations.spellSaveDc(character) ?: base.dc,
                                 attackBonus = CharacterCalculations.spellAttackBonus(character)

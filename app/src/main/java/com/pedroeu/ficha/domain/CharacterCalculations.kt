@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.content.EquipmentData
 import com.pedroeu.ficha.data.content.MagicItemData
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.data.content.SaveDcData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.WeaponPropertyData
@@ -310,14 +311,43 @@ object CharacterCalculations {
     }
 
     /**
-     * The ability the character's own spells are cast with.
+     * Every ability this character casts with, in the order the sources were taken.
      *
-     * Falls through to the subclass when the class has none of its own, which is the only way
-     * an Eldritch Knight ever gets a spell save DC.
+     * A multiclassed caster has one per class, and a subclass can add its own where the class
+     * has none — a Fighter/Eldritch Knight casts on Intelligence while its class says nothing.
+     * Feats that grant spellcasting name a fixed ability too, and it need not match either.
      */
-    fun spellcastingAbility(character: PlayerCharacter): Ability? =
-        ClassData.byId(character.classId)?.spellcastingAbility
-            ?: character.subclassId?.let { SubclassData.byId(it)?.spellcastingAbility }
+    fun spellcastingAbilities(character: PlayerCharacter): List<Ability> = buildList {
+        ClassLevels.of(character).forEach { entry ->
+            ClassData.byId(entry.classId)?.spellcastingAbility?.let(::add)
+            entry.subclassId?.let { SubclassData.byId(it)?.spellcastingAbility }?.let(::add)
+        }
+        // Falls back to the plain fields for a character saved before classLevels existed.
+        if (isEmpty()) {
+            ClassData.byId(character.classId)?.spellcastingAbility?.let(::add)
+            character.subclassId?.let { SubclassData.byId(it)?.spellcastingAbility }?.let(::add)
+        }
+        character.featIds.forEach { featId ->
+            SaveDcData.forFeat(featId)?.ability?.let(::add)
+        }
+    }.distinct()
+
+    /**
+     * The ability the character's spell attacks and save DC use.
+     *
+     * Where several apply, the highest modifier wins rather than whichever class happened to
+     * be taken first. By the book each spell is cast with the ability of whatever granted it,
+     * so a Wizard 5 / Cleric 5 with Intelligence 18 and Wisdom 12 would roll two different
+     * numbers; the sheet shows one, and showing the worse of them helps nobody.
+     *
+     * Ties keep the earlier source, so a single-class caster's ability never moves.
+     */
+    fun spellcastingAbility(character: PlayerCharacter): Ability? {
+        val candidates = spellcastingAbilities(character)
+        if (candidates.size <= 1) return candidates.firstOrNull()
+        val modifiers = abilityModifiers(character)
+        return candidates.maxByOrNull { modifiers[it] ?: 0 }
+    }
 
     fun spellSaveDc(character: PlayerCharacter): Int? {
         val ability = spellcastingAbility(character) ?: return null

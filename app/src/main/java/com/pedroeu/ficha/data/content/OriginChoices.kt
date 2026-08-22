@@ -24,6 +24,7 @@ object OriginChoices {
                 name = spell.name,
                 description = spell.description,
                 supporting = spell.subtitle,
+                book = spell.book,
             )
         }
 
@@ -106,7 +107,7 @@ object OriginChoices {
                 prompt = "Choose an Origin feat. ${species.name}s gain one from Versatile.",
                 count = 1,
                 kind = ChoiceKind.FEAT,
-                options = options.map { ChoiceOption(it.id, it.name, it.description) },
+                options = options.map { ChoiceOption(it.id, it.name, it.description, book = it.book) },
                 source = species.name,
             )
         )
@@ -134,7 +135,7 @@ object OriginChoices {
                 prompt = "Choose your Origin feat: ${choice.label}.",
                 count = 1,
                 kind = ChoiceKind.FEAT,
-                options = options.map { ChoiceOption(it.id, it.name, it.description) },
+                options = options.map { ChoiceOption(it.id, it.name, it.description, book = it.book) },
                 source = background.name,
             )
         )

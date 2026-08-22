@@ -2,6 +2,7 @@ package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.ArmorCategory
 import com.pedroeu.ficha.data.model.InventoryItem
+import com.pedroeu.ficha.data.model.Sourcebook
 
 enum class CatalogItemType { WEAPON, ARMOR, GEAR, MAGIC }
 
@@ -21,6 +22,13 @@ data class CatalogItem(
     val stats: List<Pair<String, String>>,
     val weaponDefId: String? = null,
     val armorDefId: String? = null,
+    /**
+     * The book a magic item came from, so the picker can group by it.
+     *
+     * Null for mundane gear, which the Player's Handbook equipment chapter covers and which
+     * no supplement changes.
+     */
+    val book: Sourcebook? = null,
 ) {
     val costLabel: String
         get() = when {
@@ -132,6 +140,7 @@ object ItemCatalog {
                 CatalogItem(
                     id = "magic:${magicItem.id}",
                     name = magicItem.name,
+                    book = magicItem.book,
                     type = CatalogItemType.MAGIC,
                     category = "Magic — ${magicItem.rarity.label}",
                     // Magic items have no list price; they're found or granted, not bought.

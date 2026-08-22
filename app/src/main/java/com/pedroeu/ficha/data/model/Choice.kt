@@ -34,6 +34,14 @@ data class ChoiceOption(
     val description: String = "",
     /** Short right-aligned label, e.g. an ability abbreviation or spell school. */
     val supporting: String = "",
+    /**
+     * The book the option came from, where it came from one.
+     *
+     * Null for options that are not book content — a damage type, a skill, an ability score.
+     * When a choice's options span several books the picker groups them under it, which is
+     * the difference between choosing a cantrip from a list of nine and from a list of 34.
+     */
+    val book: Sourcebook? = null,
 )
 
 /**

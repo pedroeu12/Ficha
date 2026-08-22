@@ -32,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.components.sourceGroupedItems
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -101,6 +103,7 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf<String?>(null) }
     var filtersOpen by remember { mutableStateOf(false) }
+    var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
 
     val results = remember(query, category) { ItemCatalog.search(query, category) }
 
@@ -189,8 +192,17 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.heightIn(max = 420.dp),
         ) {
-            items(results.size, key = { results[it].id }) { index ->
-                val entry = results[index]
+            sourceGroupedItems(
+                items = results,
+                query = query,
+                collapsed = collapsedBooks,
+                onToggleBook = { key ->
+                    collapsedBooks =
+                        if (key in collapsedBooks) collapsedBooks - key else collapsedBooks + key
+                },
+                id = { it.id },
+                book = { it.book },
+            ) { entry ->
                 CatalogRow(entry, onAdd = { onAdd(entry.toInventoryItem()) })
             }
         }

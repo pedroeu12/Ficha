@@ -16,6 +16,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.components.SourceSectionHeader
+import com.pedroeu.ficha.ui.components.SourceGrouping
+import com.pedroeu.ficha.ui.components.PickerSearchField
+import com.pedroeu.ficha.ui.components.NoSearchResults
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,6 +36,12 @@ import com.pedroeu.ficha.ui.components.SelectableCard
 
 @Composable
 fun SpeciesStep(state: CreationState, viewModel: CreationViewModel) {
+    var query by rememberSaveable { mutableStateOf("") }
+    var collapsed by rememberSaveable { mutableStateOf(setOf<String>()) }
+    val all = state.availableSpecies
+    val matching = SourceGrouping.matching(all, query) { it.name + " " + it.summary }
+    val grouped = SourceGrouping.worthGrouping(all) { it.book }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -40,7 +54,41 @@ fun SpeciesStep(state: CreationState, viewModel: CreationViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        items(state.availableSpecies, key = { it.id }) { species ->
+        item {
+            if (all.size >= SourceGrouping.SEARCH_THRESHOLD) {
+                PickerSearchField(
+                    query = query,
+                    onQueryChange = { query = it },
+                    placeholder = tr("Search species"),
+                )
+            }
+        }
+
+        if (matching.isEmpty()) {
+            item { NoSearchResults(query) }
+        }
+
+        // A search is already a filter; grouping its results as well buries the matches.
+        val sections =
+            if (grouped && query.isBlank()) SourceGrouping.byBook(matching) { it.book }
+            else listOf(null to matching)
+
+        sections.forEach { (book, entries) ->
+            val sectionKey = book?.id ?: "all"
+            val open = sectionKey !in collapsed
+            if (book != null) {
+                item(key = "header:$sectionKey") {
+                    SourceSectionHeader(
+                        book = book,
+                        count = entries.size,
+                        expanded = open,
+                        onToggle = {
+                            collapsed = if (open) collapsed + sectionKey else collapsed - sectionKey
+                        },
+                    )
+                }
+            }
+            if (open) items(entries, key = { it.id }) { species ->
             SelectableCard(
                 title = species.name,
                 subtitle = species.summary,
@@ -52,6 +100,7 @@ fun SpeciesStep(state: CreationState, viewModel: CreationViewModel) {
                 },
                 expandedContent = { SpeciesDetails(species, state, viewModel) },
             )
+            }
         }
     }
 }

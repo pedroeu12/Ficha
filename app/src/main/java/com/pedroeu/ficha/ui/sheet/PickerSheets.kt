@@ -23,6 +23,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.components.SourceSectionHeader
+import com.pedroeu.ficha.ui.components.SourceGrouping
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +66,7 @@ fun FeatPickerSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var query by remember { mutableStateOf("") }
     var selectedFeatId by remember { mutableStateOf<String?>(null) }
+    var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
     var selections by remember { mutableStateOf<Map<String, List<String>>>(emptyMap()) }
 
     val already = character.featIds.toSet()
@@ -109,8 +113,32 @@ fun FeatPickerSheet(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.heightIn(max = 420.dp),
             ) {
-                items(results.size, key = { results[it].id }) { index ->
-                    val feat = results[index]
+                // A search is already a filter; grouping its results too buries the matches.
+                val sections =
+                    if (query.isBlank() && SourceGrouping.worthGrouping(results) { it.book }) {
+                        SourceGrouping.byBook(results) { it.book }
+                    } else {
+                        listOf(null to results)
+                    }
+                sections.forEach { (book, entries) ->
+                val sectionKey = book?.id ?: "all"
+                val open = sectionKey !in collapsedBooks
+                if (book != null) {
+                    item(key = "header:$sectionKey") {
+                        SourceSectionHeader(
+                            book = book,
+                            count = entries.size,
+                            expanded = open,
+                            onToggle = {
+                                collapsedBooks =
+                                    if (open) collapsedBooks + sectionKey
+                                    else collapsedBooks - sectionKey
+                            },
+                        )
+                    }
+                }
+                if (open) items(entries.size, key = { entries[it].id }) { index ->
+                    val feat = entries[index]
                     val owned = feat.id in already
                     SelectableCard(
                         title = if (owned) "${feat.name} (already taken)" else feat.name,
@@ -156,6 +184,7 @@ fun FeatPickerSheet(
                         },
                     )
                 }
+                }
             }
         }
     }
@@ -176,6 +205,7 @@ fun SpellPickerSheet(
     var levelFilter by remember { mutableStateOf<Int?>(null) }
     var classListOnly by remember { mutableStateOf(true) }
     var customName by remember { mutableStateOf("") }
+    var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
 
     val known = character.knownSpells.map { it.id }.toSet()
     // Off-book spells stay out of the catalogue; the custom-name field below is the way in.
@@ -248,9 +278,33 @@ fun SpellPickerSheet(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.heightIn(max = 360.dp),
                 ) {
-                    items(results.size, key = { results[it].id }) { index ->
-                        val spell = results[index]
+                    val sections =
+                        if (query.isBlank() && SourceGrouping.worthGrouping(results) { it.book }) {
+                            SourceGrouping.byBook(results) { it.book }
+                        } else {
+                            listOf(null to results)
+                        }
+                    sections.forEach { (book, entries) ->
+                    val sectionKey = book?.id ?: "all"
+                    val open = sectionKey !in collapsedBooks
+                    if (book != null) {
+                        item(key = "header:$sectionKey") {
+                            SourceSectionHeader(
+                                book = book,
+                                count = entries.size,
+                                expanded = open,
+                                onToggle = {
+                                    collapsedBooks =
+                                        if (open) collapsedBooks + sectionKey
+                                        else collapsedBooks - sectionKey
+                                },
+                            )
+                        }
+                    }
+                    if (open) items(entries.size, key = { entries[it].id }) { index ->
+                        val spell = entries[index]
                         SpellRow(spell) { onAdd(spell.toKnownSpell()) }
+                    }
                     }
                 }
             }

@@ -12,6 +12,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.data.model.ChoiceOption
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.Choice
@@ -76,11 +81,24 @@ fun ChoiceSection(
                     }
                 }
             } else {
+                var query by rememberSaveable(choice.id) { mutableStateOf("") }
+                var collapsed by rememberSaveable(choice.id) { mutableStateOf(setOf<String>()) }
+
+                val matching = SourceGrouping.matching(choice.options, query) {
+                    it.name + " " + it.supporting
+                }
+                val grouped = SourceGrouping.worthGrouping(choice.options) { it.book }
+
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(top = 8.dp),
                 ) {
-                    choice.options.forEach { option ->
+                    if (choice.options.size >= SourceGrouping.SEARCH_THRESHOLD) {
+                        PickerSearchField(query = query, onQueryChange = { query = it })
+                    }
+
+                    @Composable
+                    fun option(option: ChoiceOption) {
                         SelectableCard(
                             title = option.name,
                             subtitle = option.description,
@@ -91,6 +109,29 @@ fun ChoiceSection(
                             // nineteen maneuvers is still something you can scroll.
                             subtitleMaxLines = 3,
                         )
+                    }
+
+                    when {
+                        matching.isEmpty() -> NoSearchResults(query)
+
+                        // A search is already a filter; grouping its results as well buries
+                        // the two matches under headers.
+                        grouped && query.isBlank() ->
+                            SourceGrouping.byBook(matching) { it.book }.forEach { (book, entries) ->
+                                val key = book?.id ?: "other"
+                                val open = key !in collapsed
+                                SourceSectionHeader(
+                                    book = book,
+                                    count = entries.size,
+                                    expanded = open,
+                                    onToggle = {
+                                        collapsed = if (open) collapsed + key else collapsed - key
+                                    },
+                                )
+                                if (open) entries.forEach { option(it) }
+                            }
+
+                        else -> matching.forEach { option(it) }
                     }
                 }
             }

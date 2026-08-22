@@ -29,6 +29,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.components.sourceGroupedItems
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -176,6 +178,7 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
 @Composable
 fun SubclassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
     val options = state.subclassOptions
+    var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
 
     StepColumn {
         item {
@@ -189,8 +192,17 @@ fun SubclassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             )
         }
 
-        items(options.size, key = { options[it].id }) { index ->
-            val subclass = options[index]
+        sourceGroupedItems(
+            items = options,
+            query = "",
+            collapsed = collapsedBooks,
+            onToggleBook = { key ->
+                collapsedBooks =
+                    if (key in collapsedBooks) collapsedBooks - key else collapsedBooks + key
+            },
+            id = { it.id },
+            book = { it.book },
+        ) { subclass ->
             SelectableCard(
                 title = subclass.name,
                 subtitle = subclass.summary,
@@ -345,6 +357,7 @@ private fun FeatureRow(name: String, description: String) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
+    var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
     val scores = CharacterCalculations.finalAbilityScores(state.character)
 
     StepColumn {
@@ -428,8 +441,17 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 )
             }
             val blockers = state.featBlockers
-            items(feats.size, key = { feats[it].id }) { index ->
-                val feat = feats[index]
+            sourceGroupedItems(
+                items = feats,
+                query = "",
+                collapsed = collapsedBooks,
+                onToggleBook = { key ->
+                    collapsedBooks =
+                        if (key in collapsedBooks) collapsedBooks - key else collapsedBooks + key
+                },
+                id = { "feat-" + it.id },
+                book = { it.book },
+            ) { feat ->
                 // A feat whose prerequisites aren't met stays visible with the reason, so
                 // the path it belongs to is legible before you're eligible for it.
                 val blocked = blockers[feat.id].orEmpty()
@@ -450,6 +472,7 @@ fun AbilityImprovementStep(state: LevelUpState, viewModel: LevelUpViewModel) {
 
 @Composable
 fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
+    var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
     var manualEntry by remember { mutableStateOf("") }
 
     StepColumn {
@@ -625,8 +648,17 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             }
 
             val spells = state.spellOptions
-            items(spells.size, key = { "spell-${spells[it].id}" }) { index ->
-                val spell = spells[index]
+            sourceGroupedItems(
+                items = spells,
+                query = "",
+                collapsed = collapsedBooks,
+                onToggleBook = { key ->
+                    collapsedBooks =
+                        if (key in collapsedBooks) collapsedBooks - key else collapsedBooks + key
+                },
+                id = { "spell-" + it.id },
+                book = { it.book },
+            ) { spell ->
                 SelectableCard(
                     title = spell.name,
                     subtitle = spell.description,

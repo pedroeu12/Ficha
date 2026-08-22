@@ -32,7 +32,7 @@ object SpellGrantData {
 
     // ------------------------------------------------------------------ Classes
 
-    private val BY_CLASS: Map<String, List<Grant>> = mapOf(
+    private val BY_CLASS_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
         // Tinker's Magic hands the Artificer the Mending cantrip outright.
         "artificer" to at(1, "mending"),
         // Druidic teaches Druidcraft alongside the secret language.
@@ -44,9 +44,11 @@ object SpellGrantData {
         "paladin" to at(2, "divine_smite") + at(5, "find_steed"),
     )
 
+    private val BY_CLASS: Map<String, List<Grant>> = BY_CLASS_ENTRIES.toMap()
+
     // ------------------------------------------------------------------ Subclasses
 
-    private val BY_SUBCLASS: Map<String, List<Grant>> = mapOf(
+    private val BY_SUBCLASS_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
         // ---- Cleric domains
         "life_domain" to at(3, "aid", "bless", "cure_wounds", "lesser_restoration") +
             at(5, "mass_healing_word", "revivify") +
@@ -196,6 +198,10 @@ object SpellGrantData {
             at(7, "giant_insect", "hallucinatory_terrain") +
             at(9, "contact_other_plane", "modify_memory"),
 
+        // Mage Hand Legerdemain hands the Arcane Trickster its Mage Hand rather than asking
+        // for it; the other two cantrips are chosen.
+        "arcane_trickster" to at(3, "mage_hand"),
+
         // ---- Unearthed Arcana 2026: Villainous Options 2
         // Commune with the Dead: a Ritual-only casting, so it belongs on the list even though
         // the Barbarian otherwise has no spells at all.
@@ -262,20 +268,25 @@ object SpellGrantData {
         "land" to emptyList(),
         "moon" to emptyList(),
         "abjurer" to emptyList(),
+        // The Eldritch Knight is granted nothing; the Arcane Trickster's Mage Hand is
+        // declared above, and a second entry here would silently win — mapOf keeps the last.
         "eldritch_knight" to emptyList(),
-        "arcane_trickster" to emptyList(),
     )
+
+    private val BY_SUBCLASS: Map<String, List<Grant>> = BY_SUBCLASS_ENTRIES.toMap()
 
     // ------------------------------------------------------------------ Species
 
-    private val BY_SPECIES: Map<String, List<Grant>> = mapOf(
+    private val BY_SPECIES_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
         // The Khoravar's Fey Gift starts as Friends and can be swapped on a Long Rest.
         "khoravar" to at(1, "friends"),
         // Control Air and Water opens up as the Triton grows into their heritage.
         "triton" to at(1, "fog_cloud") + at(3, "gust_of_wind") + at(5, "wall_of_water"),
     )
 
-    private val BY_LINEAGE: Map<String, List<Grant>> = mapOf(
+    private val BY_SPECIES: Map<String, List<Grant>> = BY_SPECIES_ENTRIES.toMap()
+
+    private val BY_LINEAGE_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
         "drow" to at(1, "dancing_lights") + at(3, "faerie_fire") + at(5, "darkness"),
         "wood_elf" to at(1, "druidcraft") + at(3, "longstrider") + at(5, "pass_without_trace"),
         "infernal" to at(1, "thaumaturgy") + at(3, "hellish_rebuke") + at(5, "darkness"),
@@ -283,9 +294,11 @@ object SpellGrantData {
         "chthonic" to at(1, "chill_touch") + at(3, "false_life") + at(5, "ray_of_enfeeblement"),
     )
 
+    private val BY_LINEAGE: Map<String, List<Grant>> = BY_LINEAGE_ENTRIES.toMap()
+
     // ------------------------------------------------------------------ Feats
 
-    private val BY_FEAT: Map<String, List<Grant>> = mapOf(
+    private val BY_FEAT_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
         "fey_touched" to at(1, "misty_step"),
         "shadow_touched" to at(1, "invisibility"),
         "telekinetic" to at(1, "mage_hand"),
@@ -325,6 +338,8 @@ object SpellGrantData {
         "lich_ascension" to at(1, "fear"),
         "boon_of_the_cleansed_heart" to at(1, "dispel_evil_and_good"),
     )
+
+    private val BY_FEAT: Map<String, List<Grant>> = BY_FEAT_ENTRIES.toMap()
 
     /**
      * Every id these tables are keyed by. A key that matches no real class, subclass, species,
@@ -379,6 +394,32 @@ object SpellGrantData {
             ),
         )
     }
+
+    /** Every spell id any source hands out, so a test can hold each against the catalog. */
+    fun allGrantedSpellIds(): Set<String> =
+        (BY_CLASS.values + BY_SUBCLASS.values + BY_SPECIES.values +
+            BY_LINEAGE.values + BY_FEAT.values)
+            .flatten().map { it.spellId }.toSet()
+
+    /**
+     * Source ids declared more than once across these tables.
+     *
+     * A duplicate key in a `mapOf` is silently the last one wins, which is how the Arcane
+     * Trickster's Mage Hand came to be declared and then immediately overwritten with an
+     * empty list. Nothing about that fails to compile and nothing about it looks wrong.
+     */
+    fun duplicateSourceIds(): List<String> {
+        val text = RAW_SOURCE_KEYS
+        return text.groupingBy { it }.eachCount().filterValues { it > 1 }.keys.toList()
+    }
+
+    /**
+     * The keys as written, in order, so duplicates survive to be counted — reading them back
+     * off the built maps would be pointless, since that is exactly where they get lost.
+     */
+    private val RAW_SOURCE_KEYS: List<String> =
+        (BY_CLASS_ENTRIES + BY_SUBCLASS_ENTRIES + BY_SPECIES_ENTRIES +
+            BY_LINEAGE_ENTRIES + BY_FEAT_ENTRIES).map { it.first }
 
     /** Every choice-keyed grant, so a test can hold each one against a real spell. */
     fun choiceGrantKeys(): Set<String> = BY_CHOICE.keys

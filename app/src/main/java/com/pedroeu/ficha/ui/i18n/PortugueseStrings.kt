@@ -650,5 +650,13 @@ object PortugueseStrings {
         "Change {0}" to "Mudar {0}",
         "Remove {0}" to "Remover {0}",
         "Add {0}" to "Adicionar {0}",
+        // ---- Spellbook and subclass-restricted spell lists
+        "Copy into Your Spellbook" to "Copiar para o Grimório",
+        "These go into your spellbook, not your prepared list. You prepare from the book " +
+            "each day, and the book keeps everything you copy into it." to
+            "Estas vão para o seu grimório, não para a sua lista de preparadas. Você prepara " +
+            "a partir do livro a cada dia, e o livro guarda tudo o que você copia nele.",
+        "Your subclass learns only {0} spells." to
+            "Sua subclasse aprende apenas magias de {0}.",
     )
 }

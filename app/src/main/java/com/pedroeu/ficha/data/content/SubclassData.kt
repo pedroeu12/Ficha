@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.data.content
 
+import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ChoiceOption
@@ -54,6 +56,16 @@ object SubclassData {
         ),
         source = "Level 3",
         changeableOnLevelUp = true,
+    )
+
+    /**
+     * The Prepared Spells column both third casters share, by class level 1..20.
+     *
+     * Zero until level 3, which is when the subclass arrives. The two tables are identical in
+     * the 2024 rules, so they are written once.
+     */
+    private val THIRD_CASTER_PREPARED = listOf(
+        0, 0, 3, 4, 4, 4, 5, 6, 6, 7, 8, 8, 9, 10, 10, 11, 11, 11, 12, 13,
     )
 
     private fun f(level: Int, name: String, description: String, vararg choices: Choice) =
@@ -593,13 +605,20 @@ object SubclassData {
         Subclass("eldritch_knight", "fighter", "Eldritch Knight",
             "A warrior who binds Wizard magic to blade and armor.",
             listOf(
-                f(3, "Spellcasting", "You cast Wizard spells using Intelligence, focusing on Abjuration and Evocation."),
+                f(3, "Spellcasting", "You have learned to cast spells. See the Player's Handbook for the rules on spellcasting. Cantrips: you know two Wizard cantrips of your choice, and you learn another at Fighter level 10. Whenever you gain a Fighter level, you can replace one of these cantrips with another Wizard cantrip. Spell Slots and Prepared Spells: the Eldritch Knight Spellcasting table shows how many spell slots you have and how many level 1+ Wizard spells you can have prepared; those spells must be Abjuration or Evocation, except that the spells you gain at Fighter levels 8, 14, and 20 can be from any school. Whenever you gain a Fighter level, you can replace one prepared spell with another Wizard spell of an eligible school and level. Intelligence is your spellcasting ability."),
                 f(3, "War Bond", "Bond with two weapons so you can summon them to your hand as a Bonus Action."),
                 f(7, "War Magic", "When you take the Attack action, you can replace one attack with a cantrip."),
                 f(10, "Eldritch Strike", "When you hit with a weapon, the target has Disadvantage on its next save against your spells."),
                 f(15, "Arcane Charge", "When you use Action Surge, you can teleport up to 30 feet."),
                 f(18, "Improved War Magic", "When you take the Attack action, you can replace one attack with a level 1 or 2 spell."),
-            )),
+            ),
+            casterType = CasterType.THIRD,
+            spellcastingAbility = Ability.INT,
+            spellListClassId = "wizard",
+            cantripsKnown = mapOf(3 to 2, 10 to 3),
+            preparedSpells = THIRD_CASTER_PREPARED,
+            spellSchools = setOf("Abjuration", "Evocation"),
+            freeSchoolLevels = setOf(8, 14, 20)),
         Subclass("psi_warrior", "fighter", "Psi Warrior",
             "Telekinetic force amplifies every swing and shields every ally.",
             listOf(
@@ -805,12 +824,21 @@ object SubclassData {
         Subclass("arcane_trickster", "rogue", "Arcane Trickster",
             "A thief who supplements sleight of hand with illusion and enchantment.",
             listOf(
-                f(3, "Spellcasting", "You cast Wizard spells using Intelligence, focusing on Illusion and Enchantment."),
+                f(3, "Spellcasting", "You have learned to cast spells. See the Player's Handbook for the rules on spellcasting. Cantrips: you know Mage Hand plus two other Wizard cantrips of your choice, and you learn another at Rogue level 10. Whenever you gain a Rogue level, you can replace one of those chosen cantrips with another Wizard cantrip. Spell Slots and Prepared Spells: the Arcane Trickster Spellcasting table shows how many spell slots you have and how many level 1+ Wizard spells you can have prepared; those spells must be Illusion or Enchantment, except that the spells you gain at Rogue levels 8, 14, and 20 can be from any school. Whenever you gain a Rogue level, you can replace one prepared spell with another Wizard spell of an eligible school and level. Intelligence is your spellcasting ability."),
                 f(3, "Mage Hand Legerdemain", "Your Mage Hand is invisible and can pick locks, pockets, and disarm traps."),
                 f(9, "Magical Ambush", "A creature you are Hidden from has Disadvantage on saves against your spells."),
                 f(13, "Versatile Trickster", "As a Bonus Action, use Mage Hand to distract a creature and gain Advantage."),
                 f(17, "Spell Thief", "As a Reaction, steal a spell cast at you and use it yourself for 8 hours."),
-            )),
+            ),
+            casterType = CasterType.THIRD,
+            spellcastingAbility = Ability.INT,
+            spellListClassId = "wizard",
+            // Three cantrips, but one of them is Mage Hand, which the subclass hands over
+            // rather than offering — so only two are chosen. The grant lives in SpellGrantData.
+            cantripsKnown = mapOf(3 to 3, 10 to 4),
+            preparedSpells = THIRD_CASTER_PREPARED,
+            spellSchools = setOf("Illusion", "Enchantment"),
+            freeSchoolLevels = setOf(8, 14, 20)),
         Subclass("assassin", "rogue", "Assassin",
             "Strike first, strike unseen, strike to kill.",
             listOf(

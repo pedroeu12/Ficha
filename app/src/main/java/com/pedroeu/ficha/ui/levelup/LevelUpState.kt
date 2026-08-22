@@ -11,6 +11,7 @@ import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ClassFeature
 import com.pedroeu.ficha.data.model.SpellSlotTables
+import com.pedroeu.ficha.data.model.Subclass
 import com.pedroeu.ficha.data.model.SubclassFeature
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.domain.CharacterCalculations
@@ -206,19 +207,56 @@ data class LevelUpState(
     private val currentCantripCount: Int get() = knownFromThisClass { it.level == 0 }
     private val currentSpellCount: Int get() = knownFromThisClass { it.level > 0 }
 
+    /**
+     * The subclass this level's spellcasting comes from, when the class has none of its own.
+     *
+     * Only the Eldritch Knight and the Arcane Trickster. Everything below has to consult it,
+     * because a Fighter's class table says nothing about cantrips or prepared spells and so
+     * offered its Eldritch Knight neither.
+     */
+    private val castingSubclass: Subclass?
+        get() = activeSubclassId
+            ?.let { SubclassData.byId(it) }
+            ?.takeIf { it.isSpellcaster && it.classId == classId }
+
     val cantripsToLearn: Int
         get() {
-            val progression = progression ?: return 0
-            val target = progression.cantripsKnownAt(targetClassLevel)
+            val target = (progression?.cantripsKnownAt(targetClassLevel) ?: 0) +
+                (castingSubclass?.cantripsKnownAt(targetClassLevel) ?: 0)
             return (target - currentCantripCount).coerceAtLeast(0)
         }
 
+    /**
+     * How many level 1+ spells this level asks the player to choose.
+     *
+     * For most casters this is the gap between the prepared count and what is already on the
+     * sheet. The Wizard is not most casters: its prepared count is drawn *from its spellbook*,
+     * and the spellbook grows by two spells at every level regardless. Reading the prepared
+     * column for it meant a level 2 Wizard was told they needed five spells, already had six,
+     * and was asked for nothing — which is exactly what a Wizard levelling up reported.
+     */
     val spellsToLearn: Int
         get() {
-            val progression = progression ?: return 0
-            val target = progression.preparedSpellsAt(targetClassLevel)
+            spellbookSpellsThisLevel?.let { return it }
+            val target = (progression?.preparedSpellsAt(targetClassLevel) ?: 0) +
+                (castingSubclass?.preparedSpellsAt(targetClassLevel) ?: 0)
             return (target - currentSpellCount).coerceAtLeast(0)
         }
+
+    /**
+     * The Wizard's Spellbook feature: *"whenever you gain a Wizard level after 1, add two
+     * Wizard spells of your choice to your spellbook"*. Null for everyone else.
+     */
+    private val spellbookSpellsThisLevel: Int?
+        get() = if (classId == "wizard") {
+            // Taking the first level of Wizard by multiclassing copies the starting six.
+            if (isNewClass) 6 else 2
+        } else {
+            null
+        }
+
+    /** True when the spells chosen this level go into a spellbook rather than being prepared. */
+    val learnsIntoSpellbook: Boolean get() = spellbookSpellsThisLevel != null
 
     /** The highest level of slot the character will have, across every class. */
     val maxSpellLevel: Int get() = CharacterCalculations.maxSpellLevel(leveledCharacter)
@@ -230,17 +268,43 @@ data class LevelUpState(
      */
     private val maxSpellLevelForThisClass: Int
         get() = SpellSlotTables
-            .maxSpellLevel(progression?.casterType ?: CasterType.NONE, targetClassLevel)
+            .maxSpellLevel(
+                CharacterCalculations.casterTypeFor(classId, activeSubclassId),
+                targetClassLevel,
+            )
             .coerceAtMost(maxSpellLevel)
+
+    /**
+     * The list the spells are drawn from, which needn't be the class's own — both third
+     * casters learn Wizard spells.
+     */
+    private val spellListClassId: String
+        get() = castingSubclass?.spellListClassId?.takeIf { it.isNotBlank() } ?: classId
 
     private val knownSpellIds: Set<String> get() = character.knownSpells.map { it.id }.toSet()
 
     val cantripOptions
-        get() = SpellData.cantripsForClass(classId).filterNot { it.id in knownSpellIds }
+        get() = SpellData.cantripsForClass(spellListClassId).filterNot { it.id in knownSpellIds }
 
+    /**
+     * The level 1+ spells on offer this level.
+     *
+     * A third caster is normally held to two schools, and the picker has to say so — but the
+     * levels the rules exempt (8, 14, and 20) open it back up to the whole list, which is the
+     * kind of clause that goes missing without anyone noticing.
+     */
     val spellOptions
-        get() = SpellData.forClassUpTo(classId, maxSpellLevelForThisClass)
+        get() = SpellData.forClassUpTo(spellListClassId, maxSpellLevelForThisClass)
             .filter { it.level > 0 && it.id !in knownSpellIds }
+            .filter { spell -> spell.school in allowedSchools || allowedSchools.isEmpty() }
+
+    /** The schools this level's pick may come from; empty means no restriction. */
+    val allowedSchools: Set<String>
+        get() {
+            val subclass = castingSubclass ?: return emptySet()
+            if (targetClassLevel in subclass.freeSchoolLevels) return emptySet()
+            return subclass.spellSchools
+        }
 
     // ------------------------------------------------- Replacing what you already know
 

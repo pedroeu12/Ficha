@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.content.EquipmentData
 import com.pedroeu.ficha.data.content.MagicItemData
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.WeaponPropertyData
 import com.pedroeu.ficha.data.model.Ability
@@ -256,8 +257,22 @@ object CharacterCalculations {
 
     // ------------------------------------------------------------------ Spellcasting
 
+    /**
+     * The caster progression for one class entry, asking the subclass before the class.
+     *
+     * A Fighter's table says NONE and an Eldritch Knight's says THIRD, and only the second is
+     * true of an Eldritch Knight. Everything downstream — slots, prepared count, cantrips,
+     * save DC, the level-up prompts — went through the class alone, which is why a pure
+     * Eldritch Knight had no spellcasting at all while a multiclassed one did.
+     */
+    fun casterTypeFor(classId: String, subclassId: String?): CasterType {
+        val fromClass = ProgressionData.forClass(classId)?.casterType ?: CasterType.NONE
+        if (fromClass != CasterType.NONE) return fromClass
+        return subclassId?.let { SubclassData.byId(it)?.casterType } ?: CasterType.NONE
+    }
+
     fun casterType(character: PlayerCharacter): CasterType =
-        ProgressionData.forClass(character.classId)?.casterType ?: CasterType.NONE
+        casterTypeFor(character.classId, character.subclassId)
 
     /**
      * Shared spell slots for however many classes the character has.
@@ -270,7 +285,11 @@ object CharacterCalculations {
     private fun multiclassSlots(character: PlayerCharacter): Map<Int, Int> {
         val classes = ClassLevels.of(character)
         if (classes.size == 1) {
-            return SpellSlotTables.slotsFor(casterType(character), character.level)
+            val entry = classes.first()
+            return SpellSlotTables.slotsFor(
+                casterTypeFor(entry.classId, entry.subclassId),
+                entry.level,
+            )
         }
 
         val casterLevel = ClassLevels.casterLevel(character)
@@ -290,8 +309,15 @@ object CharacterCalculations {
         }
     }
 
+    /**
+     * The ability the character's own spells are cast with.
+     *
+     * Falls through to the subclass when the class has none of its own, which is the only way
+     * an Eldritch Knight ever gets a spell save DC.
+     */
     fun spellcastingAbility(character: PlayerCharacter): Ability? =
         ClassData.byId(character.classId)?.spellcastingAbility
+            ?: character.subclassId?.let { SubclassData.byId(it)?.spellcastingAbility }
 
     fun spellSaveDc(character: PlayerCharacter): Int? {
         val ability = spellcastingAbility(character) ?: return null
@@ -330,7 +356,11 @@ object CharacterCalculations {
      */
     fun maxPreparedSpells(character: PlayerCharacter): Int {
         val total = ClassLevels.of(character).sumOf { entry ->
-            ProgressionData.forClass(entry.classId)?.preparedSpellsAt(entry.level) ?: 0
+            val fromClass = ProgressionData.forClass(entry.classId)?.preparedSpellsAt(entry.level) ?: 0
+            // A third caster's count lives on the subclass, since its class has none.
+            val fromSubclass = entry.subclassId
+                ?.let { SubclassData.byId(it)?.preparedSpellsAt(entry.level) } ?: 0
+            fromClass + fromSubclass
         }
         return adjust(character, OverridableStat.MAX_PREPARED_SPELLS, total)
     }
@@ -344,7 +374,10 @@ object CharacterCalculations {
      */
     fun maxCantripsKnown(character: PlayerCharacter): Int {
         val total = ClassLevels.of(character).sumOf { entry ->
-            ProgressionData.forClass(entry.classId)?.cantripsKnownAt(entry.level) ?: 0
+            val fromClass = ProgressionData.forClass(entry.classId)?.cantripsKnownAt(entry.level) ?: 0
+            val fromSubclass = entry.subclassId
+                ?.let { SubclassData.byId(it)?.cantripsKnownAt(entry.level) } ?: 0
+            fromClass + fromSubclass
         }
         return adjust(character, OverridableStat.CANTRIPS_KNOWN, total)
     }

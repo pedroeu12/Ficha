@@ -16,6 +16,15 @@ enum class CasterType {
      */
     ARTIFICER,
 
+    /**
+     * Eldritch Knight and Arcane Trickster: a third of a caster, from level 3.
+     *
+     * The only progression that belongs to a *subclass* rather than a class, which is why it
+     * went missing entirely — a Fighter's own caster type is NONE, and nothing ever asked the
+     * subclass whether it had one. See [com.pedroeu.ficha.data.model.Subclass.casterType].
+     */
+    THIRD,
+
     /** Warlock: few slots, always at the highest level available, refreshed on a short rest. */
     PACT,
 }
@@ -122,6 +131,35 @@ object SpellSlotTables {
      */
     val ARTIFICER: List<List<Int>> = HALF
 
+    /**
+     * Eldritch Knight and Arcane Trickster. Nothing until level 3, then a third of the pace.
+     *
+     * Index 0 is class level 1, so the first two rows are deliberately empty: the subclass
+     * that grants this isn't chosen until level 3.
+     */
+    val THIRD: List<List<Int>> = listOf(
+        emptyList(),
+        emptyList(),
+        listOf(2),
+        listOf(3),
+        listOf(3),
+        listOf(3),
+        listOf(4, 2),
+        listOf(4, 2),
+        listOf(4, 2),
+        listOf(4, 3),
+        listOf(4, 3),
+        listOf(4, 3),
+        listOf(4, 3, 2),
+        listOf(4, 3, 2),
+        listOf(4, 3, 2),
+        listOf(4, 3, 3),
+        listOf(4, 3, 3),
+        listOf(4, 3, 3),
+        listOf(4, 3, 3, 1),
+        listOf(4, 3, 3, 1),
+    )
+
     /** Warlock Pact Magic: slot count paired with the single level those slots are cast at. */
     val PACT: List<Pair<Int, Int>> = listOf(
         1 to 1, 2 to 1, 2 to 2, 2 to 2, 2 to 3,
@@ -139,6 +177,7 @@ object SpellSlotTables {
             CasterType.HALF -> HALF[index].mapIndexed { i, count -> (i + 1) to count }.toMap()
             CasterType.ARTIFICER ->
                 ARTIFICER[index].mapIndexed { i, count -> (i + 1) to count }.toMap()
+            CasterType.THIRD -> THIRD[index].mapIndexed { i, count -> (i + 1) to count }.toMap()
             CasterType.PACT -> {
                 val (count, slotLevel) = PACT[index]
                 mapOf(slotLevel to count)

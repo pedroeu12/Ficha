@@ -529,9 +529,30 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
         if (state.spellsWanted > 0) {
             item {
                 SectionHeader(
-                    tr("New Spells"),
+                    if (state.learnsIntoSpellbook) tr("Copy into Your Spellbook") else tr("New Spells"),
                     trailing = "${state.newSpells.size + state.manualSpells.size} / ${state.spellsWanted}",
                 )
+                // Two things the picker would otherwise leave unexplained: why a Wizard is
+                // choosing spells it can't all prepare, and why a third caster's list is short.
+                val note = when {
+                    state.learnsIntoSpellbook -> tr(
+                        "These go into your spellbook, not your prepared list. You prepare " +
+                            "from the book each day, and the book keeps everything you copy " +
+                            "into it."
+                    )
+                    state.allowedSchools.isNotEmpty() ->
+                        trf("Your subclass learns only {0} spells.",
+                            state.allowedSchools.sorted().joinToString(" and "))
+                    else -> ""
+                }
+                if (note.isNotBlank()) {
+                    Text(
+                        text = note,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
             }
 
             if (state.manualSpells.isNotEmpty()) {

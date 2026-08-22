@@ -2,6 +2,7 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.CasterType
 
 /**
@@ -73,18 +74,18 @@ object ClassLevels {
             CasterType.ARTIFICER -> (entry.level + 1) / 2
             // Pact Magic stands apart and is never folded into the shared table.
             CasterType.PACT -> 0
+            // A third of their levels, rounded down. Reached through the subclass, because a
+            // Fighter's own table has no caster type to read.
+            CasterType.THIRD -> entry.level / 3
             CasterType.NONE -> thirdCasterLevel(entry)
         }
     }
 
-    /**
-     * Eldritch Knights and Arcane Tricksters cast from a third of their levels, rounded down,
-     * even though their class has no caster type of its own.
-     */
-    private fun thirdCasterLevel(entry: ClassLevel): Int =
-        if (entry.subclassId in THIRD_CASTER_SUBCLASSES) entry.level / 3 else 0
-
-    private val THIRD_CASTER_SUBCLASSES = setOf("eldritch_knight", "arcane_trickster")
+    /** The same, for a class whose own table says NONE but whose subclass casts. */
+    private fun thirdCasterLevel(entry: ClassLevel): Int {
+        val fromSubclass = entry.subclassId?.let { SubclassData.byId(it)?.casterType }
+        return if (fromSubclass == CasterType.THIRD) entry.level / 3 else 0
+    }
 
     /** Warlock levels, which drive Pact Magic on their own. */
     fun pactLevel(character: PlayerCharacter): Int =

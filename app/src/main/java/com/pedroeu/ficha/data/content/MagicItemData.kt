@@ -2,6 +2,7 @@ package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.ItemRarity
 import com.pedroeu.ficha.data.model.MagicItem
+import com.pedroeu.ficha.data.model.Sourcebook
 
 /**
  * The magic items a DM is likely to hand out, and the ones an Artificer can replicate.
@@ -23,6 +24,7 @@ object MagicItemData {
         attunementNote: String = "",
         weightLb: Double = 0.0,
         plan: Int? = null,
+        book: Sourcebook = Sourcebook.DMG,
     ) = MagicItem(
         id = id,
         name = name,
@@ -33,6 +35,7 @@ object MagicItemData {
         attunementNote = attunementNote,
         weightLb = weightLb,
         artificerPlanLevel = plan,
+        book = book,
         // The numbers are filled in from the tables at the bottom of this file rather than
         // repeated at each call site, so a test can hold them against the rules text.
         attackBonus = ATTACK_BONUSES[id] ?: 0,
@@ -138,7 +141,7 @@ object MagicItemData {
             "This Shield has 4 charges and regains 1d4 expended charges daily at dawn. When " +
                 "you are hit by a melee attack while holding it, you can expend a charge to " +
                 "push the attacker up to 15 feet away from you.",
-            weightLb = 6.0, plan = 6),
+            weightLb = 6.0, plan = 6, book = Sourcebook.EBERRON),
         item("sentinel_shield", "Sentinel Shield", ItemRarity.UNCOMMON, "Armor (Shield)",
             "While holding this Shield you have Advantage on Initiative rolls and Wisdom " +
                 "(Perception) checks.",
@@ -187,7 +190,7 @@ object MagicItemData {
             "You gain a +1 bonus to attack and damage rolls with this weapon. Once per turn " +
                 "when you hit with it, you can dazzle the target, giving it Disadvantage on its " +
                 "next attack roll before the start of your next turn.",
-            attunement = true, plan = 6),
+            attunement = true, plan = 6, book = Sourcebook.EBERRON),
         item("defender", "Defender", ItemRarity.LEGENDARY, "Weapon (any Sword)",
             "You gain a +3 bonus to attack and damage rolls with this sword, and on each of " +
                 "your turns you can transfer any part of that bonus to your Armor Class instead.",
@@ -210,12 +213,12 @@ object MagicItemData {
             "Weapon (any Ammunition weapon)",
             "You gain a +1 bonus to attack and damage rolls with this weapon, which produces " +
                 "its own magic ammunition when you fire it. It also ignores the Loading property.",
-            attunement = true, plan = 2),
+            attunement = true, plan = 2, book = Sourcebook.EBERRON),
         item("returning_weapon", "Returning Weapon", ItemRarity.UNCOMMON,
             "Weapon (any weapon with the Thrown property)",
             "You gain a +1 bonus to attack and damage rolls with this weapon, and it returns to " +
                 "your hand immediately after you use it to make a ranged attack.",
-            plan = 2),
+            plan = 2, book = Sourcebook.EBERRON),
         item("sun_blade", "Sun Blade", ItemRarity.RARE, "Weapon (Longsword)",
             "This hilt produces a blade of pure radiance. You gain a +2 bonus to attack and " +
                 "damage rolls, it deals Radiant damage instead of Slashing, and it deals an " +
@@ -273,7 +276,7 @@ object MagicItemData {
         item("spell_refueling_ring", "Spell-Refueling Ring", ItemRarity.RARE, "Ring",
             "Once per day as a Bonus Action you can recover one expended spell slot of level 3 " +
                 "or lower.",
-            attunement = true, plan = 6),
+            attunement = true, plan = 6, book = Sourcebook.EBERRON),
     )
 
     // ------------------------------------------------------------------ Wands, rods, staffs
@@ -364,7 +367,7 @@ object MagicItemData {
         item("boots_winding_path", "Boots of the Winding Path", ItemRarity.RARE, WONDROUS,
             "As a Bonus Action you can teleport back to a space you occupied earlier on the " +
                 "same turn, up to 15 feet away.",
-            attunement = true, weightLb = 1.0, plan = 6),
+            attunement = true, weightLb = 1.0, plan = 6, book = Sourcebook.EBERRON),
         item("bracers_of_defense", "Bracers of Defense", ItemRarity.RARE, WONDROUS,
             "While wearing these bracers and using no armor or Shield, you gain a +2 bonus to " +
                 "Armor Class.",
@@ -430,7 +433,7 @@ object MagicItemData {
         item("helm_of_awareness", "Helm of Awareness", ItemRarity.RARE, WONDROUS,
             "You have Advantage on Initiative rolls while wearing this helm, and it can't be " +
                 "removed against your will.",
-            weightLb = 3.0, plan = 6),
+            weightLb = 3.0, plan = 6, book = Sourcebook.EBERRON),
         item("horn_of_blasting", "Horn of Blasting", ItemRarity.RARE, WONDROUS,
             "As a Magic action you can sound the horn, forcing each creature in a 30-foot Cone " +
                 "to make a DC 15 Constitution saving throw, taking 5d6 Thunder damage and " +
@@ -443,11 +446,11 @@ object MagicItemData {
         item("manifold_tool", "Manifold Tool", ItemRarity.UNCOMMON, WONDROUS,
             "This set of Artisan's Tools can transform into any other set of Artisan's Tools as " +
                 "a Bonus Action, and you gain a +1 bonus to ability checks made with it.",
-            attunement = true, weightLb = 5.0, plan = 2),
+            attunement = true, weightLb = 5.0, plan = 2, book = Sourcebook.EBERRON),
         item("mind_sharpener", "Mind Sharpener", ItemRarity.UNCOMMON, WONDROUS,
             "This item has 4 charges and regains 1d4 daily at dawn. When you fail a Constitution " +
                 "saving throw to maintain Concentration, you can expend a charge to succeed instead.",
-            attunement = true, plan = 6),
+            attunement = true, plan = 6, book = Sourcebook.EBERRON),
         item("necklace_of_adaptation", "Necklace of Adaptation", ItemRarity.UNCOMMON, WONDROUS,
             "You can breathe normally in any environment, and you have Advantage on saving " +
                 "throws against harmful gases and vapors.",
@@ -494,7 +497,7 @@ object MagicItemData {
         item("potion_healing", "Potion of Healing", ItemRarity.COMMON, "Potion",
             "As a Bonus Action you can drink this potion or administer it to another creature " +
                 "within 5 feet, regaining 2d4 + 2 Hit Points.",
-            weightLb = 0.5),
+            weightLb = 0.5, book = Sourcebook.PHB),
         item("potion_greater_healing", "Potion of Greater Healing", ItemRarity.UNCOMMON, "Potion",
             "As a Bonus Action you can drink this potion or administer it to another creature " +
                 "within 5 feet, regaining 4d4 + 4 Hit Points.",

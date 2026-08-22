@@ -2,6 +2,7 @@ package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.CharClass
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.FeatureChoiceOption
 import com.pedroeu.ficha.data.model.Skill
@@ -301,6 +302,7 @@ object ClassData {
         CharClass(
             id = "artificer",
             name = "Artificer",
+            book = Sourcebook.EBERRON,
             hitDie = 8,
             primaryAbility = listOf(Ability.INT),
             savingThrows = listOf(Ability.CON, Ability.INT),

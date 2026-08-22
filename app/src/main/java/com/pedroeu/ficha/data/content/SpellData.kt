@@ -1,6 +1,7 @@
 package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.SpellDef
 
 /**
@@ -360,7 +361,7 @@ object SpellData {
             setOf(BARD, DRUID, ARTIFICER), damage = "2d8", damageType = "Fire", concentration = true),
         SpellDef("homunculus_servant", "Homunculus Servant", 2, "Conjuration", "1 hour", "Touch", "V, S, M", "Until dispelled",
             "You craft a Tiny construct that obeys your commands, acts on your turn, and shares your proficiency bonus. If it drops to 0 Hit Points it is destroyed, and you can repair it with an hour's work.",
-            setOf(ARTIFICER), ritual = true),
+            setOf(ARTIFICER), ritual = true, book = Sourcebook.EBERRON),
         SpellDef("web", "Web", 2, "Conjuration", "Action", "60 feet", "V, S, M", "1 hour",
             "Sticky webs fill a 20-foot cube. Creatures make a Dexterity save or are Restrained.",
             setOf(SORCERER, WIZARD, ARTIFICER), concentration = true),

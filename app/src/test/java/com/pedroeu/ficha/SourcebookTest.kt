@@ -104,6 +104,36 @@ class SourcebookTest {
         )
     }
 
+    // ------------------------------------------------------------------ What is tagged
+
+    @Test
+    fun `content is credited to the book it was actually printed in`() {
+        // Spot checks across every catalogue, against dnd2024.wikidot.com.
+        assertEquals(Sourcebook.EBERRON, ClassData.byId("artificer")!!.book)
+        assertEquals(Sourcebook.PHB, ClassData.byId("wizard")!!.book)
+        assertEquals(Sourcebook.EBERRON, SpeciesData.byId("warforged")!!.book)
+        assertEquals(Sourcebook.PHB, SpeciesData.byId("elf")!!.book)
+        assertEquals(Sourcebook.EBERRON, FeatData.byId("mark_of_making")!!.book)
+        assertEquals(Sourcebook.PHB, FeatData.byId("alert")!!.book)
+        assertEquals(Sourcebook.UA_VILLAINOUS, FeatData.byId("lich_initiate")!!.book)
+        assertEquals(Sourcebook.PHB, SpellData.ALL.first { it.id == "fireball" }.book)
+    }
+
+    @Test
+    fun `the core books alone still make a playable character`() {
+        val core = Sourcebook.CORE
+        assertTrue(SourceFiltering.available(SpeciesData.ALL, core).size >= 10)
+        assertTrue(SourceFiltering.available(ClassData.ALL, core).size >= 12)
+        assertTrue(SourceFiltering.available(BackgroundData.ALL, core).size >= 16)
+        // Every core class needs at least one subclass, or it dead-ends at level 3.
+        SourceFiltering.available(ClassData.ALL, core).forEach { charClass ->
+            assertTrue(
+                "\${charClass.id} has no subclass in the core books",
+                SourceFiltering.available(SubclassData.forClass(charClass.id), core).isNotEmpty(),
+            )
+        }
+    }
+
     // ------------------------------------------------------------------ Creation wiring
 
     @Test

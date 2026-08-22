@@ -2,6 +2,7 @@ package com.pedroeu.ficha.data.content
 
 import com.pedroeu.ficha.data.model.LineageOption
 import com.pedroeu.ficha.data.model.Skill
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.Species
 import com.pedroeu.ficha.data.model.Trait
 
@@ -184,6 +185,7 @@ object SpeciesData {
         Species(
             id = "changeling",
             name = "Changeling",
+            book = Sourcebook.EBERRON,
             size = "Medium or Small",
             speed = 30,
             darkvisionRange = 0,
@@ -198,6 +200,7 @@ object SpeciesData {
         Species(
             id = "kalashtar",
             name = "Kalashtar",
+            book = Sourcebook.EBERRON,
             size = "Medium",
             speed = 30,
             darkvisionRange = 0,
@@ -214,6 +217,7 @@ object SpeciesData {
         Species(
             id = "khoravar",
             name = "Khoravar",
+            book = Sourcebook.EBERRON,
             size = "Medium or Small",
             speed = 30,
             darkvisionRange = 60,
@@ -229,6 +233,7 @@ object SpeciesData {
         Species(
             id = "shifter",
             name = "Shifter",
+            book = Sourcebook.EBERRON,
             size = "Medium or Small",
             speed = 30,
             darkvisionRange = 60,
@@ -249,6 +254,7 @@ object SpeciesData {
         Species(
             id = "warforged",
             name = "Warforged",
+            book = Sourcebook.EBERRON,
             size = "Medium or Small",
             speed = 30,
             darkvisionRange = 0,

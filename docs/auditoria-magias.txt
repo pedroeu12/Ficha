@@ -1,0 +1,126 @@
+### DIVERGÊNCIAS REAIS: 55 magias
+
+L0 Message
+      componentes: app='V, S, M' wiki='S, M'
+L0 Mind Sliver
+      duração: app='Instantaneous' wiki='1 round'
+L0 Resistance
+      componentes: app='V, S, M' wiki='V, S'
+L1 Bane
+      listas de classe: FALTA warlock
+L1 Color Spray
+      duração: app='1 round' wiki='Instantaneous'
+      listas de classe: FALTA bard
+L1 Command
+      duração: app='1 round' wiki='Instantaneous'
+L1 Comprehend Languages
+      listas de classe: FALTA sorcerer
+L1 Detect Magic
+      listas de classe: FALTA warlock
+L1 False Life
+      duração: app='1 hour' wiki='Instantaneous'
+L1 Goodberry
+      alcance: app='Touch' wiki='Self'
+      duração: app='Instantaneous' wiki='24 hours'
+L1 Grease
+      listas de classe: FALTA sorcerer
+L1 Protection from Evil and Good
+      listas de classe: FALTA druid
+L1 Searing Smite
+      escola: app=Transmutation wiki=Evocation
+L1 Speak with Animals
+      listas de classe: FALTA warlock
+L1 Tasha's Hideous Laughter
+      listas de classe: FALTA warlock
+L1 Thunderous Smite
+      duração: app='1 minute' wiki='Instantaneous'
+L1 Wrathful Smite
+      escola: app=Evocation wiki=Necromancy
+L2 Augury
+      listas de classe: FALTA druid
+L2 Continual Flame
+      listas de classe: FALTA druid
+L2 Cordon of Arrows
+      alcance: app='5 feet' wiki='Touch'
+L2 Crown of Madness
+      alcance: app='60 feet' wiki='120 feet'
+L2 Enhance Ability
+      listas de classe: FALTA ranger,wizard
+L2 Find Steed
+      componentes: app='V, S, M' wiki='V, S'
+L2 Flaming Sphere
+      listas de classe: FALTA sorcerer
+L2 Homunculus Servant
+      alcance: app='Touch' wiki='10 feet'
+      duração: app='Until dispelled' wiki='Instantaneous'
+L2 Magic Weapon
+      listas de classe: FALTA ranger
+L2 Mind Spike
+      alcance: app='60 feet' wiki='120 feet'
+L2 Phantasmal Force
+      listas de classe: SOBRA warlock
+L2 Prayer of Healing
+      listas de classe: SOBRA bard
+L2 Shatter
+      listas de classe: SOBRA warlock
+L3 Blinding Smite
+      escola: app=Transmutation wiki=Evocation
+L3 Conjure Animals
+      alcance: app='Self' wiki='60 feet'
+L3 Crusader's Mantle
+      listas de classe: SOBRA cleric
+L3 Dispel Magic
+      listas de classe: FALTA ranger
+L3 Elemental Weapon
+      listas de classe: FALTA druid
+L3 Mass Healing Word
+      listas de classe: SOBRA paladin
+L3 Meld into Stone
+      listas de classe: FALTA ranger
+L3 Sending
+      duração: app='1 round' wiki='Instantaneous'
+L3 Speak with Dead
+      listas de classe: SOBRA warlock
+L3 Summon Aberration
+      nível: app=3 wiki=4
+L3 Vampiric Touch
+      listas de classe: FALTA sorcerer
+L4 Banishment
+      alcance: app='60 feet' wiki='30 feet'
+L4 Divination
+      listas de classe: FALTA druid,wizard
+L4 Fire Shield
+      listas de classe: FALTA druid,sorcerer
+L4 Giant Insect
+      escola: app=Transmutation wiki=Conjuration
+      alcance: app='30 feet' wiki='60 feet'
+      listas de classe: SOBRA cleric,sorcerer
+L4 Leomund's Secret Chest
+      duração: app='Instantaneous' wiki='Until dispelled'
+L4 Phantasmal Killer
+      listas de classe: FALTA bard; SOBRA warlock
+L4 Staggering Smite
+      escola: app=Evocation wiki=Enchantment
+L5 Banishing Smite
+      escola: app=Abjuration wiki=Conjuration
+L5 Circle of Power
+      listas de classe: FALTA cleric,wizard
+L5 Destructive Wave
+      listas de classe: SOBRA cleric,druid
+L5 Greater Restoration
+      listas de classe: FALTA paladin
+L5 Hallow
+      listas de classe: SOBRA warlock
+L5 Planar Binding
+      listas de classe: FALTA warlock
+L5 Teleportation Circle
+      listas de classe: FALTA warlock
+
+### FLAG DE CONCENTRAÇÃO ERRADA: 6
+
+L0 Blade Ward                     concentração: app=False wiki=True (dur wiki='C, up to 1 minute')
+L1 Searing Smite                  concentração: app=True wiki=False (dur wiki='1 minute')
+L1 Thunderous Smite               concentração: app=True wiki=False (dur wiki='Instantaneous')
+L1 Wrathful Smite                 concentração: app=True wiki=False (dur wiki='1 minute')
+L2 Enthrall                       concentração: app=False wiki=True (dur wiki='C, up to 1 minute')
+L3 Blinding Smite                 concentração: app=True wiki=False (dur wiki='1 minute')

@@ -98,7 +98,7 @@ fun LeafFeatures(handle: SheetHandle) {
                     Leaf(trf("Subclass — {0}", subclass.name)) {
                         SheetText(subclass.summary, soft = true)
                         if (subclass.isPlaytest) {
-                            Caption(trf("Playtest material — {0}", subclass.source))
+                            Caption(trf("Playtest material — {0}", subclass.attribution))
                         }
                         Spacer(Modifier.height(4.dp))
                         subclass.features

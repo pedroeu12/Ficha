@@ -13,6 +13,7 @@ import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.Skill
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.domain.AbilityScoreGeneration
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.Coins
@@ -33,6 +34,48 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
 
     private val _savedCharacterId = MutableStateFlow<String?>(null)
     val savedCharacterId: StateFlow<String?> = _savedCharacterId.asStateFlow()
+
+    fun setSources(books: Set<Sourcebook>) = _state.update { it.withSources(books) }
+
+    fun toggleSource(book: Sourcebook) = _state.update { current ->
+        val next = if (book in current.enabledSources) {
+            current.enabledSources - book
+        } else {
+            current.enabledSources + book
+        }
+        current.withSources(next)
+    }
+
+    /**
+     * Applies a new book set, dropping any choice the new set no longer allows.
+     *
+     * Turning a book back off after picking from it has to clear that pick, or the character
+     * would be finished carrying a species the table does not use — and the step that chose
+     * it is already behind the player, so nothing else would ever ask again.
+     */
+    private fun CreationState.withSources(books: Set<Sourcebook>): CreationState {
+        var next = copy(enabledSources = books)
+        if (next.species?.book !in books) {
+            next = next.copy(speciesId = null, lineageId = null, speciesSkillChoices = emptySet())
+        }
+        if (next.charClass?.book !in books) {
+            next = next.copy(
+                classId = null,
+                classSkillChoices = emptySet(),
+                classSelections = emptyMap(),
+                classFeatureSelections = emptyMap(),
+                expertiseChoices = emptySet(),
+            )
+        }
+        if (next.background?.book !in books) {
+            next = next.copy(
+                backgroundId = null,
+                backgroundBonuses = emptyMap(),
+                originSelections = emptyMap(),
+            )
+        }
+        return next
+    }
 
     fun selectSpecies(id: String) = _state.update { current ->
         if (current.speciesId == id) current
@@ -301,6 +344,8 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             id = UUID.randomUUID().toString(),
             name = state.name.trim(),
             level = 1,
+            // Carried onto the character so level up offers the same books creation did.
+            enabledSourceIds = state.enabledSources.map { it.id }.toSet(),
             speciesId = state.speciesId.orEmpty(),
             lineageId = state.lineageId,
             classId = state.classId.orEmpty(),

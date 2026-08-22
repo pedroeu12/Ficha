@@ -119,6 +119,7 @@ fun CreationWizardScreen(
             label = "creation-step",
         ) { step ->
             when (step) {
+                CreationStep.SOURCES -> SourcesStep(state, viewModel)
                 CreationStep.SPECIES -> SpeciesStep(state, viewModel)
                 CreationStep.CLASS -> ClassStep(state, viewModel)
                 CreationStep.CLASS_CHOICES -> ClassChoicesStep(state, viewModel)
@@ -206,6 +207,7 @@ private fun hintFor(state: CreationState): String = when {
     state.canAdvance && state.step == CreationStep.DETAILS -> tr("Ready to create your character")
     state.canAdvance -> tr("Looks good")
     else -> when (state.step) {
+        CreationStep.SOURCES -> tr("Pick at least one book to draw options from")
         CreationStep.SPECIES -> tr("Pick a species and any options it offers")
         CreationStep.CLASS -> tr("Pick a class")
         CreationStep.CLASS_CHOICES -> tr("Complete every option below")

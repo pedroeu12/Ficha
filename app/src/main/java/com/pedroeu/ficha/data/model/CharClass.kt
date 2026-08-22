@@ -53,4 +53,6 @@ data class CharClass(
     val isSpellcaster: Boolean,
     val spellcastingAbility: Ability? = null,
     val summary: String,
-)
+    /** The book this comes from; the character's chosen books decide whether it is offered. */
+    override val book: Sourcebook = Sourcebook.PHB,
+) : FromSourcebook

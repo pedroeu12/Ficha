@@ -13,8 +13,20 @@ data class Subclass(
     val name: String,
     val summary: String,
     val features: List<SubclassFeature>,
-    /** Shown next to the name so playtest options are never mistaken for published ones. */
-    val source: String = "Player's Handbook (2024)",
+    /**
+     * The book this comes from. Shown next to the name so playtest options are never mistaken
+     * for published ones, and checked against the character's chosen books before the
+     * subclass is offered at all.
+     */
+    override val book: Sourcebook = Sourcebook.PHB,
+    /**
+     * The exact printing, when [book] is too coarse to name it.
+     *
+     * The Villainous Options material was published three times and the wording differs
+     * between them, so a subclass has to be able to say which one it carries even though all
+     * three are one toggle in the book selector. Empty means [book]'s own name says it.
+     */
+    val printing: String = "",
     /**
      * Spellcasting the subclass grants where the class has none.
      *
@@ -50,8 +62,11 @@ data class Subclass(
      * up as a picker that is quietly too short on three levels out of twenty.
      */
     val freeSchoolLevels: Set<Int> = emptySet(),
-) {
-    val isPlaytest: Boolean get() = source.contains("Unearthed Arcana")
+) : FromSourcebook {
+    val isPlaytest: Boolean get() = book.isPlaytest
+
+    /** What to credit on screen: the exact printing when there is one, else the book. */
+    val attribution: String get() = printing.ifEmpty { book.displayName }
 
     val isSpellcaster: Boolean get() = casterType != CasterType.NONE
 

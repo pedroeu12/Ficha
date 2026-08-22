@@ -1,6 +1,7 @@
 package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.model.InventoryItem
+import com.pedroeu.ficha.data.model.Sourcebook
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -122,6 +123,16 @@ data class PlayerCharacter(
     val level: Int = 1,
     val experiencePoints: Int = 0,
 
+    /**
+     * Ids of the books this character was built with, from [Sourcebook].
+     *
+     * Creation and level up only offer options from these books, so a character built for a
+     * core-books-only table keeps that promise every time it levels. Empty means the
+     * character predates the field and is treated as having everything — see
+     * [Sourcebook.fromIds], which would otherwise leave an existing sheet with empty pickers.
+     */
+    val enabledSourceIds: Set<String> = emptySet(),
+
     val speciesId: String = "",
     val lineageId: String? = null,
     val classId: String = "",
@@ -231,4 +242,13 @@ data class PlayerCharacter(
 
     val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
-)
+) {
+    /**
+     * The books this character may draw on, resolved from [enabledSourceIds].
+     *
+     * Read this rather than the raw ids: it is where a character saved before books existed
+     * gets treated as having all of them.
+     */
+    val enabledSources: Set<Sourcebook>
+        get() = Sourcebook.fromIds(enabledSourceIds)
+}

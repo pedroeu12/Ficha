@@ -49,9 +49,17 @@ class NoDuplicateOptionsTest {
     }
 
     @Test
-    fun `the wizard still starts at species and ends at details`() {
-        assertEquals(CreationStep.SPECIES, CreationStep.ORDER.first())
+    fun `the wizard still starts at books and ends at details`() {
+        // Books come first because every later step's options are filtered by that answer.
+        assertEquals(CreationStep.SOURCES, CreationStep.ORDER.first())
         assertEquals(CreationStep.DETAILS, CreationStep.ORDER.last())
+    }
+
+    @Test
+    fun `species is asked before anything that reads it, and after the books`() {
+        val order = CreationStep.ORDER
+        assertTrue(order.indexOf(CreationStep.SOURCES) < order.indexOf(CreationStep.SPECIES))
+        assertTrue(order.indexOf(CreationStep.SPECIES) < order.indexOf(CreationStep.CLASS))
     }
 
     // ------------------------------------------------------------- The general rule

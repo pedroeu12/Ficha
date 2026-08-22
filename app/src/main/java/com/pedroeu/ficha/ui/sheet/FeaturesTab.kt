@@ -127,7 +127,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                     )
                     if (subclass.isPlaytest) {
                         Text(
-                            text = trf("Playtest material — {0}", subclass.source),
+                            text = trf("Playtest material — {0}", subclass.attribution),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )

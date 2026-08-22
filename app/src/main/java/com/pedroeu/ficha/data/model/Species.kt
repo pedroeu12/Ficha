@@ -34,4 +34,6 @@ data class Species(
      * Versatile trait does. The creation flow offers the same list a background draws from.
      */
     val grantsOriginFeat: Boolean = false,
-)
+    /** The book this comes from; the character's chosen books decide whether it is offered. */
+    override val book: Sourcebook = Sourcebook.PHB,
+) : FromSourcebook

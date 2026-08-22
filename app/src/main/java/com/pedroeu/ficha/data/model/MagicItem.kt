@@ -41,7 +41,9 @@ data class MagicItem(
     val attackBonus: Int = 0,
     /** The bonus this item gives to Armor Class while worn, wielded, or attuned. */
     val acBonus: Int = 0,
-) {
+    /** The book this comes from; the character's chosen books decide whether it is offered. */
+    override val book: Sourcebook = Sourcebook.DMG,
+) : FromSourcebook {
     /** The line printed under the name, e.g. "Wondrous Item, Rare (Requires Attunement)". */
     val subtitle: String
         get() = buildString {

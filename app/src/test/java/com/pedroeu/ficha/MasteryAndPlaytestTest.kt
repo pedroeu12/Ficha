@@ -276,13 +276,13 @@ class MasteryAndPlaytestTest {
             assertEquals(
                 "$id was revisited, so it should carry the update's wording",
                 "Unearthed Arcana 2026: Villainous Options Update",
-                SubclassData.byId(id)!!.source,
+                SubclassData.byId(id)!!.attribution,
             )
         }
         // The Pestilence Domain was not revised, so it keeps its original attribution.
         assertEquals(
             "Unearthed Arcana 2026: Villainous Options",
-            SubclassData.byId("pestilence_domain")!!.source,
+            SubclassData.byId("pestilence_domain")!!.attribution,
         )
     }
 

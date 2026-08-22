@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.model.SourceFiltering
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Recharge
@@ -65,9 +66,11 @@ fun FeatPickerSheet(
     var selections by remember { mutableStateOf<Map<String, List<String>>>(emptyMap()) }
 
     val already = character.featIds.toSet()
-    val results = remember(query) {
+    // The character's books apply here too, so a sheet can't collect off-book feats by hand.
+    val fromBooks = SourceFiltering.available(FeatData.ALL, character.enabledSources)
+    val results = remember(query, fromBooks) {
         val q = query.trim().lowercase()
-        FeatData.ALL.filter { feat ->
+        fromBooks.filter { feat ->
             feat.id != "ability_score_improvement" &&
                 (q.isEmpty() || feat.name.lowercase().contains(q) ||
                     feat.description.lowercase().contains(q))
@@ -175,9 +178,11 @@ fun SpellPickerSheet(
     var customName by remember { mutableStateOf("") }
 
     val known = character.knownSpells.map { it.id }.toSet()
-    val results = remember(query, levelFilter, classListOnly, known) {
+    // Off-book spells stay out of the catalogue; the custom-name field below is the way in.
+    val fromBooks = SourceFiltering.available(SpellData.ALL, character.enabledSources)
+    val results = remember(query, levelFilter, classListOnly, known, fromBooks) {
         val q = query.trim().lowercase()
-        SpellData.ALL.filter { spell ->
+        fromBooks.filter { spell ->
             (!classListOnly || character.classId in spell.classes) &&
                 (levelFilter == null || spell.level == levelFilter) &&
                 (q.isEmpty() || spell.name.lowercase().contains(q) ||

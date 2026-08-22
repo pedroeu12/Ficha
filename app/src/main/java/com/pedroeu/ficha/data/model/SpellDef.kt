@@ -26,7 +26,9 @@ data class SpellDef(
     val saveAbility: Ability? = null,
     /** True for cantrips whose damage grows at character levels 5, 11, and 17. */
     val scalesWithLevel: Boolean = false,
-) {
+    /** The book this comes from; the character's chosen books decide whether it is offered. */
+    override val book: Sourcebook = Sourcebook.PHB,
+) : FromSourcebook {
     val levelLabel: String
         get() = if (level == 0) "Cantrip" else "Level $level"
 

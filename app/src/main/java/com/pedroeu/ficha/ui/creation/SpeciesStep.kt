@@ -40,7 +40,7 @@ fun SpeciesStep(state: CreationState, viewModel: CreationViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        items(SpeciesData.ALL, key = { it.id }) { species ->
+        items(state.availableSpecies, key = { it.id }) { species ->
             SelectableCard(
                 title = species.name,
                 subtitle = species.summary,

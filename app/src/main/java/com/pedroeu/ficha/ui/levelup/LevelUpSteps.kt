@@ -196,7 +196,7 @@ fun SubclassStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 subtitle = subclass.summary,
                 selected = state.activeSubclassId == subclass.id,
                 onClick = { viewModel.selectSubclass(subclass.id) },
-                trailingLabel = if (subclass.isPlaytest) "Playtest • ${subclass.source}" else null,
+                trailingLabel = if (subclass.isPlaytest) "Playtest • ${subclass.attribution}" else null,
                 expandedContent = {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         subclass.features.forEach { feature ->

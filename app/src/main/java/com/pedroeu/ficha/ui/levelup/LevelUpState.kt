@@ -2,6 +2,7 @@ package com.pedroeu.ficha.ui.levelup
 
 import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.model.SourceFiltering
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpellData
@@ -144,7 +145,9 @@ data class LevelUpState(
         get() = progression?.subclassLevel == targetClassLevel &&
             ClassLevels.subclassIn(character, classId) == null
 
-    val subclassOptions get() = SubclassData.forClass(classId)
+    /** Subclasses for this class that the character's books allow. */
+    val subclassOptions
+        get() = SourceFiltering.available(SubclassData.forClass(classId), character.enabledSources)
 
     val activeSubclassId: String?
         get() = subclassId ?: ClassLevels.subclassIn(character, classId)
@@ -441,6 +444,7 @@ data class LevelUpState(
         } else {
             FeatData.GENERAL_FEATS.filterNot { it.id == "ability_score_improvement" }
         }.filterNot { it.id in character.featIds }
+            .let { SourceFiltering.available(it, character.enabledSources) }
 
     /**
      * Why a feat can't be taken yet, keyed by feat id and empty for the ones that can.

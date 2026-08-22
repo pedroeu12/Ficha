@@ -42,7 +42,7 @@ fun BackgroundStep(state: CreationState, viewModel: CreationViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        items(BackgroundData.ALL, key = { it.id }) { background ->
+        items(state.availableBackgrounds, key = { it.id }) { background ->
             SelectableCard(
                 title = background.name,
                 subtitle = background.summary,

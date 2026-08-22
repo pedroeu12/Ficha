@@ -62,7 +62,7 @@ class VillainousOptions2Test {
                 "$id must be marked as playtest so it isn't mistaken for a published option",
                 subclass.isPlaytest,
             )
-            assertTrue("$id names its source", subclass.source.contains("Villainous Options 2"))
+            assertTrue("$id names its source", subclass.attribution.contains("Villainous Options 2"))
         }
     }
 

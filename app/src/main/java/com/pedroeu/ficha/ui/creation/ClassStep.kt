@@ -33,7 +33,7 @@ fun ClassStep(state: CreationState, viewModel: CreationViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        items(ClassData.ALL, key = { it.id }) { charClass ->
+        items(state.availableClasses, key = { it.id }) { charClass ->
             SelectableCard(
                 title = charClass.name,
                 subtitle = charClass.summary,

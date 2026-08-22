@@ -12,6 +12,8 @@ import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.Skill
+import com.pedroeu.ficha.data.model.SourceFiltering
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.domain.AbilityScoreGeneration
 import com.pedroeu.ficha.domain.Owned
 import com.pedroeu.ficha.domain.ScoreMethod
@@ -23,12 +25,15 @@ enum class BonusSpread(val label: String, val values: List<Int>) {
 }
 
 /**
- * Order matters. Background comes before Class so the proficiencies it grants outright are
+ * Order matters. Books come first: every later step draws its options from the books chosen
+ * there, so asking anything before that would offer options the table may not use. Background
+ * comes before Class so the proficiencies it grants outright are
  * already known when the class offers its skill list, letting the class step grey out what
  * the character would get anyway. Origin Options stays last of the three because some of its
  * grants depend on choices made inside the class.
  */
 enum class CreationStep(private val titleKey: String, private val shortLabelKey: String) {
+    SOURCES("Choose Your Books", "Books"),
     SPECIES("Choose a Species", "Species"),
     BACKGROUND("Choose an Origin", "Origin"),
     CLASS("Choose a Class", "Class"),
@@ -48,7 +53,15 @@ enum class CreationStep(private val titleKey: String, private val shortLabelKey:
 }
 
 data class CreationState(
-    val step: CreationStep = CreationStep.SPECIES,
+    val step: CreationStep = CreationStep.SOURCES,
+
+    /**
+     * The books this character may draw on, chosen in the first step.
+     *
+     * Every picker in the wizard reads this, and it is written to the finished character so
+     * level up keeps offering the same set.
+     */
+    val enabledSources: Set<Sourcebook> = Sourcebook.CORE,
 
     val speciesId: String? = null,
     val lineageId: String? = null,
@@ -89,6 +102,15 @@ data class CreationState(
     val species get() = speciesId?.let { SpeciesData.byId(it) }
     val charClass get() = classId?.let { ClassData.byId(it) }
     val background get() = backgroundId?.let { BackgroundData.byId(it) }
+
+    /** The species the chosen books allow, which is what the Species step lists. */
+    val availableSpecies get() = SourceFiltering.available(SpeciesData.ALL, enabledSources)
+
+    /** The classes the chosen books allow. */
+    val availableClasses get() = SourceFiltering.available(ClassData.ALL, enabledSources)
+
+    /** The backgrounds the chosen books allow. */
+    val availableBackgrounds get() = SourceFiltering.available(BackgroundData.ALL, enabledSources)
 
     /**
      * Decisions the class table's level 1 features force, beyond the ones [charClass] already
@@ -255,6 +277,8 @@ data class CreationState(
     /** True when every decision on the current step has been made. */
     val canAdvance: Boolean
         get() = when (step) {
+            // At least one book, or every later step would have nothing to offer.
+            CreationStep.SOURCES -> enabledSources.isNotEmpty()
             CreationStep.SPECIES -> speciesValid()
             CreationStep.CLASS -> classId != null
             CreationStep.CLASS_CHOICES -> classChoicesValid()

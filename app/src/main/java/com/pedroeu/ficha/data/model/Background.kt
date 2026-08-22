@@ -11,4 +11,6 @@ data class Background(
     val featId: String,
     val equipment: List<String>,
     val startingGold: Int,
-)
+    /** The book this comes from; the character's chosen books decide whether it is offered. */
+    override val book: Sourcebook = Sourcebook.PHB,
+) : FromSourcebook

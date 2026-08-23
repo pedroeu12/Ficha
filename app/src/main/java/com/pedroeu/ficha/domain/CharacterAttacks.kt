@@ -57,11 +57,58 @@ object CharacterAttacks {
         return CharacterCalculations.formatModifier(toHit) to damage
     }
 
-    fun all(character: PlayerCharacter): List<AttackLine> =
-        CharacterCalculations.attacks(character) +
+    /**
+     * Every attack on the sheet, in the order the player put them, with whatever they
+     * retyped, and without the ones they took off.
+     *
+     * A hand-written attack is one of these like any other: same shape, same edits, same
+     * place in the order. The only thing that separates it is that deleting it works, where
+     * a derived line can only be hidden — it is rebuilt from the inventory every time.
+     */
+    fun all(character: PlayerCharacter): List<AttackLine> {
+        val derived = CharacterCalculations.attacks(character) +
             unarmed(character) +
             featureAttacks(character) +
             cantrips(character)
+
+        val custom = character.customAttacks.map { attack ->
+            val (toHit, damage) = customAttackNumbers(character, attack)
+            AttackLine(
+                id = attack.id,
+                name = attack.name,
+                attackBonus = 0,
+                bonusLabel = toHit,
+                damage = damage,
+                damageType = attack.damageType,
+                notes = listOf(attack.range, attack.notes)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" • "),
+                source = AttackSource.WEAPON,
+                isCustom = true,
+            )
+        }
+
+        val edited = (derived + custom)
+            .filterNot { it.id in character.hiddenAttackIds }
+            .map { applyOverrides(character, it) }
+
+        // Named ids first in the order the player set; anything new keeps its natural place
+        // at the end rather than disappearing into an order it was never added to.
+        val position = character.attackOrder.withIndex().associate { (i, id) -> id to i }
+        return edited.sortedBy { position[it.id] ?: (position.size + edited.indexOf(it)) }
+    }
+
+    /** Text the player typed over a line, from Edit Mode. */
+    private fun applyOverrides(character: PlayerCharacter, line: AttackLine): AttackLine {
+        fun override(field: String) = character.textOverrides["attack:${line.id}:$field"]
+        return line.copy(
+            name = override("name") ?: line.name,
+            bonusLabel = override("bonus") ?: line.bonusLabel,
+            damage = override("damage") ?: line.damage,
+            damageType = override("damageType") ?: line.damageType,
+            notes = override("notes") ?: line.notes,
+        )
+    }
 
     // ------------------------------------------------------------------ Unarmed Strike
 
@@ -96,6 +143,7 @@ object CharacterAttacks {
 
         return listOf(
             AttackLine(
+                id = "unarmed",
                 name = "Unarmed Strike",
                 attackBonus = abilityMod + pb,
                 damage = "$damage ${CharacterCalculations.formatModifier(abilityMod)}",
@@ -127,6 +175,7 @@ object CharacterAttacks {
 
         fun line(name: String, ability: Ability, damage: String, type: String, notes: String) =
             AttackLine(
+                id = "feature:" + name.lowercase().replace(Regex("[^a-z0-9]+"), "_"),
                 name = name,
                 attackBonus = (mods[ability] ?: 0) + pb,
                 damage = "$damage ${CharacterCalculations.formatModifier(mods[ability] ?: 0)}",
@@ -191,6 +240,7 @@ object CharacterAttacks {
                 val dc = CharacterDcs.all(character).firstOrNull { it.id == dcId }
                 add(
                     AttackLine(
+                        id = "feature:$dcId",
                         name = name,
                         attackBonus = dc?.attackBonus ?: 0,
                         damage = damage,
@@ -301,6 +351,7 @@ object CharacterAttacks {
                 }
 
                 AttackLine(
+                    id = "spell:${spell.id}",
                     name = spell.name,
                     attackBonus = dc?.attackBonus ?: 0,
                     damage = dice,

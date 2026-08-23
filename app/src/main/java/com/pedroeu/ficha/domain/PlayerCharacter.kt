@@ -221,6 +221,23 @@ data class PlayerCharacter(
 
     /** Attacks and actions written by the player. */
     val customAttacks: List<CustomAttack> = emptyList(),
+
+    /**
+     * Attack lines the player has taken off the sheet.
+     *
+     * A derived attack cannot be deleted — it comes back the moment the inventory is read
+     * again — so hiding is what "remove it from my sheet" means for one. Custom attacks are
+     * deleted outright and never appear here.
+     */
+    val hiddenAttackIds: Set<String> = emptySet(),
+
+    /**
+     * The order the player dragged the attacks into, by [AttackLine.id].
+     *
+     * Ids missing from this list keep their natural order after the ones named here, so a
+     * newly bought weapon appears at the bottom rather than vanishing.
+     */
+    val attackOrder: List<String> = emptyList(),
     /** Extra features written by the player. */
     val customFeatures: List<CustomFeature> = emptyList(),
     /** Limited-use resources written by the player. */

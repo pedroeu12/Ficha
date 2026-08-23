@@ -48,6 +48,7 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.StatEditDialog
 
@@ -185,10 +186,16 @@ private fun VitalsRow(
             editMode = editMode,
             onClick = { onEdit(OverridableStat.SPEED) },
         )
+        // Size is words rather than a number, so it edits through the text overrides the
+        // rest of the sheet's prose uses rather than through the numeric stat overrides.
         StatTile(
             modifier = Modifier.weight(1f),
             label = tr("Size"),
             value = CharacterCalculations.size(character),
+            adjusted = character.textOverrides.containsKey("vitals:size"),
+            editMode = editMode,
+            textValue = CharacterCalculations.size(character),
+            onTextChange = { viewModel.setText("vitals:size", it) },
         )
         StatTile(
             modifier = Modifier.weight(1f),
@@ -227,6 +234,9 @@ private fun StatTile(
     adjusted: Boolean = false,
     editMode: Boolean = false,
     onClick: (() -> Unit)? = null,
+    /** Set instead of [onClick] for a tile whose value is text rather than a number. */
+    textValue: String? = null,
+    onTextChange: ((String?) -> Unit)? = null,
 ) {
     val clickable = editMode && onClick != null
     Card(
@@ -242,6 +252,30 @@ private fun StatTile(
                 .padding(vertical = 12.dp, horizontal = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            // A tile whose value is words edits in place; the numeric ones open the stat
+            // editor instead, which offers a bonus as well as an outright override.
+            if (editMode && textValue != null && onTextChange != null) {
+                EditableText(
+                    value = textValue,
+                    editMode = true,
+                    onChange = onTextChange,
+                    label = label,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                    isOverridden = adjusted,
+                )
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                return@Column
+            }
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // A number gets the big treatment; a word like "Medium or Small" would spill
                 // out of the tile at that size, so longer values step down instead.

@@ -37,6 +37,10 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.domain.CharacterAttacks
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CustomAttack
+import com.pedroeu.ficha.domain.AttackLine
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.foundation.layout.Spacer
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.ui.components.ExpandableOption
@@ -59,10 +63,14 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     ) {
         item {
             CombatCard {
-                SectionHeader(tr("Weapons & Damage Cantrips"))
+                SectionHeader(
+                    tr("Attacks"),
+                    trailing = attacks.size.takeIf { it > 0 }?.toString(),
+                )
                 if (attacks.isEmpty()) {
                     Text(
-                        text = tr("Nothing to attack with yet. Add a weapon on the Inventory tab."),
+                        text = tr("Nothing to attack with yet. Add a weapon on the Inventory " +
+                            "tab, or write an attack here."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),
@@ -78,88 +86,52 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                         HeaderCell(tr("Damage"), Modifier.weight(2f))
                     }
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    attacks.forEach { attack ->
-                        Column(Modifier.padding(vertical = 8.dp)) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = attack.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.weight(2f),
-                                )
-                                Text(
-                                    text = CharacterCalculations.formatModifier(attack.attackBonus),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.weight(1f),
-                                )
-                                Text(
-                                    text = "${attack.damage} ${attack.damageType}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.weight(2f),
-                                )
-                            }
-                            if (attack.notes.isNotBlank()) {
-                                Text(
-                                    text = attack.notes,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            // A mastery the character can actually use opens to its full
-                            // rules text — knowing a weapon has Topple is no use without
-                            // knowing what Topple does at the moment you hit.
-                            if (attack.masteryProperty.isNotBlank()) {
-                                ExpandableOption(
-                                    name = trf("Mastery: {0}", attack.masteryProperty),
-                                    description = attack.masteryDescription,
-                                )
-                            }
-                            // Properties that need a rule to be usable — Burst Fire and
-                            // Reload above all, which firearms brought in.
-                            attack.explainedProperties.forEach { (name, rule) ->
-                                ExpandableOption(name = name, description = rule)
-                            }
-                        }
+                    attacks.forEachIndexed { index, attack ->
+                        AttackRow(
+                            character = character,
+                            viewModel = viewModel,
+                            attack = attack,
+                            editMode = editMode,
+                            isFirst = index == 0,
+                            isLast = index == attacks.lastIndex,
+                            onOpen = {
+                                character.customAttacks
+                                    .find { it.id == attack.id }
+                                    ?.let { editingAttack = it }
+                            },
+                        )
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
-            }
-        }
 
-        item {
-            CombatCard {
-                SectionHeader(
-                    tr("Other Attacks & Actions"),
-                    trailing = character.customAttacks.size.takeIf { it > 0 }?.toString(),
-                )
-                if (character.customAttacks.isEmpty()) {
+                // Hidden lines are only listed in Edit Mode: they are off the sheet on
+                // purpose, and one hidden by mistake still has to be findable.
+                val hidden = character.hiddenAttackIds
+                if (editMode && hidden.isNotEmpty()) {
                     Text(
-                        text = tr("Nothing here yet. Add a spell attack, a breath weapon, or " +
-                            "anything else you want on the sheet."),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 8.dp),
+                        text = tr("Hidden"),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(top = 12.dp),
                     )
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.padding(top = 8.dp),
-                ) {
-                    character.customAttacks.forEach { attack ->
-                        CustomAttackRow(
-                            character = character,
-                            attack = attack,
-                            onOpen = { editingAttack = attack },
-                            onDelete = { viewModel.removeCustomAttack(attack.id) },
-                        )
+                    hidden.sorted().forEach { id ->
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = character.textOverrides["attack:$id:name"] ?: id,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                            )
+                            TextButton(onClick = { viewModel.showAttack(id) }) {
+                                Text(tr("Put back"))
+                            }
+                        }
                     }
                 }
+
                 TextButton(onClick = { addingAttack = true }) {
                     Icon(Icons.Default.Add, contentDescription = null)
                     Text(tr("  Add attack"))
@@ -282,66 +254,104 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 }
 
 @Composable
-private fun CustomAttackRow(
+private fun AttackRow(
     character: PlayerCharacter,
-    attack: CustomAttack,
+    viewModel: SheetViewModel,
+    attack: AttackLine,
+    editMode: Boolean,
+    isFirst: Boolean,
+    isLast: Boolean,
     onOpen: () -> Unit,
-    onDelete: () -> Unit,
 ) {
-    // Worked out from the ability, proficiency and magic bonus unless the player overrode it.
-    val (toHit, damage) = CharacterAttacks.customAttackNumbers(character, attack)
+    /** Every field is a text override keyed on the line's id, so all of them are editable. */
+    @Composable
+    fun field(
+        which: String,
+        value: String,
+        modifier: Modifier = Modifier,
+        style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+        color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight: FontWeight? = null,
+    ) {
+        val key = "attack:${attack.id}:$which"
+        EditableText(
+            value = value,
+            editMode = editMode,
+            onChange = { viewModel.setText(key, it) },
+            label = which,
+            style = style,
+            color = color,
+            fontWeight = fontWeight,
+            isOverridden = character.textOverrides.containsKey(key),
+            modifier = modifier,
+        )
+    }
+
     Column(
         Modifier
             .fillMaxWidth()
-            .clickable(onClick = onOpen),
+            .then(if (attack.isCustom && !editMode) Modifier.clickable(onClick = onOpen) else Modifier)
+            .padding(vertical = 8.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = attack.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            field(
+                "name", attack.name, Modifier.weight(2f),
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f),
             )
-            if (toHit.isNotBlank()) {
-                Text(
-                    text = toHit,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
+            field(
+                "bonus", attack.shownBonus, Modifier.weight(1f),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Bold,
+            )
+            field("damage", attack.damage, Modifier.weight(1.2f))
+            field("damageType", attack.damageType, Modifier.weight(0.8f))
+        }
+
+        field("notes", attack.notes, Modifier.fillMaxWidth(), MaterialTheme.typography.labelSmall)
+
+        // Reordering and removal are Edit Mode work: they change the sheet's shape rather
+        // than what happens at the table, and a stray tap should not move an attack.
+        if (editMode) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { viewModel.moveAttack(attack.id, up = true) }, enabled = !isFirst) {
+                    Icon(
+                        Icons.Default.KeyboardArrowUp,
+                        contentDescription = "Move ${attack.name} up",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                IconButton(onClick = { viewModel.moveAttack(attack.id, up = false) }, enabled = !isLast) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Move ${attack.name} down",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (attack.isCustom) {
+                    TextButton(onClick = onOpen) { Text(tr("Edit")) }
+                }
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { viewModel.hideAttack(attack.id) }) {
+                    // A derived line comes back on the next read, so "remove" would be a lie.
+                    Text(if (attack.isCustom) tr("Delete") else tr("Take off the sheet"))
+                }
             }
-            IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Remove ${attack.name}",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
-        val line = listOf(damage, attack.damageType, attack.range)
-            .filter { it.isNotBlank() }
-            .joinToString(" • ")
-        if (line.isNotBlank()) {
-            Text(
-                text = line,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+
+        if (attack.masteryProperty.isNotBlank()) {
+            ExpandableOption(
+                name = trf("Mastery: {0}", attack.masteryProperty),
+                description = attack.masteryDescription,
             )
         }
-        if (attack.notes.isNotBlank()) {
-            Text(
-                text = attack.notes,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        attack.explainedProperties.forEach { (name, rule) ->
+            ExpandableOption(name = name, description = rule)
         }
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.outlineVariant,
-            modifier = Modifier.padding(top = 8.dp),
-        )
     }
 }
+
 
 @Composable
 private fun CombatCard(content: @Composable () -> Unit) {

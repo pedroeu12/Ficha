@@ -18,6 +18,14 @@ import com.pedroeu.ficha.data.model.WeaponDef
 import kotlin.math.floor
 
 data class AttackLine(
+    /**
+     * Stable identity for this line, e.g. "weapon:<inventory id>" or "spell:fire_bolt".
+     *
+     * Everything the player can do to an attack — rename it, retype its damage, hide it,
+     * move it up the list — is stored against this, so it has to survive a recalculation.
+     * A derived line has no other identity: it is rebuilt from the inventory every time.
+     */
+    val id: String,
     val name: String,
     val attackBonus: Int,
     val damage: String,
@@ -37,7 +45,20 @@ data class AttackLine(
      * this necessary: "Burst Fire" and "Reload (30 shots)" mean nothing on their own.
      */
     val explainedProperties: List<Pair<String, String>> = emptyList(),
-)
+    /**
+     * What to print for the attack bonus.
+     *
+     * Normally the formatted [attackBonus], but a line the player retyped can say anything —
+     * "spell attack", "see notes" — which an Int cannot hold.
+     */
+    val bonusLabel: String = "",
+    /** False for a derived line; true for one the player wrote, which can be deleted. */
+    val isCustom: Boolean = false,
+) {
+    /** The attack bonus as shown, honouring a retyped label. */
+    val shownBonus: String
+        get() = bonusLabel.ifBlank { CharacterCalculations.formatModifier(attackBonus) }
+}
 
 /**
  * Derived statistics for a character. Everything the sheet displays that isn't stored
@@ -171,8 +192,11 @@ object CharacterCalculations {
         else -> 0
     }
 
+    /** The species' size, or whatever the player typed over it in Edit Mode. */
     fun size(character: PlayerCharacter): String =
-        SpeciesData.byId(character.speciesId)?.size ?: "Medium"
+        character.textOverrides["vitals:size"]
+            ?: SpeciesData.byId(character.speciesId)?.size
+            ?: "Medium"
 
     fun hitDie(character: PlayerCharacter): Int = ClassData.byId(character.classId)?.hitDie ?: 8
 
@@ -440,6 +464,10 @@ object CharacterCalculations {
                 val masteryNote = CharacterMasteries.noteFor(character, weapon)
                 val mastery = CharacterMasteries.forWeapon(character, weapon)
                 AttackLine(
+                    // Inventory items are keyed by name rather than an id, so the line is
+                    // identified by the weapon it uses plus the name the player sees.
+                    id = "weapon:${weapon.id}:" +
+                        item.name.lowercase().replace(Regex("[^a-z0-9]+"), "_"),
                     name = if (magic != null) item.name else weapon.name,
                     attackBonus = attackBonus,
                     damage = "${weapon.damageDice} ${formatModifier(abilityMod + magicBonus)}",

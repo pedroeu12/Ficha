@@ -298,7 +298,6 @@ private fun Nib(description: String, glyph: String, onClick: () -> Unit) {
 private fun AttacksLedger(handle: SheetHandle) {
     val v = LocalVellum.current
     val attacks = CharacterAttacks.all(handle.character)
-    val custom = handle.character.customAttacks
 
     Leaf(
         title = tr("Attacks"),
@@ -337,40 +336,6 @@ private fun AttacksLedger(handle: SheetHandle) {
                         soft = true,
                         modifier = Modifier.weight(1.8f),
                     )
-                }
-            }
-        }
-
-        // The custom ones again, with the controls that only they have.
-        if (custom.isNotEmpty()) {
-            Spacer(Modifier.height(6.dp))
-            Caption(tr("Written by hand"))
-            custom.forEach { attack ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
-                        .clickable { handle.editAttack(attack) }
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // The same four columns as the derived attacks above, so a hand-written
-                    // attack reads as one of the list rather than a bare name.
-                    val (toHit, damage) =
-                        CharacterAttacks.customAttackNumbers(handle.character, attack)
-                    InkedValue(attack.name, Modifier.weight(1.6f))
-                    InkedValue(toHit, Modifier.weight(0.5f))
-                    InkedValue(
-                        listOf(damage, attack.damageType).filter { it.isNotBlank() }
-                            .joinToString(" "),
-                        Modifier.weight(1.1f),
-                    )
-                    InkedValue(
-                        listOf(attack.range, attack.notes).filter { it.isNotBlank() }
-                            .joinToString(" • "),
-                        Modifier.weight(1.8f),
-                    )
-                    PenMark(tr("Delete")) { handle.viewModel.removeCustomAttack(attack.id) }
                 }
             }
         }

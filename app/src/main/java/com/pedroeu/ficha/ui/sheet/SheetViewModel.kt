@@ -26,6 +26,7 @@ import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PerUseChoices
+import com.pedroeu.ficha.domain.CharacterAttacks
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.RestEngine
 import com.pedroeu.ficha.domain.RestOutcome
@@ -486,6 +487,43 @@ class SheetViewModel(
 
     fun removeCustomAttack(attackId: String) = update { character ->
         character.copy(customAttacks = character.customAttacks.filterNot { it.id == attackId })
+    }
+
+    /**
+     * Takes an attack off the sheet, or deletes it outright when the player wrote it.
+     *
+     * A derived line cannot be deleted: it is rebuilt from the inventory on the next read, so
+     * hiding is what removing one means. Hidden lines are listed again in Edit Mode so a line
+     * hidden by mistake is not lost.
+     */
+    fun hideAttack(attackId: String) = update { character ->
+        if (character.customAttacks.any { it.id == attackId }) {
+            character.copy(customAttacks = character.customAttacks.filterNot { it.id == attackId })
+        } else {
+            character.copy(hiddenAttackIds = character.hiddenAttackIds + attackId)
+        }
+    }
+
+    fun showAttack(attackId: String) = update { character ->
+        character.copy(hiddenAttackIds = character.hiddenAttackIds - attackId)
+    }
+
+    /**
+     * Moves an attack one place up or down.
+     *
+     * The stored order starts out as whatever is on the sheet today, so the first move puts
+     * every current line into it and nothing jumps around underneath the one being dragged.
+     */
+    fun moveAttack(attackId: String, up: Boolean) = update { character ->
+        val current = CharacterAttacks.all(character).map { it.id }
+        val index = current.indexOf(attackId)
+        val target = if (up) index - 1 else index + 1
+        if (index < 0 || target !in current.indices) return@update character
+        val reordered = current.toMutableList().apply {
+            set(index, current[target])
+            set(target, current[index])
+        }
+        character.copy(attackOrder = reordered)
     }
 
     // ------------------------------------------------------------------ Feats & features

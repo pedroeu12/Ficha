@@ -354,7 +354,22 @@ private fun AttacksLedger(handle: SheetHandle) {
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    InkedValue(attack.name, Modifier.weight(1f))
+                    // The same four columns as the derived attacks above, so a hand-written
+                    // attack reads as one of the list rather than a bare name.
+                    val (toHit, damage) =
+                        CharacterAttacks.customAttackNumbers(handle.character, attack)
+                    InkedValue(attack.name, Modifier.weight(1.6f))
+                    InkedValue(toHit, Modifier.weight(0.5f))
+                    InkedValue(
+                        listOf(damage, attack.damageType).filter { it.isNotBlank() }
+                            .joinToString(" "),
+                        Modifier.weight(1.1f),
+                    )
+                    InkedValue(
+                        listOf(attack.range, attack.notes).filter { it.isNotBlank() }
+                            .joinToString(" • "),
+                        Modifier.weight(1.8f),
+                    )
                     PenMark(tr("Delete")) { handle.viewModel.removeCustomAttack(attack.id) }
                 }
             }

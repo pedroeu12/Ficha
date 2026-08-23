@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.Ability
@@ -151,12 +153,16 @@ private fun VitalsRow(
     editMode: Boolean,
     onEdit: (OverridableStat) -> Unit,
 ) {
+    // Three to a row, each taking an equal share. Fixed-width tiles left ragged gaps at the
+    // end of every row and gave a value like "Medium or Small" nowhere to go.
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
+        maxItemsInEachRow = 3,
         modifier = Modifier.fillMaxWidth(),
     ) {
         StatTile(
+            modifier = Modifier.weight(1f),
             label = tr("Armor Class"),
             value = "${CharacterCalculations.armorClass(character)}",
             adjusted = character.isAdjusted(OverridableStat.ARMOR_CLASS),
@@ -164,6 +170,7 @@ private fun VitalsRow(
             onClick = { onEdit(OverridableStat.ARMOR_CLASS) },
         )
         StatTile(
+            modifier = Modifier.weight(1f),
             label = tr("Initiative"),
             value = CharacterCalculations.formatModifier(CharacterCalculations.initiative(character)),
             adjusted = character.isAdjusted(OverridableStat.INITIATIVE),
@@ -171,14 +178,20 @@ private fun VitalsRow(
             onClick = { onEdit(OverridableStat.INITIATIVE) },
         )
         StatTile(
+            modifier = Modifier.weight(1f),
             label = tr("Speed"),
             value = "${CharacterCalculations.speed(character)} ft",
             adjusted = character.isAdjusted(OverridableStat.SPEED),
             editMode = editMode,
             onClick = { onEdit(OverridableStat.SPEED) },
         )
-        StatTile(label = tr("Size"), value = CharacterCalculations.size(character))
         StatTile(
+            modifier = Modifier.weight(1f),
+            label = tr("Size"),
+            value = CharacterCalculations.size(character),
+        )
+        StatTile(
+            modifier = Modifier.weight(1f),
             label = tr("Passive Perception"),
             value = "${CharacterCalculations.passivePerception(character)}",
             adjusted = character.isAdjusted(OverridableStat.PASSIVE_PERCEPTION),
@@ -186,6 +199,7 @@ private fun VitalsRow(
             onClick = { onEdit(OverridableStat.PASSIVE_PERCEPTION) },
         )
         StatTile(
+            modifier = Modifier.weight(1f),
             label = tr("Proficiency"),
             value = CharacterCalculations.formatModifier(
                 CharacterCalculations.proficiencyBonus(character)
@@ -194,7 +208,11 @@ private fun VitalsRow(
             editMode = editMode,
             onClick = { onEdit(OverridableStat.PROFICIENCY_BONUS) },
         )
-        InspirationTile(character.heroicInspiration, viewModel::toggleHeroicInspiration)
+        InspirationTile(
+            modifier = Modifier.weight(1f),
+            active = character.heroicInspiration,
+            onToggle = viewModel::toggleHeroicInspiration,
+        )
     }
 }
 
@@ -205,6 +223,7 @@ private fun PlayerCharacter.isAdjusted(stat: OverridableStat): Boolean =
 private fun StatTile(
     label: String,
     value: String,
+    modifier: Modifier = Modifier,
     adjusted: Boolean = false,
     editMode: Boolean = false,
     onClick: (() -> Unit)? = null,
@@ -213,8 +232,8 @@ private fun StatTile(
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier
-            .width(108.dp)
+        modifier = modifier
+            .heightIn(min = 86.dp)
             .then(if (clickable) Modifier.clickable { onClick!!() } else Modifier),
     ) {
         Column(
@@ -224,12 +243,22 @@ private fun StatTile(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // A number gets the big treatment; a word like "Medium or Small" would spill
+                // out of the tile at that size, so longer values step down instead.
                 Text(
                     text = value,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = when {
+                        value.length <= 4 -> MaterialTheme.typography.headlineMedium
+                        value.length <= 9 -> MaterialTheme.typography.titleLarge
+                        else -> MaterialTheme.typography.titleSmall
+                    },
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     color = if (adjusted) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.weight(1f, fill = false),
                 )
                 if (clickable) {
                     Icon(
@@ -247,6 +276,8 @@ private fun StatTile(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
             if (adjusted) {
                 Text(
@@ -260,15 +291,19 @@ private fun StatTile(
 }
 
 @Composable
-private fun InspirationTile(active: Boolean, onToggle: () -> Unit) {
+private fun InspirationTile(
+    active: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (active) MaterialTheme.colorScheme.secondary
             else MaterialTheme.colorScheme.surface
         ),
-        modifier = Modifier
-            .width(108.dp)
+        modifier = modifier
+            .heightIn(min = 86.dp)
             .clickable(onClick = onToggle),
     ) {
         Column(

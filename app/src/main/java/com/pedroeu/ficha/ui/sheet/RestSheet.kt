@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -85,11 +89,15 @@ fun RestSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
+        // The sheet is given a bounded height so the body can scroll inside it and the
+        // action button can be pinned below. Without that the body grew past the screen and
+        // took the button with it, which is how a Long Rest became impossible to confirm.
         Column(
             Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.92f)
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 28.dp),
+                .padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(
@@ -108,6 +116,13 @@ fun RestSheet(
                 ) { Text(tr("Done")) }
                 return@Column
             }
+
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
 
             if (kind == RestKind.SHORT) {
                 RestCard {
@@ -193,29 +208,35 @@ fun RestSheet(
             // Clerics, Artificers, and the other prepared casters rebuild their list each
             // day, so a Long Rest is exactly when that decision gets made.
             if (kind == RestKind.LONG && CharacterSpells.preparesDaily(character)) {
-                PreparationSection(character, viewModel)
+                RestSection(
+                    title = tr("Prepare spells"),
+                    trailing = trf(
+                        "{0} / {1}",
+                        character.knownSpells.count { it.prepared && it.level > 0 },
+                        CharacterCalculations.maxPreparedSpells(character),
+                    ),
+                ) { PreparationSection(character, viewModel) }
             }
 
             // The Artificer is alone in rethinking a cantrip overnight rather than on
             // levelling, so this appears only when a class on the sheet actually says so.
             if (kind == RestKind.LONG) {
                 CharacterSpells.classesSwappingCantripsOnLongRest(character).forEach { classId ->
-                    CantripSwapSection(character, viewModel, classId)
+                    // Nobody swaps a cantrip most nights, so this one starts folded.
+                    RestSection(title = tr("Swap a cantrip"), startExpanded = false) {
+                        CantripSwapSection(character, viewModel, classId)
+                    }
                 }
             }
 
             if (restChangeable.isNotEmpty()) {
-                Text(
-                    text = tr("You may change these while you rest"),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.heightIn(max = 280.dp),
+                RestSection(
+                    title = tr("You may change these while you rest"),
+                    trailing = restChangeable.size.toString(),
+                    startExpanded = false,
                 ) {
-                    items(restChangeable.size, key = { restChangeable[it].choice.id }) { index ->
-                        val resolved = restChangeable[index]
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    restChangeable.forEach { resolved ->
                         ChoiceSection(
                             choice = resolved.choice,
                             selected = resolved.selectedIds,
@@ -236,6 +257,9 @@ fun RestSheet(
                         )
                     }
                 }
+                }
+            }
+
             }
 
             Button(
@@ -257,6 +281,50 @@ fun RestSheet(
                     }
                 )
             }
+        }
+    }
+}
+
+/**
+ * One folding section of the rest sheet.
+ *
+ * A Long Rest can ask for a lot at once — a prepared caster's whole list, a cantrip swap, and
+ * every choice the rules let you revisit — and stacking all of it open means scrolling past
+ * the parts you are not changing today. Sections start open only when they are the point.
+ */
+@Composable
+private fun RestSection(
+    title: String,
+    trailing: String = "",
+    startExpanded: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    var expanded by rememberSaveable(title) { mutableStateOf(startExpanded) }
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = (if (expanded) "▾  " else "▸  ") + title,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            if (trailing.isNotBlank()) {
+                Text(
+                    text = trailing,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (expanded) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
         }
     }
 }
@@ -379,21 +447,17 @@ private fun PreparationSection(character: PlayerCharacter, viewModel: SheetViewM
             .padding(top = 8.dp),
     )
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.heightIn(max = 300.dp),
-    ) {
+    // A plain Column: this sits inside the sheet's own scroll now, and a lazy list nested in
+    // a scrolling parent is what squeezed this list down to one visible row.
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         available.forEach { (level, spells) ->
-            item(key = "level-$level") {
-                Text(
-                    text = trf("Level {0}", level),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
-                )
-            }
-            items(spells.size, key = { spells[it].id }) { index ->
-                val spell = spells[index]
+            Text(
+                text = trf("Level {0}", level),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.padding(top = 8.dp, bottom = 2.dp),
+            )
+            spells.forEach { spell ->
                 PreparableRow(spell, prepared = false) {
                     viewModel.setSpellPrepared(spell, true)
                 }
@@ -499,12 +563,8 @@ private fun CantripSwapSection(
 
             val onSheet = character.knownSpells.map { it.id }.toSet()
             val options = CharacterSpells.cantripChoices(classId).filterNot { it.id in onSheet }
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier.heightIn(max = 240.dp),
-            ) {
-                items(options.size, key = { options[it].id }) { index ->
-                    val spell = options[index]
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                options.forEach { spell ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier

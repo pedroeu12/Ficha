@@ -26,6 +26,37 @@ enum class AttackSource {
  */
 object CharacterAttacks {
 
+    /**
+     * The attack and damage a hand-written attack works out to.
+     *
+     * A player who typed a bonus keeps it — that field exists so "DEX + PB" or "spell attack"
+     * can be written when the maths doesn't fit. Everything else is derived from the ability
+     * chosen, whether proficiency applies, and the magic bonus, so a +1 Longsword picked from
+     * three dropdowns comes out right without anyone doing the addition.
+     */
+    fun customAttackNumbers(
+        character: PlayerCharacter,
+        attack: CustomAttack,
+    ): Pair<String, String> {
+        if (attack.bonus.isNotBlank()) return attack.bonus to attack.damageDice
+
+        val ability = Ability.ALL.firstOrNull { it.name == attack.abilityName }
+        val abilityMod = ability?.let { CharacterCalculations.abilityModifiers(character)[it] } ?: 0
+        val proficiency =
+            if (attack.proficient) CharacterCalculations.proficiencyBonus(character) else 0
+
+        val toHit = abilityMod + proficiency + attack.magicBonus
+        val damageMod = abilityMod + attack.magicBonus
+
+        val damage = buildString {
+            append(attack.damageDice)
+            if (damageMod != 0) {
+                append(if (damageMod > 0) " + $damageMod" else " - ${-damageMod}")
+            }
+        }
+        return CharacterCalculations.formatModifier(toHit) to damage
+    }
+
     fun all(character: PlayerCharacter): List<AttackLine> =
         CharacterCalculations.attacks(character) +
             unarmed(character) +

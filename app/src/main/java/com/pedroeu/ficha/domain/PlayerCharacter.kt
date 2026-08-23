@@ -54,11 +54,23 @@ data class CustomAttack(
     val id: String,
     val name: String,
     val damageDice: String = "",
-    /** Free text so "+7", "DEX + PB", or "spell attack" all work. */
+    /**
+     * Free text so "+7", "DEX + PB", or "spell attack" all work.
+     *
+     * Left as written when it is set: an attack typed in by hand keeps whatever the player
+     * decided, and only an attack with no manual bonus gets its numbers worked out from
+     * [abilityName], [proficient] and [magicBonus] below.
+     */
     val bonus: String = "",
     val damageType: String = "",
     val range: String = "",
     val notes: String = "",
+    /** [com.pedroeu.ficha.data.model.Ability] name whose modifier this adds, or blank. */
+    val abilityName: String = "",
+    /** True when the character's Proficiency Bonus applies to the attack roll. */
+    val proficient: Boolean = true,
+    /** A magic weapon's +1, +2 or +3, which applies to both the attack and the damage. */
+    val magicBonus: Int = 0,
 )
 
 /** A limited-use resource the player added by hand, for anything the rules engine misses. */

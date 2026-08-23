@@ -23,6 +23,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import com.pedroeu.ficha.ui.i18n.trf
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Checkbox
+import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterAttacks
+import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.ui.components.SourceSectionHeader
 import com.pedroeu.ficha.ui.components.SourceGrouping
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -380,9 +387,10 @@ private fun SpellRow(spell: SpellDef, onAdd: () -> Unit) {
 // ---------------------------------------------------------------------- Attacks
 
 /** Create or edit an attack by hand, for anything the weapon table doesn't cover. */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AttackEditorSheet(
+    character: PlayerCharacter,
     existing: CustomAttack?,
     onDismiss: () -> Unit,
     onSave: (CustomAttack) -> Unit,
@@ -394,6 +402,9 @@ fun AttackEditorSheet(
     var damageType by remember { mutableStateOf(existing?.damageType.orEmpty()) }
     var range by remember { mutableStateOf(existing?.range.orEmpty()) }
     var notes by remember { mutableStateOf(existing?.notes.orEmpty()) }
+    var abilityName by remember { mutableStateOf(existing?.abilityName.orEmpty()) }
+    var proficient by remember { mutableStateOf(existing?.proficient ?: true) }
+    var magicBonus by remember { mutableStateOf(existing?.magicBonus ?: 0) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -428,30 +439,91 @@ fun AttackEditorSheet(
                     modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
-                    value = bonus,
-                    onValueChange = { bonus = it },
-                    label = { Text(tr("Attack / damage bonus")) },
-                    placeholder = { Text("+7") },
+                    value = damageType,
+                    onValueChange = { damageType = it },
+                    label = { Text(tr("Damage type")) },
+                    placeholder = { Text(tr("Slashing")) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f),
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = damageType,
-                    onValueChange = { damageType = it },
-                    label = { Text(tr("Damage type")) },
-                    placeholder = { Text(tr("Fire")) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.weight(1f),
+
+            // The three things that decide the numbers. Everything below is worked out from
+            // them, so the player picks a Strength longsword rather than doing the addition.
+            Text(
+                text = tr("Ability used"),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ChoiceChip(
+                    label = tr("None"),
+                    selected = abilityName.isBlank(),
+                    onClick = { abilityName = "" },
                 )
+                Ability.ALL.forEach { ability ->
+                    ChoiceChip(
+                        label = ability.abbreviation,
+                        supporting = CharacterCalculations.formatModifier(
+                            CharacterCalculations.abilityModifiers(character)[ability] ?: 0,
+                        ),
+                        selected = abilityName == ability.name,
+                        onClick = { abilityName = ability.name },
+                    )
+                }
+            }
+
+            Text(
+                text = tr("Magic bonus"),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(0, 1, 2, 3).forEach { value ->
+                    ChoiceChip(
+                        label = if (value == 0) tr("None") else "+$value",
+                        selected = magicBonus == value,
+                        onClick = { magicBonus = value },
+                    )
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { proficient = !proficient },
+            ) {
+                Checkbox(checked = proficient, onCheckedChange = { proficient = it })
+                Text(
+                    text = trf(
+                        "Proficient ({0})",
+                        CharacterCalculations.formatModifier(
+                            CharacterCalculations.proficiencyBonus(character),
+                        ),
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = range,
                     onValueChange = { range = it },
                     label = { Text(tr("Range")) },
                     placeholder = { Text(tr("30 ft")) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(1f),
+                )
+                OutlinedTextField(
+                    value = bonus,
+                    onValueChange = { bonus = it },
+                    label = { Text(tr("Override the bonus")) },
+                    placeholder = { Text(tr("e.g. DEX + PB")) },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f),
@@ -466,20 +538,33 @@ fun AttackEditorSheet(
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),
             )
+            val draft = CustomAttack(
+                id = existing?.id ?: "attack:${UUID.randomUUID()}",
+                name = name.trim(),
+                damageDice = dice.trim(),
+                bonus = bonus.trim(),
+                damageType = damageType.trim(),
+                range = range.trim(),
+                notes = notes.trim(),
+                abilityName = abilityName,
+                proficient = proficient,
+                magicBonus = magicBonus,
+            )
+            val (toHit, damage) = CharacterAttacks.customAttackNumbers(character, draft)
+            Text(
+                text = trf(
+                    "This attack: {0} to hit, {1} {2}",
+                    toHit,
+                    damage.ifBlank { "-" },
+                    damageType.trim(),
+                ).trimEnd(),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+
             Button(
-                onClick = {
-                    onSave(
-                        CustomAttack(
-                            id = existing?.id ?: "attack:${UUID.randomUUID()}",
-                            name = name.trim(),
-                            damageDice = dice.trim(),
-                            bonus = bonus.trim(),
-                            damageType = damageType.trim(),
-                            range = range.trim(),
-                            notes = notes.trim(),
-                        )
-                    )
-                },
+                onClick = { onSave(draft) },
                 enabled = name.isNotBlank(),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.fillMaxWidth(),

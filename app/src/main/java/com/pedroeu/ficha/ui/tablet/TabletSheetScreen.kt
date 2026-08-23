@@ -261,6 +261,7 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
         }
 
         is SheetOverlay.Attack -> AttackEditorSheet(
+            character = character,
             existing = overlay.existing,
             onDismiss = onDismiss,
             onSave = { attack ->

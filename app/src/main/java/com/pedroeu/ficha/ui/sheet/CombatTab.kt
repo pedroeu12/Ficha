@@ -153,6 +153,7 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                 ) {
                     character.customAttacks.forEach { attack ->
                         CustomAttackRow(
+                            character = character,
                             attack = attack,
                             onOpen = { editingAttack = attack },
                             onDelete = { viewModel.removeCustomAttack(attack.id) },
@@ -257,6 +258,7 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 
     if (addingAttack) {
         AttackEditorSheet(
+            character = character,
             existing = null,
             onDismiss = { addingAttack = false },
             onSave = {
@@ -268,6 +270,7 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 
     editingAttack?.let { attack ->
         AttackEditorSheet(
+            character = character,
             existing = attack,
             onDismiss = { editingAttack = null },
             onSave = {
@@ -280,10 +283,13 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 
 @Composable
 private fun CustomAttackRow(
+    character: PlayerCharacter,
     attack: CustomAttack,
     onOpen: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    // Worked out from the ability, proficiency and magic bonus unless the player overrode it.
+    val (toHit, damage) = CharacterAttacks.customAttackNumbers(character, attack)
     Column(
         Modifier
             .fillMaxWidth()
@@ -297,9 +303,9 @@ private fun CustomAttackRow(
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
             )
-            if (attack.bonus.isNotBlank()) {
+            if (toHit.isNotBlank()) {
                 Text(
-                    text = attack.bonus,
+                    text = toHit,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.secondary,
@@ -313,7 +319,7 @@ private fun CustomAttackRow(
                 )
             }
         }
-        val line = listOf(attack.damageDice, attack.damageType, attack.range)
+        val line = listOf(damage, attack.damageType, attack.range)
             .filter { it.isNotBlank() }
             .joinToString(" • ")
         if (line.isNotBlank()) {

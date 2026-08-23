@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pedroeu.ficha.domain.ActionCost
 import com.pedroeu.ficha.domain.ActiveChoice
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.PerUseChoices
@@ -67,6 +68,15 @@ fun ResourcesCard(
     val resources = CharacterResources.states(character)
     var showAdd by remember { mutableStateOf(false) }
     var editingMax by remember { mutableStateOf<ResourceState?>(null) }
+    var collapsed by remember { mutableStateOf(emptySet<ActionCost>()) }
+
+    // You get one Action, one Bonus Action and one Reaction a round, so that is the split a
+    // player reads this list by. A sheet whose pools all cost the same thing gets no headers:
+    // one heading over the whole list says nothing the list didn't already say.
+    val sections = ActionCost.ORDER
+        .map { cost -> cost to resources.filter { ActionCost.of(it.def) == cost } }
+        .filter { (_, rows) -> rows.isNotEmpty() }
+    val grouped = sections.size > 1
 
     MaybeCard(framed) {
         Column(
@@ -86,24 +96,39 @@ fun ResourcesCard(
                 )
             }
 
-            resources.forEach { state ->
-                ResourceRow(
-                    state = state,
-                    editMode = editMode,
-                    // The decisions the rules attach to this ability's use, asked here rather
-                    // than once at character creation.
-                    perUseChoices = PerUseChoices.forResource(character, state.def.id),
-                    onSetSpent = { viewModel.setResourceSpent(state.def.id, it) },
-                    onChoose = { choiceId, optionId ->
-                        viewModel.setPerUseChoice(choiceId, optionId)
-                    },
-                    onClearChoice = { viewModel.clearPerUseChoice(it) },
-                    onUse = { choiceId, optionId ->
-                        viewModel.spendResourceOn(state.def.id, choiceId, optionId)
-                    },
-                    onEditMax = { editingMax = state },
-                    onDelete = { viewModel.removeCustomResource(state.def.id) },
-                )
+            sections.forEach { (cost, rows) ->
+                val open = !grouped || cost !in collapsed
+                if (grouped) {
+                    ActionSectionHeader(
+                        cost = cost,
+                        count = rows.size,
+                        expanded = open,
+                        onToggle = {
+                            collapsed = if (open) collapsed + cost else collapsed - cost
+                        },
+                    )
+                }
+                if (open) {
+                    rows.forEach { state ->
+                        ResourceRow(
+                            state = state,
+                            editMode = editMode,
+                            // The decisions the rules attach to this ability's use, asked
+                            // here rather than once at character creation.
+                            perUseChoices = PerUseChoices.forResource(character, state.def.id),
+                            onSetSpent = { viewModel.setResourceSpent(state.def.id, it) },
+                            onChoose = { choiceId, optionId ->
+                                viewModel.setPerUseChoice(choiceId, optionId)
+                            },
+                            onClearChoice = { viewModel.clearPerUseChoice(it) },
+                            onUse = { choiceId, optionId ->
+                                viewModel.spendResourceOn(state.def.id, choiceId, optionId)
+                            },
+                            onEditMax = { editingMax = state },
+                            onDelete = { viewModel.removeCustomResource(state.def.id) },
+                        )
+                    }
+                }
             }
 
             TextButton(onClick = { showAdd = true }) {
@@ -315,6 +340,42 @@ private fun ResourceRow(
                 }
             }
         }
+    }
+}
+
+/**
+ * The heading over one action's worth of trackers.
+ *
+ * Tappable because the split is only useful when you can fold away the two thirds of the list
+ * that aren't the question you're asking: on your turn you want the Actions and the Bonus
+ * Actions, and on someone else's turn you want the one Reaction.
+ */
+@Composable
+private fun ActionSectionHeader(
+    cost: ActionCost,
+    count: Int,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onToggle)
+            .padding(top = 2.dp, bottom = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = (if (expanded) "\u25BE  " else "\u25B8  ") + tr(cost.label),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

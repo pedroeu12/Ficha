@@ -209,6 +209,7 @@ object ResourceData {
                 if (level >= 2) add(
                     ResourceDef(
                         id = "paladin:smite",
+                        spellId = "divine_smite",
                         name = "Free Divine Smite",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -221,6 +222,7 @@ object ResourceData {
                 if (level >= 5) add(
                     ResourceDef(
                         id = "paladin:find_steed",
+                        spellId = "find_steed",
                         name = "Free Find Steed",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -236,6 +238,7 @@ object ResourceData {
                 add(
                     ResourceDef(
                         id = "ranger:favored_enemy",
+                        spellId = "hunters_mark",
                         name = "Free Hunter's Mark",
                         max = when {
                             level >= 17 -> 6
@@ -511,6 +514,7 @@ object ResourceData {
             "archfey" -> listOf(
                 ResourceDef(
                     id = "archfey:steps_of_the_fey",
+                    spellId = "misty_step",
                     name = "Steps of the Fey",
                     max = c.proficiencyBonus,
                     recharge = Recharge.LONG_REST,
@@ -654,6 +658,7 @@ object ResourceData {
                 if (level >= 6) add(
                     ResourceDef(
                         id = "necromancer:undead_thralls",
+                        spellId = "animate_dead",
                         name = "Free Animate Dead",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -666,6 +671,7 @@ object ResourceData {
                 add(
                     ResourceDef(
                         id = "transmuter:wondrous_alteration",
+                        spellId = "alter_self",
                         name = "Free Alter Self",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -684,6 +690,7 @@ object ResourceData {
                 if (level >= 10) add(
                     ResourceDef(
                         id = "transmuter:shapechanger",
+                        spellId = "polymorph",
                         name = "Free Polymorph",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -695,6 +702,7 @@ object ResourceData {
             "mercy" -> listOf(
                 ResourceDef(
                     id = "mercy:ultimate_mercy",
+                    actionCost = "Magic action",
                     name = "Hand of Ultimate Mercy",
                     max = if (level >= 17) 1 else 0,
                     recharge = Recharge.LONG_REST,
@@ -705,6 +713,7 @@ object ResourceData {
             "shadow" -> if (level >= 17) listOf(
                 ResourceDef(
                     id = "shadow:cloak_of_shadows",
+                    spellId = "invisibility",
                     name = "Cloak of Shadows",
                     max = 1,
                     recharge = Recharge.SHORT_REST,
@@ -726,6 +735,7 @@ object ResourceData {
                 if (level >= 11) add(
                     ResourceDef(
                         id = "fey_wanderer:summon_fey",
+                        spellId = "summon_fey",
                         name = "Free Summon Fey",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -738,6 +748,7 @@ object ResourceData {
                 if (level >= 15) add(
                     ResourceDef(
                         id = "fey_wanderer:misty_wanderer",
+                        spellId = "misty_step",
                         name = "Free Misty Step",
                         max = c.modAtLeastOne(Ability.WIS),
                         recharge = Recharge.LONG_REST,
@@ -799,6 +810,7 @@ object ResourceData {
             "sea" -> listOf(
                 ResourceDef(
                     id = "sea:wrath_of_the_sea",
+                    actionCost = "Bonus Action",
                     name = "Wrath of the Sea",
                     max = c.modAtLeastOne(Ability.WIS),
                     recharge = Recharge.LONG_REST,
@@ -809,6 +821,7 @@ object ResourceData {
             "trickery_domain" -> listOf(
                 ResourceDef(
                     id = "trickery:blessing_of_the_trickster",
+                    actionCost = "Magic action",
                     name = "Blessing of the Trickster",
                     max = c.proficiencyBonus,
                     recharge = Recharge.LONG_REST,
@@ -914,6 +927,7 @@ object ResourceData {
             "devotion" -> if (level >= 20) listOf(
                 ResourceDef(
                     id = "devotion:holy_nimbus",
+                    actionCost = "Bonus Action",
                     name = "Holy Nimbus",
                     max = 1,
                     recharge = Recharge.LONG_REST,
@@ -924,6 +938,7 @@ object ResourceData {
             "vengeance" -> if (level >= 20) listOf(
                 ResourceDef(
                     id = "vengeance:avenging_angel",
+                    actionCost = "Bonus Action",
                     name = "Avenging Angel",
                     max = 1,
                     recharge = Recharge.LONG_REST,
@@ -954,6 +969,7 @@ object ResourceData {
                 if (level >= 9) add(
                     ResourceDef(
                         id = "alchemist:restorative_reagents",
+                        spellId = "lesser_restoration",
                         name = "Restorative Reagents",
                         max = c.modAtLeastOne(Ability.INT),
                         recharge = Recharge.LONG_REST,
@@ -1034,6 +1050,7 @@ object ResourceData {
                 add(
                     ResourceDef(
                         id = "cartographer:illuminated_cartography",
+                        spellId = "faerie_fire",
                         name = "Illuminated Cartography",
                         description = "You can cast Faerie Fire without expending a spell " +
                             "slot, outlining the affected creatures as if in ink. Your Guided " +
@@ -1048,6 +1065,7 @@ object ResourceData {
                 if (level >= 15) add(
                     ResourceDef(
                         id = "cartographer:unerring_path",
+                        spellId = "find_the_path",
                         name = "Unerring Path",
                         description = "While you are one of the map holders for your " +
                             "Adventurer's Atlas, you can cast Find the Path without expending " +
@@ -1388,6 +1406,7 @@ object ResourceData {
                 if (level >= 6) add(
                     ResourceDef(
                         id = "shadow_sorcery:spirits_of_ill_omen",
+                        spellId = "summon_undead",
                         name = "Summon Undead (free casting)",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -1410,6 +1429,7 @@ object ResourceData {
                 if (level >= 3) add(
                     ResourceDef(
                         id = "hexblade_patron:curse",
+                        spellId = "hex",
                         name = "Hexblade's Curse",
                         max = c.modAtLeastOne(Ability.CHA),
                         recharge = Recharge.LONG_REST,
@@ -1461,6 +1481,7 @@ object ResourceData {
                 if (level >= 6) add(
                     ResourceDef(
                         id = "college_of_spirits:spiritual_manifestation",
+                        spellId = "spirit_guardians",
                         name = "Spirit Guardians (free casting)",
                         max = 1,
                         recharge = Recharge.LONG_REST,
@@ -1494,6 +1515,7 @@ object ResourceData {
                 if (level >= 18) add(
                     ResourceDef(
                         id = "draconic:dragon_companion",
+                        spellId = "summon_dragon",
                         name = "Summon Dragon (free casting)",
                         max = 1,
                         recharge = Recharge.LONG_REST,

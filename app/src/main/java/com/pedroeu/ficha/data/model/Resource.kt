@@ -68,4 +68,20 @@ data class ResourceDef(
     val isCustom: Boolean = false,
     /** Abilities this pool pays for, each with its own rules text. */
     val options: List<ResourceOption> = emptyList(),
+    /**
+     * What using it costs on your turn — "Bonus Action", "Magic action", "Reaction" — for the
+     * pools whose summary doesn't say.
+     *
+     * Most say it in their own words and are read straight; this is for the ones whose
+     * description is a one-line paraphrase that dropped the cost, and for the handful the
+     * rules genuinely leave to the feature that spends them. Empty means "work it out".
+     */
+    val actionCost: String = "",
+    /**
+     * The spell this pool exists to cast for free, when that is what it is.
+     *
+     * Free Divine Smite costs a Bonus Action for exactly one reason: Divine Smite does. Naming
+     * the spell rather than repeating its casting time keeps the two from drifting apart.
+     */
+    val spellId: String = "",
 )

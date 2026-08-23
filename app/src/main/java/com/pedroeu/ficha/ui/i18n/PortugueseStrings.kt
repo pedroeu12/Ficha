@@ -181,6 +181,12 @@ object PortugueseStrings {
 
         // ---------------------------------------------------------------- Resources
         "Limited Uses" to "Usos Limitados",
+        // The headings the limited-use trackers are split under, one per action a
+        // round gives you.
+        "Action" to "A\u00e7\u00e3o",
+        "Bonus Action" to "A\u00e7\u00e3o B\u00f4nus",
+        "Reaction" to "Rea\u00e7\u00e3o",
+        "No action or varies" to "Sem a\u00e7\u00e3o ou varia",
         "Comes back on" to "Recupera em",
         "What comes back" to "O que recupera",
         "How to spend it" to "Como gastar",

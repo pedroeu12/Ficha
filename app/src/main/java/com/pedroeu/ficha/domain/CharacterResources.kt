@@ -82,11 +82,25 @@ object CharacterResources {
      * Shot). Both carry their own rules text so the sheet can explain each one.
      */
     fun optionsFor(character: PlayerCharacter, resourceId: String): List<ResourceOption> {
-        val granted = ResourceOptionData.forResource(
-            resourceId = resourceId,
-            subclassId = character.subclassId,
-            level = character.level,
-        )
+        // Every subclass the character holds, at the level they hold it in — a multiclassed
+        // Cleric/Paladin has two Channel Divinity pools and each one's options come from its
+        // own subclass, not from whichever subclass the plain field happens to name.
+        val granted = ClassLevels.of(character)
+            .flatMap { entry ->
+                ResourceOptionData.forResource(
+                    resourceId = resourceId,
+                    subclassId = entry.subclassId,
+                    level = entry.level,
+                )
+            }
+            .ifEmpty {
+                ResourceOptionData.forResource(
+                    resourceId = resourceId,
+                    subclassId = character.subclassId,
+                    level = character.level,
+                )
+            }
+            .distinctBy { it.id }
 
         val chosen = ChoiceResolver.all(character)
             .filter { it.choice.resourceId == resourceId }

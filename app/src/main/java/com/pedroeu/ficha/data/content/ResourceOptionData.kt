@@ -67,12 +67,6 @@ object ResourceOptionData {
                 "weapon or an Unarmed Strike against a creature within 60 feet.",
             unlockLevel = 3,
         ),
-        option(
-            "uncanny_metabolism_note", "Spending on Subclass Features", "Varies", "Varies",
-            "Your subclass adds its own uses for Focus Points. Those appear on the Features " +
-                "tab under the subclass feature that grants them.",
-            unlockLevel = 3,
-        ),
     )
 
     private val MERCY_FOCUS = listOf(
@@ -491,6 +485,59 @@ object ResourceOptionData {
             ?.takeIf { it.first == resourceId }
             ?.second
             .orEmpty()
-        return (base + fromSubclass).filter { it.unlockLevel <= level }
+        val curated = base + fromSubclass
+        val derived = derivedFrom(resourceId, subclassId)
+            // A curated entry wins: the Monk subclasses have hand-written text with the
+            // Focus Point cost spelled out, which is better than the feature blurb.
+            .filterNot { d -> curated.any { it.name.equals(d.name, ignoreCase = true) } }
+        return (curated + derived).filter { it.unlockLevel <= level }
+    }
+
+    /**
+     * The pools a subclass feature can say it spends, and the name it calls each one.
+     *
+     * Deriving these beats listing them: a subclass already carries the level, name and rules
+     * text of every feature it grants, and repeating that in a second table is how fifteen
+     * Paladin and Cleric options came to be missing from the Channel Divinity tracker while
+     * the features themselves were on the sheet the whole time.
+     */
+    private val SPENT_BY: Map<String, Regex> = mapOf(
+        "cleric:channel_divinity" to spendRegex("Channel Divinity"),
+        "paladin:channel_divinity" to spendRegex("Channel Divinity"),
+        "bard:inspiration" to spendRegex("Bardic Inspiration"),
+        "monk:focus" to spendRegex("Focus Point"),
+        "druid:wild_shape" to spendRegex("Wild Shape"),
+        "sorcerer:sorcery_points" to spendRegex("Sorcery Point"),
+        "battle_master:superiority" to spendRegex("[Ss]uperiority [Dd]i"),
+        "barbarian:rage" to spendRegex("Rage"),
+    )
+
+    /**
+     * Matches a feature that *spends* the pool, not one that merely mentions it.
+     *
+     * Most Barbarian subclass features say "While raging", which costs nothing; only the ones
+     * that expend a use belong on a tracker.
+     */
+    private fun spendRegex(name: String) =
+        Regex("""(?:[Ss]pend|[Ee]xpend(?:ing|s)?)[^.]{0,60}?$name""")
+
+    private fun derivedFrom(resourceId: String, subclassId: String?): List<ResourceOption> {
+        val spends = SPENT_BY[resourceId] ?: return emptyList()
+        val subclass = subclassId?.let { SubclassData.byId(it) } ?: return emptyList()
+        // The pool is named for the class that grants it, so a Cleric domain must not add
+        // options to a Paladin's tracker just because both are called Channel Divinity.
+        if (!resourceId.startsWith("${subclass.classId}:")) return emptyList()
+
+        return subclass.features
+            .filter { spends.containsMatchIn(it.description) }
+            .map { feature ->
+                ResourceOption(
+                    id = "${subclass.id}:" + feature.name.lowercase().replace(Regex("[^a-z0-9]+"), "_"),
+                    name = feature.name,
+                    cost = "1 use",
+                    description = feature.description,
+                    unlockLevel = feature.level,
+                )
+            }
     }
 }

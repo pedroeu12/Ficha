@@ -38,6 +38,40 @@ object PerUseChoiceData {
 
     val ALL: List<PerUseChoice> = listOf(
 
+        // ---------------------------------------------------------------- Barbarian
+        PerUseChoice(
+            id = "spiritual_guardian:spiritual_protectors",
+            label = "Spiritual Protectors",
+            prompt = "What do the spirits do on this hit? You choose again on every hit you " +
+                "land while your Rage is active.",
+            source = "Spiritual Protectors",
+            resourceId = "barbarian:rage",
+            subclassId = "spiritual_guardian",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "distract", "Distract",
+                    "Until the start of your next turn, the target has Disadvantage on " +
+                        "attack rolls against targets other than you or another Barbarian " +
+                        "who has this feature.",
+                    "On a hit",
+                ),
+                ChoiceOption(
+                    "protect", "Protect",
+                    "Until the end of the target's next turn, the next time it hits a " +
+                        "creature other than you with an attack roll, that creature has " +
+                        "Resistance to the damage dealt by the attack.",
+                    "On a hit",
+                ),
+                ChoiceOption(
+                    "strike", "Strike",
+                    "The target takes an extra 1d6 damage, which can be Acid, Cold, Fire, " +
+                        "Force, Lightning, or Thunder damage (your choice).",
+                    "On a hit",
+                ),
+            ),
+        ),
+
         // ---------------------------------------------------------------- Artificer
         PerUseChoice(
             id = "artillerist:cannon_activation",

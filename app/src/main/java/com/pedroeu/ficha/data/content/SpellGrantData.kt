@@ -205,6 +205,11 @@ object SpellGrantData {
         // for it; the other two cantrips are chosen.
         "arcane_trickster" to at(3, "mage_hand"),
 
+        // ---- Unearthed Arcana 2025: Updated Subclasses
+        // Consult the Spirits casts one of the two without a slot, so both belong on the
+        // list even though the Barbarian has no spellcasting of its own.
+        "spiritual_guardian" to at(10, "augury", "clairvoyance"),
+
         // ---- Unearthed Arcana 2026: Villainous Options 2
         // Commune with the Dead: a Ritual-only casting, so it belongs on the list even though
         // the Barbarian otherwise has no spells at all.

@@ -410,6 +410,18 @@ object SubclassData {
                 f(10, "Retaliation", "As a Reaction when a creature within 5 feet damages you, make a melee attack against it."),
                 f(14, "Intimidating Presence", "As a Bonus Action, force nearby creatures to make a Wisdom save or be Frightened of you."),
             )),
+        // The article renames this one: it is the Path of the Ancestral Guardian from
+        // Xanathar's, rebuilt and reprinted as the Path of the Spiritual Guardian. The old
+        // name is kept in the summary so a player looking for it finds it in a search.
+        Subclass("spiritual_guardian", "barbarian", "Path of the Spiritual Guardian",
+            "Call ancestral, bestial, or elemental spirits into your Rage to distract, shield, and strike. Formerly the Path of the Ancestral Guardian.",
+            listOf(
+                f(3, "Spiritual Protectors", "Your Rage summons spectral warriors to your aid. While your Rage is active, when you hit a creature with a weapon or an Unarmed Strike, it suffers one of the following effects of your choice. Distract: until the start of your next turn, the target has Disadvantage on attack rolls against targets other than you or another Barbarian who has this feature. Protect: until the end of the target's next turn, the next time it hits a creature other than you with an attack roll, that creature has Resistance to the damage dealt by the attack. Strike: the target takes an extra 1d6 damage, which can be Acid, Cold, Fire, Force, Lightning, or Thunder damage (your choice)."),
+                f(6, "Spirit Shield", "Your guardian spirits can provide supernatural protection to those you defend. While your Rage is active, when another creature you can see within 30 feet of you takes damage, you can take a Reaction to reduce that damage. To determine the amount the damage is reduced by, roll a number of d6s equal to your Rage Damage bonus, and add them together."),
+                f(10, "Consult the Spirits", "You gain the ability to consult with your guardian spirits. When you do so, you cast the Augury or Clairvoyance spell, without expending a spell slot or needing Material components. Rather than creating a spherical sensor, this use of Clairvoyance invisibly summons one of your guardian spirits to the chosen location. Wisdom is your spellcasting ability for these spells. After you cast either spell in this way, you can't use this feature again until you finish a Short or Long Rest."),
+                f(14, "Vengeful Spirits", "When you make an attack roll with a Melee weapon as part of the Attack action and roll 18-20 on the d20, you can make one additional attack roll with the same weapon as part of that action. Once you use this feature, you can't do so again until the start of your next turn."),
+            ),
+            book = UA_SUB),
         Subclass("wild_heart", "barbarian", "Path of the Wild Heart",
             "Draw on animal spirits for speed, senses, and unnatural resilience.",
             listOf(

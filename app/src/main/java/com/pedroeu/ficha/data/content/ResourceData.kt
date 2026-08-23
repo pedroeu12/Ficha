@@ -876,6 +876,18 @@ object ResourceData {
                 )
             ) else emptyList()
 
+            // One casting of Augury or Clairvoyance, then it is spent until a rest.
+            "spiritual_guardian" -> if (level >= 10) listOf(
+                ResourceDef(
+                    id = "spiritual_guardian:consult_the_spirits",
+                    name = "Consult the Spirits",
+                    max = 1,
+                    recharge = Recharge.SHORT_REST,
+                    source = "Path of the Spiritual Guardian",
+                    notes = "Casts Augury or Clairvoyance with Wisdom, no slot or Material components.",
+                )
+            ) else emptyList()
+
             "world_tree" -> if (level >= 6) listOf(
                 ResourceDef(
                     id = "world_tree:branches",

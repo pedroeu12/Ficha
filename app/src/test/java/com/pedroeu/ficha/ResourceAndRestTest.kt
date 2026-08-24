@@ -177,11 +177,15 @@ class ResourceAndRestTest {
 
     // ------------------------------------------------------------------ Rests
 
+    /** Hit Dice spent from one class's pool, which is what a Short Rest now takes. */
+    private fun dice(classId: String, vararg rolls: Int) =
+        rolls.map { RestEngine.DieSpent(classId, it) }
+
     @Test
     fun `a short rest heals per die plus constitution and spends the dice`() {
         val con = 2 // Constitution 14
         val fighter = character("fighter", level = 5).copy(currentHitPoints = 10)
-        val outcome = RestEngine.shortRest(fighter, listOf(6, 4))
+        val outcome = RestEngine.shortRest(fighter, dice("fighter", 6, 4))
 
         assertEquals(2, outcome.hitDiceSpent)
         assertEquals((6 + con) + (4 + con), outcome.hitPointsRegained)
@@ -195,7 +199,7 @@ class ResourceAndRestTest {
             currentHitPoints = 1,
             hitDiceSpent = 1,
         )
-        val outcome = RestEngine.shortRest(fighter, listOf(5, 5, 5))
+        val outcome = RestEngine.shortRest(fighter, dice("fighter", 5, 5, 5))
         assertEquals("only one die was left", 1, outcome.hitDiceSpent)
         assertEquals(2, outcome.character.hitDiceSpent)
     }
@@ -205,7 +209,7 @@ class ResourceAndRestTest {
         val fighter = character("fighter", level = 5)
         val max = CharacterCalculations.maxHitPoints(fighter)
         val full = fighter.copy(currentHitPoints = max)
-        val outcome = RestEngine.shortRest(full, listOf(10))
+        val outcome = RestEngine.shortRest(full, dice("fighter", 10))
         assertEquals(0, outcome.hitPointsRegained)
         assertEquals(max, outcome.character.currentHitPoints)
     }

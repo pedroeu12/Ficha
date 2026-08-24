@@ -15,6 +15,7 @@ import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.domain.ArtificerItems
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterHitDice
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.domain.CustomAttack
@@ -109,8 +110,9 @@ class SheetViewModel(
         it.copy(temporaryHitPoints = value.coerceAtLeast(0))
     }
 
-    fun setHitDiceSpent(value: Int) = update { character ->
-        character.copy(hitDiceSpent = value.coerceIn(0, character.level))
+    /** Sets how many of one class's Hit Dice are spent. */
+    fun setHitDiceSpent(classId: String, value: Int) = update { character ->
+        CharacterHitDice.withSpent(character, classId, value)
     }
 
     fun setDeathSaves(successes: Int, failures: Int) = update {
@@ -634,7 +636,7 @@ class SheetViewModel(
 
     // ------------------------------------------------------------------ Rests
 
-    fun shortRest(diceRolls: List<Int>): RestOutcome? {
+    fun shortRest(diceRolls: List<RestEngine.DieSpent>): RestOutcome? {
         val current = _character.value ?: return null
         val outcome = RestEngine.shortRest(current, diceRolls)
         _character.value = outcome.character
@@ -642,9 +644,12 @@ class SheetViewModel(
         return outcome
     }
 
-    fun rollHitDie(): Int {
+    /** Rolls one of [classId]'s Hit Dice. */
+    fun rollHitDie(classId: String): Int {
         val current = _character.value ?: return 1
-        return RestEngine.rollHitDie(CharacterCalculations.hitDie(current))
+        val die = CharacterHitDice.pools(current)
+            .firstOrNull { it.classId == classId }?.die ?: 8
+        return RestEngine.rollHitDie(die)
     }
 
     fun longRestDetailed(): RestOutcome? {

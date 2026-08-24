@@ -50,7 +50,15 @@ fun WrittenLine(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(6.dp))
-            .clickable { handle.editText(key, label, override ?: "") }
+            .then(
+                // Writable in Edit Mode only, matching the phone. Out of it these are a
+                // record to read, and a tap that lands here is a tap that missed.
+                if (handle.editMode) {
+                    Modifier.clickable { handle.editText(key, label, override ?: "") }
+                } else {
+                    Modifier
+                }
+            )
             .padding(vertical = 5.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {

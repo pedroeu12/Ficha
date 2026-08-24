@@ -42,6 +42,7 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterHitDice
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
@@ -74,13 +75,17 @@ fun RestSheet(
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var rolls by remember { mutableStateOf<List<Int>>(emptyList()) }
+    var rolls by remember { mutableStateOf<List<RestEngine.DieSpent>>(emptyList()) }
     var outcome by remember { mutableStateOf<RestOutcome?>(null) }
 
-    val hitDie = CharacterCalculations.hitDie(character)
     val conMod = CharacterCalculations.abilityModifiers(character)[Ability.CON] ?: 0
+    // Each class has its own dice, so what is left is counted per pool: a Fighter 5 / Wizard 3
+    // who has spent every d10 still has three d6s, and one button for "a Hit Die" cannot say
+    // which of the two it means.
+    val pools = CharacterHitDice.pools(character)
+    val spentHere = rolls.groupingBy { it.classId }.eachCount()
     val available = RestEngine.availableHitDice(character) - rolls.size
-    val projectedHealing = rolls.sumOf { (it + conMod).coerceAtLeast(1) }
+    val projectedHealing = rolls.sumOf { (it.roll + conMod).coerceAtLeast(1) }
 
     val restChangeable = ChoiceResolver.restChangeable(character)
 
@@ -128,7 +133,7 @@ fun RestSheet(
                 RestCard {
                     SectionHeader(
                         tr("Hit Dice"),
-                        trailing = "${available} of ${character.level} left",
+                        trailing = "$available of ${CharacterHitDice.totalDice(character)} left",
                     )
                     Text(
                         text = "Each die you spend restores its roll plus your Constitution " +
@@ -140,7 +145,7 @@ fun RestSheet(
 
                     if (rolls.isNotEmpty()) {
                         Text(
-                            text = rolls.joinToString(" + ") { "$it${
+                            text = rolls.joinToString(" + ") { "${it.roll}${
                                 if (conMod >= 0) "+$conMod" else "$conMod"
                             }" } + "  =  $projectedHealing hit points",
                             style = MaterialTheme.typography.bodyMedium,
@@ -150,20 +155,41 @@ fun RestSheet(
                         )
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(
-                            onClick = { rolls = rolls + viewModel.rollHitDie() },
-                            enabled = available > 0,
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Icon(Icons.Default.Casino, contentDescription = null)
-                            Text(trf("  Roll d{0}", hitDie))
+                    // A row of buttons per pool. One class is the common case and reads as
+                    // it always did; two classes get to choose which die they are spending.
+                    pools.forEach { pool ->
+                        val left = pool.remaining - (spentHere[pool.classId] ?: 0)
+                        if (pools.size > 1) {
+                            Text(
+                                text = "${pool.className} — ${pool.label}, $left left",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.padding(top = 6.dp),
+                            )
                         }
-                        OutlinedButton(
-                            onClick = { rolls = rolls + (hitDie / 2 + 1) },
-                            enabled = available > 0,
-                            modifier = Modifier.weight(1f),
-                        ) { Text(tr("Average")) }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = {
+                                    rolls = rolls + RestEngine.DieSpent(
+                                        pool.classId, viewModel.rollHitDie(pool.classId),
+                                    )
+                                },
+                                enabled = left > 0,
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                Icon(Icons.Default.Casino, contentDescription = null)
+                                Text(trf("  Roll d{0}", pool.die))
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    rolls = rolls + RestEngine.DieSpent(
+                                        pool.classId, pool.die / 2 + 1,
+                                    )
+                                },
+                                enabled = left > 0,
+                                modifier = Modifier.weight(1f),
+                            ) { Text(tr("Average")) }
+                        }
                     }
                     if (rolls.isNotEmpty()) {
                         TextButton(onClick = { rolls = emptyList() }) { Text(tr("Clear dice")) }

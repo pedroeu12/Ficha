@@ -160,7 +160,16 @@ fun CharacterSheetScreen(
 
         // Given the width, the sheet is laid out like the printed one rather than paged
         // through. Which happens is the player's choice, defaulting to whatever fits.
-        BoxWithConstraints(Modifier.fillMaxSize()) {
+        //
+        // weight, not fillMaxSize. Inside a Column, fillMaxSize measures against the whole
+        // screen rather than what the app bar left over, so the sheet was laid out an app
+        // bar too tall and the last rows of it fell off the bottom. Edit Mode made it worse
+        // by a banner's height, which is why Edit Mode looked like the thing that was broken.
+        BoxWithConstraints(
+            Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
             if (layout.mode.isWide(maxWidth)) {
                 TabletSheetScreen(loaded, viewModel, editMode)
                 return@BoxWithConstraints
@@ -214,7 +223,11 @@ private fun PhoneSheet(
 
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize(),
+            // The same reason as the sheet above: fillMaxSize under a tab row measures
+            // against the whole column and hangs a tab row's worth off the bottom.
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
         ) { page ->
             when (TABS[page]) {
                 "Stats" -> StatsTab(character, viewModel, editMode)

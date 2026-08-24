@@ -28,26 +28,36 @@ object RestEngine {
     fun rollHitDie(hitDie: Int, random: Random = Random): Int = random.nextInt(1, hitDie + 1)
 
     fun availableHitDice(character: PlayerCharacter): Int =
-        (character.level - character.hitDiceSpent).coerceAtLeast(0)
+        CharacterHitDice.remaining(character)
+
+    /** One Hit Die spent: which class's pool it came out of, and what it rolled. */
+    data class DieSpent(val classId: String, val roll: Int)
 
     /**
-     * Spends [diceRolls] Hit Dice. Each entry is a die result; the Constitution modifier is
-     * added per die and a die never heals less than 1.
+     * Spends [diceSpent] Hit Dice. Each entry names the class whose die it was and what it
+     * rolled; the Constitution modifier is added per die and a die never heals less than 1.
+     *
+     * Naming the class matters for a multiclassed character: their d10s and their d6s are
+     * different pools, and spending one is not spending the other.
      */
-    fun shortRest(character: PlayerCharacter, diceRolls: List<Int>): RestOutcome {
-        val available = availableHitDice(character)
-        val rolls = diceRolls.take(available)
+    fun shortRest(character: PlayerCharacter, diceSpent: List<DieSpent>): RestOutcome {
         val conMod = CharacterCalculations.abilityModifiers(character)[Ability.CON] ?: 0
         val max = CharacterCalculations.maxHitPoints(character)
 
-        val healing = rolls.sumOf { (it + conMod).coerceAtLeast(1) }
+        // Take each die off its own pool, dropping any the character can no longer pay for.
+        var spending = character
+        val rolls = diceSpent.filter { die ->
+            val before = CharacterHitDice.pools(spending).firstOrNull { it.classId == die.classId }
+            if (before == null || before.remaining <= 0) return@filter false
+            spending = CharacterHitDice.spendOne(spending, die.classId)
+            true
+        }
+
+        val healing = rolls.sumOf { (it.roll + conMod).coerceAtLeast(1) }
         val newHp = (character.currentHitPoints + healing).coerceAtMost(max)
         val actuallyHealed = newHp - character.currentHitPoints
 
-        var rested = character.copy(
-            currentHitPoints = newHp,
-            hitDiceSpent = character.hitDiceSpent + rolls.size,
-        )
+        var rested = spending.copy(currentHitPoints = newHp)
 
         val restored = CharacterResources.byRecharge(rested, Recharge.SHORT_REST)
             .filter { it.spent > 0 }
@@ -72,7 +82,7 @@ object RestEngine {
 
     /** Hit Dice recovered by a Long Rest: half your total, at least one. */
     fun hitDiceRecoveredOnLongRest(character: PlayerCharacter): Int =
-        (character.level / 2).coerceAtLeast(1)
+        (CharacterHitDice.totalDice(character) / 2).coerceAtLeast(1)
 
     fun longRest(character: PlayerCharacter): RestOutcome {
         val max = CharacterCalculations.maxHitPoints(character)
@@ -82,10 +92,9 @@ object RestEngine {
             .filter { it.spent > 0 && it.def.recharge.refilledBy(Recharge.LONG_REST) }
             .map { it.def.name }
 
-        var rested = character.copy(
+        var rested = CharacterHitDice.withRecovered(character, recovered).copy(
             currentHitPoints = max,
             temporaryHitPoints = 0,
-            hitDiceSpent = (character.hitDiceSpent - recovered).coerceAtLeast(0),
             deathSaves = DeathSaves(),
             spellSlotsExpended = emptyMap(),
         )

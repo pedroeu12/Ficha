@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterHitDice
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -382,8 +383,8 @@ private fun HitPointsCard(
             SectionHeader(
                 tr("Hit Points"),
                 // A multiclass character has a mix, e.g. "5d10 + 3d6", so show the breakdown.
-                trailing = "Hit Dice: ${character.level - character.hitDiceSpent}/" +
-                    "${character.level} ${ClassLevels.hitDiceLabel(character)}",
+                trailing = "Hit Dice: ${CharacterHitDice.remaining(character)}/" +
+                    "${CharacterHitDice.totalDice(character)} ${ClassLevels.hitDiceLabel(character)}",
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -496,20 +497,36 @@ private fun HitPointsCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                QuickAdjustButton(
-                    label = "-1",
-                    onClick = { viewModel.setHitDiceSpent(character.hitDiceSpent - 1) },
-                )
-                Text(
-                    text = "${character.hitDiceSpent}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                )
-                QuickAdjustButton(
-                    label = "+1",
-                    onClick = { viewModel.setHitDiceSpent(character.hitDiceSpent + 1) },
-                )
+            }
+            // One counter per class, because the dice are not interchangeable: spending a d10
+            // is not spending a d6, and a single number could not say which had gone.
+            CharacterHitDice.pools(character).forEach { pool ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "${pool.className} · ${pool.label}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                    )
+                    QuickAdjustButton(
+                        label = "-1",
+                        onClick = { viewModel.setHitDiceSpent(pool.classId, pool.spent - 1) },
+                    )
+                    Text(
+                        text = "${pool.spent}",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    )
+                    QuickAdjustButton(
+                        label = "+1",
+                        onClick = { viewModel.setHitDiceSpent(pool.classId, pool.spent + 1) },
+                    )
+                }
             }
         }
     }

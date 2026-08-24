@@ -96,7 +96,15 @@ fun TabletSheetScreen(
                 Masthead(handle)
                 LeafTabs(leaf) { leaf = it }
 
-                Box(Modifier.fillMaxSize()) {
+                // weight, not fillMaxSize. Inside a Column, fillMaxSize measures against the
+                // whole page rather than what the masthead and the tabs left over, so the
+                // leaf was laid out a masthead's worth too tall and ran off the bottom of
+                // the screen — taking the last rows of every leaf with it.
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
                     when (leaf) {
                         0 -> LeafCharacter(handle)
                         1 -> LeafFeatures(handle)

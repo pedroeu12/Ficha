@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -34,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterAttacks
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.CharacterHitDice
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.ui.i18n.trf
@@ -112,8 +115,10 @@ private fun ConditionBlock(handle: SheetHandle) {
     val v = LocalVellum.current
     val character = handle.character
     val max = CharacterCalculations.maxHitPoints(character)
-    val hitDie = CharacterCalculations.hitDie(character)
-    val diceLeft = (character.level - character.hitDiceSpent).coerceAtLeast(0)
+    // Each class brings its own die, so this is a list of pools rather than one number.
+    val pools = CharacterHitDice.pools(character)
+    val diceLeft = CharacterHitDice.remaining(character)
+    val diceTotal = CharacterHitDice.totalDice(character)
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         EngravedHeading(tr("Hit Points"))
@@ -125,7 +130,13 @@ private fun ConditionBlock(handle: SheetHandle) {
                 Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(10.dp))
-                    .clickable { handle.editStat(OverridableStat.MAX_HIT_POINTS) },
+                    .then(
+                        if (handle.editMode) {
+                            Modifier.clickable { handle.editStat(OverridableStat.MAX_HIT_POINTS) }
+                        } else {
+                            Modifier
+                        }
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
@@ -158,34 +169,51 @@ private fun ConditionBlock(handle: SheetHandle) {
                     Caption(tr("Temp HP"), align = TextAlign.Center)
                 }
             }
-            Stone(modifier = Modifier.weight(1f), onClick = {
-                handle.viewModel.setTemporaryHitPoints(0)
-            }) {
+            // Not a button: it was wired to clear the Temp HP beside it, which is what the
+            // tile above does and the last thing this one should.
+            Stone(modifier = Modifier.weight(1f)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("d$hitDie", style = NumeralMedium, color = v.ink)
-                    Caption(tr("Hit Die"), align = TextAlign.Center)
+                    Text(
+                        text = ClassLevels.hitDiceLabel(character),
+                        style = NumeralMedium.copy(
+                            fontSize = if (pools.size > 1) 15.sp else 20.sp,
+                        ),
+                        color = v.ink,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                    )
+                    Caption(tr("Hit Dice"), align = TextAlign.Center)
                 }
             }
         }
 
-        // Hit dice, as pips you spend — the same gesture as everything else on the sheet.
+        // Hit dice, as pips you spend — the same gesture as everything else on the sheet, but
+        // one row per class: a d10 and a d6 are different dice and spending one is not
+        // spending the other.
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Caption(trf("Hit Dice — {0} of {1} left", diceLeft, character.level))
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                (1..character.level).forEach { index ->
-                    val spent = index <= character.hitDiceSpent
-                    Pip(
-                        filled = spent,
-                        tint = v.inkSoft,
-                        onClick = {
-                            handle.viewModel.setHitDiceSpent(
-                                if (character.hitDiceSpent == index) index - 1 else index
+            Caption(trf("Hit Dice — {0} of {1} left", diceLeft, diceTotal))
+            pools.forEach { pool ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (pools.size > 1) {
+                        Caption(pool.label, modifier = Modifier.width(52.dp))
+                    }
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        (1..pool.total).forEach { index ->
+                            Pip(
+                                filled = index <= pool.spent,
+                                tint = v.inkSoft,
+                                onClick = {
+                                    handle.viewModel.setHitDiceSpent(
+                                        pool.classId,
+                                        if (pool.spent == index) index - 1 else index,
+                                    )
+                                },
                             )
-                        },
-                    )
+                        }
+                    }
                 }
             }
         }
@@ -309,33 +337,82 @@ private fun AttacksLedger(handle: SheetHandle) {
             listOf(
                 tr("Name") to 1.6f,
                 tr("Atk") to 0.5f,
-                tr("Damage") to 1.1f,
-                tr("Notes") to 1.8f,
+                tr("Damage") to 0.9f,
+                tr("Type") to 0.7f,
+                tr("Notes") to 1.6f,
             )
         )
 
         attacks.forEachIndexed { index, attack ->
-            LedgerRow(index) {
+            LedgerRow(
+                index,
+                // Out of Edit Mode a tap opens the one the player wrote, which is where its
+                // arithmetic lives. In Edit Mode a tap belongs to whichever cell it landed on.
+                onClick = if (!handle.editMode && attack.isCustom) {
+                    { handle.character.customAttacks.find { it.id == attack.id }
+                        ?.let(handle::editAttack) }
+                } else {
+                    null
+                },
+            ) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AttackCell(handle, attack, "name", attack.name, 1.6f, emphasis = true)
+                        AttackCell(handle, attack, "bonus", attack.shownBonus, 0.5f, emphasis = true)
+                        AttackCell(handle, attack, "damage", attack.damage, 0.9f)
+                        AttackCell(handle, attack, "damageType", attack.damageType, 0.7f, soft = true)
+                        AttackCell(handle, attack, "notes", attack.notes, 1.6f, soft = true)
+                    }
+
+                    if (attack.masteryProperty.isNotBlank()) {
+                        Caption(trf("Mastery: {0}", attack.masteryProperty))
+                    }
+
+                    // Reordering and taking a line off the sheet change the sheet's shape
+                    // rather than what happens at the table, so they are Edit Mode work.
+                    if (handle.editMode) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            PenMark(tr("Move up"), glyph = "↑") {
+                                handle.viewModel.moveAttack(attack.id, up = true)
+                            }
+                            PenMark(tr("Move down"), glyph = "↓") {
+                                handle.viewModel.moveAttack(attack.id, up = false)
+                            }
+                            if (attack.isCustom) {
+                                PenMark(tr("Edit"), glyph = "✎") {
+                                    handle.character.customAttacks.find { it.id == attack.id }
+                                        ?.let(handle::editAttack)
+                                }
+                            }
+                            Spacer(Modifier.weight(1f))
+                            PenMark(
+                                // A derived line comes back on the next read, so "delete"
+                                // would be a lie for anything but a written one.
+                                if (attack.isCustom) tr("Delete") else tr("Take off the sheet"),
+                                glyph = "×",
+                            ) { handle.viewModel.hideAttack(attack.id) }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Hidden lines are listed in Edit Mode only: they are off the sheet on purpose, and
+        // one hidden by mistake still has to be findable.
+        val hidden = handle.character.hiddenAttackIds
+        if (handle.editMode && hidden.isNotEmpty()) {
+            Caption(tr("Hidden"))
+            hidden.sorted().forEach { id ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    InkedValue(attack.name, Modifier.weight(1.6f), emphasis = true)
-                    Text(
-                        text = CharacterCalculations.formatModifier(attack.attackBonus),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                        color = v.ink,
-                        modifier = Modifier.weight(0.5f),
-                    )
                     SheetText(
-                        text = "${attack.damage} ${attack.damageType}".trim(),
-                        modifier = Modifier.weight(1.1f),
-                    )
-                    SheetText(
-                        text = attack.notes.ifBlank { "—" },
+                        text = handle.character.textOverrides["attack:$id:name"] ?: id,
                         soft = true,
-                        modifier = Modifier.weight(1.8f),
+                        modifier = Modifier.weight(1f),
                     )
+                    PenMark(tr("Put back"), glyph = "+") { handle.viewModel.showAttack(id) }
                 }
             }
         }
@@ -347,6 +424,34 @@ private fun AttacksLedger(handle: SheetHandle) {
             )
         }
     }
+}
+
+/**
+ * One cell of the attacks ledger, written over by an override keyed on the line.
+ *
+ * The same keys the phone uses, so a bonus rewritten on one shows up on the other — the sheet
+ * is the character's, not the screen's.
+ */
+@Composable
+private fun RowScope.AttackCell(
+    handle: SheetHandle,
+    attack: com.pedroeu.ficha.domain.AttackLine,
+    field: String,
+    value: String,
+    weight: Float,
+    emphasis: Boolean = false,
+    soft: Boolean = false,
+) {
+    val key = "attack:${attack.id}:$field"
+    InkField(
+        value = value,
+        editMode = handle.editMode,
+        overridden = handle.character.textOverrides.containsKey(key),
+        onEdit = { handle.editText(key, field, handle.character.textOverrides[key] ?: value) },
+        emphasis = emphasis,
+        soft = soft,
+        modifier = Modifier.weight(weight),
+    )
 }
 
 /**

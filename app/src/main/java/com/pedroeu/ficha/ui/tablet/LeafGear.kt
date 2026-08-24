@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.ui.i18n.trf
@@ -223,6 +224,58 @@ fun LeafGear(handle: SheetHandle) {
                     placeholder = tr("Tap to add your own notes"),
                     onEdit = { handle.editText("bio:notes", tr("Session Notes"), character.notes) },
                 )
+            }
+
+            // The books this character may draw on, which the phone offers in Edit Mode and
+            // the tablet offered nowhere at all — leaving a tablet-only table unable to turn
+            // a supplement on after the character was made.
+            if (handle.editMode) {
+                item { BooksBlock(handle) }
+            }
+        }
+    }
+}
+
+/**
+ * Which books this character's pickers may offer.
+ *
+ * Narrowing the set never takes anything off the sheet — a spell already learned is still
+ * theirs — so this is safe to change mid-campaign, and the caption says so.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun BooksBlock(handle: SheetHandle) {
+    val enabled = handle.character.enabledSources
+
+    Leaf(tr("Books")) {
+        SheetText(
+            tr(
+                "Which books this character may draw on. Changing this only changes what " +
+                    "future pickers offer - nothing already on the sheet is taken away.",
+            ),
+            soft = true,
+        )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Sourcebook.ALL.forEach { book ->
+                val on = book in enabled
+                Row(
+                    Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            handle.viewModel.setSources(
+                                if (on) enabled - book else enabled + book,
+                            )
+                        }
+                        .padding(horizontal = 4.dp, vertical = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Pip(filled = on)
+                    SheetText(book.displayName, soft = !on)
+                }
             }
         }
     }

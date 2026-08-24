@@ -205,7 +205,8 @@ private fun SpellStone(
     val v = LocalVellum.current
     Stone(
         modifier = Modifier.widthIn(min = 96.dp),
-        onClick = { handle.editStat(stat) },
+        // Edit Mode only, like every other overridable number on the sheet.
+        onClick = if (handle.editMode) ({ handle.editStat(stat) }) else null,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(

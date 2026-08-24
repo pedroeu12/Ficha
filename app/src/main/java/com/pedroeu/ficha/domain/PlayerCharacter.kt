@@ -255,7 +255,22 @@ data class PlayerCharacter(
 
     val currentHitPoints: Int = 0,
     val temporaryHitPoints: Int = 0,
+    /**
+     * Hit Dice spent, for a character with one class.
+     *
+     * Kept because every sheet saved before multiclassing existed holds its count here, and
+     * because a single-class character has nothing to spread. [hitDiceSpentByClass] is what a
+     * multiclassed one uses; see [com.pedroeu.ficha.domain.CharacterHitDice].
+     */
     val hitDiceSpent: Int = 0,
+    /**
+     * Hit Dice spent per class, because each class brings its own die.
+     *
+     * A Fighter 5 / Wizard 3 has 5d10 and 3d6, not eight of anything, and which one you spend
+     * is a real decision at the table. Empty on a single-class sheet and on every sheet saved
+     * before this existed, both of which fall back to [hitDiceSpent].
+     */
+    val hitDiceSpentByClass: Map<String, Int> = emptyMap(),
     /** Hit points gained at each level after 1st, in level order. */
     val hitPointsPerLevel: List<Int> = emptyList(),
     val deathSaves: DeathSaves = DeathSaves(),

@@ -139,7 +139,14 @@ object ClassLevels {
             .mapValues { (_, entries) -> entries.sumOf { it.level } }
             .toSortedMap()
 
-    /** A label for the sheet, e.g. "5d10 + 3d6". */
+    /**
+     * A label for the sheet, e.g. "5d10 + 3d6".
+     *
+     * Largest die first, which is the order the pools themselves are listed in and the order
+     * a player reads them: the die you would reach for is the one printed first.
+     */
     fun hitDiceLabel(character: PlayerCharacter): String =
-        hitDice(character).entries.joinToString(" + ") { (die, count) -> "${count}d$die" }
+        hitDice(character).entries
+            .sortedByDescending { it.key }
+            .joinToString(" + ") { (die, count) -> "${count}d$die" }
 }

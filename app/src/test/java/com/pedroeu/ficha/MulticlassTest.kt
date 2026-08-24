@@ -96,7 +96,7 @@ class MulticlassTest {
 
         assertEquals(3, dice[6])
         assertEquals(5, dice[10])
-        assertEquals("3d6 + 5d10", ClassLevels.hitDiceLabel(pc))
+        assertEquals("5d10 + 3d6", ClassLevels.hitDiceLabel(pc))
     }
 
     @Test

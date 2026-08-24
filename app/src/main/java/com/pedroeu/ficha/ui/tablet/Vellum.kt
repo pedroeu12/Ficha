@@ -481,6 +481,43 @@ fun InkedValue(
     )
 }
 
+/**
+ * A value on the page that Edit Mode lets the player rewrite.
+ *
+ * The sheet's own answer is shown until someone writes over it; the override is what is shown
+ * after, in the accent ink so the page admits the number is no longer the rules'. Tapping is
+ * live only in Edit Mode, so a stray finger during play can't rewrite a to-hit bonus.
+ */
+@Composable
+fun InkField(
+    value: String,
+    editMode: Boolean,
+    overridden: Boolean,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier,
+    emphasis: Boolean = false,
+    soft: Boolean = false,
+    maxLines: Int = 2,
+) {
+    val v = LocalVellum.current
+    Text(
+        text = value.ifBlank { if (editMode) "—" else "" },
+        style = MaterialTheme.typography.bodyMedium.copy(
+            fontFamily = FontFamily.Serif,
+            fontWeight = if (emphasis) FontWeight.SemiBold else FontWeight.Normal,
+        ),
+        color = when {
+            overridden -> v.accent
+            soft -> v.inkSoft
+            else -> v.ink
+        },
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+            .then(if (editMode) Modifier.clickable(onClick = onEdit) else Modifier),
+    )
+}
+
 /** A gap the width of a printed sheet's gutter. */
 @Composable
 fun Gutter(width: Dp = 20.dp) = Spacer(Modifier.width(width))

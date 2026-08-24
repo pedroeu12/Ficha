@@ -14,6 +14,7 @@ import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevel
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.RestEngine
 import com.pedroeu.ficha.ui.levelup.LevelUpState
 import org.junit.Assert.assertTrue
@@ -69,7 +70,12 @@ class SheetSweepTest {
         guard("armour class") { CharacterCalculations.armorClass(character) }
         guard("hit points") { CharacterCalculations.maxHitPoints(character) }
         guard("spell slots") { CharacterCalculations.spellSlots(character) }
-        guard("short rest") { RestEngine.shortRest(character, List(20) { 5 }) }
+        guard("short rest") {
+            // Twenty dice off the first class, which is more than anyone has: spending past
+            // the pool has to be refused rather than counted.
+            val classId = ClassLevels.of(character).first().classId
+            RestEngine.shortRest(character, List(20) { RestEngine.DieSpent(classId, 5) })
+        }
         guard("long rest") { RestEngine.longRest(character) }
         guard("backup round trip") {
             val restored = CharacterBackup

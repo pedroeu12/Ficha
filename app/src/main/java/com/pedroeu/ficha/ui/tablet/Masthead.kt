@@ -210,7 +210,9 @@ private fun VitalStone(
     val v = LocalVellum.current
     Stone(
         modifier = Modifier.width(STONE_WIDTH),
-        onClick = { handle.editStat(stat) },
+        // Only in Edit Mode, the same as the phone. These are rules calculations, and a stray
+        // tap during play should not open a dialog offering to overrule one.
+        onClick = if (handle.editMode) ({ handle.editStat(stat) }) else null,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(

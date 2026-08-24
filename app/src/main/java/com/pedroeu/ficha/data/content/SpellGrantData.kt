@@ -446,6 +446,26 @@ object SpellGrantData {
     fun choiceGrantSpellIds(): Set<String> =
         BY_CHOICE.values.flatMap { it.grants }.map { it.spellId }.toSet()
 
+    /**
+     * The spells a class hands its members outright by [level], whatever they pick.
+     *
+     * A picker has no business offering these: a Ranger always has Hunter's Mark prepared, so
+     * spending one of their two level 1 choices on it buys nothing, and a Paladin choosing
+     * Divine Smite is choosing something they cannot not have.
+     */
+    fun alwaysPreparedForClass(classId: String, level: Int): Set<String> =
+        BY_CLASS[classId].orEmpty()
+            .filter { it.alwaysPrepared && it.level <= level }
+            .map { it.spellId }
+            .toSet()
+
+    /** The same, for a subclass — its spell list arrives on the level in its own class. */
+    fun alwaysPreparedForSubclass(subclassId: String?, level: Int): Set<String> =
+        BY_SUBCLASS[subclassId].orEmpty()
+            .filter { it.alwaysPrepared && it.level <= level }
+            .map { it.spellId }
+            .toSet()
+
     /** Everything the character is handed outright, before any level filtering. */
     fun forSources(
         classId: String,

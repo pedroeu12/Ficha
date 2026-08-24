@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SpellData
+import com.pedroeu.ficha.data.model.SpellSlotTables
 import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
 
@@ -164,16 +165,24 @@ object CharacterSpells {
         val chosen = all(character).filter { it.level > 0 && it.id !in granted }
         val chosenIds = chosen.map { it.id }.toSet()
 
+        // Slots come from the combined table, but what a class lets you prepare is capped by
+        // your level in *that* class: a Ranger 3 / Wizard 9 has level 5 slots and may still
+        // only prepare level 1 Ranger spells.
         val maxLevel = CharacterCalculations.maxSpellLevel(character)
         val fromClassLists = ClassLevels.of(character)
-            .map { it.classId }
-            .filter { it in PREPARES_FROM_CLASS_LIST }
-            .flatMap { classId ->
-                SpellData.forClassUpTo(classId, maxLevel).map { classId to it }
+            .filter { it.classId in PREPARES_FROM_CLASS_LIST }
+            .flatMap { entry ->
+                val cap = SpellSlotTables
+                    .maxSpellLevel(
+                        CharacterCalculations.casterTypeFor(entry.classId, entry.subclassId),
+                        entry.level,
+                    )
+                    .coerceAtMost(maxLevel)
+                SpellData.forClassUpTo(entry.classId, cap)
+                    .filter { it.level in 1..cap }
+                    .map { entry.classId to it }
             }
-            .filter { (_, spell) ->
-                spell.level in 1..maxLevel && spell.id !in granted && spell.id !in chosenIds
-            }
+            .filter { (_, spell) -> spell.id !in granted && spell.id !in chosenIds }
             .distinctBy { (_, spell) -> spell.id }
             .map { (classId, spell) ->
                 KnownSpell(

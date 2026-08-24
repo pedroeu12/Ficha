@@ -41,9 +41,257 @@ object ResourceData {
     fun forContext(context: Context): List<ResourceDef> = buildList {
         addAll(classResources(context))
         addAll(subclassResources(context))
+        addAll(sweptSubclassResources(context))
         addAll(speciesResources(context))
         addAll(featResources(context))
     }.filter { it.max > 0 }
+
+
+    /**
+     * Limited uses the subclass tables promise but nothing was counting.
+     *
+     * These came out of a sweep once the subclasses carried the books' own wording: a feature
+     * that says "you regain all expended uses when you finish a Long Rest" has uses to expend,
+     * and twenty-odd of them had a rule on the sheet and no way to track it. Dread Ambusher is
+     * the one that made it obvious — its Dreadful Strike is a Ranger's main damage feature and
+     * the sheet never showed how many were left.
+     *
+     * Kept apart from [subclassResources] deliberately: that function is a per-subclass `when`
+     * of curated pools, and threading two dozen additions through its branches would bury them.
+     */
+    private fun sweptSubclassResources(c: Context): List<ResourceDef> = buildList {
+        if (c.subclassId == "gloom_stalker" && c.level >= 3) add(
+            ResourceDef(
+                id = "gloom_stalker:dreadful_strike",
+                name = "Dreadful Strike",
+                max = c.modAtLeastOne(Ability.WIS),
+                recharge = Recharge.LONG_REST,
+                source = "Dread Ambusher",
+                // One of three benefits inside Dread Ambusher rather than a feature of its
+                // own, so there is no feature text to borrow — it goes in full here.
+                description = "When you attack a creature and hit it with a weapon, you can " +
+                    "deal an extra 2d6 Psychic damage. You can use this benefit only once " +
+                    "per turn, you can use it a number of times equal to your Wisdom " +
+                    "modifier (minimum of once), and you regain all expended uses when you " +
+                    "finish a Long Rest. At Ranger level 11 the damage becomes 2d8 and " +
+                    "Stalker's Flurry adds the Sudden Strike and Mass Fear effects.",
+            )
+        )
+        if (c.subclassId == "armorer" && c.level >= 3) add(
+            ResourceDef(
+                id = "armorer:armor_model",
+                name = "Armor Model",
+                max = c.modAtLeastOne(Ability.INT),
+                recharge = Recharge.LONG_REST,
+                source = "Armor Model",
+            )
+        )
+        if (c.subclassId == "cartographer" && c.level >= 3) add(
+            ResourceDef(
+                id = "cartographer:mapping_magic",
+                name = "Mapping Magic",
+                max = c.modAtLeastOne(Ability.INT),
+                recharge = Recharge.LONG_REST,
+                source = "Mapping Magic",
+            )
+        )
+        if (c.subclassId == "cartographer" && c.level >= 15) add(
+            ResourceDef(
+                id = "cartographer:superior_atlas",
+                name = "Superior Atlas",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Superior Atlas",
+            )
+        )
+        if (c.subclassId == "alchemist" && c.level >= 15) add(
+            ResourceDef(
+                id = "alchemist:chemical_mastery",
+                name = "Chemical Mastery",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Chemical Mastery",
+            )
+        )
+        if (c.subclassId == "ancients" && c.level >= 20) add(
+            ResourceDef(
+                id = "ancients:elder_champion",
+                name = "Elder Champion",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Oath of the Ancients",
+            )
+        )
+        if (c.subclassId == "glory" && c.level >= 20) add(
+            ResourceDef(
+                id = "glory:living_legend",
+                name = "Living Legend",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Oath of Glory",
+            )
+        )
+        if (c.subclassId == "archfey" && c.level >= 10) add(
+            ResourceDef(
+                id = "archfey:beguiling_defenses",
+                name = "Beguiling Defenses",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Archfey Patron",
+                notes = "You can also restore this by expending a Pact Magic spell slot.",
+            )
+        )
+        if (c.subclassId == "fiend" && c.level >= 14) add(
+            ResourceDef(
+                id = "fiend:hurl_through_hell",
+                name = "Hurl Through Hell",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Fiend Patron",
+                notes = "You can also restore this by expending a Pact Magic spell slot.",
+            )
+        )
+        if (c.subclassId == "celestial" && c.level >= 14) add(
+            ResourceDef(
+                id = "celestial:searing_vengeance",
+                name = "Searing Vengeance",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Celestial Patron",
+            )
+        )
+        if (c.subclassId == "undead_patron" && c.level >= 10) add(
+            ResourceDef(
+                id = "undead_patron:necrotic_husk",
+                name = "Necrotic Husk",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Undead Patron",
+            )
+        )
+        if (c.subclassId == "primordial_patron" && c.level >= 6) add(
+            ResourceDef(
+                id = "primordial_patron:elemental_haven",
+                name = "Elemental Haven",
+                max = c.modAtLeastOne(Ability.CHA),
+                recharge = Recharge.LONG_REST,
+                source = "Primordial Patron",
+            )
+        )
+        if (c.subclassId == "primordial_patron" && c.level >= 14) add(
+            ResourceDef(
+                id = "primordial_patron:elemental_harbinger",
+                name = "Elemental Harbinger",
+                max = 1,
+                recharge = Recharge.SPECIAL,
+                source = "Primordial Patron",
+                notes = "Comes back after 2d4 Long Rests.",
+            )
+        )
+        if (c.subclassId == "glamour" && c.level >= 6) add(
+            ResourceDef(
+                id = "glamour:mantle_of_majesty",
+                name = "Mantle of Majesty",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "College of Glamour",
+            )
+        )
+        if (c.subclassId == "glamour" && c.level >= 14) add(
+            ResourceDef(
+                id = "glamour:unbreakable_majesty",
+                name = "Unbreakable Majesty",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "College of Glamour",
+            )
+        )
+        if (c.subclassId == "college_of_spirits" && c.level >= 6) add(
+            ResourceDef(
+                id = "college_of_spirits:empowered_channeling",
+                name = "Empowered Channeling",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "College of Spirits",
+            )
+        )
+        if (c.subclassId == "light_domain" && c.level >= 17) add(
+            ResourceDef(
+                id = "light:corona_of_light",
+                name = "Corona of Light",
+                max = c.modAtLeastOne(Ability.WIS),
+                recharge = Recharge.LONG_REST,
+                source = "Light Domain",
+            )
+        )
+        if (c.subclassId == "stars" && c.level >= 3) add(
+            ResourceDef(
+                id = "stars:star_map",
+                name = "Star Map",
+                max = c.modAtLeastOne(Ability.WIS),
+                recharge = Recharge.LONG_REST,
+                source = "Circle of the Stars",
+            )
+        )
+        if (c.subclassId == "open_hand" && c.level >= 6) add(
+            ResourceDef(
+                id = "open_hand:wholeness_of_body",
+                name = "Wholeness of Body",
+                max = c.modAtLeastOne(Ability.WIS),
+                recharge = Recharge.LONG_REST,
+                source = "Warrior of the Open Hand",
+            )
+        )
+        if (c.subclassId == "psi_warrior" && c.level >= 7) add(
+            ResourceDef(
+                id = "psi_warrior:telekinetic_adept",
+                name = "Telekinetic Adept",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Psi Warrior",
+                notes = "You can also restore this by expending a Psionic Energy Die.",
+            )
+        )
+        if (c.subclassId == "psi_warrior" && c.level >= 15) add(
+            ResourceDef(
+                id = "psi_warrior:bulwark_of_force",
+                name = "Bulwark of Force",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Psi Warrior",
+                notes = "You can also restore this by expending a Psionic Energy Die.",
+            )
+        )
+        if (c.subclassId == "soulknife" && c.level >= 13) add(
+            ResourceDef(
+                id = "soulknife:psychic_veil",
+                name = "Psychic Veil",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Soulknife",
+                notes = "You can also restore this by expending a Psionic Energy Die.",
+            )
+        )
+        if (c.subclassId == "soulknife" && c.level >= 17) add(
+            ResourceDef(
+                id = "soulknife:rend_mind",
+                name = "Rend Mind",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Soulknife",
+                notes = "You can also restore this by expending three Psionic Energy Dice.",
+            )
+        )
+        if (c.subclassId == "hollow_warden" && c.level >= 15) add(
+            ResourceDef(
+                id = "hollow_warden:ancient_might",
+                name = "Ancient Might",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Hollow Warden",
+            )
+        )
+    }
 
     // ------------------------------------------------------------------ Classes
 
@@ -1590,7 +1838,9 @@ object ResourceData {
             ResourceDef(
                 id = "aasimar:celestial_revelation",
                 name = "Celestial Revelation",
-                max = if (c.level >= 3) 1 else 0,
+                // A species trait arrives on the character's total level, not on the level in
+                // whichever class happened to be looked at first.
+                max = if (c.characterLevel >= 3) 1 else 0,
                 recharge = Recharge.LONG_REST,
                 source = "Aasimar",
             ),

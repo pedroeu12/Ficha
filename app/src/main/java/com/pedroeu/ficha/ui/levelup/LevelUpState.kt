@@ -6,6 +6,7 @@ import com.pedroeu.ficha.data.model.SourceFiltering
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpellData
+import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.CasterType
@@ -284,7 +285,17 @@ data class LevelUpState(
     private val spellListClassId: String
         get() = castingSubclass?.spellListClassId?.takeIf { it.isNotBlank() } ?: classId
 
-    private val knownSpellIds: Set<String> get() = character.knownSpells.map { it.id }.toSet()
+    /**
+     * Spells a picker must not offer: the ones already on the sheet, plus the ones the class
+     * and subclass hand out whatever the player does.
+     *
+     * A Ranger always has Hunter's Mark prepared and a Gloom Stalker always has Fear; picking
+     * either buys nothing and puts a duplicate row on the Spells tab.
+     */
+    private val knownSpellIds: Set<String>
+        get() = character.knownSpells.map { it.id }.toSet() +
+            SpellGrantData.alwaysPreparedForClass(classId, targetClassLevel) +
+            SpellGrantData.alwaysPreparedForSubclass(activeSubclassId, targetClassLevel)
 
     val cantripOptions
         get() = SpellData.cantripsForClass(spellListClassId).filterNot { it.id in knownSpellIds }

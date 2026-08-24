@@ -121,11 +121,14 @@ object CharacterAttacks {
         val pb = CharacterCalculations.proficiencyBonus(character)
         val str = mods[Ability.STR] ?: 0
         val dex = mods[Ability.DEX] ?: 0
-        val isMonk = character.classId == "monk"
+        // The level in the Monk class, not the character's total: a Monk 3 / Fighter 3 has a
+        // level 3 Monk's Martial Arts die, and reading the total handed them a level 6 one.
+        val monkLevel = ClassLevels.levelIn(character, "monk")
+        val isMonk = monkLevel > 0
 
         // Martial Arts lets a Monk use Dexterity and replaces the damage with a growing die.
         val abilityMod = if (isMonk && dex > str) dex else str
-        val martialArtsDie = if (isMonk) martialArtsDie(character.level) else null
+        val martialArtsDie = if (isMonk) martialArtsDie(monkLevel) else null
         val hasTavernBrawler = "tavern_brawler" in character.featIds
 
         val damage = when {
@@ -154,7 +157,7 @@ object CharacterAttacks {
         )
     }
 
-    /** The Monk's Martial Arts die, which grows at levels 5, 11, and 17. */
+    /** The Monk's Martial Arts die, which grows at Monk levels 5, 11, and 17. */
     private fun martialArtsDie(level: Int): String = when {
         level >= 17 -> "1d12"
         level >= 11 -> "1d10"
@@ -171,7 +174,9 @@ object CharacterAttacks {
     private fun featureAttacks(character: PlayerCharacter): List<AttackLine> {
         val mods = CharacterCalculations.abilityModifiers(character)
         val pb = CharacterCalculations.proficiencyBonus(character)
-        val level = character.level
+        // Every one of these scales on the level in the class that granted the subclass, so
+        // there is deliberately no character-total level in scope here to reach for.
+        val classLevel = { classId: String -> ClassLevels.levelIn(character, classId) }
 
         fun line(name: String, ability: Ability, damage: String, type: String, notes: String) =
             AttackLine(
@@ -185,7 +190,8 @@ object CharacterAttacks {
             )
 
         return buildList {
-            if (character.subclassId == "armorer") {
+            if (ClassLevels.hasSubclass(character, "armorer")) {
+                val level = classLevel("artificer")
                 // Which model is active is a rest-changeable choice, so show the one picked.
                 val model = ChoiceResolver.all(character)
                     .firstOrNull { it.choice.id == "armor_model" }
@@ -216,7 +222,7 @@ object CharacterAttacks {
                 }
             }
 
-            if (character.subclassId == "battle_smith" && level >= 3) {
+            if (ClassLevels.hasSubclass(character, "battle_smith") && classLevel("artificer") >= 3) {
                 add(
                     line(
                         "Steel Defender: Force-Empowered Rend", Ability.INT, "1d8 + 2", "Force",
@@ -251,9 +257,7 @@ object CharacterAttacks {
                 )
             }
 
-            val classLevel = { classId: String -> ClassLevels.levelIn(character, classId) }
-
-            if (character.subclassId == "path_of_lament" && classLevel("barbarian") >= 3) {
+            if (ClassLevels.hasSubclass(character, "path_of_lament") && classLevel("barbarian") >= 3) {
                 // The wail's dice are the Rage Damage bonus, which is the one number on the
                 // Barbarian table that grows without a feature announcing it.
                 val rageDamage = when {
@@ -268,7 +272,7 @@ object CharacterAttacks {
                 )
             }
 
-            if (character.subclassId == "warrior_of_venom" && classLevel("monk") >= 17) {
+            if (ClassLevels.hasSubclass(character, "warrior_of_venom") && classLevel("monk") >= 17) {
                 saveLine(
                     "Hallucinogenic Breath", "feature:monk",
                     "3 × Martial Arts die", "Poison", Ability.CON,
@@ -276,7 +280,9 @@ object CharacterAttacks {
                 )
             }
 
-            if (character.subclassId == "primordial_patron" && classLevel("warlock") >= 3) {
+            if (ClassLevels.hasSubclass(character, "primordial_patron") &&
+                classLevel("warlock") >= 3
+            ) {
                 val warlockLevel = classLevel("warlock")
                 val dice = when {
                     warlockLevel >= 14 -> "3d6"
@@ -302,11 +308,12 @@ object CharacterAttacks {
                 )
             }
 
-            if (character.subclassId == "soulknife" && level >= 3) {
+            val rogueLevel = classLevel("rogue")
+            if (ClassLevels.hasSubclass(character, "soulknife") && rogueLevel >= 3) {
                 val die = when {
-                    level >= 17 -> "1d12"
-                    level >= 11 -> "1d10"
-                    level >= 5 -> "1d8"
+                    rogueLevel >= 17 -> "1d12"
+                    rogueLevel >= 11 -> "1d10"
+                    rogueLevel >= 5 -> "1d8"
                     else -> "1d6"
                 }
                 add(

@@ -35,6 +35,29 @@ object ClassLevels {
     fun levelIn(character: PlayerCharacter, classId: String): Int =
         of(character).find { it.classId == classId }?.level ?: 0
 
+    /**
+     * True when the character has any levels at all in [classId].
+     *
+     * The test a feature that arrives at level 1 wants — Unarmored Defense, Martial Arts — and
+     * the one that reading the plain `classId` field gets wrong in both directions: a
+     * Fighter 3 / Monk 3 was not a Monk at all, and a Monk 3 / Fighter 3 was a level 6 one.
+     */
+    fun has(character: PlayerCharacter, classId: String): Boolean =
+        levelIn(character, classId) > 0
+
+    /** True when the character holds [subclassId] in any of their classes. */
+    fun hasSubclass(character: PlayerCharacter, subclassId: String): Boolean =
+        of(character).any { it.subclassId == subclassId }
+
+    /**
+     * Levels in the class that granted [subclassId], or zero if they don't have it.
+     *
+     * A subclass feature scales on its own class's level, so a Rogue 3 / Fighter 9 has a
+     * level 3 Soulknife's Psychic Blades, not a level 12 one.
+     */
+    fun levelForSubclass(character: PlayerCharacter, subclassId: String): Int =
+        of(character).firstOrNull { it.subclassId == subclassId }?.level ?: 0
+
     /** The subclass chosen for one class, which each class picks independently. */
     fun subclassIn(character: PlayerCharacter, classId: String): String? =
         of(character).find { it.classId == classId }?.subclassId

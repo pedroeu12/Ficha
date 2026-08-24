@@ -170,10 +170,14 @@ object CharacterCalculations {
 
         // Fast Movement stops applying in Heavy armor; Unarmored Movement needs no armor at all.
         val inHeavyArmor = equippedArmor.any { it.category == ArmorCategory.HEAVY }
+        // Both scale on the level in their own class: a Monk 3 / Rogue 3 moves 10 feet
+        // faster, not the 15 a level 6 Monk would.
+        val barbarianLevel = ClassLevels.levelIn(character, "barbarian")
+        val monkLevel = ClassLevels.levelIn(character, "monk")
         val barbarianFastMovement =
-            if (character.classId == "barbarian" && character.level >= 5 && !inHeavyArmor) 10 else 0
+            if (barbarianLevel >= 5 && !inHeavyArmor) 10 else 0
         val monkUnarmoredMovement =
-            if (character.classId == "monk" && equippedArmor.isEmpty()) monkSpeedBonus(character.level) else 0
+            if (monkLevel > 0 && equippedArmor.isEmpty()) monkSpeedBonus(monkLevel) else 0
 
         val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.SPEED)
         return adjust(
@@ -252,11 +256,15 @@ object CharacterCalculations {
         }
 
         val wearingArmor = bodyArmor != null
+        // Each of these arrives at level 1 of its own class, or at level 3 with its subclass,
+        // so having any levels there is the whole test — the plain classId field named one
+        // class and left a multiclassed Barbarian defending as if unarmoured meant naked.
+        val isMonk = ClassLevels.has(character, "monk")
         val unarmoredAc = when {
-            character.classId == "barbarian" && !wearingArmor -> 10 + dex + con
-            character.classId == "monk" && equipped.isEmpty() -> 10 + dex + wis
-            character.subclassId == "draconic" && !wearingArmor -> 10 + dex + cha
-            character.subclassId == "dance" && !wearingArmor -> 10 + dex + cha
+            ClassLevels.has(character, "barbarian") && !wearingArmor -> 10 + dex + con
+            isMonk && equipped.isEmpty() -> 10 + dex + wis
+            ClassLevels.hasSubclass(character, "draconic") && !wearingArmor -> 10 + dex + cha
+            ClassLevels.hasSubclass(character, "dance") && !wearingArmor -> 10 + dex + cha
             else -> null
         }
 
@@ -264,8 +272,7 @@ object CharacterCalculations {
         val best = listOfNotNull(armoredAc, unarmoredAc, defaultAc).max()
 
         // A Monk's Unarmored Defense requires no shield, so only add the shield when it applies.
-        val monkUnarmoredWins =
-            character.classId == "monk" && unarmoredAc != null && best == unarmoredAc
+        val monkUnarmoredWins = isMonk && unarmoredAc != null && best == unarmoredAc
         val withShield = if (monkUnarmoredWins) best else best + shieldBonus
         // Magic items worn or wielded add on top of whatever is underneath them: a +1 made
         // from a breastplate is a +1 breastplate, and a Cloak of Protection helps regardless.
@@ -296,8 +303,20 @@ object CharacterCalculations {
         return subclassId?.let { SubclassData.byId(it)?.casterType } ?: CasterType.NONE
     }
 
-    fun casterType(character: PlayerCharacter): CasterType =
-        casterTypeFor(character.classId, character.subclassId)
+    /**
+     * The kind of caster the character is, across every class they hold.
+     *
+     * Pact Magic wins where it is present, because it is the pool the sheet has to show as
+     * its own; otherwise any real casting beats none, so a Fighter 5 / Wizard 3 is a caster.
+     */
+    fun casterType(character: PlayerCharacter): CasterType {
+        val types = ClassLevels.of(character)
+            .map { casterTypeFor(it.classId, it.subclassId) }
+            .filter { it != CasterType.NONE }
+        return types.firstOrNull { it == CasterType.PACT }
+            ?: types.firstOrNull()
+            ?: CasterType.NONE
+    }
 
     /**
      * Shared spell slots for however many classes the character has.
@@ -492,8 +511,12 @@ object CharacterCalculations {
     )
 
     private fun isProficientWithWeapon(character: PlayerCharacter, weapon: WeaponDef): Boolean {
-        val charClass = ClassData.byId(character.classId) ?: return false
-        val profs = charClass.weaponProficiencies + character.weaponProficiencies
+        // Every class the character has, because multiclassing grants weapon training: a
+        // Cleric who takes a Fighter level really is trained with martial weapons.
+        val fromClasses = ClassLevels.of(character)
+            .flatMap { ClassData.byId(it.classId)?.weaponProficiencies.orEmpty() }
+        val profs = fromClasses + character.weaponProficiencies
+        if (profs.isEmpty()) return false
         if (profs.contains("Martial")) return true
         if (profs.contains("Simple") && SIMPLE_WEAPON_IDS.contains(weapon.id)) return true
         // Remaining entries name individual weapons, e.g. "Shortswords" for a Monk.

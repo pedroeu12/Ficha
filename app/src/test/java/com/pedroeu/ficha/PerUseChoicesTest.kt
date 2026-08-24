@@ -297,9 +297,10 @@ class PerUseChoicesTest {
     }
 
     @Test
-    fun `the feature's own text mentions that you choose as you go`() {
+    fun `the feature's own text shows the player there is a choice to make`() {
         // A player reading the feature on the sheet should learn this without finding the
-        // chips first.
+        // chips first. The books say it either way — "each time you activate it", or by
+        // naming the options in the sentence that spends the use — so either satisfies this.
         val featureTexts = SubclassData.ALL.flatMap { subclass ->
             subclass.features.map { it.name to it.description }
         } + SpeciesData.ALL.flatMap { species ->
@@ -310,9 +311,20 @@ class PerUseChoicesTest {
             .forEach { name ->
                 val text = featureTexts.firstOrNull { it.first == name }?.second
                 assertNotNull("$name is missing from the rules text", text)
+
+                val optionNames = PerUseChoiceData.ALL
+                    .firstOrNull { it.source == name }
+                    ?.options
+                    ?.map { it.name }
+                    .orEmpty()
+                assertTrue("$name has no per-use choice to describe", optionNames.isNotEmpty())
+
+                val saysWhen = text!!.contains("each time", ignoreCase = true)
+                val namesThemAll = optionNames.all { text.contains(it, ignoreCase = true) }
                 assertTrue(
-                    "$name should say the option is chosen as you go: $text",
-                    text!!.contains("each time", ignoreCase = true),
+                    "$name should either say the choice is made each use or name every " +
+                        "option, and does neither: $text",
+                    saysWhen || namesThemAll,
                 )
             }
     }

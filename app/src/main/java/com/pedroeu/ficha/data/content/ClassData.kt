@@ -26,11 +26,20 @@ object ClassData {
      * same spell picked at creation and granted by a feature looked like two different
      * entries. Reading the catalog fixes both, and a spell added there reaches every class
      * that lists it without a second edit here.
+     *
+     * Anything the class already hands out at level 1 is left off: a Ranger always has
+     * Hunter's Mark prepared and a Paladin always has Divine Smite, so offering either as one
+     * of the two spells they get to choose spends a choice on something they cannot not have
+     * — and then lists it twice on the sheet.
      */
-    private fun catalogSpells(classId: String, level: Int): List<SpellStub> =
-        SpellData.forClass(classId, level).map { spell ->
-            SpellStub(spell.id, spell.name, spell.level, spell.school, spell.description)
-        }
+    private fun catalogSpells(classId: String, level: Int): List<SpellStub> {
+        val alreadyGranted = SpellGrantData.alwaysPreparedForClass(classId, level = 1)
+        return SpellData.forClass(classId, level)
+            .filterNot { it.id in alreadyGranted }
+            .map { spell ->
+                SpellStub(spell.id, spell.name, spell.level, spell.school, spell.description)
+            }
+    }
 
     val ALL: List<CharClass> = listOf(
         CharClass(

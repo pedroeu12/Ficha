@@ -524,9 +524,12 @@ object ResourceOptionData {
     private fun derivedFrom(resourceId: String, subclassId: String?): List<ResourceOption> {
         val spends = SPENT_BY[resourceId] ?: return emptyList()
         val subclass = subclassId?.let { SubclassData.byId(it) } ?: return emptyList()
-        // The pool is named for the class that grants it, so a Cleric domain must not add
-        // options to a Paladin's tracker just because both are called Channel Divinity.
-        if (!resourceId.startsWith("${subclass.classId}:")) return emptyList()
+        // The pool is named for whatever grants it — usually the class, so a Cleric domain
+        // must not add options to a Paladin's tracker just because both are called Channel
+        // Divinity, and sometimes the subclass itself, as with the Battle Master's dice.
+        val ownedHere = resourceId.startsWith("${subclass.classId}:") ||
+            resourceId.startsWith("${subclass.id}:")
+        if (!ownedHere) return emptyList()
 
         return subclass.features
             .filter { spends.containsMatchIn(it.description) }

@@ -49,6 +49,7 @@ import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.KnownSpell
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.ChoiceChip
 import com.pedroeu.ficha.ui.components.ChoiceSection
@@ -215,12 +216,15 @@ fun SpellPickerSheet(
     var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
 
     val known = character.knownSpells.map { it.id }.toSet()
+    // "My class's list" means every class the character has, or a Cleric/Wizard browsing for
+    // a Wizard spell would be told there isn't one.
+    val classIds = ClassLevels.of(character).map { it.classId }.toSet()
     // Off-book spells stay out of the catalogue; the custom-name field below is the way in.
     val fromBooks = SourceFiltering.available(SpellData.ALL, character.enabledSources)
     val results = remember(query, levelFilter, classListOnly, known, fromBooks) {
         val q = query.trim().lowercase()
         fromBooks.filter { spell ->
-            (!classListOnly || character.classId in spell.classes) &&
+            (!classListOnly || spell.classes.any { it in classIds }) &&
                 (levelFilter == null || spell.level == levelFilter) &&
                 (q.isEmpty() || spell.name.lowercase().contains(q) ||
                     spell.school.lowercase().contains(q)) &&

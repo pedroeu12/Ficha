@@ -18,6 +18,15 @@ data class ResolvedChoice(
     /** The feature the choice hangs off, e.g. "Beast Tattoos" or "Level 4". */
     val featureName: String,
     val level: Int,
+    /**
+     * The class the choice was earned in, empty for one that came from a species, a
+     * background, or a feat.
+     *
+     * A multiclassed character reaches "Ability Score Improvement" once per class, and the
+     * feature name alone can't tell the Fighter's from the Wizard's — which is how both ended
+     * up listed under both.
+     */
+    val classId: String = "",
 ) {
     val isAnswered: Boolean get() = selectedIds.isNotEmpty()
     val summary: String get() = selectedNames.joinToString(", ")
@@ -115,6 +124,7 @@ object ChoiceResolver {
         choice: Choice,
         featureName: String,
         level: Int,
+        classId: String = "",
     ): ResolvedChoice {
         val ids = selectionsFor(character, choice.id, level.takeIf { it > 0 })
         return ResolvedChoice(
@@ -123,6 +133,7 @@ object ChoiceResolver {
             selectedNames = ids.map { nameFor(choice, it) },
             featureName = featureName,
             level = level,
+            classId = classId,
         )
     }
 
@@ -139,7 +150,9 @@ object ChoiceResolver {
             progression.features
                 .filter { it.level <= entry.level }
                 .flatMap { feature ->
-                    feature.choices.map { resolve(character, it, feature.name, feature.level) }
+                    feature.choices.map {
+                        resolve(character, it, feature.name, feature.level, entry.classId)
+                    }
                 }
         }
 
@@ -151,7 +164,9 @@ object ChoiceResolver {
             subclass.features
                 .filter { it.level <= entry.level }
                 .flatMap { feature ->
-                    feature.choices.map { resolve(character, it, feature.name, feature.level) }
+                    feature.choices.map {
+                        resolve(character, it, feature.name, feature.level, entry.classId)
+                    }
                 }
         }
 
@@ -159,15 +174,23 @@ object ChoiceResolver {
      * Level-1 class options, which use the older [ClassChoice] shape. Only the feature
      * branches are meaningful here; cantrip picks already surface as known spells.
      */
-    fun levelOneClassOptions(character: PlayerCharacter): List<Pair<String, String>> {
-        val charClass = ClassData.byId(character.classId) ?: return emptyList()
-        return charClass.choices
-            .filterIsInstance<ClassChoice.FeatureOption>()
-            .mapNotNull { choice ->
-                val selectedId = character.classChoiceSelections[choice.id]?.firstOrNull()
-                val option = choice.options.find { it.id == selectedId } ?: return@mapNotNull null
-                choice.label to option.name
-            }
+    fun levelOneClassOptions(
+        character: PlayerCharacter,
+        /** One class's options, or every class's when left out. */
+        classId: String? = null,
+    ): List<Pair<String, String>> {
+        val ids = classId?.let { listOf(it) } ?: ClassLevels.of(character).map { it.classId }
+        return ids.flatMap { id ->
+            val charClass = ClassData.byId(id) ?: return@flatMap emptyList()
+            charClass.choices
+                .filterIsInstance<ClassChoice.FeatureOption>()
+                .mapNotNull { choice ->
+                    val selectedId = character.classChoiceSelections[choice.id]?.firstOrNull()
+                    val option = choice.options.find { it.id == selectedId }
+                        ?: return@mapNotNull null
+                    choice.label to option.name
+                }
+        }
     }
 
     /**

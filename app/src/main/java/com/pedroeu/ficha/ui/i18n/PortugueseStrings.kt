@@ -577,6 +577,8 @@ object PortugueseStrings {
         "Level {0} grants an Epic Boon feat." to
             "O nível {0} concede um talento de Dádiva Épica.",
         "Class Features — {0}" to "Características de Classe — {0}",
+        // A multiclassed sheet gets one card per class, each naming its own level.
+        "Class Features — {0} {1}" to "Características de Classe — {0} {1}",
         "Subclass — {0}" to "Subclasse — {0}",
         "Species Traits — {0}" to "Traços de Espécie — {0}",
         "Playtest material — {0}" to "Material de playtest — {0}",

@@ -45,9 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pedroeu.ficha.data.CharacterRepository
-import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpeciesData
-import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.ui.components.EditableText
@@ -93,7 +91,8 @@ fun CharacterSheetScreen(
     // so the "Level N" prefix is dropped for them.
     val isMulticlassed = ClassLevels.isMulticlassed(loaded)
     val charClass = ClassLevels.label(loaded)
-    val subclass = loaded.subclassId?.let { SubclassData.byId(it)?.name }
+    // Every class picks its own subclass, so a multiclassed character has more than one.
+    val subclass = ClassLevels.subclassLabel(loaded).takeIf { it.isNotBlank() }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(

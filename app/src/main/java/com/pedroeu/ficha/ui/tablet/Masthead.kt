@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.SpeciesData
-import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.OverridableStat
@@ -51,7 +50,8 @@ fun Masthead(handle: SheetHandle) {
 
     val species = SpeciesData.byId(character.speciesId)?.name.orEmpty()
     val background = BackgroundData.byId(character.backgroundId)?.name.orEmpty()
-    val subclass = character.subclassId?.let { SubclassData.byId(it)?.name }.orEmpty()
+    // Every class picks its own subclass, so a multiclassed character has more than one.
+    val subclass = ClassLevels.subclassLabel(character)
     val classes = ClassLevels.label(character)
 
     Column(

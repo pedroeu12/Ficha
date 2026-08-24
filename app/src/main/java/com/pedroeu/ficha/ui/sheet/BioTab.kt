@@ -21,8 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.BackgroundData
-import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.data.model.Sourcebook
@@ -33,7 +33,8 @@ import com.pedroeu.ficha.ui.components.SectionHeader
 @Composable
 fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
     val species = SpeciesData.byId(character.speciesId)
-    val charClass = ClassData.byId(character.classId)
+    // "Fighter 5 / Wizard 3" for a multiclassed character, and just the name for everyone else.
+    val classLine = ClassLevels.label(character)
     val background = BackgroundData.byId(character.backgroundId)
 
     LazyColumn(
@@ -74,7 +75,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                     }
                     EditableBioLine(
                         label = tr("Class"),
-                        value = character.textOverrides["bio:class"] ?: charClass?.name.orEmpty(),
+                        value = character.textOverrides["bio:class"] ?: classLine,
                         editMode = editMode,
                         overridden = character.textOverrides.containsKey("bio:class"),
                         onChange = { viewModel.setText("bio:class", it) },

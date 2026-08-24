@@ -29,10 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.FeatData
-import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.SheetFeatures
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.ui.i18n.trf
@@ -51,13 +52,18 @@ import com.pedroeu.ficha.ui.sheet.PoolFeaturesCard
 @Composable
 fun LeafFeatures(handle: SheetHandle) {
     val character = handle.character
-    val charClass = ClassData.byId(character.classId)
-    val progression = ProgressionData.forClass(character.classId)
-    val subclass = character.subclassId?.let { SubclassData.byId(it) }
     val species = SpeciesData.byId(character.speciesId)
 
-    val classChoices = ChoiceResolver.classFeatureChoices(character).groupBy { it.featureName }
-    val subclassChoices = ChoiceResolver.subclassFeatureChoices(character).groupBy { it.featureName }
+    // Every class, each with its own subclass and its own level — reading the plain classId
+    // field showed a multiclassed character only the class they started as.
+    val classes = ClassLevels.of(character)
+
+    // Keyed by class as well as feature: two classes both reach "Ability Score Improvement",
+    // and the name alone can't tell one card's from the other's.
+    val classChoices = ChoiceResolver.classFeatureChoices(character)
+        .groupBy { it.classId to it.featureName }
+    val subclassChoices = ChoiceResolver.subclassFeatureChoices(character)
+        .groupBy { it.classId to it.featureName }
     val originChoices = ChoiceResolver.originChoices(character)
 
     Row(Modifier.fillMaxWidth()) {
@@ -66,54 +72,56 @@ fun LeafFeatures(handle: SheetHandle) {
             contentPadding = PaddingValues(start = 20.dp, end = 10.dp, top = 12.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
-            if (charClass != null) {
-                item {
-                    Leaf(trf("Class Features — {0}", charClass.name)) {
-                        charClass.level1Features.forEach { feature ->
-                            FeatureLine(
-                                name = feature.name,
-                                body = feature.description,
-                                choices = classChoices[feature.name].orEmpty(),
-                                handle = handle,
-                            )
-                        }
-                        ChoiceResolver.levelOneClassOptions(character).forEach { (label, option) ->
-                            FeatureLine("$label: $option", "", emptyList(), handle)
-                        }
-                        progression?.features
-                            ?.filter { it.level in 2..character.level }
-                            ?.sortedBy { it.level }
-                            ?.forEach { feature ->
-                                FeatureLine(
-                                    name = trf("Level {0} — {1}", feature.level, feature.name),
-                                    body = feature.description,
-                                    choices = classChoices[feature.name].orEmpty(),
-                                    handle = handle,
-                                )
+            classes.forEach { entry ->
+                val charClass = ClassData.byId(entry.classId)
+                val subclass = entry.subclassId?.let { SubclassData.byId(it) }
+
+                if (charClass != null) {
+                    item(key = "class:${entry.classId}") {
+                        Leaf(
+                            if (classes.size > 1) {
+                                trf("Class Features — {0} {1}", charClass.name, "${entry.level}")
+                            } else {
+                                trf("Class Features — {0}", charClass.name)
                             }
+                        ) {
+                            SheetFeatures.classFeatures(character, entry.classId)
+                                .forEach { feature ->
+                                    FeatureLine(
+                                        name = featureTitle(feature),
+                                        body = feature.description,
+                                        choices = classChoices[entry.classId to feature.name]
+                                            .orEmpty(),
+                                        handle = handle,
+                                    )
+                                }
+                            ChoiceResolver.levelOneClassOptions(character, entry.classId)
+                                .forEach { (label, option) ->
+                                    FeatureLine("$label: $option", "", emptyList(), handle)
+                                }
+                        }
                     }
                 }
-            }
 
-            if (subclass != null) {
-                item {
-                    Leaf(trf("Subclass — {0}", subclass.name)) {
-                        SheetText(subclass.summary, soft = true)
-                        if (subclass.isPlaytest) {
-                            Caption(trf("Playtest material — {0}", subclass.attribution))
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        subclass.features
-                            .filter { it.level <= character.level }
-                            .sortedBy { it.level }
-                            .forEach { feature ->
-                                FeatureLine(
-                                    name = trf("Level {0} — {1}", feature.level, feature.name),
-                                    body = feature.description,
-                                    choices = subclassChoices[feature.name].orEmpty(),
-                                    handle = handle,
-                                )
+                if (subclass != null) {
+                    item(key = "subclass:${entry.classId}") {
+                        Leaf(trf("Subclass — {0}", subclass.name)) {
+                            SheetText(subclass.summary, soft = true)
+                            if (subclass.isPlaytest) {
+                                Caption(trf("Playtest material — {0}", subclass.attribution))
                             }
+                            Spacer(Modifier.height(4.dp))
+                            SheetFeatures.subclassFeatures(character, entry.classId)
+                                .forEach { feature ->
+                                    FeatureLine(
+                                        name = featureTitle(feature),
+                                        body = feature.description,
+                                        choices = subclassChoices[entry.classId to feature.name]
+                                            .orEmpty(),
+                                        handle = handle,
+                                    )
+                                }
+                        }
                     }
                 }
             }
@@ -386,3 +394,7 @@ private fun ProficienciesBlock(handle: SheetHandle) {
         )
     }
 }
+
+/** The heading one feature is listed under; a starting feature has no level to name. */
+private fun featureTitle(feature: SheetFeatures.Entry): String =
+    if (feature.level <= 1) feature.name else "Level ${feature.level} \u2014 ${feature.name}"

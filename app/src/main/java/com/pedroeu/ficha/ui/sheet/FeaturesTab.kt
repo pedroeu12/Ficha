@@ -32,13 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.FeatData
-import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.ArtificerItems
 import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
+import com.pedroeu.ficha.domain.SheetFeatures
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.EditableText
 import androidx.compose.foundation.clickable
@@ -52,15 +53,20 @@ import com.pedroeu.ficha.ui.components.TextEditDialog
 @Composable
 fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Boolean) {
     val species = SpeciesData.byId(character.speciesId)
-    val charClass = ClassData.byId(character.classId)
     val lineage = species?.lineageOptions?.find { it.id == character.lineageId }
-    val progression = ProgressionData.forClass(character.classId)
-    val subclass = character.subclassId?.let { SubclassData.byId(it) }
+
+    // Every class the character has levels in. A multiclassed sheet used to read the plain
+    // classId field and show one class's features and one class's subclass — a Fighter 5 /
+    // Wizard 3 saw the Fighter half and nothing else.
+    val classes = ClassLevels.of(character)
 
     // Selections are stored in three separate maps; the resolver reads all of them so a
-    // feature's actual picks appear under it rather than only its name.
-    val classChoices = ChoiceResolver.classFeatureChoices(character).groupBy { it.featureName }
-    val subclassChoices = ChoiceResolver.subclassFeatureChoices(character).groupBy { it.featureName }
+    // feature's actual picks appear under it rather than only its name. Keyed by class as
+    // well as feature, because two classes both reach "Ability Score Improvement".
+    val classChoices = ChoiceResolver.classFeatureChoices(character)
+        .groupBy { it.classId to it.featureName }
+    val subclassChoices = ChoiceResolver.subclassFeatureChoices(character)
+        .groupBy { it.classId to it.featureName }
     // Unanswered ones stay in the list rather than being hidden: a feat gained before the
     // app knew to ask, or one added by hand, still owes a decision, and this card is the
     // only place to make it. ChoiceLine already marks an open choice and offers "Choose".
@@ -75,82 +81,81 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        if (charClass != null) {
-            item {
-                FeatureCard(trf("Class Features — {0}", charClass.name)) {
-                    charClass.level1Features.forEach { feature ->
-                        FeatureEntry(
-                            name = feature.name,
-                            description = feature.description,
-                            scope = "class",
-                            character = character,
-                            viewModel = viewModel,
-                            editMode = editMode,
-                            choices = classChoices[feature.name].orEmpty(),
-                            onEditChoice = { editingChoice = it },
-                        )
-                    }
-                    // The level-1 branch options, e.g. Fighting Style or Divine Order.
-                    ChoiceResolver.levelOneClassOptions(character).forEach { (label, option) ->
-                        FeatureEntry(
-                            name = "$label: $option",
-                            description = "",
-                            scope = "class",
-                            character = character,
-                            viewModel = viewModel,
-                            editMode = editMode,
-                        )
-                    }
-                    // Everything gained from level 2 onward, in the order it was earned.
-                    progression?.features
-                        ?.filter { it.level in 2..character.level }
-                        ?.sortedBy { it.level }
-                        ?.forEach { feature ->
+        // One card per class, each followed by its own subclass, so the two halves of a
+        // multiclassed character read as two halves rather than one muddled list. Each class
+        // is filtered by the level in *that* class: a Fighter 5 / Wizard 3 gets a level 5
+        // Fighter's features and a level 3 Wizard's, not level 8 of either.
+        classes.forEach { entry ->
+            val charClass = ClassData.byId(entry.classId)
+            val subclass = entry.subclassId?.let { SubclassData.byId(it) }
+
+            if (charClass != null) {
+                item(key = "class:${entry.classId}") {
+                    FeatureCard(
+                        if (classes.size > 1) {
+                            trf("Class Features — {0} {1}", charClass.name, "${entry.level}")
+                        } else {
+                            trf("Class Features — {0}", charClass.name)
+                        }
+                    ) {
+                        SheetFeatures.classFeatures(character, entry.classId).forEach { feature ->
                             FeatureEntry(
-                                name = "Level ${feature.level} — ${feature.name}",
+                                name = featureTitle(feature),
                                 description = feature.description,
                                 scope = "class",
                                 character = character,
                                 viewModel = viewModel,
                                 editMode = editMode,
-                                choices = classChoices[feature.name].orEmpty(),
+                                choices = classChoices[entry.classId to feature.name].orEmpty(),
                                 onEditChoice = { editingChoice = it },
                             )
                         }
+                        // The level-1 branch options, e.g. Fighting Style or Divine Order.
+                        ChoiceResolver.levelOneClassOptions(character, entry.classId)
+                            .forEach { (label, option) ->
+                                FeatureEntry(
+                                    name = "$label: $option",
+                                    description = "",
+                                    scope = "class",
+                                    character = character,
+                                    viewModel = viewModel,
+                                    editMode = editMode,
+                                )
+                            }
+                    }
                 }
             }
-        }
 
-        if (subclass != null) {
-            item {
-                FeatureCard(trf("Subclass — {0}", subclass.name)) {
-                    Text(
-                        text = subclass.summary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    if (subclass.isPlaytest) {
+            if (subclass != null) {
+                item(key = "subclass:${entry.classId}") {
+                    FeatureCard(trf("Subclass — {0}", subclass.name)) {
                         Text(
-                            text = trf("Playtest material — {0}", subclass.attribution),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            text = subclass.summary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                    }
-                    subclass.features
-                        .filter { it.level <= character.level }
-                        .sortedBy { it.level }
-                        .forEach { feature ->
-                            FeatureEntry(
-                                name = "Level ${feature.level} — ${feature.name}",
-                                description = feature.description,
-                                scope = "subclass",
-                                character = character,
-                                viewModel = viewModel,
-                                editMode = editMode,
-                                choices = subclassChoices[feature.name].orEmpty(),
-                                onEditChoice = { editingChoice = it },
+                        if (subclass.isPlaytest) {
+                            Text(
+                                text = trf("Playtest material — {0}", subclass.attribution),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
                             )
                         }
+                        SheetFeatures.subclassFeatures(character, entry.classId)
+                            .forEach { feature ->
+                                FeatureEntry(
+                                    name = featureTitle(feature),
+                                    description = feature.description,
+                                    scope = "subclass",
+                                    character = character,
+                                    viewModel = viewModel,
+                                    editMode = editMode,
+                                    choices = subclassChoices[entry.classId to feature.name]
+                                        .orEmpty(),
+                                    onEditChoice = { editingChoice = it },
+                                )
+                            }
+                    }
                 }
             }
         }
@@ -524,3 +529,12 @@ private fun FeatureEntry(
         }
     }
 }
+
+/**
+ * The heading one feature is listed under.
+ *
+ * A starting feature has no level to name, so it goes without the prefix rather than being
+ * labelled "Level 0".
+ */
+private fun featureTitle(feature: SheetFeatures.Entry): String =
+    if (feature.level <= 1) feature.name else "Level ${feature.level} — ${feature.name}"

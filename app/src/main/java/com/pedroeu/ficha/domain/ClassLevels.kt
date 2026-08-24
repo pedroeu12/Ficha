@@ -50,6 +50,17 @@ object ClassLevels {
     fun startingClass(character: PlayerCharacter): ClassLevel? =
         of(character).firstOrNull { it.isStarting } ?: of(character).firstOrNull()
 
+    /**
+     * The subclasses, in class order, e.g. "Champion / Evoker".
+     *
+     * Each class picks its own, so a multiclassed character has as many as it has classes past
+     * level 3 — reading only the plain subclassId field named one of them and dropped the rest.
+     * Empty when no class has reached its subclass yet.
+     */
+    fun subclassLabel(character: PlayerCharacter): String = of(character)
+        .mapNotNull { entry -> entry.subclassId?.let { SubclassData.byId(it)?.name } }
+        .joinToString(" / ")
+
     /** A short label for the sheet, e.g. "Fighter 5 / Wizard 3". */
     fun label(character: PlayerCharacter): String = of(character).joinToString(" / ") { entry ->
         "${ClassData.byId(entry.classId)?.name ?: entry.classId} ${entry.level}"

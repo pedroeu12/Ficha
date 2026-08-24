@@ -41,6 +41,7 @@ import com.pedroeu.ficha.domain.AttackLine
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.foundation.layout.Spacer
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.EditableText
 import com.pedroeu.ficha.ui.components.ExpandableOption
@@ -51,7 +52,12 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     // Weapons carried, plus everything else the character can attack with: an Unarmed
     // Strike, a feature's conjured weapon, and any damage cantrip they know.
     val attacks = CharacterAttacks.all(character)
-    val charClass = ClassData.byId(character.classId)
+    // Armour, weapon and tool training is the union of every class's — a Cleric/Fighter is
+    // trained with martial weapons even though the class they started as was not.
+    val classArmor = ClassLevels.of(character)
+        .flatMap { ClassData.byId(it.classId)?.armorProficiencies.orEmpty() }.distinct()
+    val classWeapons = ClassLevels.of(character)
+        .flatMap { ClassData.byId(it.classId)?.weaponProficiencies.orEmpty() }.distinct()
 
     var editingAttack by remember { mutableStateOf<CustomAttack?>(null) }
     var addingAttack by remember { mutableStateOf(false) }
@@ -150,7 +156,7 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                         label = tr("Armor Training"),
                         key = "combat:armor_training",
                         fallback = character.armorTraining
-                            .ifEmpty { charClass?.armorProficiencies.orEmpty() }
+                            .ifEmpty { classArmor }
                             .takeIf { it.isNotEmpty() }?.joinToString() ?: tr("None"),
                         character = character,
                         viewModel = viewModel,
@@ -160,7 +166,7 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
                         label = tr("Weapons"),
                         key = "combat:weapons",
                         fallback = character.weaponProficiencies
-                            .ifEmpty { charClass?.weaponProficiencies.orEmpty() }
+                            .ifEmpty { classWeapons }
                             .takeIf { it.isNotEmpty() }?.joinToString() ?: tr("None"),
                         character = character,
                         viewModel = viewModel,

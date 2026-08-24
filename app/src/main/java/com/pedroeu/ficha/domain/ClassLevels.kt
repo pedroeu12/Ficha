@@ -62,6 +62,10 @@ object ClassLevels {
     fun subclassIn(character: PlayerCharacter, classId: String): String? =
         of(character).find { it.classId == classId }?.subclassId
 
+    /** Levels keyed by class, for anything that needs to look several of them up at once. */
+    fun levelMap(character: PlayerCharacter): Map<String, Int> =
+        of(character).associate { it.classId to it.level }
+
     /** Total levels across every class. This is what sets the Proficiency Bonus. */
     fun totalLevel(character: PlayerCharacter): Int =
         of(character).sumOf { it.level }.coerceAtLeast(1)

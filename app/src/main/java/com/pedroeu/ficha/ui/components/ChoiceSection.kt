@@ -102,16 +102,32 @@ fun ChoiceSection(
                     @Composable
                     fun option(option: ChoiceOption) {
                         var showFullText by rememberSaveable(option.id) { mutableStateOf(false) }
+                        val available = option.id !in disabledOptionIds
                         SelectableCard(
                             title = option.name,
                             subtitle = option.description,
                             selected = selected.contains(option.id),
                             onClick = { onToggle(option.id) },
                             trailingLabel = option.supporting.ifBlank { null },
+                            // The card branch used to ignore this, so every list that isn't
+                            // chips — invocations, Metamagic, maneuvers, feats, spells — let
+                            // you pick something you already had or didn't qualify for.
+                            enabled = available,
                             // Options carry the book's full rules text; clamp it so a list of
                             // nineteen maneuvers is still something you can scroll.
                             subtitleMaxLines = 3,
                         )
+                        // What the rules ask of it, printed whether or not it is met: an
+                        // option greyed out with no reason given reads as a bug.
+                        if (option.prerequisite.isNotBlank()) {
+                            Text(
+                                text = option.prerequisite,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (available) MaterialTheme.colorScheme.secondary
+                                else MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(start = 12.dp, bottom = 2.dp),
+                            )
+                        }
                         // Tapping the card picks the option, so reading the rest of the rules
                         // needs its own target — otherwise the only way to read a long option
                         // is to select it.

@@ -281,6 +281,9 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 choice = choice,
                 owned = OwnedOptions.of(state.character),
                 currentSelection = state.selections[choice.id].orEmpty().toSet(),
+                // The level being gained, not the one being left: an invocation that asks
+                // for Warlock 5 is available on the level up that reaches 5.
+                classLevels = ClassLevels.levelMap(state.leveledCharacter),
             )
 
             ChoiceSection(
@@ -323,6 +326,9 @@ fun FeatChoicesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 choice = choice,
                 owned = OwnedOptions.of(state.character),
                 currentSelection = state.selections[choice.id].orEmpty().toSet(),
+                // The level being gained, not the one being left: an invocation that asks
+                // for Warlock 5 is available on the level up that reaches 5.
+                classLevels = ClassLevels.levelMap(state.leveledCharacter),
             )
 
             ChoiceSection(

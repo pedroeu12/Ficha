@@ -42,6 +42,30 @@ data class ChoiceOption(
      * the difference between choosing a cantrip from a list of nine and from a list of 34.
      */
     val book: Sourcebook? = null,
+    /**
+     * Levels needed in the choice's own class before this option may be taken.
+     *
+     * Zero for an option anyone can take from the start. A level 1 Warlock has five legal
+     * Eldritch Invocations out of twenty-eight, and offering the other twenty-three lets them
+     * build a character the rules do not allow.
+     */
+    val minLevel: Int = 0,
+    /**
+     * Other options from the same choice that must already be held.
+     *
+     * Eldritch Smite needs Pact of the Blade; Devouring Blade needs Thirsting Blade, which
+     * needs Pact of the Blade in turn. Chains like that resolve on their own, because what is
+     * ticked right now counts as held.
+     */
+    val requiresOptions: List<String> = emptyList(),
+    /**
+     * The book's own wording of the prerequisite, shown under the option.
+     *
+     * Some of them can't be checked — "a Warlock cantrip that deals damage via an attack
+     * roll" depends on cantrips the player may not have picked yet — and printing the
+     * condition is better than either hiding the option or pretending there isn't one.
+     */
+    val prerequisite: String = "",
 )
 
 /**
@@ -78,6 +102,14 @@ data class Choice(
      * the options the character actually picked, with their rules text.
      */
     val resourceId: String? = null,
+    /**
+     * The class whose levels [ChoiceOption.minLevel] is measured against.
+     *
+     * Empty where no option has a level prerequisite. Named rather than assumed, because a
+     * multiclassed Warlock 5 / Fighter 6 has five Warlock levels and eleven character levels,
+     * and the invocation list cares about the first number.
+     */
+    val prerequisiteClassId: String = "",
 )
 
 /** Convenience builders for the common option shapes. */

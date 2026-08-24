@@ -52,6 +52,12 @@ object OwnedOptions {
         choice: Choice,
         owned: Owned,
         currentSelection: Set<String> = emptySet(),
+        /**
+         * Levels per class, for options that ask for one. A map rather than a character
+         * because creation has no character yet and still knows the class is at level 1.
+         * Empty means no level prerequisite is checked.
+         */
+        classLevels: Map<String, Int> = emptyMap(),
     ): Set<String> {
         val disabled = when (choice.kind) {
             ChoiceKind.SKILL -> choice.options.map { it.id }.filter { it in owned.skills }
@@ -84,7 +90,39 @@ object OwnedOptions {
         }
 
         // Never disable something the player just picked here; they need to be able to undo it.
-        return disabled.toSet() - currentSelection
+        return (disabled.toSet() +
+            unmetPrerequisites(choice, owned, currentSelection, classLevels)) - currentSelection
+    }
+
+    /**
+     * Options the character does not yet qualify for.
+     *
+     * Two kinds, both from the Eldritch Invocations list and both real: a level in the
+     * choice's own class, and another option from the same list. Chains resolve on their own
+     * — Devouring Blade needs Thirsting Blade, which needs Pact of the Blade — because an
+     * option ticked right now counts as held, so a player can build the chain in one sitting.
+     *
+     * Prerequisites the app cannot check are deliberately not enforced: "a Warlock cantrip
+     * that deals damage" depends on cantrips that may not be chosen yet, and greying out
+     * Agonizing Blast for a Warlock who is about to take Eldritch Blast would be worse than
+     * printing the condition and trusting the table.
+     */
+    private fun unmetPrerequisites(
+        choice: Choice,
+        owned: Owned,
+        currentSelection: Set<String>,
+        classLevels: Map<String, Int>,
+    ): Set<String> {
+        val held = owned.options + currentSelection
+        val level = choice.prerequisiteClassId
+            .takeIf { it.isNotBlank() && classLevels.isNotEmpty() }
+            ?.let { classLevels[it] ?: 0 }
+
+        return choice.options.filter { option ->
+            val tooEarly = level != null && option.minLevel > level
+            val missingSupport = option.requiresOptions.any { it !in held }
+            tooEarly || missingSupport
+        }.map { it.id }.toSet()
     }
 
     /** Tool and language names are written inconsistently across sources, so loosen the match. */

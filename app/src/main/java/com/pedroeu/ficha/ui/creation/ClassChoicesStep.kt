@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.ui.components.ChoiceChip
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.SelectableCard
@@ -186,10 +187,20 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
         val featureChoices = state.classFeatureChoices
         items(featureChoices.size, key = { featureChoices[it].id }) { index ->
             val choice = featureChoices[index]
+            // A new character is level 1 in the class they are taking, which is what an
+            // option's level prerequisite is measured against. A level 1 Warlock has five
+            // legal Eldritch Invocations, not twenty-eight.
+            val disabled = OwnedOptions.disabledFor(
+                choice = choice,
+                owned = state.owned,
+                currentSelection = state.classFeatureSelections[choice.id].orEmpty().toSet(),
+                classLevels = state.classId?.let { mapOf(it to 1) }.orEmpty(),
+            )
             ChoiceSection(
                 choice = choice,
                 selected = state.classFeatureSelections[choice.id].orEmpty(),
                 onToggle = { viewModel.toggleClassFeatureChoice(choice.id, it, choice.count) },
+                disabledOptionIds = disabled,
             )
         }
     }

@@ -121,9 +121,17 @@ object CharacterCalculations {
 
     // ------------------------------------------------------------------ Saves & skills
 
-    fun isSavingThrowProficient(character: PlayerCharacter, ability: Ability): Boolean =
-        character.saveProficiencyOverrides[ability.name]
-            ?: (ClassData.byId(character.classId)?.savingThrows?.contains(ability) == true)
+    /**
+     * Saving throw proficiency, which comes from the starting class and nowhere else.
+     *
+     * The one proficiency multiclassing never grants: a Wizard who takes three Fighter levels
+     * is no better at Strength saves than they were.
+     */
+    fun isSavingThrowProficient(character: PlayerCharacter, ability: Ability): Boolean {
+        character.saveProficiencyOverrides[ability.name]?.let { return it }
+        val starting = ClassLevels.startingClass(character)?.classId ?: character.classId
+        return ClassData.byId(starting)?.savingThrows?.contains(ability) == true
+    }
 
     fun savingThrowBonus(character: PlayerCharacter, ability: Ability): Int {
         character.saveOverrides[ability.name]?.let { return it }
@@ -511,11 +519,14 @@ object CharacterCalculations {
     )
 
     private fun isProficientWithWeapon(character: PlayerCharacter, weapon: WeaponDef): Boolean {
-        // Every class the character has, because multiclassing grants weapon training: a
-        // Cleric who takes a Fighter level really is trained with martial weapons.
-        val fromClasses = ClassLevels.of(character)
-            .flatMap { ClassData.byId(it.classId)?.weaponProficiencies.orEmpty() }
-        val profs = fromClasses + character.weaponProficiencies
+        // The starting class grants its whole list; a class taken later grants only the
+        // narrower multiclass set, which level up has already written onto the character. So
+        // the union is the starting class plus what is recorded — taking a Cleric level as a
+        // Wizard grants armour training and no weapons, and reading the Cleric's own list
+        // would hand out Simple weapons the rules never gave.
+        val starting = ClassLevels.startingClass(character)?.classId ?: character.classId
+        val fromStartingClass = ClassData.byId(starting)?.weaponProficiencies.orEmpty()
+        val profs = fromStartingClass + character.weaponProficiencies
         if (profs.isEmpty()) return false
         if (profs.contains("Martial")) return true
         if (profs.contains("Simple") && SIMPLE_WEAPON_IDS.contains(weapon.id)) return true

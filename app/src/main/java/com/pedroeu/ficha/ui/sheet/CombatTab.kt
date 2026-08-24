@@ -52,12 +52,13 @@ fun CombatTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     // Weapons carried, plus everything else the character can attack with: an Unarmed
     // Strike, a feature's conjured weapon, and any damage cantrip they know.
     val attacks = CharacterAttacks.all(character)
-    // Armour, weapon and tool training is the union of every class's — a Cleric/Fighter is
-    // trained with martial weapons even though the class they started as was not.
-    val classArmor = ClassLevels.of(character)
-        .flatMap { ClassData.byId(it.classId)?.armorProficiencies.orEmpty() }.distinct()
-    val classWeapons = ClassLevels.of(character)
-        .flatMap { ClassData.byId(it.classId)?.weaponProficiencies.orEmpty() }.distinct()
+    // Only used when the character records nothing of its own — a sheet made before level up
+    // started writing training down. A class taken later grants the narrower multiclass set,
+    // which is already on the character, so this shows the starting class's list alone rather
+    // than inventing training out of another class's full one.
+    val starting = ClassLevels.startingClass(character)?.classId ?: character.classId
+    val classArmor = ClassData.byId(starting)?.armorProficiencies.orEmpty()
+    val classWeapons = ClassData.byId(starting)?.weaponProficiencies.orEmpty()
 
     var editingAttack by remember { mutableStateOf<CustomAttack?>(null) }
     var addingAttack by remember { mutableStateOf(false) }

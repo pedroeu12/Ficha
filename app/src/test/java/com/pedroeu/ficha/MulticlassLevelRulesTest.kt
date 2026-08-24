@@ -1,6 +1,7 @@
 package com.pedroeu.ficha
 
 import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.content.MulticlassData
 import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
@@ -122,17 +123,31 @@ class MulticlassLevelRulesTest {
     }
 
     @Test
-    fun `weapon training is the union of every class`() {
-        val clericFighter = character(
-            ClassLevel("cleric", 5, "life_domain", isStarting = true),
-            ClassLevel("fighter", 1),
+    fun `a class taken later grants the narrow multiclass training, not its whole list`() {
+        // Taking a Cleric level grants armour training and no weapons at all, so reading the
+        // Cleric's own starting list would hand out Simple weapons the rules never gave.
+        val cleric = MulticlassData.forClass("cleric")!!
+        assertTrue(cleric.weaponProficiencies.isEmpty())
+        assertTrue(cleric.armorTraining.contains("Shields"))
+
+        // The Fighter does grant weapons, which is why the two cannot share one rule.
+        assertTrue(MulticlassData.forClass("fighter")!!.weaponProficiencies.contains("Martial"))
+
+        // A Wizard is worth naming: it grants nothing whatsoever.
+        val wizard = MulticlassData.forClass("wizard")!!
+        assertTrue(wizard.weaponProficiencies.isEmpty())
+        assertTrue(wizard.armorTraining.isEmpty())
+    }
+
+    @Test
+    fun `saving throw proficiency comes from the starting class alone`() {
+        // The one proficiency multiclassing never grants.
+        val wizardFirst = character(
+            ClassLevel("wizard", 5, "evoker", isStarting = true),
+            ClassLevel("fighter", 3, "champion"),
         )
-        assertTrue(
-            "multiclassing grants weapon training, so the Fighter level really does count",
-            ClassData.byId("fighter")!!.weaponProficiencies.contains("Martial"),
-        )
-        // The sheet reads the union; a martial weapon is now proficient.
-        assertTrue(ClassLevels.has(clericFighter, "fighter"))
+        val saves = Ability.ALL.filter { CharacterCalculations.isSavingThrowProficient(wizardFirst, it) }
+        assertEquals(ClassData.byId("wizard")!!.savingThrows.toSet(), saves.toSet())
     }
 
     // ------------------------------------------------------------------ Character level

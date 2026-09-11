@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -129,7 +130,7 @@ private fun ConditionBlock(handle: SheetHandle) {
             Column(
                 Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(Corner.row)
                     .then(
                         if (handle.editMode) {
                             Modifier.clickable { handle.editStat(OverridableStat.MAX_HIT_POINTS) }

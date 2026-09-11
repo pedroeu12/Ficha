@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -114,7 +115,7 @@ fun FeatPickerSheet(
                 label = { Text(tr("Search feats")) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -178,7 +179,7 @@ fun FeatPickerSheet(
                                 Button(
                                     onClick = { onAdd(feat.id, selections) },
                                     enabled = !owned && allAnswered,
-                                    shape = RoundedCornerShape(10.dp),
+                                    shape = Corner.row,
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     Text(
@@ -255,7 +256,7 @@ fun SpellPickerSheet(
                 label = { Text(tr("Search spells")) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -330,7 +331,7 @@ fun SpellPickerSheet(
                     onValueChange = { customName = it },
                     label = { Text(tr("Or add a spell by name")) },
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.weight(1f),
                 )
                 Button(
@@ -348,7 +349,7 @@ fun SpellPickerSheet(
                         customName = ""
                     },
                     enabled = customName.isNotBlank(),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.padding(start = 8.dp),
                 ) { Text(tr("Add")) }
             }
@@ -384,7 +385,7 @@ private fun SpellRow(spell: SpellDef, onAdd: () -> Unit) {
                 )
                 Button(
                     onClick = onAdd,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.fillMaxWidth(),
                 ) { Text("Add ${spell.name}") }
             }
@@ -433,7 +434,7 @@ fun AttackEditorSheet(
                 onValueChange = { name = it },
                 label = { Text(tr("Attack name")) },
                 singleLine = true,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -443,7 +444,7 @@ fun AttackEditorSheet(
                     label = { Text(tr("Damage die")) },
                     placeholder = { Text("2d6") },
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
@@ -452,7 +453,7 @@ fun AttackEditorSheet(
                     label = { Text(tr("Damage type")) },
                     placeholder = { Text(tr("Slashing")) },
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -524,7 +525,7 @@ fun AttackEditorSheet(
                     label = { Text(tr("Range")) },
                     placeholder = { Text(tr("30 ft")) },
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
@@ -533,7 +534,7 @@ fun AttackEditorSheet(
                     label = { Text(tr("Override the bonus")) },
                     placeholder = { Text(tr("e.g. DEX + PB")) },
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -543,7 +544,7 @@ fun AttackEditorSheet(
                 label = { Text(tr("Special effects / notes")) },
                 placeholder = { Text(tr("On a hit, the target must succeed on a DC 15 save or…")) },
                 minLines = 3,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
             val draft = CustomAttack(
@@ -574,7 +575,7 @@ fun AttackEditorSheet(
             Button(
                 onClick = { onSave(draft) },
                 enabled = name.isNotBlank(),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(if (existing == null) tr("Add attack") else tr("Save changes")) }
         }
@@ -619,7 +620,7 @@ fun CustomResourceSheet(
                 onValueChange = { name = it },
                 label = { Text(tr("Name")) },
                 singleLine = true,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
@@ -628,7 +629,7 @@ fun CustomResourceSheet(
                 label = { Text(tr("Number of uses")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -655,7 +656,7 @@ fun CustomResourceSheet(
                 onValueChange = { notes = it },
                 label = { Text(tr("Notes (optional)")) },
                 minLines = 2,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
             Button(
@@ -663,7 +664,7 @@ fun CustomResourceSheet(
                     onSave(name.trim(), max.toIntOrNull() ?: 1, recharge, notes.trim())
                 },
                 enabled = name.isNotBlank(),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(tr("Add tracker")) }
         }

@@ -1,5 +1,7 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.design.Motion
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -107,9 +109,9 @@ fun CreationWizardScreen(
                 val forward = CreationStep.ORDER.indexOf(targetState) >
                     CreationStep.ORDER.indexOf(initialState)
                 val offset = if (forward) 1 else -1
-                (slideInHorizontally(tween(260)) { it * offset } + fadeIn(tween(260)))
+                (slideInHorizontally(Motion.emphasis()) { it * offset } + fadeIn(Motion.emphasis()))
                     .togetherWith(
-                        slideOutHorizontally(tween(260)) { -it * offset } + fadeOut(tween(260))
+                        slideOutHorizontally(Motion.emphasis()) { -it * offset } + fadeOut(Motion.emphasis())
                     )
                     .using(SizeTransform(clip = false))
             },
@@ -153,7 +155,7 @@ private fun StepIndicator(current: CreationStep) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp)),
+                            .clip(Corner.bar),
                         color = when {
                             active -> MaterialTheme.colorScheme.secondary
                             done -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.55f)
@@ -195,7 +197,7 @@ private fun WizardBottomBar(state: CreationState, onNext: () -> Unit) {
             Button(
                 onClick = onNext,
                 enabled = state.canAdvance,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
             ) {
                 Text(if (state.step == CreationStep.DETAILS) tr("Create") else tr("Next"))
             }

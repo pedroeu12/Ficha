@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,7 @@ fun WrittenLine(
     Column(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
+            .clip(Corner.small)
             .then(
                 // Writable in Edit Mode only, matching the phone. Out of it these are a
                 // record to read, and a tap that lands here is a tap that missed.

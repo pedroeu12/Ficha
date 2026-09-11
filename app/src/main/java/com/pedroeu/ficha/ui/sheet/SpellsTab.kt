@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
@@ -73,7 +74,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         item {
             Button(
                 onClick = { addingSpell = true },
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
@@ -97,7 +98,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         if (ability != null) {
             item {
                 Card(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = Corner.card,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer
                     ),
@@ -142,7 +143,7 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
         if (saveDcs.size > 1 || (ability == null && saveDcs.isNotEmpty())) {
             item {
                 Card(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = Corner.card,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
@@ -277,7 +278,7 @@ private fun PreparedCountCard(
     val maxCantrips = CharacterCalculations.maxCantripsKnown(character)
 
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -338,7 +339,7 @@ private fun SpellSlotsCard(
     slots: Map<Int, Int>,
 ) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -439,7 +440,7 @@ private fun SpellSection(
     onOpenSpell: (KnownSpell) -> Unit,
 ) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

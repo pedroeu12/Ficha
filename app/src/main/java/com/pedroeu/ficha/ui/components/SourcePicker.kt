@@ -101,26 +101,13 @@ fun SourceSectionHeader(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onToggle)
-            .padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(
-            text = (if (expanded) "▾  " else "▸  ") + (book?.displayName ?: tr("Other")),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.secondary,
-        )
-        Text(
-            text = count.toString(),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
+    SectionDisclosure(
+        title = book?.displayName ?: tr("Other"),
+        expanded = expanded,
+        onToggle = onToggle,
+        modifier = modifier,
+        trailing = count.toString(),
+    )
 }
 
 /**

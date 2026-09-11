@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.components
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -41,7 +42,7 @@ fun ChoiceSection(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp)) {

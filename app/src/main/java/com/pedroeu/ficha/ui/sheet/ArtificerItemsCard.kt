@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -234,7 +235,7 @@ fun ReplicaBasePickerSheet(
                 label = { Text(tr("Search")) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -264,7 +265,7 @@ private fun PlansContainer(framed: Boolean, content: @Composable () -> Unit) {
         return
     }
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) { content() }
 }

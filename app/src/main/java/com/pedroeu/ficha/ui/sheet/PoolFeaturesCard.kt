@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -108,7 +109,7 @@ private fun PoolContainer(framed: Boolean, content: @Composable () -> Unit) {
         return
     }
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) { content() }
 }

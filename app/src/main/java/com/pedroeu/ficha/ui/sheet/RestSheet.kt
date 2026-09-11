@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
@@ -51,6 +52,9 @@ import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.RestEngine
 import com.pedroeu.ficha.domain.RestOutcome
 import com.pedroeu.ficha.ui.components.ChoiceSection
+import com.pedroeu.ficha.ui.components.SectionDisclosure
+import com.pedroeu.ficha.ui.components.Disclosed
+import com.pedroeu.ficha.ui.design.Space
 import com.pedroeu.ficha.ui.components.SectionHeader
 
 enum class RestKind(private val titleKey: String) {
@@ -116,7 +120,7 @@ fun RestSheet(
                 RestSummary(done)
                 Button(
                     onClick = onDismiss,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.fillMaxWidth(),
                 ) { Text(tr("Done")) }
                 return@Column
@@ -296,7 +300,7 @@ fun RestSheet(
                         viewModel.longRestDetailed()
                     }
                 },
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
@@ -327,30 +331,14 @@ private fun RestSection(
 ) {
     var expanded by rememberSaveable(title) { mutableStateOf(startExpanded) }
     Column(Modifier.fillMaxWidth()) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Text(
-                text = (if (expanded) "▾  " else "▸  ") + title,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.secondary,
-            )
-            if (trailing.isNotBlank()) {
-                Text(
-                    text = trailing,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        if (expanded) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
+        SectionDisclosure(
+            title = title,
+            expanded = expanded,
+            onToggle = { expanded = !expanded },
+            trailing = trailing,
+        )
+        Disclosed(visible = expanded) {
+            Column(verticalArrangement = Arrangement.spacedBy(Space.inline)) { content() }
         }
     }
 }
@@ -388,7 +376,7 @@ private fun RestSummary(outcome: RestOutcome) {
 @Composable
 private fun RestCard(content: @Composable () -> Unit) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),

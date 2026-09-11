@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +72,7 @@ fun Masthead(handle: SheetHandle) {
             Column(
                 Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(Corner.small)
                     .clickable(enabled = handle.editMode) {
                         handle.editText("character:name", tr("Character name"), character.name)
                     }

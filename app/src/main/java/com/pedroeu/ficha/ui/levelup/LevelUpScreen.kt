@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.levelup
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -117,7 +118,7 @@ fun LevelUpScreen(
                     Button(
                         onClick = { if (isLastStep) viewModel.confirm() else viewModel.next() },
                         enabled = loaded.canAdvance,
-                        shape = RoundedCornerShape(10.dp),
+                        shape = Corner.row,
                     ) {
                         Text(if (isLastStep) tr("Level Up") else tr("Next"))
                     }
@@ -165,7 +166,7 @@ private fun LevelUpStepIndicator(steps: List<LevelUpStep>, current: LevelUpStep)
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp)),
+                            .clip(Corner.bar),
                         color = when {
                             active -> MaterialTheme.colorScheme.secondary
                             done -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.55f)

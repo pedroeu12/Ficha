@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
@@ -90,7 +91,7 @@ fun AbilitiesStep(state: CreationState, viewModel: CreationViewModel) {
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer
                         ),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = Corner.row,
                     ) {
                         Row(
                             Modifier
@@ -160,7 +161,7 @@ private fun PoolSection(state: CreationState, viewModel: CreationViewModel) {
                     Box(
                         Modifier
                             .size(44.dp)
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(Corner.row)
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -183,7 +184,7 @@ private fun AssignRow(ability: Ability, state: CreationState, viewModel: Creatio
     val pool = state.availablePool().distinct().sortedDescending()
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = Corner.row,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(12.dp)) {
@@ -252,7 +253,7 @@ private fun StepperRow(
     val finalScore = score + bonus
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = Corner.row,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
@@ -318,7 +319,7 @@ private fun StepperRow(
 private fun FinalPreview(state: CreationState) {
     val finals = state.previewFinalScores()
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),

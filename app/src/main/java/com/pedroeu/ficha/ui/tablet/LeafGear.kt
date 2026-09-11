@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -263,7 +264,7 @@ private fun BooksBlock(handle: SheetHandle) {
                 val on = book in enabled
                 Row(
                     Modifier
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(Corner.small)
                         .clickable {
                             handle.viewModel.setSources(
                                 if (on) enabled - book else enabled + book,
@@ -315,7 +316,7 @@ private fun Prose(
         Column(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(Corner.small)
                 .clickable(onClick = onEdit)
                 .padding(vertical = 2.dp),
         ) {

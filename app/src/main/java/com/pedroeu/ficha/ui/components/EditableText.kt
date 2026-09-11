@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.components
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -111,7 +112,7 @@ fun TextEditDialog(
                     onValueChange = { text = it },
                     singleLine = !multiline,
                     minLines = if (multiline) 4 else 1,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 if (canReset) {

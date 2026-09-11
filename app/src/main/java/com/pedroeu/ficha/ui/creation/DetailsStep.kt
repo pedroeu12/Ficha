@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +53,7 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
                 label = { Text(tr("Character Name")) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
             )
         }
 
@@ -87,7 +88,7 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
                 label = { Text(tr("Appearance (optional)")) },
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
             )
         }
 
@@ -98,7 +99,7 @@ fun DetailsStep(state: CreationState, viewModel: CreationViewModel) {
                 label = { Text(tr("Backstory & Personality (optional)")) },
                 minLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
             )
         }
     }
@@ -112,7 +113,7 @@ private fun CharacterSummary(state: CreationState) {
     val finals = state.previewFinalScores()
 
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),

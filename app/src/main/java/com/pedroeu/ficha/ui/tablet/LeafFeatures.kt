@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -258,13 +259,13 @@ private fun FeatureLine(
         Row(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(6.dp))
+                .clip(Corner.small)
                 .let { if (hasBody) it.clickable { open = !open } else it }
                 .padding(vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (hasBody) (if (open) "▾  " else "▸  ") + shownName else "    $shownName",
+                text = shownName,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.SemiBold,
@@ -280,20 +281,10 @@ private fun FeatureLine(
             if (onRemove != null) PenMark(tr("Delete"), glyph = "×", onClick = onRemove)
         }
 
-        // Short text unfolds in place, the way the paper sheet reads. Book-length text would
-        // push the rest of the leaf off the page, so it opens in a sheet of its own instead.
-        val readInASheet = shownBody.length > LONG_TEXT_THRESHOLD
-
-        AnimatedVisibility(visible = open && !readInASheet) {
-            Column(Modifier.padding(start = 18.dp, bottom = 8.dp)) {
-                SheetText(
-                    shownBody,
-                    soft = handle.character.textOverrides[bodyKey] == null,
-                )
-            }
-        }
-
-        if (open && readInASheet) {
+        // One gesture, one outcome. This used to unfold short text in place and open long
+        // text in a sheet, so the same tap on two neighbouring features did two different
+        // things — which is precisely what made the app feel like it had no rules.
+        if (open) {
             RulesTextSheet(
                 title = shownName,
                 body = shownBody,

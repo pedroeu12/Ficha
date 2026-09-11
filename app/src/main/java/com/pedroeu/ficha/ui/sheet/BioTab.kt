@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
     ) {
         item {
             Card(
-                shape = RoundedCornerShape(14.dp),
+                shape = Corner.card,
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
@@ -113,7 +114,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                 onValueChange = viewModel::setAppearance,
                 label = { Text(tr("Appearance")) },
                 minLines = 3,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -124,7 +125,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                 onValueChange = viewModel::setBackstory,
                 label = { Text(tr("Backstory & Personality")) },
                 minLines = 5,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -132,7 +133,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
         if (editMode) {
             item {
                 Card(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = Corner.card,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
@@ -188,7 +189,7 @@ fun BioTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bool
                 onValueChange = viewModel::setNotes,
                 label = { Text(tr("Session Notes")) },
                 minLines = 5,
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             )
         }

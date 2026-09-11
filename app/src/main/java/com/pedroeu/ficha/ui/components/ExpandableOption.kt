@@ -1,38 +1,20 @@
 package com.pedroeu.ficha.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 
 /**
- * One named sub-option — a Ki ability, a Metamagic option, a maneuver — shown as a tappable
- * row that opens to reveal its full rules text.
+ * One named thing with rules behind it: a maneuver, an invocation, a mastery property, a
+ * feature's chosen option.
  *
- * When there is no rules text to show the row stays flat and untappable, so this can be used
- * for lists that mix described options with plain ones (skills, ability scores) without
- * promising an expansion that never arrives.
+ * It used to fold open in place, which meant a list of nineteen maneuvers became nineteen
+ * pages the moment you were curious about one, and meant that reading a feature worked
+ * differently from reading a spell or an item three tabs away. It is a row now, and the row
+ * opens the same sheet everything else opens.
  */
 @Composable
 fun ExpandableOption(
@@ -42,72 +24,23 @@ fun ExpandableOption(
     subtitle: String = "",
     trailingLabel: String = "",
 ) {
-    var expanded by remember(name) { mutableStateOf(false) }
+    var open by rememberSaveable(name) { mutableStateOf(false) }
     val hasBody = description.isNotBlank()
-    // Short text reads fine unfolded in place; book-length text gets its own sheet, so a list
-    // of nineteen maneuvers doesn't turn into nineteen pages when one is opened.
-    val readInASheet = description.length > LONG_TEXT_THRESHOLD
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
-            .let { if (hasBody) it.clickable { expanded = !expanded } else it }
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                if (subtitle.isNotBlank()) {
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
-                }
-            }
-            if (trailingLabel.isNotBlank()) {
-                Text(
-                    text = trailingLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            if (hasBody) {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp
-                    else Icons.Default.KeyboardArrowDown,
-                    contentDescription = if (expanded) "Hide $name" else "Show $name",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .size(20.dp),
-                )
-            }
-        }
+    DetailRow(
+        title = name,
+        modifier = modifier,
+        // The first sentence stands in for the rest, so the list says something useful
+        // without the player having to open every row to find out which one they want.
+        supporting = if (hasBody) firstSentenceOf(description) else subtitle,
+        trailing = trailingLabel,
+        onClick = if (hasBody) ({ open = true }) else null,
+    )
 
-        if (expanded && hasBody && !readInASheet) {
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-
-    if (expanded && readInASheet) {
-        RulesTextSheet(
-            title = name,
-            body = description,
-            subtitle = subtitle,
-            onDismiss = { expanded = false },
+    if (open) {
+        DetailSheet(
+            detail = Detail(title = name, kind = subtitle, body = description),
+            onDismiss = { open = false },
         )
     }
 }

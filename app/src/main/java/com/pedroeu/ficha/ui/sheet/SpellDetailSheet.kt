@@ -1,154 +1,62 @@
 package com.pedroeu.ficha.ui.sheet
 
-import com.pedroeu.ficha.ui.i18n.tr
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.domain.KnownSpell
-import com.pedroeu.ficha.ui.components.ChoiceChip
-import com.pedroeu.ficha.ui.components.SectionHeader
+import com.pedroeu.ficha.ui.components.Detail
+import com.pedroeu.ficha.ui.components.DetailFact
+import com.pedroeu.ficha.ui.components.DetailSheet
+import com.pedroeu.ficha.ui.i18n.tr
 
 /**
- * Everything about one spell: what it costs to cast, how far it reaches, how long it lasts,
- * what it needs, and what it actually does.
+ * Everything about one spell, in the app's one detail shape.
  *
- * The stored [KnownSpell] only carries a name, level, school, and description, so anything
- * else comes from the catalog. A spell the player wrote by hand won't be in there, and the
- * sheet shows what it has rather than pretending to know the rest.
+ * The stored [KnownSpell] carries only a name, level, school and description, so the numbers
+ * come from the catalogue. A spell the player wrote by hand won't be in there, and the sheet
+ * shows what it has rather than pretending to know the rest.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SpellDetailSheet(spell: KnownSpell, onDismiss: () -> Unit) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val catalogEntry = SpellData.byId(spell.id)
+    val entry = SpellData.byId(spell.id)
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = spell.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-
-            Text(
-                text = listOf(
-                    if (spell.level == 0) tr("Cantrip") else "Level ${spell.level}",
-                    spell.school,
-                ).filter { it.isNotBlank() }.joinToString(" • "),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.secondary,
-            )
-
-            if (catalogEntry != null) {
-                // Concentration and Ritual are the two flags that change how a spell is
-                // played, so they get chips rather than being buried in a row of labels.
-                if (catalogEntry.concentration || catalogEntry.ritual) {
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (catalogEntry.concentration) {
-                            ChoiceChip(tr("Concentration"), selected = true, onClick = {})
-                        }
-                        if (catalogEntry.ritual) {
-                            ChoiceChip(tr("Ritual"), selected = true, onClick = {})
-                        }
-                    }
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DetailRow(tr("Casting Time"), catalogEntry.castingTime)
-                    DetailRow(tr("Range"), catalogEntry.range)
-                    DetailRow(tr("Components"), catalogEntry.components)
-                    DetailRow(tr("Duration"), catalogEntry.duration)
-                    DetailRow(
-                        tr("Concentration"),
-                        if (catalogEntry.concentration) tr("Yes") else tr("No"),
-                    )
-                    if (catalogEntry.damage.isNotBlank()) {
-                        DetailRow(
-                            tr("Damage"),
-                            "${catalogEntry.damage} ${catalogEntry.damageType}",
-                        )
-                        DetailRow(
-                            tr("Resolves with"),
-                            if (catalogEntry.needsAttackRoll) {
-                                tr("A spell attack roll")
-                            } else {
-                                catalogEntry.saveAbility
-                                    ?.let { "${it.fullName} saving throw" }
-                                    .orEmpty()
-                            },
-                        )
-                    }
-                }
-            }
-
-            if (spell.source.isNotBlank()) {
-                DetailRow(tr("From"), spell.source)
-            }
-
-            SectionHeader(tr("Effect"))
-            Text(
-                text = catalogEntry?.description?.takeIf { it.isNotBlank() }
-                    ?: spell.description.ifBlank { tr("No description recorded for this spell.") },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            if (catalogEntry == null) {
-                Text(
-                    text = tr("This spell isn't in the rulebook data, so only what you entered is " +
-                        "shown. You can edit its text in Edit Mode."),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailRow(label: String, value: String) {
-    if (value.isBlank()) return
-    Row(Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1.6f),
-        )
-    }
+    DetailSheet(
+        detail = Detail(
+            title = spell.name,
+            kind = listOf(
+                if (spell.level == 0) tr("Cantrip") else "${tr("Level")} ${spell.level}",
+                spell.school,
+            ).filter { it.isNotBlank() }.joinToString(" • "),
+            // What a caster needs in the half-second before casting: what it does to whom.
+            summary = entry?.let { catalogue ->
+                listOfNotNull(
+                    catalogue.damage.takeIf { it.isNotBlank() }
+                        ?.let { "$it ${catalogue.damageType}".trim() },
+                    when {
+                        catalogue.needsAttackRoll -> tr("Spell attack roll")
+                        catalogue.saveAbility != null ->
+                            "${catalogue.saveAbility!!.fullName} ${tr("saving throw")}"
+                        else -> null
+                    },
+                    tr("Concentration").takeIf { catalogue.concentration },
+                    tr("Ritual").takeIf { catalogue.ritual },
+                ).joinToString(" • ")
+            }.orEmpty(),
+            facts = listOfNotNull(
+                entry?.let { DetailFact(tr("Casting Time"), it.castingTime) },
+                entry?.let { DetailFact(tr("Range"), it.range) },
+                entry?.let { DetailFact(tr("Components"), it.components) },
+                entry?.let { DetailFact(tr("Duration"), it.duration) },
+                spell.source.takeIf { it.isNotBlank() }?.let { DetailFact(tr("From"), it) },
+            ),
+            body = entry?.description?.takeIf { it.isNotBlank() }
+                ?: spell.description.ifBlank { tr("No description recorded for this spell.") },
+            footnote = if (entry == null) {
+                tr("This spell isn't in the rulebook data, so only what you entered is " +
+                    "shown. You can edit its text in Edit Mode.")
+            } else {
+                ""
+            },
+        ),
+        onDismiss = onDismiss,
+    )
 }

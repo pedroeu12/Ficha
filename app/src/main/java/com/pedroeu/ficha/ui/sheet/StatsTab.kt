@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
@@ -241,7 +242,7 @@ private fun StatTile(
 ) {
     val clickable = editMode && onClick != null
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = Corner.row,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = modifier
             .heightIn(min = 86.dp)
@@ -332,7 +333,7 @@ private fun InspirationTile(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = Corner.row,
         colors = CardDefaults.cardColors(
             containerColor = if (active) MaterialTheme.colorScheme.secondary
             else MaterialTheme.colorScheme.surface
@@ -376,7 +377,7 @@ private fun HitPointsCard(
     val hitDie = CharacterCalculations.hitDie(character)
 
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -540,7 +541,7 @@ private fun QuickAdjustButton(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
+            .clip(Corner.small)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp, horizontal = 14.dp),
@@ -557,7 +558,7 @@ private fun QuickAdjustButton(
 @Composable
 private fun DeathSavesCard(character: PlayerCharacter, viewModel: SheetViewModel) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -629,7 +630,7 @@ private fun AbilityCard(
         character.abilityScoreBonuses.containsKey(ability.name)
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = Corner.row,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = if (editMode) Modifier.clickable { onEditScore() } else Modifier,
     ) {

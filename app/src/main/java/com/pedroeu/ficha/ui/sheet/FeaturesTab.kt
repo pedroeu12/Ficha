@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.domain.SheetFeatures
 import com.pedroeu.ficha.ui.components.ChoiceSection
+import com.pedroeu.ficha.ui.components.DetailRow
 import com.pedroeu.ficha.ui.components.EditableText
 import androidx.compose.foundation.clickable
 import com.pedroeu.ficha.ui.components.LONG_TEXT_THRESHOLD
@@ -421,7 +423,7 @@ private fun ChoiceEditDialog(
 @Composable
 private fun FeatureCard(title: String, content: @Composable () -> Unit) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
@@ -481,29 +483,19 @@ private fun FeatureEntry(
         }
 
         val body = descOverride ?: description
-        // Edit Mode always shows the field, since that is the only way to change the text.
-        // Outside it, anything book-length collapses to its first line and opens in full on
-        // a tap, so a list of features stays a list rather than becoming a wall of prose.
-        val readInASheet = !editMode && body.length > LONG_TEXT_THRESHOLD
-
-        if (readInASheet) {
+        // One gesture, one outcome. Short text used to sit inline and long text opened in a
+        // sheet, so whether a tap did anything depended on how wordy the feature happened to
+        // be. Outside Edit Mode every feature reads the same way: a summary line, and the
+        // book's words in the app's one sheet. Edit Mode still shows the field, because that
+        // is the only way to change the text.
+        if (!editMode && body.isNotBlank()) {
             var showFullText by remember(featureId) { mutableStateOf(false) }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showFullText = true },
-            ) {
-                Text(
-                    text = firstSentenceOf(body),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = tr("Read the full rules"),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
+            // The feature's name is already the heading above, so the row carries the
+            // summary and the chevron that says there is more behind it.
+            DetailRow(
+                title = firstSentenceOf(body),
+                onClick = { showFullText = true },
+            )
             if (showFullText) {
                 RulesTextSheet(
                     title = nameOverride ?: name,

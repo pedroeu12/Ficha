@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.levelup
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -65,7 +66,7 @@ private fun StepColumn(content: LazyListScope.() -> Unit) {
 @Composable
 private fun InfoCard(content: @Composable () -> Unit) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -164,7 +165,7 @@ fun HitPointsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                         label = { Text(trf("Hit points rolled (1-{0})", state.hitDie)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = Corner.row,
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -632,7 +633,7 @@ fun NewSpellsStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                                 onValueChange = { manualEntry = it },
                                 label = { Text(tr("Spell name")) },
                                 singleLine = true,
-                                shape = RoundedCornerShape(10.dp),
+                                shape = Corner.row,
                                 modifier = Modifier.weight(1f),
                             )
                             IconButton(

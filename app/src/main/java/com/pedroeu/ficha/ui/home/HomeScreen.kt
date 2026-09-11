@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.home
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -182,7 +183,7 @@ private fun CharacterRow(
 
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(

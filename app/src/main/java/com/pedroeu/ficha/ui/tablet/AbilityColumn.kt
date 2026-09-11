@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -61,9 +62,9 @@ fun AbilityBlock(
         Box(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(Corner.row)
                 .background(v.well.copy(alpha = if (v.isDark) 0.85f else 0.7f))
-                .border(1.dp, v.rule, RoundedCornerShape(12.dp))
+                .border(1.dp, v.rule, Corner.row)
                 .clickable(enabled = editMode) { viewModel.editAbility(ability) }
                 .padding(vertical = 8.dp),
         ) {
@@ -161,7 +162,7 @@ private fun ProficiencyLine(
     Row(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(6.dp))
+            .clip(Corner.small)
             .let { if (onOpen != null) it.clickable(onClick = onOpen) else it }
             .padding(horizontal = 6.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,

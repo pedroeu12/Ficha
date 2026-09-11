@@ -1,5 +1,8 @@
 package com.pedroeu.ficha.ui.tablet
 
+import com.pedroeu.ficha.ui.design.Corner
+import androidx.compose.animation.Crossfade
+import com.pedroeu.ficha.ui.design.Motion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -90,7 +93,7 @@ fun TabletSheetScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(6.dp)
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(Corner.page)
                     .paperPage(vellum)
             ) {
                 Masthead(handle)
@@ -105,11 +108,15 @@ fun TabletSheetScreen(
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    when (leaf) {
-                        0 -> LeafCharacter(handle)
-                        1 -> LeafFeatures(handle)
-                        2 -> LeafMagic(handle)
-                        else -> LeafGear(handle)
+                    // Crossfaded rather than swapped: turning a page of the sheet should read
+                    // as a movement, the way the phone's pager already does.
+                    Crossfade(targetState = leaf, animationSpec = Motion.standard(), label = "leaf") {
+                        when (it) {
+                            0 -> LeafCharacter(handle)
+                            1 -> LeafFeatures(handle)
+                            2 -> LeafMagic(handle)
+                            else -> LeafGear(handle)
+                        }
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -114,7 +115,7 @@ private fun CatalogBrowser(onAdd: (InventoryItem) -> Unit) {
             label = { Text(tr("Search the rulebook")) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
             singleLine = true,
-            shape = RoundedCornerShape(10.dp),
+            shape = Corner.row,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
@@ -241,7 +242,7 @@ private fun CatalogRow(entry: CatalogItem, onAdd: () -> Unit) {
                 }
                 Button(
                     onClick = onAdd,
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(tr("Add to inventory"))
@@ -267,7 +268,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
             onValueChange = { name = it },
             label = { Text(tr("Item name")) },
             singleLine = true,
-            shape = RoundedCornerShape(10.dp),
+            shape = Corner.row,
             modifier = Modifier.fillMaxWidth(),
         )
         Row(
@@ -280,7 +281,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
                 label = { Text(tr("Quantity")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.weight(1f),
             )
             OutlinedTextField(
@@ -289,7 +290,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
                 label = { Text(tr("Weight (lb)")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -298,7 +299,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
             onValueChange = { notes = it },
             label = { Text(tr("Description or notes")) },
             minLines = 3,
-            shape = RoundedCornerShape(10.dp),
+            shape = Corner.row,
             modifier = Modifier.fillMaxWidth(),
         )
         Button(
@@ -313,7 +314,7 @@ private fun CustomItemForm(onAdd: (InventoryItem) -> Unit) {
                 )
             },
             enabled = name.isNotBlank(),
-            shape = RoundedCornerShape(10.dp),
+            shape = Corner.row,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(tr("Add to inventory"))

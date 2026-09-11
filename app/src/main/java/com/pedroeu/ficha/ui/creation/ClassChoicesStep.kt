@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.creation
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -209,7 +210,7 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
 @Composable
 private fun ChoiceBlock(content: @Composable () -> Unit) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),

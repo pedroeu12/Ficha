@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.components
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.layout.Arrangement
@@ -77,7 +78,7 @@ fun StatEditDialog(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = if (allowNegative) KeyboardType.Text else KeyboardType.Number
                     ),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 OutlinedTextField(
@@ -89,7 +90,7 @@ fun StatEditDialog(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = if (allowNegative) KeyboardType.Text else KeyboardType.Number
                     ),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = Corner.row,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

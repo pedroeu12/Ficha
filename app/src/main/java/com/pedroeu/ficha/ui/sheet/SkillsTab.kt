@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,7 +75,7 @@ fun SkillsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
             if (skills.isEmpty()) return@forEach
             item(key = ability.name) {
                 Card(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = Corner.card,
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
@@ -119,7 +120,7 @@ fun SkillsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
 
         item {
             Card(
-                shape = RoundedCornerShape(14.dp),
+                shape = Corner.card,
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
@@ -251,7 +252,7 @@ private fun ToolProficienciesCard(
     var newTool by remember { mutableStateOf("") }
 
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -293,7 +294,7 @@ private fun ToolProficienciesCard(
                         label = { Text(tr("Add a tool or proficiency")) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = Corner.row,
                         modifier = Modifier.weight(1f),
                     )
                     IconButton(

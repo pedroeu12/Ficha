@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.background
@@ -51,6 +52,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.pedroeu.ficha.ui.components.SelectableCard
 import com.pedroeu.ficha.ui.components.ExpandableOption
+import com.pedroeu.ficha.ui.components.SectionDisclosure
+import com.pedroeu.ficha.ui.components.Disclosed
+import com.pedroeu.ficha.ui.design.Space
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.StatEditDialog
 
@@ -103,16 +107,17 @@ fun ResourcesCard(
             sections.forEach { (cost, rows) ->
                 val open = !grouped || cost !in collapsed
                 if (grouped) {
-                    ActionSectionHeader(
-                        cost = cost,
-                        count = rows.size,
+                    SectionDisclosure(
+                        title = tr(cost.label),
                         expanded = open,
                         onToggle = {
                             collapsed = if (open) collapsed + cost else collapsed - cost
                         },
+                        trailing = rows.size.toString(),
                     )
                 }
-                if (open) {
+                Disclosed(visible = open) {
+                  Column(verticalArrangement = Arrangement.spacedBy(Space.betweenRows)) {
                     rows.forEach { state ->
                         ResourceRow(
                             state = state,
@@ -132,6 +137,7 @@ fun ResourcesCard(
                             onDelete = { viewModel.removeCustomResource(state.def.id) },
                         )
                     }
+                  }
                 }
             }
 
@@ -383,35 +389,6 @@ private fun ResourceRow(
  * that aren't the question you're asking: on your turn you want the Actions and the Bonus
  * Actions, and on someone else's turn you want the one Reaction.
  */
-@Composable
-private fun ActionSectionHeader(
-    cost: ActionCost,
-    count: Int,
-    expanded: Boolean,
-    onToggle: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onToggle)
-            .padding(top = 2.dp, bottom = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(
-            text = (if (expanded) "\u25BE  " else "\u25B8  ") + tr(cost.label),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.secondary,
-        )
-        Text(
-            text = count.toString(),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
 /**
  * What are you spending this on?
  *
@@ -480,7 +457,7 @@ private fun MaybeCard(framed: Boolean, content: @Composable () -> Unit) {
         return
     }
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) { content() }
 }

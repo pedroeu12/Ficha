@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.sheet
 
+import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.i18n.trf
 import com.pedroeu.ficha.ui.i18n.tr
 import androidx.compose.foundation.clickable
@@ -72,7 +73,7 @@ fun InventoryTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode
         item {
             Button(
                 onClick = { showAddSheet = true },
-                shape = RoundedCornerShape(10.dp),
+                shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
@@ -140,7 +141,7 @@ private fun InventoryRow(
     }
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = Corner.row,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column {
@@ -231,7 +232,7 @@ private fun InventoryRow(
                         },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = Corner.small,
                         modifier = Modifier.width(96.dp),
                     )
                 }
@@ -243,7 +244,7 @@ private fun InventoryRow(
 @Composable
 private fun CoinsCard(coins: Coins, onChange: (Coins) -> Unit) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = Corner.card,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -283,7 +284,7 @@ private fun CoinField(
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            shape = RoundedCornerShape(8.dp),
+            shape = Corner.small,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(

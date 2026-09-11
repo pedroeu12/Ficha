@@ -3,6 +3,8 @@ package com.pedroeu.ficha.ui.creation
 import com.pedroeu.ficha.ui.i18n.tr
 import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.content.SpellGrantData
+import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
@@ -208,7 +210,26 @@ data class CreationState(
             originChoices
                 .filter { it.kind == ChoiceKind.SPELL }
                 .forEach { addAll(originSelections[it.id].orEmpty()) }
+            // Spells nobody chose because the rules simply hand them over: a Tiefling's
+            // lineage cantrip, a Drow's Dancing Lights, a feat's free casting. They were
+            // missing here, so the Warlock cantrip list went on offering a Tiefling the
+            // Thaumaturgy they already had.
+            addAll(grantedSpellIds)
         }
+
+    /** Spells the character is given outright by species, lineage, background, or a feat. */
+    val grantedSpellIds: Set<String>
+        get() = SpellGrantData.grantedSpellIds(
+            classId = classId.orEmpty(),
+            speciesId = speciesId.orEmpty(),
+            lineageId = lineageId,
+            featIds = originChoices
+                .filter { it.kind == ChoiceKind.FEAT }
+                .flatMap { originSelections[it.id].orEmpty() } +
+                listOfNotNull(background?.takeIf { it.featChoice == null }?.featId),
+            selections = classSelections + originSelections,
+            level = 1,
+        )
 
     /**
      * The names of those spells. A class's cantrip list and the spell catalog give the same
@@ -216,6 +237,7 @@ data class CreationState(
      */
     val ownedSpellNames: Set<String>
         get() = buildSet {
+            grantedSpellIds.forEach { id -> SpellData.byId(id)?.let { add(it.name) } }
             charClass?.choices
                 ?.filterIsInstance<ClassChoice.CantripChoice>()
                 ?.forEach { choice ->

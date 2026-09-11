@@ -46,6 +46,10 @@ import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.PerUseChoices
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResourceState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import com.pedroeu.ficha.ui.components.SelectableCard
 import com.pedroeu.ficha.ui.components.ExpandableOption
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.StatEditDialog
@@ -180,6 +184,23 @@ private fun ResourceRow(
 ) {
     val def = state.def
     var optionsShown by remember(def.id) { mutableStateOf(false) }
+    // The rules attach a decision to spending this pool, so spending it has to ask. Set when
+    // a pip or the Spend button is tapped, and answered by picking from the list.
+    var choosingUse by remember(def.id) { mutableStateOf(false) }
+
+    /**
+     * Spends a use. Where the feature asks which effect you are spending it on, the question
+     * comes first — tapping a pip used to spend the use silently and leave the choice
+     * unanswered beside it, which is the one order the rules never mean.
+     */
+    fun spend(newSpent: Int) {
+        val isSpending = newSpent > state.spent
+        if (isSpending && perUseChoices.any { it.choice.options.isNotEmpty() }) {
+            choosingUse = true
+            return
+        }
+        onSetSpent(newSpent)
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -246,7 +267,7 @@ private fun ResourceRow(
                                 CircleShape,
                             )
                             // Tapping a spent pip gives that use back.
-                            .clickable { onSetSpent(if (state.spent == index) index - 1 else index) },
+                            .clickable { spend(if (state.spent == index) index - 1 else index) },
                     )
                 }
             }
@@ -256,7 +277,7 @@ private fun ResourceRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 TextButton(
-                    onClick = { onSetSpent(state.spent + 1) },
+                    onClick = { spend(state.spent + 1) },
                     enabled = state.remaining > 0,
                 ) { Text(tr("Spend 1")) }
                 TextButton(
@@ -280,6 +301,18 @@ private fun ResourceRow(
                     { optionId -> onUse(active.choice.id, optionId) }
                 } else {
                     null
+                },
+            )
+        }
+
+        if (choosingUse) {
+            UseChoiceDialog(
+                poolName = def.name,
+                choices = perUseChoices,
+                onDismiss = { choosingUse = false },
+                onPick = { choiceId, optionId ->
+                    choosingUse = false
+                    onUse(choiceId, optionId)
                 },
             )
         }
@@ -377,6 +410,60 @@ private fun ActionSectionHeader(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+}
+
+/**
+ * What are you spending this on?
+ *
+ * Asked when a use is spent from a pool the rules attach a decision to. A list of the actual
+ * effects, each with its rules text, rather than a button that spends the use and leaves you
+ * to remember what you meant by it.
+ */
+@Composable
+private fun UseChoiceDialog(
+    poolName: String,
+    choices: List<ActiveChoice>,
+    onDismiss: () -> Unit,
+    onPick: (choiceId: String, optionId: String) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(trf("Use {0}", poolName)) },
+        text = {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                choices.forEach { active ->
+                    if (choices.size > 1) {
+                        Text(
+                            text = tr(active.choice.label),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                    }
+                    Text(
+                        text = tr(active.choice.prompt),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    active.choice.options.forEach { option ->
+                        SelectableCard(
+                            title = option.name,
+                            subtitle = option.description,
+                            selected = active.selected?.id == option.id,
+                            onClick = { onPick(active.choice.id, option.id) },
+                            trailingLabel = option.supporting.ifBlank { null },
+                            subtitleMaxLines = 4,
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Cancel")) } },
+    )
 }
 
 /**

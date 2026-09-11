@@ -154,6 +154,7 @@ object ChoiceResolver {
                         resolve(character, it, feature.name, feature.level, entry.classId)
                     }
                 }
+                .let(::oneLinePerChoice)
         }
 
     /** Every choice attached to subclass features the character has reached. */
@@ -168,7 +169,25 @@ object ChoiceResolver {
                         resolve(character, it, feature.name, feature.level, entry.classId)
                     }
                 }
+                .let(::oneLinePerChoice)
         }
+
+    /**
+     * One line per question, not one per level that asked it.
+     *
+     * A Warlock's invocations are asked again at eight levels and a martial class's Weapon
+     * Mastery at three or four, each asking restating the whole set under the same id. Left
+     * as they come, the sheet showed the level 1 answer, the level 2 answer and the level 5
+     * answer side by side — three lists of the same invocations, under three headings, on
+     * every card that shared the feature's name.
+     *
+     * The live answer is the one given at the highest level reached, which also carries that
+     * level's count, so that is the one kept.
+     */
+    private fun oneLinePerChoice(resolved: List<ResolvedChoice>): List<ResolvedChoice> =
+        resolved.groupBy { it.choice.id }
+            .map { (_, forId) -> forId.maxBy { it.level } }
+            .sortedBy { it.level }
 
     /**
      * Level-1 class options, which use the older [ClassChoice] shape. Only the feature

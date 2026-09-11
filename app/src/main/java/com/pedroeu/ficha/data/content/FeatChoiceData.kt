@@ -43,6 +43,11 @@ object FeatChoiceData {
         "heavily_armored" to listOf(Ability.STR),
         "heavy_armor_master" to listOf(Ability.STR),
         "inspiring_leader" to listOf(Ability.WIS, Ability.CHA),
+        // Both compute a number from whichever of the two they raised — Infernal
+        // Bulwark's Armor Class, Infernal Dragoon's save DC — so the answer has to be
+        // asked for and kept, not just applied to the score and forgotten.
+        "infernal_bulwark" to listOf(Ability.CON, Ability.CHA),
+        "infernal_dragoon" to listOf(Ability.CON, Ability.CHA),
         "keen_mind" to listOf(Ability.INT),
         "lightly_armored" to listOf(Ability.STR, Ability.DEX),
         "mage_slayer" to listOf(Ability.STR, Ability.DEX),

@@ -268,11 +268,18 @@ object CharacterCalculations {
         // so having any levels there is the whole test — the plain classId field named one
         // class and left a multiclassed Barbarian defending as if unarmoured meant naked.
         val isMonk = ClassLevels.has(character, "monk")
+        // A feat can set an unarmoured AC too, and Infernal Bulwark's uses whichever ability
+        // the feat raised — a formula the sheet has to finish, not print.
+        val bulwarkAbility = FeatBonuses.all(character)
+            .firstOrNull { it.featId == "infernal_bulwark" }
+            ?.ability
         val unarmoredAc = when {
             ClassLevels.has(character, "barbarian") && !wearingArmor -> 10 + dex + con
             isMonk && equipped.isEmpty() -> 10 + dex + wis
             ClassLevels.hasSubclass(character, "draconic") && !wearingArmor -> 10 + dex + cha
             ClassLevels.hasSubclass(character, "dance") && !wearingArmor -> 10 + dex + cha
+            bulwarkAbility != null && !wearingArmor && shieldBonus == 0 ->
+                10 + dex + (mods[bulwarkAbility] ?: 0)
             else -> null
         }
 

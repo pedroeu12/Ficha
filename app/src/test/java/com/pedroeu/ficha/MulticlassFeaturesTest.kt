@@ -121,10 +121,22 @@ class MulticlassFeaturesTest {
     // ------------------------------------------------------------------ Starting features
 
     @Test
-    fun `starting features carry no level, so they are listed without one`() {
+    fun `a class has features from the moment you take it`() {
         val starting = SheetFeatures.classFeatures(fighterWizard(), "fighter")
-            .filter { it.level == 0 }
-        assertTrue("a class has features from the moment you take it", starting.isNotEmpty())
+            .filter { it.level == 1 }
+        assertTrue(starting.isNotEmpty())
+    }
+
+    @Test
+    fun `a feature restated at higher levels is listed once`() {
+        // A Warlock's table says "Eldritch Invocations" at eight levels and a Fighter's says
+        // "Weapon Mastery" at three; each is the same choice with a bigger number.
+        val fighter = SheetFeatures.classFeatures(fighterWizard(fighter = 20, wizard = 0), "fighter")
+        assertEquals(
+            "Weapon Mastery is one row, not four",
+            1,
+            fighter.count { it.name == "Weapon Mastery" },
+        )
     }
 
     // ------------------------------------------------------------------ Choices

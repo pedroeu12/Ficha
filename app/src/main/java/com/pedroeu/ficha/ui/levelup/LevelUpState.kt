@@ -294,6 +294,9 @@ data class LevelUpState(
      */
     private val knownSpellIds: Set<String>
         get() = character.knownSpells.map { it.id }.toSet() +
+            // Everything already granted: a lineage cantrip, a feat's free casting, a
+            // subclass's always-prepared list. None of it is a pick to spend.
+            CharacterSpells.granted(character).map { it.spell.id } +
             SpellGrantData.alwaysPreparedForClass(classId, targetClassLevel) +
             SpellGrantData.alwaysPreparedForSubclass(activeSubclassId, targetClassLevel)
 

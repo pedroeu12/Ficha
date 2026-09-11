@@ -73,6 +73,12 @@ object SpellGrantData {
             at(7, "arcane_eye", "banishment", "confusion") +
             at(9, "legend_lore", "scrying", "synaptic_static"),
 
+        // ---- Arcana Unleashed
+        "arcana_domain" to at(3, "detect_magic", "magic_missile", "magic_weapon", "nystuls_magic_aura") +
+            at(5, "counterspell", "dispel_magic") +
+            at(7, "arcane_eye", "leomunds_secret_chest") +
+            at(9, "bigbys_hand", "teleportation_circle"),
+
         // ---- Paladin oaths
         "oathbreaker" to at(3, "hellish_rebuke", "witch_bolt") +
             at(5, "crown_of_madness", "darkness") +
@@ -465,6 +471,31 @@ object SpellGrantData {
             .filter { it.alwaysPrepared && it.level <= level }
             .map { it.spellId }
             .toSet()
+
+    /**
+     * Every spell already granted at [level], from every source, as a flat set of ids.
+     *
+     * For the pickers, which must never offer something the character is handed anyway — a
+     * Tiefling is given Thaumaturgy by their lineage and was still being offered it in the
+     * Warlock cantrip list, where taking it spent a pick on a spell they already had.
+     *
+     * Takes the pieces rather than a character because character creation has no character
+     * yet and still knows the species, the lineage and the class. A finished character should
+     * go through [com.pedroeu.ficha.domain.CharacterSpells.granted] instead, which knows to
+     * scale class grants on the class level and species grants on the character's.
+     */
+    fun grantedSpellIds(
+        classId: String = "",
+        subclassId: String? = null,
+        speciesId: String = "",
+        lineageId: String? = null,
+        featIds: List<String> = emptyList(),
+        selections: Map<String, List<String>> = emptyMap(),
+        level: Int = 1,
+    ): Set<String> = forSources(classId, subclassId, speciesId, lineageId, featIds, selections)
+        .filter { (_, grant) -> grant.level <= level }
+        .map { (_, grant) -> grant.spellId }
+        .toSet()
 
     /** Everything the character is handed outright, before any level filtering. */
     fun forSources(

@@ -49,6 +49,7 @@ import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.KnownSpell
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.ChoiceChip
@@ -215,7 +216,10 @@ fun SpellPickerSheet(
     var customName by remember { mutableStateOf("") }
     var collapsedBooks by rememberSaveable { mutableStateOf(setOf<String>()) }
 
-    val known = character.knownSpells.map { it.id }.toSet()
+    // Spells already on the sheet, chosen or granted. A spell the rules hand over is not a
+    // spell to add: offering it again puts a second copy in the list.
+    val known = character.knownSpells.map { it.id }.toSet() +
+        CharacterSpells.granted(character).map { it.spell.id }
     // "My class's list" means every class the character has, or a Cleric/Wizard browsing for
     // a Wizard spell would be told there isn't one.
     val classIds = ClassLevels.of(character).map { it.classId }.toSet()

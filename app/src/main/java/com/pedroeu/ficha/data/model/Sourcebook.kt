@@ -30,6 +30,7 @@ enum class Sourcebook(
     RAVENLOFT("ravenloft", "Ravenloft: The Horrors Within"),
     ASTARIONS_BOOK("astarions_book", "Astarion's Book of Hungers"),
     LORWYN("lorwyn", "Lorwyn: First Light"),
+    ARCANA_UNLEASHED("arcana_unleashed", "Arcana Unleashed"),
     HELLFIRE_CLUB("hellfire_club", "Welcome to the Hellfire Club"),
     UNI_LOST_HORN("uni_lost_horn", "Uni and the Hunt for the Lost Horn"),
 

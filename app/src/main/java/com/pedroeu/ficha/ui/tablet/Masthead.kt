@@ -148,12 +148,25 @@ fun Masthead(handle: SheetHandle) {
                     value = "${CharacterCalculations.passivePerception(character)}",
                     label = tr("Passive Perception"),
                 )
-                Stone(modifier = Modifier.width(STONE_WIDTH)) {
+                // Writable, like the phone's. Size is the one vital the rules take from the
+                // species and a table routinely overrules — an enlarged character, a DM's
+                // ruling — and it was read-only here while the phone let you type over it.
+                val sizeOverridden = character.textOverrides.containsKey("vitals:size")
+                Stone(
+                    modifier = Modifier.width(STONE_WIDTH),
+                    onClick = if (handle.editMode) ({
+                        handle.editText(
+                            "vitals:size",
+                            tr("Size"),
+                            character.textOverrides["vitals:size"].orEmpty(),
+                        )
+                    }) else null,
+                ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = CharacterCalculations.size(character),
                             style = NumeralMedium.copy(fontSize = 15.sp),
-                            color = v.ink,
+                            color = if (sizeOverridden) v.accent else v.ink,
                             textAlign = TextAlign.Center,
                             maxLines = 1,
                         )

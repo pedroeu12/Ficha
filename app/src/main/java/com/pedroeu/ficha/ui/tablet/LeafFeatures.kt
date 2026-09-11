@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.pedroeu.ficha.ui.components.RulesTextSheet
 import com.pedroeu.ficha.ui.components.LONG_TEXT_THRESHOLD
 import androidx.compose.runtime.getValue
@@ -333,24 +334,70 @@ private fun ChoiceLine(resolved: ResolvedChoice, handle: SheetHandle) {
                 color = v.danger,
             )
         } else {
-            answers.forEach { answer ->
-                Row(verticalAlignment = Alignment.Top) {
-                    Text(
-                        text = "·  ",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = v.inkFaint,
-                    )
-                    Text(
-                        text = answer,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontFamily = FontFamily.Serif,
-                        ),
-                        color = v.ink,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+            // Each pick opens its own rules, the same way the phone's do and the same way
+            // everything else in the app does. These used to be bullets of plain text: an
+            // invocation or a mastery property you could read the name of and nothing else.
+            resolved.selectedIds.forEachIndexed { index, id ->
+                val option = resolved.choice.options.find { it.id == id }
+                val label = answers.getOrNull(index) ?: option?.name ?: id
+                PickLine(
+                    label = label,
+                    body = option?.description.orEmpty(),
+                    subtitle = option?.supporting.orEmpty(),
+                )
             }
         }
+    }
+}
+
+/**
+ * One thing picked inside a feature, on the tablet's paper.
+ *
+ * Drawn in the sheet's own hand but behaving exactly as the phone's does: a tap opens the
+ * app's one detail sheet. Only the skin differs between the two, which is the whole rule for
+ * how these layouts are allowed to diverge.
+ */
+@Composable
+private fun PickLine(label: String, body: String, subtitle: String) {
+    val v = LocalVellum.current
+    var open by rememberSaveable(label) { mutableStateOf(false) }
+    val hasBody = body.isNotBlank()
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(Corner.small)
+            .let { if (hasBody) it.clickable { open = true } else it }
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Text(
+            text = "\u00b7  ",
+            style = MaterialTheme.typography.bodySmall,
+            color = v.inkFaint,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Serif),
+            color = v.ink,
+            modifier = Modifier.weight(1f),
+        )
+        if (hasBody) {
+            Text(
+                text = "\u203a",
+                style = MaterialTheme.typography.bodySmall,
+                color = v.inkFaint,
+            )
+        }
+    }
+
+    if (open) {
+        RulesTextSheet(
+            title = label,
+            body = body,
+            subtitle = subtitle,
+            onDismiss = { open = false },
+        )
     }
 }
 

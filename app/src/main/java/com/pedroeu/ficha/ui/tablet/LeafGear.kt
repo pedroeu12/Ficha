@@ -167,6 +167,22 @@ fun LeafGear(handle: SheetHandle) {
                             .byId(character.speciesId)?.name.orEmpty(),
                         handle = handle,
                     )
+                    // The lineage, where the species has one. The phone lists it between
+                    // species and class, and leaving it off here meant a Drow elf read as
+                    // plain "Elf" on one device and not the other.
+                    com.pedroeu.ficha.data.content.SpeciesData.byId(character.speciesId)
+                        ?.let { species ->
+                            species.lineageOptions
+                                .find { it.id == character.lineageId }
+                                ?.let { lineage ->
+                                    WrittenLine(
+                                        label = species.lineageChoiceLabel ?: tr("Lineage"),
+                                        key = "bio:lineage",
+                                        fallback = lineage.name,
+                                        handle = handle,
+                                    )
+                                }
+                        }
                     WrittenLine(
                         label = tr("Class"),
                         key = "bio:class",

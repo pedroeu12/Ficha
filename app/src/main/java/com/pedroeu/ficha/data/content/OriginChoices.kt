@@ -160,9 +160,6 @@ object OriginChoices {
         }
     }
 
-    /** The five types both Primordial Patron invocations choose between. */
-    private val ELEMENTAL_OVERFLOW_TYPES = listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")
-
     /** Tool and cantrip grants attached to a class at level 1 that name a group. */
     fun forClass(
         classId: String,
@@ -208,103 +205,6 @@ object OriginChoices {
                 options = spellOptions("cleric", 0),
                 source = "Divine Order: Thaumaturge",
             )
-        }
-
-        // Two of the Primordial Patron's invocations name a damage type. Asked here rather
-        // than inside the invocation list, because an option can't carry a question of its
-        // own — the same route a Cleric's Thaumaturge cantrip takes.
-        if (classId == "warlock") {
-            val invocations = classSelections[ProgressionData.INVOCATION_CHOICE_ID].orEmpty()
-            if ("elemental_overflow" in invocations) {
-                choices += Choice(
-                    id = "invocation:elemental_overflow:damage",
-                    label = "Elemental Overflow",
-                    // Repeatable in the rules — "each time you do so, choose a different
-                    // damage type" — so each type held here is one taking of the invocation.
-                    // Edit Mode's pool editor is where a second taking gets added.
-                    prompt = "Choose the damage type your overflow wreathes you in. If you " +
-                        "have taken this invocation more than once, hold one type per taking.",
-                    count = 1,
-                    kind = ChoiceKind.DAMAGE_TYPE,
-                    options = ChoiceOptions.fromStrings(ELEMENTAL_OVERFLOW_TYPES),
-                    source = "Elemental Overflow",
-                )
-            }
-            // The three that name one of your own damage cantrips. Each is Repeatable, so a
-            // second taking picks a second cantrip; the pool editor is where that is added.
-            listOf(
-                Triple("agonizing_blast", "Agonizing Blast",
-                    "Choose the damage cantrip that adds your Charisma modifier to its damage."),
-                Triple("eldritch_spear", "Eldritch Spear",
-                    "Choose the damage cantrip whose range grows with your Warlock level."),
-                Triple("repelling_blast", "Repelling Blast",
-                    "Choose the damage cantrip whose hits push a creature 10 feet away."),
-            ).forEach { (id, label, prompt) ->
-                if (id in invocations) {
-                    choices += Choice(
-                        id = "invocation:$id:cantrip",
-                        label = label,
-                        prompt = prompt,
-                        count = 1,
-                        kind = ChoiceKind.SPELL,
-                        options = warlockDamageCantrips(),
-                        source = label,
-                    )
-                }
-            }
-
-            // "You gain one Origin feat of your choice."
-            if ("lessons_of_the_first_ones" in invocations) {
-                choices += Choice(
-                    id = "invocation:lessons_of_the_first_ones:feat",
-                    label = "Lessons of the First Ones",
-                    prompt = "Choose the Origin feat this invocation teaches you.",
-                    count = 1,
-                    kind = ChoiceKind.FEAT,
-                    options = FeatData.ORIGIN_FEATS
-                        .filter { it.book in books }
-                        .map { ChoiceOption(it.id, it.name, it.description, book = it.book) },
-                    source = "Lessons of the First Ones",
-                )
-            }
-
-            // The Book of Shadows: three cantrips from any list, and a level 1 ritual.
-            if ("pact_tome" in invocations) {
-                choices += Choice(
-                    id = "invocation:pact_tome:cantrips",
-                    label = "Book of Shadows: Cantrips",
-                    prompt = "Choose three cantrips from any class's spell list.",
-                    count = 3,
-                    kind = ChoiceKind.SPELL,
-                    options = SpellData.ALL
-                        .filter { it.level == 0 }
-                        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) },
-                    source = "Pact of the Tome",
-                )
-                choices += Choice(
-                    id = "invocation:pact_tome:ritual",
-                    label = "Book of Shadows: Ritual",
-                    prompt = "Choose a level 1 spell with the Ritual tag, from any class's list.",
-                    count = 1,
-                    kind = ChoiceKind.SPELL,
-                    options = SpellData.ALL
-                        .filter { it.level == 1 && it.ritual }
-                        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) },
-                    source = "Pact of the Tome",
-                )
-            }
-
-            if ("elemental_transmutation" in invocations) {
-                choices += Choice(
-                    id = "invocation:elemental_transmutation:damage",
-                    label = "Elemental Transmutation",
-                    prompt = "Choose the damage type you convert your damage into.",
-                    count = 1,
-                    kind = ChoiceKind.DAMAGE_TYPE,
-                    options = ChoiceOptions.fromStrings(ELEMENTAL_OVERFLOW_TYPES),
-                    source = "Elemental Transmutation",
-                )
-            }
         }
 
         val primalOrder = classSelections["primal_order"]?.firstOrNull()
@@ -372,15 +272,5 @@ object OriginChoices {
 
         return choices.distinctBy { it.id }
     }
-
-    /**
-     * The Warlock's own damage cantrips, for the three invocations that name one.
-     *
-     * Drawn from the catalogue rather than listed by hand, so a damage cantrip added to the
-     * Warlock list later is offered without a second edit here.
-     */
-    private fun warlockDamageCantrips(): List<ChoiceOption> = SpellData.ALL
-        .filter { it.level == 0 && "warlock" in it.classes && it.damage.isNotBlank() }
-        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) }
 
 }

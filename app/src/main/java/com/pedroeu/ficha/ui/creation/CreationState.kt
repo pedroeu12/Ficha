@@ -7,6 +7,7 @@ import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.domain.ChoiceGraph
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.ToolData
 import com.pedroeu.ficha.data.model.Ability
@@ -128,11 +129,15 @@ data class CreationState(
         get() {
             val classId = classId ?: return emptyList()
             val alreadyAsked = charClass?.choices.orEmpty().map { it.id }.toSet()
-            return ProgressionData.forClass(classId)
+            val roots = ProgressionData.forClass(classId)
                 ?.featuresAt(1)
                 ?.flatMap { it.choices }
                 ?.filterNot { it.id in alreadyAsked || it.kind == ChoiceKind.EXPERTISE }
                 .orEmpty()
+            // A level 1 Warlock picks one invocation here; if it is Pact of the Tome, the
+            // five spells that pact wants are asked in this same step rather than left for
+            // the player to discover unanswered on the finished sheet.
+            return ChoiceGraph.expand(roots, classFeatureSelections, enabledSources)
         }
 
     /**
@@ -165,13 +170,17 @@ data class CreationState(
      * cantrip and spell prompts into being.
      */
     val originChoices: List<Choice>
-        get() = OriginChoices.all(
-            speciesId = speciesId,
-            lineageId = lineageId,
-            classId = classId,
-            classSelections = classSelections,
-            backgroundId = backgroundId,
-            originSelections = originSelections,
+        get() = ChoiceGraph.expand(
+            roots = OriginChoices.all(
+                speciesId = speciesId,
+                lineageId = lineageId,
+                classId = classId,
+                classSelections = classSelections,
+                backgroundId = backgroundId,
+                originSelections = originSelections,
+                books = enabledSources,
+            ),
+            answers = originSelections,
             books = enabledSources,
         )
 

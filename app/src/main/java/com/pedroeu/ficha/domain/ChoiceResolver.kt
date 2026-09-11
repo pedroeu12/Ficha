@@ -217,8 +217,8 @@ object ChoiceResolver {
      * taken in place of an Ability Score Improvement, which have their own sub-choices and
      * used to appear nowhere at all.
      */
-    fun originChoices(character: PlayerCharacter): List<ResolvedChoice> =
-        OriginChoices.all(
+    fun originChoices(character: PlayerCharacter): List<ResolvedChoice> {
+        val fromOrigin = OriginChoices.all(
             speciesId = character.speciesId,
             lineageId = character.lineageId,
             classId = character.classId,
@@ -229,7 +229,17 @@ object ChoiceResolver {
             originSelections = character.originChoiceSelections,
             extraFeatIds = character.featIds,
             books = character.enabledSources,
-        ).map { choice -> resolve(character, choice, choice.label, 0) }
+        )
+        // The class and subclass questions are roots here too, not to be shown again — their
+        // own cards do that — but because the answers to them raise further questions. An
+        // invocation is picked on the Features card; the cantrip it names is asked here.
+        val classRoots = ChoiceGraph.rootsFor(character)
+        val classRootIds = classRoots.map { it.id }.toSet()
+        return ChoiceGraph
+            .expand(fromOrigin + classRoots, answers(character), character.enabledSources)
+            .filterNot { it.id in classRootIds }
+            .map { choice -> resolve(character, choice, choice.label, 0) }
+    }
 
     /** Everything the character has decided, for the "your choices" view and rests. */
     fun all(character: PlayerCharacter): List<ResolvedChoice> =

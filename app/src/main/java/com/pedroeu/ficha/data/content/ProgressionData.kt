@@ -73,10 +73,48 @@ object ProgressionData {
      * the count a Warlock knows was being clamped to what was on offer, so a level 18 Warlock
      * chose ten out of ten and had no decision to make at all.
      */
+    /** The five types both Primordial Patron invocations choose between. */
+    private val ELEMENTAL_TYPES = listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")
+
+    /**
+     * The Warlock's own damage cantrips, for the three invocations that name one.
+     *
+     * Drawn from the catalogue rather than listed by hand, so a damage cantrip added to the
+     * Warlock list later is offered without a second edit here.
+     */
+    private fun warlockDamageCantrips(): List<ChoiceOption> = SpellData.ALL
+        .filter { it.level == 0 && "warlock" in it.classes && it.damage.isNotBlank() }
+        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) }
+
+    /** The cantrip an invocation singles out, asked as soon as the invocation is taken. */
+    private fun cantripChoice(invocationId: String, label: String, prompt: String) = Choice(
+        id = "invocation:$invocationId:cantrip",
+        label = label,
+        prompt = prompt,
+        count = 1,
+        kind = ChoiceKind.SPELL,
+        options = warlockDamageCantrips(),
+        source = label,
+    )
+
+    private fun elementChoice(invocationId: String, label: String, prompt: String) = Choice(
+        id = "invocation:$invocationId:damage",
+        label = label,
+        prompt = prompt,
+        count = 1,
+        kind = ChoiceKind.DAMAGE_TYPE,
+        options = ChoiceOptions.fromStrings(ELEMENTAL_TYPES),
+        source = label,
+    )
+
     private val INVOCATION_OPTIONS = listOf(
         ChoiceOption("agonizing_blast", "Agonizing Blast", "Choose one of your known Warlock cantrips that deals damage. You can add your Charisma modifier to that spell's damage rolls. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip.",
             minLevel = 2,
-            prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage"),
+            prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage",
+            grants = listOf(
+                cantripChoice("agonizing_blast", "Agonizing Blast",
+                    "Choose the damage cantrip that adds your Charisma modifier to its damage.")
+            )),
         ChoiceOption("armor_of_shadows", "Armor of Shadows", "You can cast Mage Armor on yourself without expending a spell slot."),
         ChoiceOption("ascendant_step", "Ascendant Step", "You can cast Levitate on yourself without expending a spell slot.",
             minLevel = 5,
@@ -95,7 +133,11 @@ object ProgressionData {
             prerequisite = "Level 5+ Warlock, Pact of the Blade Invocation"),
         ChoiceOption("eldritch_spear", "Eldritch Spear", "Choose one of your known Warlock cantrips that deals damage and has a range of 10+ feet. When you cast that spell, its range increases by a number of feet equal to 30 times your Warlock level. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip.",
             minLevel = 2,
-            prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage"),
+            prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage",
+            grants = listOf(
+                cantripChoice("eldritch_spear", "Eldritch Spear",
+                    "Choose the damage cantrip whose range grows with your Warlock level.")
+            )),
         ChoiceOption("fiendish_vigor", "Fiendish Vigor", "You can cast False Life on yourself without expending a spell slot. When you cast the spell with this feature, you don't roll the die for the Temporary Hit Points; you automatically get the highest number on the die.",
             minLevel = 2,
             prerequisite = "Level 2+ Warlock"),
@@ -115,7 +157,19 @@ object ProgressionData {
             prerequisite = "Level 5+ Warlock, Pact of the Chain Invocation"),
         ChoiceOption("lessons_of_the_first_ones", "Lessons of the First Ones", "You have received knowledge from an elder entity of the multiverse, allowing you to gain one Origin feat of your choice. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different Origin feat .",
             minLevel = 2,
-            prerequisite = "Level 2+ Warlock"),
+            prerequisite = "Level 2+ Warlock",
+            grants = listOf(
+                Choice(
+                    id = "invocation:lessons_of_the_first_ones:feat",
+                    label = "Lessons of the First Ones",
+                    prompt = "Choose the Origin feat this invocation teaches you.",
+                    count = 1,
+                    kind = ChoiceKind.FEAT,
+                    options = FeatData.ORIGIN_FEATS
+                        .map { ChoiceOption(it.id, it.name, it.description, book = it.book) },
+                    source = "Lessons of the First Ones",
+                )
+            )),
         ChoiceOption("lifedrinker", "Lifedrinker", "Once per turn when you hit a creature with your pact weapon, you can deal an extra 1d6 Necrotic, Psychic, or Radiant damage (your choice) to the creature, and you can expend one of your Hit Point Dice to roll it and regain a number of Hit Points equal to the roll plus your Constitution modifier (minimum of 1 Hit Point).",
             minLevel = 9,
             requiresOptions = listOf("pact_blade"),
@@ -137,10 +191,37 @@ object ProgressionData {
             prerequisite = "Level 2+ Warlock"),
         ChoiceOption("pact_blade", "Pact of the Blade", "As a Bonus Action, you can conjure a pact weapon in your hand-a Simple or Martial Melee weapon of your choice with which you bond-or create a bond with a magic weapon you touch; you can't bond with a magic weapon if someone else is attuned to it or another Warlock is bonded with it. Until the bond ends, you have proficiency with the weapon, and you can use it as a Spellcasting Focus. Whenever you attack with the bonded weapon, you can use your Charisma modifier for the attack and damage rolls instead of using Strength or Dexterity; and you can cause the weapon to deal Necrotic, Psychic, or Radiant damage or its normal damage type. Your bond with the weapon ends if you use this feature's Bonus Action again, if the weapon is more than 5 feet away from you for 1 minute or more, or if you die. A conjured weapon disappears when the bond ends."),
         ChoiceOption("pact_chain", "Pact of the Chain", "You learn the Find Familiar spell and can cast it as a Magic action without expending a spell slot. When you cast the spell, you choose one of the normal forms for your familiar or one of the following special forms: Imp, Pseudodragon, Quasit, Skeleton, Slaad Tadpole, Sphinx of Wonder, Sprite, or Venomous Snake (see appendix B for the familiar's stat block). Additionally, when you take the Attack action, you can forgo one of your own attacks to allow your familiar to make one attack of its own with its Reaction."),
-        ChoiceOption("pact_tome", "Pact of the Tome", "Stitching together strands of shadow, you conjure forth a book in your hand at the end of a Short or Long Rest. This Book of Shadows (you determine its appearance) contains eldritch magic that only you can access, granting you the benefits below. The book disappears if you conjure another book with this feature or if you die. Cantrips and Rituals. When the book appears, choose three cantrips, and choose two level 1 spells that have the Ritual tag. The spells can be from any class's spell list, and they must be spells you don't already have prepared. While the book is on your person, you have the chosen spells prepared, and they function as Warlock spells for you. Spellcasting Focus. You can use the book as a Spellcasting Focus."),
+        ChoiceOption("pact_tome", "Pact of the Tome", "Stitching together strands of shadow, you conjure forth a book in your hand at the end of a Short or Long Rest. This Book of Shadows (you determine its appearance) contains eldritch magic that only you can access, granting you the benefits below. The book disappears if you conjure another book with this feature or if you die. Cantrips and Rituals. When the book appears, choose three cantrips, and choose two level 1 spells that have the Ritual tag. The spells can be from any class's spell list, and they must be spells you don't already have prepared. While the book is on your person, you have the chosen spells prepared, and they function as Warlock spells for you. Spellcasting Focus. You can use the book as a Spellcasting Focus.",
+            grants = listOf(
+                Choice(
+                    id = "invocation:pact_tome:cantrips",
+                    label = "Book of Shadows: Cantrips",
+                    prompt = "Choose three cantrips from any class\'s spell list.",
+                    count = 3,
+                    kind = ChoiceKind.SPELL,
+                    options = SpellData.ALL.filter { it.level == 0 }
+                        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) },
+                    source = "Pact of the Tome",
+                ),
+                Choice(
+                    id = "invocation:pact_tome:ritual",
+                    label = "Book of Shadows: Rituals",
+                    // "choose two level 1 spells that have the Ritual tag" — it asked for one.
+                    prompt = "Choose two level 1 spells with the Ritual tag, from any class\'s list.",
+                    count = 2,
+                    kind = ChoiceKind.SPELL,
+                    options = SpellData.ALL.filter { it.level == 1 && it.ritual }
+                        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) },
+                    source = "Pact of the Tome",
+                )
+            )),
         ChoiceOption("repelling_blast", "Repelling Blast", "Choose one of your known Warlock cantrips that requires an attack roll. When you hit a Large or smaller creature with that cantrip, you can push the creature up to 10 feet straight away from you. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip.",
             minLevel = 2,
-            prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage via an Attack Roll"),
+            prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage via an Attack Roll",
+            grants = listOf(
+                cantripChoice("repelling_blast", "Repelling Blast",
+                    "Choose the damage cantrip whose hits push a creature 10 feet away.")
+            )),
         ChoiceOption("thirsting_blade", "Thirsting Blade", "You gain the Extra Attack feature for your pact weapon only. With that feature, you can attack twice with the weapon instead of once when you take the Attack action on your turn.",
             minLevel = 5,
             requiresOptions = listOf("pact_blade"),
@@ -156,10 +237,19 @@ object ProgressionData {
             prerequisite = "Level 15+ Warlock"),
         ChoiceOption("elemental_overflow", "Elemental Overflow", "Choose a damage type: Acid, Cold, Fire, Lightning, or Thunder. Whenever you cast a spell that deals the chosen damage type, you can cause elemental energy to wreathe you until the end of your next turn. For the duration, whenever a creature within 5 feet of you hits you with a melee attack roll, that creature takes 1d4 damage of the chosen damage type. Repeatable: you can gain this invocation more than once, choosing a different damage type each time — hold one damage type per taking in the Elemental Overflow choice this raises.",
             minLevel = 5,
-            prerequisite = "Level 5+ Warlock, Primordial Patron"),
+            prerequisite = "Level 5+ Warlock, Primordial Patron",
+            grants = listOf(
+                elementChoice("elemental_overflow", "Elemental Overflow",
+                    "Choose the damage type your overflow wreathes you in. If you have taken " +
+                        "this invocation more than once, hold one type per taking.")
+            )),
         ChoiceOption("elemental_transmutation", "Elemental Transmutation", "Choose a damage type: Acid, Cold, Fire, Lightning, or Thunder. Once per turn, whenever you deal damage of any of those types, you can deal the chosen damage type instead.",
             minLevel = 2,
-            prerequisite = "Level 2+ Warlock, Primordial Patron"),
+            prerequisite = "Level 2+ Warlock, Primordial Patron",
+            grants = listOf(
+                elementChoice("elemental_transmutation", "Elemental Transmutation",
+                    "Choose the damage type you convert your damage into.")
+            )),
     )
 
     /**

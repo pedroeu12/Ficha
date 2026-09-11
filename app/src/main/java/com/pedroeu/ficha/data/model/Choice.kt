@@ -66,6 +66,26 @@ data class ChoiceOption(
      * condition is better than either hiding the option or pretending there isn't one.
      */
     val prerequisite: String = "",
+    /**
+     * The choices taking this option forces, asked as soon as it is taken.
+     *
+     * The rulebook writes plenty of options that are themselves a question — Agonizing Blast
+     * names one of your cantrips, Pact of the Tome names five spells, Lessons of the First
+     * Ones names an Origin feat. Until this field existed an option could not carry a
+     * question of its own, so each of those was answered by a hand-written branch somewhere
+     * else, keyed to the class that happened to raise it. That is why the same bug kept
+     * coming back under a new name: every new piece of content needed someone to remember to
+     * write another branch, and the list of things to remember was nowhere.
+     *
+     * Now the question travels with the option. [com.pedroeu.ficha.domain.ChoiceGraph] asks
+     * it wherever the option is taken — during creation, during a level up, from Edit Mode —
+     * without knowing anything about what the option is.
+     *
+     * Only choices made *when the option is gained* belong here. A decision the rules have
+     * you make each time you use the feature is a
+     * [com.pedroeu.ficha.data.content.PerUseChoice] instead.
+     */
+    val grants: List<Choice> = emptyList(),
 )
 
 /**

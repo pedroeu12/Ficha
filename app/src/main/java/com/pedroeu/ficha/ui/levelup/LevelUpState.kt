@@ -20,6 +20,7 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.FeatPrerequisites
 import com.pedroeu.ficha.domain.CharacterSpells
+import com.pedroeu.ficha.domain.ChoiceGraph
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
@@ -176,7 +177,16 @@ data class LevelUpState(
             val revisited = ChoiceResolver.levelUpChangeable(character)
                 .map { it.choice }
                 .filterNot { revisit -> fromNewFeatures.any { it.id == revisit.id } }
-            return fromNewFeatures + revisited
+            // What has just been ticked, over what the character already held. An invocation
+            // picked a moment ago names a cantrip; that question has to appear here, next to
+            // the invocation, not on a card the player finds days later. Reading the live
+            // selections is what makes it appear as the option is ticked.
+            val answered = ChoiceResolver.answers(character) + selections
+            return ChoiceGraph.expand(
+                roots = fromNewFeatures + revisited,
+                answers = answered,
+                books = character.enabledSources,
+            )
         }
 
     val grantsAsi: Boolean get() = progression?.grantsAsiAt(targetClassLevel) == true
@@ -189,7 +199,15 @@ data class LevelUpState(
      * level 4 on want to know which ability score goes up. None of it used to be asked.
      */
     val featChoices: List<Choice>
-        get() = featId?.let { OriginChoices.forFeat(it) }.orEmpty()
+        get() = featId?.let {
+            // Expanded, not just the feat's own list: a feat that grants a feat — and a feat
+            // whose answer opens another question — asks all of it before the flow moves on.
+            ChoiceGraph.expand(
+                roots = OriginChoices.forFeat(it),
+                answers = ChoiceResolver.answers(character) + selections,
+                books = character.enabledSources,
+            )
+        }.orEmpty()
 
     // ---------------------------------------------------------------- Spellcasting
 

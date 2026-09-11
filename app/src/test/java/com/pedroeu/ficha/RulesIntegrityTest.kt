@@ -13,6 +13,7 @@ import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ChoiceOption
+import com.pedroeu.ficha.domain.ChoiceGraph
 import com.pedroeu.ficha.domain.Owned
 import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.data.model.ClassChoice
@@ -123,17 +124,19 @@ class RulesIntegrityTest {
             .first { it.id == ProgressionData.INVOCATION_CHOICE_ID }
             .options
 
-        // Every question the app can raise off the back of an invocation, by option id.
-        val raised = Ability.ALL.let {
-            (1..1).flatMap {
-                OriginChoices.forClass(
-                    "warlock",
-                    mapOf(
-                        ProgressionData.INVOCATION_CHOICE_ID to invocations.map { o -> o.id },
-                    ),
-                )
-            }
-        }.map { it.id }.toSet() + PerUseChoiceData.ALL.map { it.id }.toSet()
+        // Every question the app raises off the back of an invocation. It asks for all of
+        // them at once — an option raises nothing until it is taken — which is the whole of
+        // the general rule, applied here to the one list this test is about.
+        val raised = ChoiceGraph.followUps(
+            roots = listOf(
+                ProgressionData.forClass("warlock")!!.features
+                    .flatMap { it.choices }
+                    .first { it.id == ProgressionData.INVOCATION_CHOICE_ID }
+            ),
+            answers = mapOf(
+                ProgressionData.INVOCATION_CHOICE_ID to invocations.map { it.id },
+            ),
+        ).map { it.id }.toSet() + PerUseChoiceData.ALL.map { it.id }.toSet()
 
         val missing = invocations
             .filter { asksAgain.containsMatchIn(it.description) }

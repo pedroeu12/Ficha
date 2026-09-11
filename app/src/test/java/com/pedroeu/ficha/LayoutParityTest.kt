@@ -191,6 +191,71 @@ class LayoutParityTest {
         "bio:notes",
     )
 
+    // ================================================================ Same source of truth
+
+    /**
+     * Both layouts read the same list from the same place.
+     *
+     * The tablet once printed an attack's derived bonus where the phone printed the one the
+     * player had written, so an attack at +9 read as +0 on the other device. Nothing about
+     * the layout caused that — a second copy of the derivation did. Whatever a leaf or a tab
+     * looks like, the list it draws comes out of the domain, and out of the same function.
+     */
+    @Test
+    fun `both layouts derive their lists from the same domain functions`() {
+        val phoneText = textOf(phone())
+        val tabletText = textOf(tablet())
+
+        listOf(
+            // What attacks exist, and with what numbers.
+            "CharacterAttacks.all",
+            // What spells are on the sheet, and which of them the character always has.
+            "CharacterSpells.all",
+            "CharacterSpells.isGranted",
+            // Slots, DCs, and how many spells may be prepared.
+            "CharacterCalculations.spellSlots",
+            "CharacterCalculations.spellSaveDc",
+            "CharacterCalculations.maxPreparedSpells",
+            "CharacterDcs.all",
+            // What features the character has, and what was chosen for each.
+            "SheetFeatures.classFeatures",
+            "SheetFeatures.subclassFeatures",
+            "ChoiceResolver.classFeatureChoices",
+            "ChoiceResolver.subclassFeatureChoices",
+            "ChoiceResolver.originChoices",
+        ).forEach { call ->
+            assertTrue("the phone stopped reading $call", phoneText.contains(call))
+            assertTrue("the tablet stopped reading $call", tabletText.contains(call))
+        }
+    }
+
+    // ================================================================ Same gestures
+
+    /**
+     * A thing is opened the same way on both.
+     *
+     * Every openable thing in the app opens on a plain tap. A long press, a swipe, or a drag
+     * added to one layout would be a gesture a player who uses the other device would never
+     * find, and could not be told about in one sentence that is true of both.
+     */
+    @Test
+    fun `neither layout hides behaviour behind a gesture the other lacks`() {
+        val gestures = listOf(
+            "combinedClickable", "onLongClick", "detectTapGestures",
+            "swipeable", "SwipeToDismiss", "draggable", "pointerInput",
+        )
+        listOf("the phone" to phone(), "the tablet" to tablet()).forEach { (who, files) ->
+            val text = textOf(files)
+            gestures.forEach { gesture ->
+                assertTrue(
+                    "$who now uses $gesture; every other surface opens on a tap, so this is " +
+                        "either a gesture the other layout lacks or one nothing teaches",
+                    !text.contains(gesture),
+                )
+            }
+        }
+    }
+
     // ================================================================ Same reading gesture
 
     /**

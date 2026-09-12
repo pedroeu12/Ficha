@@ -1,7 +1,8 @@
-# A unified rules engine — proposal
+# A unified rules engine
 
-**Status: proposed, not built.** Nothing in this document is implemented. It is here to be
-argued with before any content moves.
+**Status: Phase 0 done, Phase 1 begun, Phase 3 done.** The schema below is built and in the
+repository. What follows describes it; the section at the end records how much of the app
+actually runs through it.
 
 ## The problem, stated precisely
 
@@ -269,3 +270,75 @@ These are flagged now rather than discovered halfway through.
 
 Roughly 1,500 content entries across 24 files, plus six domain objects rewritten to read the
 engine. The phases above are what keeps that from being one unreviewable change.
+
+
+---
+
+# Where the migration actually stands
+
+Measured, not estimated. Numbers come from walking thirteen level-20 single-class characters,
+one per class, through `RulesEngine.elementsFor`.
+
+## Reachable through the engine: all of it
+
+Every one of the nine tables is read by an adapter and emitted as `RuleElement`s. Across those
+thirteen characters the engine produces **397 elements carrying 229 effects**: 78 spell grants,
+64 questions asked on gain, 44 limited-use pools, 14 save DCs, 14 on-use questions, 14
+swappable answers. A conformance test holds each of those against the old path for sixteen
+character shapes, multiclass splits included.
+
+183 of the 397 elements carry no effect at all. Most are correct — a feature whose whole
+content is rules text has nothing for the sheet to compute — but some are not, and they are the
+honest measure of what is left to describe (see "the thin part" below).
+
+## Load-bearing: 2 of 9 systems
+
+| System | Reads the engine? |
+|---|---|
+| Passive bonuses (`PassiveBonuses`) | **yes** |
+| Save DCs (`CharacterDcs`) | **yes** |
+| Granted spells (`CharacterSpells`) | no — reads `SpellGrantData` |
+| Limited uses (`CharacterResources`) | no — reads `ResourceData` |
+| Choices (`ChoiceResolver`, `ChoiceGraph`) | no — reads the content types directly |
+| On-use choices (`PerUseChoices`) | no |
+| Calculated stats (`CharacterCalculations`) | partly, through `PassiveBonuses` |
+| Attacks (`CharacterAttacks`) | no |
+| Summons (`CharacterSummons`) | **yes — born in the engine** |
+
+Switching the first two earned itself: the engine's first pass scaled a per-level class bonus
+by the character's level rather than the class's, so a Sorcerer 5 / Fighter 3 gained eight Hit
+Points from Draconic Resilience instead of five. It surfaced only because two implementations
+were being compared. That is the argument for finishing Phase 1, and the reason to do it one
+system at a time.
+
+## Declaring effects natively: summons only
+
+Everything else still reaches the engine through an adapter. Summoning was built in the schema
+from the start and has no adapter — which is the proof the schema can carry new content, since
+adding a summoning spell is now a row in `SummonData` and a stat block in `StatblockData`.
+
+## The thin part: calculated modifiers
+
+`ModifyStat` appears **once** across all thirteen characters, because `PassiveBonusData` holds
+only ten bonuses. The rest of the app's arithmetic — a Barbarian's Unarmored Defense, a Monk's
+speed, a Draconic Sorcerer's Armor Class — lives inside `CharacterCalculations` as code, guarded
+by conditions.
+
+This is the least migrated area and the one where the schema is least proven. `Condition` can
+name the fifteen or so that matter, but nothing has been moved yet, so the enum is untested
+against real content. Recommendation: migrate these next, before the remaining tables, because
+it is the part most likely to send the schema back for changes.
+
+## What still does not fit
+
+Unchanged from the proposal, now with evidence:
+
+1. **Conditional modifiers** — the open question above. `Condition.Descriptive` exists as the
+   escape hatch and is currently used **zero** times, which is the number to watch: if it
+   climbs while migrating `CharacterCalculations`, the enum is too narrow.
+2. **Spell mechanics** — 419 spells stay prose. Confirmed by the choice audit: sixteen word a
+   choice and all sixteen are made at the table.
+3. **Magic items** — 418, of which roughly 40 change a printed number or grant a spell. Only
+   those are worth migrating; the rest stay catalogue entries.
+4. **Multiclass spell slots** — stays in `CharacterCalculations`, fed caster types.
+5. **DM-facing text** — stays prose.

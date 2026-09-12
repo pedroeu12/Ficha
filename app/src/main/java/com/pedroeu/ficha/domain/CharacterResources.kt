@@ -36,7 +36,7 @@ object CharacterResources {
                     // Only the first pass carries the species and feats.
                     speciesId = if (index == 0) character.speciesId else "",
                     lineageId = if (index == 0) character.lineageId else null,
-                    featIds = if (index == 0) character.featIds else emptyList(),
+                    featIds = if (index == 0) CharacterFeats.heldBy(character) else emptyList(),
                     level = entry.level,
                     proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
                     abilityModifiers = CharacterCalculations.abilityModifiers(character),

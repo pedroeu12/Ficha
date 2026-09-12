@@ -227,7 +227,7 @@ object ChoiceResolver {
             classSelections = answers(character),
             backgroundId = character.backgroundId,
             originSelections = character.originChoiceSelections,
-            extraFeatIds = character.featIds,
+            extraFeatIds = CharacterFeats.heldBy(character),
             books = character.enabledSources,
         )
         // The class and subclass questions are roots here too, not to be shown again — their

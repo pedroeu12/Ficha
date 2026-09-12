@@ -162,7 +162,7 @@ object CharacterCalculations {
 
     fun initiative(character: PlayerCharacter): Int {
         val dex = abilityModifiers(character)[Ability.DEX] ?: 0
-        val alertBonus = if (character.featIds.contains("alert")) proficiencyBonus(character) else 0
+        val alertBonus = if (CharacterFeats.has(character, "alert")) proficiencyBonus(character) else 0
         val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.INITIATIVE)
         return adjust(character, OverridableStat.INITIATIVE, dex + alertBonus + passive)
     }
@@ -385,7 +385,7 @@ object CharacterCalculations {
             ClassData.byId(character.classId)?.spellcastingAbility?.let(::add)
             character.subclassId?.let { SubclassData.byId(it)?.spellcastingAbility }?.let(::add)
         }
-        character.featIds.forEach { featId ->
+        CharacterFeats.heldBy(character).forEach { featId ->
             SaveDcData.forFeat(featId)?.ability?.let(::add)
         }
     }.distinct()

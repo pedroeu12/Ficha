@@ -36,7 +36,7 @@ object FeatPrerequisites {
             }
 
             val hasNamedFeat = requirement.anyOf.isEmpty() ||
-                requirement.anyOf.any { it in character.featIds }
+                requirement.anyOf.any { it in CharacterFeats.heldBy(character) }
             val hasFeature = requirement.feature?.let { hasFeature(character, it) } ?: true
 
             // A few feats accept the named feat *or* the feature; the rest want both.
@@ -50,7 +50,7 @@ object FeatPrerequisites {
             }
 
             requirement.countFrom?.let { (needed, pool) ->
-                val held = pool.count { it in character.featIds }
+                val held = pool.count { it in CharacterFeats.heldBy(character) }
                 if (held < needed) {
                     add("$needed feats from this path (you have $held)")
                 }

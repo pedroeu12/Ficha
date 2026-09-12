@@ -40,7 +40,7 @@ object CharacterMasteries {
         }
 
         // The Weapon Master feat grants one more kind of weapon on top of the class's.
-        if ("weapon_master" in character.featIds) {
+        if ("weapon_master" in CharacterFeats.heldBy(character)) {
             ChoiceResolver
                 .selectionsFor(character, "feat:weapon_master:mastery")
                 .forEach { weaponId -> addMastery(weaponId, "Weapon Master") }
@@ -81,7 +81,7 @@ object CharacterMasteries {
         val fromClasses = ClassLevels.of(character).sumOf { entry ->
             MasteryData.countFor(entry.classId, entry.level)
         }
-        val fromFeat = if ("weapon_master" in character.featIds) 1 else 0
+        val fromFeat = if ("weapon_master" in CharacterFeats.heldBy(character)) 1 else 0
         return fromClasses + fromFeat
     }
 

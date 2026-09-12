@@ -29,7 +29,7 @@ object FeatBonuses {
 
     /** The ability increases the character's feats add, one entry per feat. */
     fun all(character: PlayerCharacter): List<FeatAbilityBonus> =
-        character.featIds.distinct().mapNotNull { featId ->
+        CharacterFeats.heldBy(character).distinct().mapNotNull { featId ->
             val options = FeatChoiceData.ABILITY_OPTIONS[featId] ?: return@mapNotNull null
             val name = FeatData.byId(featId)?.name ?: featId
             val cap = if (featId.startsWith("boon_")) 30 else 20

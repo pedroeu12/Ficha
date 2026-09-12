@@ -38,7 +38,7 @@ object OwnedOptions {
         spells = CharacterSpells.all(character).map { it.id }.toSet(),
         spellNames = CharacterSpells.all(character).map { it.name.normalized() }.toSet(),
         languages = character.languages.map { it.normalized() }.toSet(),
-        feats = character.featIds.toSet(),
+        feats = CharacterFeats.heldBy(character).toSet(),
         options = ChoiceResolver.all(character).flatMap { it.selectedIds }.toSet(),
     )
 

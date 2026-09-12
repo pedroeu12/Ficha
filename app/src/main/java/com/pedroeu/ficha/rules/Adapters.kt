@@ -15,6 +15,7 @@ import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.domain.ActionCost
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterFeats
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -114,7 +115,7 @@ internal object Adapters {
     }
 
     private fun feats(character: PlayerCharacter): List<RuleElement> =
-        character.featIds.mapNotNull { featId ->
+        CharacterFeats.heldBy(character).mapNotNull { featId ->
             val feat = FeatData.byId(featId) ?: return@mapNotNull null
             RuleElement(
                 id = "feat:${feat.id}",
@@ -142,7 +143,7 @@ internal object Adapters {
             classSelections = ChoiceResolver.answers(character),
             backgroundId = character.backgroundId,
             originSelections = character.originChoiceSelections,
-            extraFeatIds = character.featIds,
+            extraFeatIds = CharacterFeats.heldBy(character),
             books = character.enabledSources,
         ).map { choice ->
             RuleElement(
@@ -174,7 +175,7 @@ internal object Adapters {
                 subclassId = entry.subclassId,
                 speciesId = if (index == 0) character.speciesId else "",
                 lineageId = if (index == 0) character.lineageId else null,
-                featIds = if (index == 0) character.featIds else emptyList(),
+                featIds = if (index == 0) CharacterFeats.heldBy(character) else emptyList(),
                 selections = ChoiceResolver.answers(character),
             ).map { (sourceId, grant) ->
                 val isClassGrant = sourceId == entry.classId || sourceId == entry.subclassId
@@ -216,7 +217,7 @@ internal object Adapters {
                     subclassId = entry.subclassId,
                     speciesId = if (index == 0) character.speciesId else "",
                     lineageId = if (index == 0) character.lineageId else null,
-                    featIds = if (index == 0) character.featIds else emptyList(),
+                    featIds = if (index == 0) CharacterFeats.heldBy(character) else emptyList(),
                     level = entry.level,
                     proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
                     abilityModifiers = CharacterCalculations.abilityModifiers(character),
@@ -298,7 +299,7 @@ internal object Adapters {
                 addAll(bonuses(it, Source.Lineage(it, character.speciesId),
                     PassiveBonusData.forLineage(it)))
             }
-            character.featIds.forEach {
+            CharacterFeats.heldBy(character).forEach {
                 addAll(bonuses(it, Source.Feat(it), PassiveBonusData.forFeat(it)))
             }
             classes.forEach { entry ->
@@ -387,7 +388,7 @@ internal object Adapters {
                 Source.Species(character.speciesId))?.let(::add)
             element("lineage", SaveDcData.forLineage(character.lineageId),
                 Source.Lineage(character.lineageId.orEmpty(), character.speciesId))?.let(::add)
-            character.featIds.forEach { featId ->
+            CharacterFeats.heldBy(character).forEach { featId ->
                 element("feat", SaveDcData.forFeat(featId), Source.Feat(featId))?.let(::add)
 
                 // A feat whose magic says "Intelligence, Wisdom, or Charisma is your

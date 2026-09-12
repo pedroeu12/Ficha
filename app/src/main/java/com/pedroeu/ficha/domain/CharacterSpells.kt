@@ -234,7 +234,7 @@ object CharacterSpells {
                 subclassId = entry.subclassId,
                 speciesId = if (index == 0) character.speciesId else "",
                 lineageId = if (index == 0) character.lineageId else null,
-                featIds = if (index == 0) character.featIds else emptyList(),
+                featIds = if (index == 0) CharacterFeats.heldBy(character) else emptyList(),
                 // A grant can hang off an answer rather than a source: the Primordial
                 // Patron's list follows the element it chose, which changes on any level up.
                 selections = ChoiceResolver.answers(character),

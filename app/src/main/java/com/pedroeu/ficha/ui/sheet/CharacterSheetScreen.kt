@@ -176,7 +176,10 @@ fun CharacterSheetScreen(
         // by a banner's height, which is why Edit Mode looked like the thing that was broken.
         SummonBar(
             summons = loaded.activeSummons,
-            selectedInstanceId = viewing,
+            // Derived, so a dismissed creature stops being the selected one on its own.
+            selectedInstanceId = loaded.activeSummons
+                .find { it.instanceId == viewing }
+                ?.instanceId,
             onSelectCharacter = { viewing = null },
             onSelectSummon = { viewing = it },
             // Null hides the button entirely: a character with nothing to summon should not
@@ -189,9 +192,11 @@ fun CharacterSheetScreen(
             characterName = loaded.name,
         )
 
-        // A creature that has been dismissed cannot still be the one on screen.
+        // A creature that has been dismissed cannot still be the one on screen. Derived
+        // rather than corrected: writing the state back during composition asks Compose to
+        // recompose from inside a composition, which is the shape that turns a dismissed
+        // summon into a frame of flicker or worse.
         val openSummon = loaded.activeSummons.find { it.instanceId == viewing }
-        if (viewing != null && openSummon == null) viewing = null
 
         if (openSummon != null) {
             SummonSheet(

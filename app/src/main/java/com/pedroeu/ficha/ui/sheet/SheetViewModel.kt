@@ -24,6 +24,7 @@ import com.pedroeu.ficha.domain.CustomResource
 import com.pedroeu.ficha.domain.DeathSaves
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CharacterSpells
+import com.pedroeu.ficha.domain.CharacterSummons
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.OverridableStat
 import com.pedroeu.ficha.domain.PerUseChoices
@@ -72,6 +73,55 @@ class SheetViewModel(
         _character.value = updated
         viewModelScope.launch { repository.save(updated) }
     }
+
+    // ------------------------------------------------------------------ Summons
+
+    /**
+     * Creatures on the table, each tracked on its own.
+     *
+     * All of it goes through [CharacterSummons], which is the same path a future summoning
+     * spell takes: the sheet never knows which spell called something up, only that something
+     * is out and has hit points of its own.
+     */
+    fun summon(
+        statblockId: String,
+        sourceId: String,
+        sourceLabel: String,
+        spellLevel: Int = 0,
+        owningClassId: String? = null,
+        concentration: Boolean = false,
+        howMany: Int = 1,
+    ) = update { character ->
+        CharacterSummons.summon(
+            character, statblockId, sourceId, sourceLabel,
+            spellLevel, owningClassId, concentration, howMany,
+        )
+    }
+
+    fun dismissSummon(instanceId: String) =
+        update { CharacterSummons.dismiss(it, instanceId) }
+
+    fun dismissAllSummons() = update { CharacterSummons.dismissAll(it) }
+
+    fun endSummonConcentration() = update { CharacterSummons.endConcentration(it) }
+
+    fun damageSummon(instanceId: String, amount: Int) =
+        update { CharacterSummons.damage(it, instanceId, amount) }
+
+    fun healSummon(instanceId: String, amount: Int) =
+        update { CharacterSummons.heal(it, instanceId, amount) }
+
+    fun setSummonHitPoints(instanceId: String, current: Int, temp: Int? = null) =
+        update { CharacterSummons.setHitPoints(it, instanceId, current, temp) }
+
+    fun renameSummon(instanceId: String, name: String) =
+        update { CharacterSummons.rename(it, instanceId, name) }
+
+    fun setSummonNotes(instanceId: String, notes: String) =
+        update { CharacterSummons.setNotes(it, instanceId, notes) }
+
+    fun spendSummonUse(instanceId: String, trait: String, delta: Int) =
+        update { CharacterSummons.spend(it, instanceId, trait, delta) }
 
     // ------------------------------------------------------------------ Play tracking
 

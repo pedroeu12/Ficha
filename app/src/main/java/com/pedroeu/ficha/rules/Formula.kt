@@ -69,6 +69,17 @@ sealed interface Formula {
     /** "…(minimum of one)", which the rules attach to most ability-modifier counts. */
     data class AtLeast(val of: Formula, val floor: Int) : Formula
 
+    /**
+     * The level of the spell slot spent, for a summon that grows with it.
+     *
+     * Every 2024 "Summon" spell scales this way — a Bestial Spirit has "5 + 5 per spell level"
+     * Hit Points — and it is the reason a summoned creature has to be computed rather than
+     * printed on a card. Zero outside a spell, which reads as no contribution.
+     */
+    data object SpellLevel : Formula
+
+    data class PerSpellLevel(val amount: Int) : Formula
+
     companion object {
         val ZERO: Formula = Flat(0)
         fun of(vararg parts: Formula): Formula = Sum(parts.toList())
@@ -83,6 +94,8 @@ object FormulaEval {
         character: PlayerCharacter,
         /** The class whose level [LevelScope.OWNING_CLASS] means, when there is one. */
         owningClassId: String? = null,
+        /** The level of the slot spent, for a summon that scales with it. */
+        spellLevel: Int = 0,
     ): Int = when (formula) {
         is Formula.Flat -> formula.amount
 
@@ -95,13 +108,17 @@ object FormulaEval {
         is Formula.ProficiencyBonus ->
             formula.times * CharacterCalculations.proficiencyBonus(character)
 
-        is Formula.Sum -> formula.parts.sumOf { eval(it, character, owningClassId) }
+        is Formula.Sum -> formula.parts.sumOf { eval(it, character, owningClassId, spellLevel) }
 
         is Formula.Larger ->
-            formula.parts.maxOfOrNull { eval(it, character, owningClassId) } ?: 0
+            formula.parts.maxOfOrNull { eval(it, character, owningClassId, spellLevel) } ?: 0
 
         is Formula.AtLeast ->
-            eval(formula.of, character, owningClassId).coerceAtLeast(formula.floor)
+            eval(formula.of, character, owningClassId, spellLevel).coerceAtLeast(formula.floor)
+
+        is Formula.SpellLevel -> spellLevel
+
+        is Formula.PerSpellLevel -> formula.amount * spellLevel
     }
 
     fun levelFor(
@@ -132,5 +149,7 @@ object FormulaEval {
         is Formula.Sum -> formula.parts.joinToString(" + ") { describe(it) }
         is Formula.Larger -> formula.parts.joinToString(" or ") { describe(it) } + ", whichever is higher"
         is Formula.AtLeast -> describe(formula.of) + " (minimum ${formula.floor})"
+        is Formula.SpellLevel -> "the spell's level"
+        is Formula.PerSpellLevel -> "${formula.amount} per spell level"
     }
 }

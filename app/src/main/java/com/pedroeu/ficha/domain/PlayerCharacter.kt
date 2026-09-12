@@ -284,6 +284,18 @@ data class PlayerCharacter(
     val alignment: String = "",
     val notes: String = "",
 
+    /**
+     * Creatures currently on the table, each with its own hit points and expended uses.
+     *
+     * Stored rather than derived, because the whole point is that they change — a summon
+     * takes damage, spends a once-a-day trait, and is dismissed. Several can be out at once:
+     * Animate Dead raises one more corpse every casting and keeps the earlier ones.
+     *
+     * Added at the end with a default, so every character saved before summons existed reads
+     * back with none and nothing needs migrating.
+     */
+    val activeSummons: List<com.pedroeu.ficha.rules.ActiveSummon> = emptyList(),
+
     val createdAt: Long = 0L,
     val updatedAt: Long = 0L,
 ) {

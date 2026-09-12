@@ -48,7 +48,11 @@ import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.CharacterSummons
 import com.pedroeu.ficha.ui.components.EditableText
+import com.pedroeu.ficha.ui.components.SummonBar
+import com.pedroeu.ficha.ui.components.SummonPickerSheet
+import com.pedroeu.ficha.ui.components.SummonSheet
 import com.pedroeu.ficha.ui.layout.LocalLayoutController
 import com.pedroeu.ficha.ui.tablet.TabletSheetScreen
 import kotlinx.coroutines.launch
@@ -74,6 +78,11 @@ fun CharacterSheetScreen(
     val scope = rememberCoroutineScope()
     val layout = LocalLayoutController.current
     var restKind by remember { mutableStateOf<RestKind?>(null) }
+    // Which sheet is showing: null for the character's own, otherwise a summoned creature.
+    // Kept here rather than inside either layout, so the phone and the tablet switch the
+    // same way and neither can reach a creature the other cannot.
+    var viewing by remember { mutableStateOf<String?>(null) }
+    var summoning by remember { mutableStateOf(false) }
 
     // Coming back from the level-up flow, the stored character has changed underneath us.
     LaunchedEffect(Unit) { viewModel.refresh() }
@@ -165,6 +174,56 @@ fun CharacterSheetScreen(
         // screen rather than what the app bar left over, so the sheet was laid out an app
         // bar too tall and the last rows of it fell off the bottom. Edit Mode made it worse
         // by a banner's height, which is why Edit Mode looked like the thing that was broken.
+        SummonBar(
+            summons = loaded.activeSummons,
+            selectedInstanceId = viewing,
+            onSelectCharacter = { viewing = null },
+            onSelectSummon = { viewing = it },
+            onSummonSomething = { summoning = true }
+                .takeIf { CharacterSummons.available(loaded).isNotEmpty() },
+            characterName = loaded.name,
+        )
+
+        // A creature that has been dismissed cannot still be the one on screen.
+        val openSummon = loaded.activeSummons.find { it.instanceId == viewing }
+        if (viewing != null && openSummon == null) viewing = null
+
+        if (openSummon != null) {
+            SummonSheet(
+                character = loaded,
+                summon = openSummon,
+                editMode = editMode,
+                onRename = { viewModel.renameSummon(openSummon.instanceId, it) },
+                onDamage = { viewModel.damageSummon(openSummon.instanceId, it) },
+                onHeal = { viewModel.healSummon(openSummon.instanceId, it) },
+                onSetHitPoints = { hp, temp ->
+                    viewModel.setSummonHitPoints(openSummon.instanceId, hp, temp)
+                },
+                onDismiss = {
+                    viewModel.dismissSummon(openSummon.instanceId)
+                    viewing = null
+                },
+                onSpend = { trait, delta ->
+                    viewModel.spendSummonUse(openSummon.instanceId, trait, delta)
+                },
+                onNotes = { viewModel.setSummonNotes(openSummon.instanceId, it) },
+                modifier = Modifier.weight(1f),
+            )
+            if (summoning) {
+                SummonPickerSheet(
+                    character = loaded,
+                    onDismiss = { summoning = false },
+                    onSummon = { statblockId, sourceId, label, level, classId, concentration ->
+                        viewModel.summon(
+                            statblockId, sourceId, label, level, classId, concentration,
+                        )
+                        summoning = false
+                    },
+                )
+            }
+            return@Column
+        }
+
         BoxWithConstraints(
             Modifier
                 .fillMaxWidth()

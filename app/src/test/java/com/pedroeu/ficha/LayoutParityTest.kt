@@ -26,8 +26,32 @@ class LayoutParityTest {
     private fun tree(name: String): List<File> =
         File(ui, name).walkTopDown().filter { it.isFile && it.extension == "kt" }.toList()
 
-    private fun phone() = tree("sheet")
+    /**
+     * Files under `sheet/` that belong to neither layout.
+     *
+     * `sheet/` is the phone's package by history, not by meaning. The host that owns the app
+     * bar, the rest sheet, every picker, every detail sheet and the cards that *are* a system
+     * all live there and are rendered or opened by both layouts. Counting them as the phone's
+     * is what forced a long list of named exceptions, and it would have hidden a real
+     * divergence behind them.
+     *
+     * What is left in [phone] after this is the phone's seven tabs: its actual layout.
+     */
+    private val SHARED_UNDER_SHEET = setOf(
+        // The host: app bar, rest, level up, the summon switcher, and the phone/tablet split.
+        "CharacterSheetScreen.kt",
+        "SheetViewModel.kt",
+        // Whole screens both layouts open from the shared top bar.
+        "RestSheet.kt",
+        // The cards that are a system, rendered by both.
+        "ResourcesCard.kt", "PerUseChoiceUi.kt", "ArtificerItemsCard.kt", "PoolFeaturesCard.kt",
+        // Pickers and detail sheets, opened by both.
+        "PickerSheets.kt", "AddItemSheet.kt", "SpellDetailSheet.kt", "ItemDetailSheet.kt",
+    )
+
+    private fun phone() = tree("sheet").filterNot { it.name in SHARED_UNDER_SHEET }
     private fun tablet() = tree("tablet")
+    private fun sharedHost() = tree("sheet").filter { it.name in SHARED_UNDER_SHEET }
 
     private fun textOf(files: List<File>) = files.joinToString("\n") { it.readText() }
 
@@ -49,7 +73,7 @@ class LayoutParityTest {
      */
     @Test
     fun `every action one layout can take, the other can take too`() {
-        val shared = tree("components").let(::actionsIn)
+        val shared = actionsIn(tree("components") + sharedHost())
         val phoneOnly = actionsIn(phone()) - actionsIn(tablet()) - shared
         val tabletOnly = actionsIn(tablet()) - actionsIn(phone()) - shared
 
@@ -73,15 +97,11 @@ class LayoutParityTest {
      * rule — it is saying they are outside the two trees being compared.
      */
     private val ROUTED_THROUGH_SHARED_SCREENS = setOf(
-        // The rest sheet.
-        "shortRest", "longRestDetailed", "rollHitDie", "swapCantrip",
         // The limited-use trackers, rendered by the shared ResourcesCard on both.
         "addCustomResource", "removeCustomResource", "setResourceMax", "setResourceSpent",
         "spendResourceOn", "setPerUseChoice", "clearPerUseChoice",
         // Replicate Magic Item, rendered by the shared ArtificerItemsCard on both.
         "makeArtificerItem", "unmakeArtificerItem",
-        // The top bar and the character store.
-        "toggleEditMode", "clearAllOverrides", "refresh",
         // Two names for one gesture: the phone sets a spell prepared, the tablet toggles it.
         "setSpellPrepared", "toggleSpellPrepared",
         // The tablet's handle names these; the phone calls the same view model methods from
@@ -190,6 +210,29 @@ class LayoutParityTest {
         "bio:alignment",
         "bio:notes",
     )
+
+    /**
+     * The summon switcher belongs to neither layout, which is how both are certain to have it.
+     *
+     * A creature on the table is a whole second sheet, and building it inside one layout would
+     * have handed the phone a feature the tablet could not reach — the exact fault the rest of
+     * this file exists to catch. It lives above the point where the two part instead, so there
+     * is one implementation and no way for them to diverge.
+     */
+    @Test
+    fun `the summon switcher lives above the split, not inside one layout`() {
+        val hostText = textOf(sharedHost())
+        listOf("SummonBar(", "SummonSheet(", "SummonPickerSheet(").forEach {
+            assertTrue("the shared host stopped rendering $it", hostText.contains(it))
+        }
+        listOf(phone(), tablet()).forEach { side ->
+            val text = textOf(side)
+            assertTrue(
+                "a layout is drawing the summon switcher itself, which is how the two drift",
+                !text.contains("SummonBar("),
+            )
+        }
+    }
 
     // ================================================================ Same source of truth
 

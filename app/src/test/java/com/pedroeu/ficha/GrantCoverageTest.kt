@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SpellGrantData
+import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.content.SubclassData
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -21,13 +22,27 @@ import org.junit.Test
  * The check reads each feature's own description, finds the spells it names, and holds them
  * against what [SpellGrantData] actually grants. Nothing here is typed in by hand, so a
  * subclass added later is checked against its own text the moment it arrives.
+ *
+ * It walks *options* as well, which it did not at first, and that omission cost a real bug: a
+ * level 1 Warlock with Pact of the Chain did not have Find Familiar, and eleven other
+ * invocations were handing out nothing either. An invocation is not a feature, a trait or a
+ * feat — it is an option inside a choice — so a check written around those three walked past
+ * every one of them. Options are where a Fighting Style, a Metamagic, a maneuver and an
+ * Artificer's plan live too.
  */
 class GrantCoverageTest {
 
-    /** Wording that means the spell is handed over rather than offered. */
+    /**
+     * Wording that means the spell is handed over rather than offered.
+     *
+     * "You can cast X without expending a spell slot" belongs here as much as "you always
+     * have X prepared" does, and leaving it out is what let twelve invocations grant nothing
+     * while this test reported everything covered. A spell the rules let you cast is a spell
+     * that has to be on the sheet, whatever sentence hands it over.
+     */
     private val PROMISE = Regex(
         "(?i)(always have|thereafter always have|have the .{0,60}? spells? prepared|" +
-            "spells? prepared)"
+            "spells? prepared|you can cast|you can also cast|you learn the)"
     )
 
     /**
@@ -92,6 +107,40 @@ class GrantCoverageTest {
                 SpellGrantData.grantedSpellIds(featIds = listOf(f.id), level = 20),
             )
         }
+
+        // Options: invocations, Fighting Styles, Metamagic, maneuvers, Artificer plans. Each
+        // is checked against what *it alone* grants, not against everything the game grants
+        // to anyone — the difference matters, because Mage Armor being granted by some other
+        // source elsewhere made Armor of Shadows look covered when it granted nothing.
+        // An option that *is* a spell carries the spell's own text, which describes what
+        // happens when it is cast — not something the option hands over. The same is true of
+        // the Artificer's plans, whose options are magic items.
+        fun optionsOf(choices: List<com.pedroeu.ficha.data.model.Choice>) =
+            choices
+                .filterNot { it.kind == ChoiceKind.SPELL }
+                .filterNot { it.id == ProgressionData.PLAN_CHOICE_ID }
+                .flatMap { c -> c.options.map { c.id to it } }
+
+        val everyOption = buildList {
+            ProgressionData.ALL.forEach { p ->
+                p.features.forEach { addAll(optionsOf(it.choices)) }
+            }
+            SubclassData.ALL.forEach { s ->
+                s.features.forEach { addAll(optionsOf(it.choices)) }
+            }
+        }.distinctBy { "${it.first}:${it.second.id}" }
+
+        everyOption.forEach { (choiceId, option) ->
+            check(
+                option.id,
+                option.name,
+                option.description,
+                SpellGrantData.grantedSpellIds(
+                    selections = mapOf(choiceId to listOf(option.id)),
+                    level = 20,
+                ),
+            )
+        }
     }
 
     @Test
@@ -137,6 +186,30 @@ class GrantCoverageTest {
         // "an aura of fear" and "aid you", both ordinary words here.
         "infernal_dragoon:fear",
         "infernal_dragoon:aid",
+        // "you can teleport to an unoccupied space", the verb.
+        "archfey:teleport",
+        "cartographer:teleport",
+        "cartographer:jump",
+        // The feature is called Expert *Divination* and grants Darkvision to nobody.
+        "diviner:divination",
+        "diviner:darkvision",
+        // "Resistance to Poison damage", not the cantrip.
+        "alchemist:resistance",
+        "touch_of_death:resistance",
+        // "you can command the companion", the verb.
+        "reanimator:command",
+        // "the shadow can aid you", the verb.
+        "living_shadow:aid",
+        // The feature is called Wish Magic; it grants a level 1 spell, not Wish.
+        "genie_magic:wish",
+        // "while you're in an area of Dim Light or Darkness" — the condition, not the spells.
+        "one_with_shadows:darkness",
+        "one_with_shadows:light",
+        // "If you already know that cantrip" — Light is granted, and the *alternative* is the
+        // choice this feat raises.
+        "illusionist:minor_illusion",
+        // "Minor Telekinesis" is the name of the benefit; the spell it grants is Mage Hand.
+        "telekinetic:telekinesis",
     )
 
     /**

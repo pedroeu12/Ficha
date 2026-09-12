@@ -389,6 +389,60 @@ internal object Adapters {
                 Source.Lineage(character.lineageId.orEmpty(), character.speciesId))?.let(::add)
             character.featIds.forEach { featId ->
                 element("feat", SaveDcData.forFeat(featId), Source.Feat(featId))?.let(::add)
+
+                // A feat whose magic says "Intelligence, Wisdom, or Charisma is your
+                // spellcasting ability (choose when you select this feat)" sets a DC that
+                // SaveDcData has no way to hold: the ability is an answer, not a constant.
+                // AbilityRef.ChosenIn is exactly that, so these DCs exist here and nowhere
+                // else — and a feat granting a spell that forces a save finally shows the
+                // number the save is against.
+                // The other half of the same idea: a feat whose spell is cast with "the
+                // ability increased by this feat". The ability is again an answer, this time
+                // the one that raised a score, so the DC reads from that choice instead.
+                val feat = FeatData.byId(featId)
+                val castsFromRaisedAbility = feat?.description.orEmpty().let { text ->
+                    "ability increased by this feat" in text ||
+                        "ability you increased" in text
+                }
+                if (castsFromRaisedAbility && FeatChoiceData.CASTING_ABILITY_FEATS[featId] == null) {
+                    add(
+                        RuleElement(
+                            id = "dc:feat:$featId",
+                            name = feat?.name.orEmpty().ifBlank { featId },
+                            description = "Cast with the ability this feat raised.",
+                            source = Source.Feat(featId),
+                            gate = Gate.ALWAYS,
+                            effects = listOf(
+                                Effect.ProvidesSaveDc(
+                                    id = "feat:$featId",
+                                    label = feat?.name.orEmpty().ifBlank { featId },
+                                    ability = AbilityRef.ChosenIn("feat:$featId:ability"),
+                                    note = "Cast with the ability this feat raised.",
+                                )
+                            ),
+                        )
+                    )
+                }
+
+                FeatChoiceData.CASTING_ABILITY_FEATS[featId]?.let { label ->
+                    add(
+                        RuleElement(
+                            id = "dc:feat:$featId",
+                            name = feat?.name ?: label,
+                            description = "$label, cast with the ability you chose for it.",
+                            source = Source.Feat(featId),
+                            gate = Gate.ALWAYS,
+                            effects = listOf(
+                                Effect.ProvidesSaveDc(
+                                    id = "feat:$featId",
+                                    label = feat?.name ?: label,
+                                    ability = AbilityRef.ChosenIn("feat:$featId:casting_ability"),
+                                    note = "$label, cast with the ability you chose for it.",
+                                )
+                            ),
+                        )
+                    )
+                }
             }
         }.distinctBy { it.id }
     }

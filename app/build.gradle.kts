@@ -14,8 +14,8 @@ android {
         applicationId = "com.pedroeu.ficha"
         minSdk = 26
         targetSdk = 35
-        versionCode = 49
-        versionName = "3.11.4"
+        versionCode = 50
+        versionName = "3.12.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

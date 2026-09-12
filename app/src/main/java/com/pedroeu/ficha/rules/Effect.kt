@@ -162,6 +162,19 @@ sealed interface Effect {
 
     // ---------------------------------------------------------------- Summoning
 
+    /**
+     * Adds creatures to a summon another element already provides.
+     *
+     * Pact of the Chain does not summon anything of its own: it widens Find Familiar, which
+     * the Warlock casts as normal, with eight special forms. Writing that as a second summon
+     * would put two Find Familiars on the sheet, and writing it into Find Familiar itself
+     * would offer an Imp to every Wizard who ever learned the spell.
+     */
+    data class ExtendsSummon(
+        val summonId: String,
+        val statblockIds: List<String>,
+    ) : Effect
+
     data class Summons(
         val summonId: String,
         val label: String,

@@ -5,6 +5,9 @@ import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ResourceData
 import com.pedroeu.ficha.data.content.SaveDcData
 import com.pedroeu.ficha.data.content.SpellGrantData
+import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.rules.RulesEngine
+import com.pedroeu.ficha.rules.Source
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.Feat
@@ -229,7 +232,12 @@ class ContentCoverageTest {
     @Test
     fun `every feat that casts from a chosen ability has a save DC`() {
         // A feat that grants a spell needs a DC, or the sheet shows the spell with no number
-        // to roll against. The exceptions are feats whose spells force no save at all.
+        // to roll against. Asked of the rules engine rather than of SaveDcData, because a
+        // feat whose text says "Intelligence, Wisdom, or Charisma is your spellcasting
+        // ability (choose when you select this feat)" sets a DC that table cannot hold: the
+        // ability is an answer the player gave, not a constant. That was written off here as
+        // "a gap in the DC model"; AbilityRef.ChosenIn closed it, so those feats are no
+        // longer exceptions.
         val noSaveNeeded = setOf(
             "telekinetic", "mark_of_making", "mark_of_passage", "mark_of_healing",
             "mark_of_hospitality", "mark_of_scribing", "mark_of_finding", "mark_of_handling",
@@ -241,15 +249,30 @@ class ContentCoverageTest {
             // Magic Weapon are all cast without the target rolling anything.
             "shadowmoor_hexer", "gathered_whispers", "second_skin", "watchers",
             "cloying_mists", "fey_tormentor", "infernal_bulwark", "infernal_dragoon",
-            // These two do force a save — Charm Person and Entangle — but the feat lets the
-            // player choose the ability that casts it, which SaveDcData has no way to
-            // express. Same gap as undead_grasp, and it belongs to the DC model, not here.
-            "treacherous_allure", "fey_sentinel",
+            // Mage Hand and Light force nothing on their own.
+            "living_shadow", "light_bringer",
+            // Chill Touch is a melee spell attack in the 2024 rules, so it wants an attack
+            // bonus and never a save.
+            "touch_of_death",
         )
+
+        fun withFeat(featId: String) = PlayerCharacter(
+            id = "t", name = "T", speciesId = "human", classId = "fighter",
+            backgroundId = "soldier", level = 8,
+            baseAbilityScores = Ability.ALL.associate { it.name to 14 },
+            featIds = listOf(featId),
+        )
+
         val granting = SpellGrantData.sourceIds().filter { id -> FeatData.byId(id) != null }
         val missing = granting
             .filterNot { it in noSaveNeeded }
-            .filter { SaveDcData.forFeat(it) == null }
+            .filter { featId ->
+                // By source, not by the shape of an id: several Death Knight feats share one
+                // DC entry between them, and what matters is that the character holding the
+                // feat ends up with a number to roll against.
+                RulesEngine.saveDcs(withFeat(featId))
+                    .none { (it.element.source as? Source.Feat)?.id == featId }
+            }
 
         assertTrue(
             "these feats grant a spell but set no save DC: $missing",

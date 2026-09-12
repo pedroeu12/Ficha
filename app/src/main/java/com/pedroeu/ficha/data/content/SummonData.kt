@@ -89,6 +89,20 @@ object SummonData {
         ),
     )
 
+    /**
+     * Options that widen a summon someone else provides, keyed by the option's id.
+     *
+     * Pact of the Chain summons nothing of its own — the Warlock still casts Find Familiar —
+     * but it adds eight forms to it. Kept apart from [BY_SPELL] so an Imp is offered to the
+     * Warlock who took the pact and to nobody else.
+     */
+    val EXTENSIONS_BY_OPTION: Map<String, Effect.ExtendsSummon> = mapOf(
+        "pact_chain" to Effect.ExtendsSummon(
+            summonId = "find_familiar",
+            statblockIds = StatblockData.PACT_OF_THE_CHAIN_FORMS,
+        ),
+    )
+
     /** Summons hung off a class or subclass feature, keyed by the feature's element id. */
     val BY_FEATURE: Map<String, Effect.Summons> = mapOf(
         "subclass:battle_smith:3:steel_defender" to Effect.Summons(

@@ -221,7 +221,7 @@ object FeatChoiceData {
      * They are listed rather than detected from the text: a list is what a reader can check
      * against the book, and the coverage test fails if a new feat says it and is not here.
      */
-    private val CASTING_ABILITY_FEATS: Map<String, String> = mapOf(
+    val CASTING_ABILITY_FEATS: Map<String, String> = mapOf(
         "mark_of_detection" to "Magical Detection",
         "mark_of_finding" to "Magical Discovery",
         "mark_of_handling" to "Primal Connection",

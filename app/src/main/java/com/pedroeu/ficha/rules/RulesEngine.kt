@@ -100,7 +100,12 @@ object RulesEngine {
             description = option?.description.orEmpty(),
             source = Source.Option(optionId, choice.id, parent.source),
             gate = Gate.ALWAYS,
-            effects = grants.map { Effect.AskOnGain(it) },
+            // An option carries whatever it carries: the questions it raises, and anything
+            // it adds to a summon someone else provides.
+            effects = grants.map { Effect.AskOnGain(it) } +
+                listOfNotNull(
+                    com.pedroeu.ficha.data.content.SummonData.EXTENSIONS_BY_OPTION[optionId]
+                ),
             book = option?.book,
         )
     }

@@ -66,7 +66,23 @@ object CharacterSummons {
             )
         }
 
-        return (fromSpells + fromFeatures).distinctBy { it.summons.summonId }
+        // What the character's picked options add. Pact of the Chain widens Find Familiar
+        // rather than summoning anything itself, and an Imp belongs only to the Warlock who
+        // took the pact.
+        val extensions = RulesEngine.view<Effect.ExtendsSummon>(character)
+            .groupBy { it.effect.summonId }
+            .mapValues { (_, applied) -> applied.flatMap { it.effect.statblockIds }.distinct() }
+
+        return (fromSpells + fromFeatures)
+            .distinctBy { it.summons.summonId }
+            .map { entry ->
+                val extra = extensions[entry.summons.summonId].orEmpty()
+                if (extra.isEmpty()) entry
+                else entry.copy(
+                    options = (entry.options + StatblockData.idsMatching(extra))
+                        .distinctBy { it.id },
+                )
+            }
     }
 
     /**

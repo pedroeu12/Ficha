@@ -563,10 +563,180 @@ object StatblockData {
         familiar("familiar_weasel", "Weasel", 13, 1, "30 ft., Climb 30 ft.", 3, 16, 8, 2, 12, 3),
     )
 
+
+    // ================================================================ Pact of the Chain
+
+    /**
+     * "Imp, Pseudodragon, Quasit, Skeleton, Slaad Tadpole, Sphinx of Wonder, Sprite, or
+     * Venomous Snake."
+     *
+     * The eight forms Pact of the Chain adds to Find Familiar. Unlike the ordinary familiar
+     * forms these can act — a Pact of the Chain familiar makes an attack of its own when the
+     * Warlock forgoes one — so each carries its attack rather than the note that it has none.
+     */
+    private fun pactFamiliar(
+        id: String, name: String, type: String, ac: Int, hp: Int, speed: String,
+        str: Int, dex: Int, con: Int, int: Int, wis: Int, cha: Int,
+        attack: StatblockAction,
+        senses: String = "Darkvision 60 ft.",
+        extra: List<StatblockAction> = emptyList(),
+    ) = Statblock(
+        id = id, name = name, size = "Tiny", creatureType = type,
+        armorClass = Formula.Flat(ac), hitPoints = Formula.Flat(hp), speed = speed,
+        abilityScores = scores(str, dex, con, int, wis, cha),
+        senses = senses,
+        actions = listOf(attack) + extra,
+    )
+
+    private val PACT_FAMILIARS = listOf(
+        pactFamiliar(
+            "pact_imp", "Imp", "Fiend (Devil)", 13, 21, "20 ft., Fly 40 ft.",
+            6, 17, 13, 11, 12, 14,
+            StatblockAction(
+                name = "Sting",
+                description = "Melee Attack Roll: +5, reach 5 ft. Hit: 1d4 + 3 Piercing " +
+                    "damage plus 3d6 Poison damage.",
+                damageDice = "1d4", damageBonus = Formula.Flat(3),
+                damageType = "Piercing plus 3d6 Poison", reach = "5 ft.",
+            ),
+            extra = listOf(
+                StatblockAction(
+                    name = "Invisibility",
+                    kind = ActionKind.TRAIT,
+                    description = "The imp magically turns Invisible until it attacks, or " +
+                        "until its Concentration ends.",
+                ),
+                StatblockAction(
+                    name = "Shape-Shift",
+                    kind = ActionKind.BONUS_ACTION,
+                    description = "The imp shape-shifts into a Rat, a Raven, or a Spider, or " +
+                        "back into its true form.",
+                ),
+            ),
+        ),
+        pactFamiliar(
+            "pact_pseudodragon", "Pseudodragon", "Dragon", 14, 10, "15 ft., Fly 30 ft.",
+            6, 15, 13, 10, 12, 10,
+            StatblockAction(
+                name = "Bite",
+                description = "Melee Attack Roll: +4, reach 5 ft. Hit: 1d4 + 2 Piercing damage.",
+                damageDice = "1d4", damageBonus = Formula.Flat(2),
+                damageType = "Piercing", reach = "5 ft.",
+            ),
+            senses = "Blindsight 10 ft., Darkvision 60 ft.",
+            extra = listOf(
+                StatblockAction(
+                    name = "Sting",
+                    description = "Constitution saving throw DC 12. Failure: 2d4 Poison " +
+                        "damage, and the target has the Poisoned condition for 1 hour.",
+                ),
+            ),
+        ),
+        pactFamiliar(
+            "pact_quasit", "Quasit", "Fiend (Demon)", 13, 25, "40 ft.",
+            5, 17, 14, 7, 10, 10,
+            StatblockAction(
+                name = "Claw",
+                description = "Melee Attack Roll: +5, reach 5 ft. Hit: 1d4 + 3 Slashing " +
+                    "damage, and the target has the Poisoned condition until the end of its " +
+                    "next turn.",
+                damageDice = "1d4", damageBonus = Formula.Flat(3),
+                damageType = "Slashing", reach = "5 ft.",
+            ),
+            extra = listOf(
+                StatblockAction(
+                    name = "Scare (1/Day)",
+                    description = "One creature within 20 feet makes a DC 10 Wisdom saving " +
+                        "throw or has the Frightened condition for 1 minute.",
+                ),
+                StatblockAction(
+                    name = "Shape-Shift",
+                    kind = ActionKind.BONUS_ACTION,
+                    description = "The quasit shape-shifts into a Bat, a Centipede, or a " +
+                        "Toad, or back into its true form.",
+                ),
+            ),
+        ),
+        pactFamiliar(
+            "pact_skeleton", "Skeleton", "Undead", 15, 13, "30 ft.",
+            10, 16, 15, 6, 8, 5,
+            StatblockAction(
+                name = "Shortbow",
+                description = "Ranged Attack Roll: +5, range 80/320 ft. Hit: 1d6 + 3 " +
+                    "Piercing damage.",
+                damageDice = "1d6", damageBonus = Formula.Flat(3),
+                damageType = "Piercing", reach = "80/320 ft.",
+            ),
+        ),
+        pactFamiliar(
+            "pact_slaad_tadpole", "Slaad Tadpole", "Aberration", 12, 10, "30 ft.",
+            7, 15, 10, 3, 5, 3,
+            StatblockAction(
+                name = "Bite",
+                description = "Melee Attack Roll: +3, reach 5 ft. Hit: 1d4 + 1 Piercing damage.",
+                damageDice = "1d4", damageBonus = Formula.Flat(1),
+                damageType = "Piercing", reach = "5 ft.",
+            ),
+        ),
+        pactFamiliar(
+            "pact_sphinx_of_wonder", "Sphinx of Wonder", "Celestial", 13, 7, "20 ft., Fly 40 ft.",
+            6, 17, 13, 15, 12, 11,
+            StatblockAction(
+                name = "Rend",
+                description = "Melee Attack Roll: +5, reach 5 ft. Hit: 1d4 + 3 Slashing " +
+                    "damage plus 2d6 Radiant damage.",
+                damageDice = "1d4", damageBonus = Formula.Flat(3),
+                damageType = "Slashing plus 2d6 Radiant", reach = "5 ft.",
+            ),
+            extra = listOf(
+                StatblockAction(
+                    name = "Magic Resistance",
+                    kind = ActionKind.TRAIT,
+                    description = "The sphinx has Advantage on saving throws against spells " +
+                        "and other magical effects.",
+                ),
+            ),
+        ),
+        pactFamiliar(
+            "pact_sprite", "Sprite", "Fey", 15, 10, "10 ft., Fly 40 ft.",
+            3, 18, 10, 14, 13, 11,
+            StatblockAction(
+                name = "Shortbow",
+                description = "Ranged Attack Roll: +6, range 40/160 ft. Hit: 1 Piercing " +
+                    "damage, and the target has the Poisoned condition until the end of its " +
+                    "next turn; a DC 10 Constitution save ends the condition early. On a " +
+                    "failed save by 5 or more the target also falls Unconscious for 1 minute.",
+                damageDice = "1", damageType = "Piercing", reach = "40/160 ft.",
+            ),
+            senses = "",
+            extra = listOf(
+                StatblockAction(
+                    name = "Heart Sight",
+                    description = "The sprite touches a creature and learns its emotional " +
+                        "state and whether it is Evil.",
+                ),
+            ),
+        ),
+        pactFamiliar(
+            "pact_venomous_snake", "Venomous Snake", "Beast", 12, 5, "30 ft., Swim 30 ft.",
+            2, 15, 11, 1, 10, 3,
+            StatblockAction(
+                name = "Bite",
+                description = "Melee Attack Roll: +4, reach 5 ft. Hit: 1 Piercing damage " +
+                    "plus 2d4 Poison damage.",
+                damageDice = "1", damageType = "Piercing plus 2d4 Poison", reach = "5 ft.",
+            ),
+            senses = "Blindsight 10 ft.",
+        ),
+    )
+
+    /** The eight forms Pact of the Chain adds to Find Familiar. */
+    val PACT_OF_THE_CHAIN_FORMS: List<String> = PACT_FAMILIARS.map { it.id }
+
     // ================================================================ The catalogue
 
     val ALL: List<Statblock> =
-        BESTIAL + UNDEAD + FEY + ELEMENTAL + VESTIGES + FAMILIARS +
+        BESTIAL + UNDEAD + FEY + ELEMENTAL + VESTIGES + FAMILIARS + PACT_FAMILIARS +
             listOf(STEEL_DEFENDER, SKELETON, ZOMBIE, OTHERWORLDLY_STEED)
 
     private val byId: Map<String, Statblock> = ALL.associateBy { it.id }

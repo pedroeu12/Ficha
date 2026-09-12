@@ -175,7 +175,8 @@ object SpellGrantData {
             at(5, "flaming_sphere", "melfs_acid_arrow") +
             at(9, "gaseous_form", "mass_healing_word") +
             at(13, "death_ward", "vitriolic_sphere") +
-            at(17, "cloudkill", "raise_dead"),
+            at(17, "cloudkill", "raise_dead") +
+            at(9, "lesser_restoration") + at(15, "tasha_s_bubbling_cauldron"),
         "armorer" to at(3, "magic_missile", "thunderwave") +
             at(5, "mirror_image", "shatter") +
             at(9, "hypnotic_pattern", "lightning_bolt") +
@@ -195,7 +196,8 @@ object SpellGrantData {
             at(5, "locate_object", "mind_spike") +
             at(9, "call_lightning", "clairvoyance") +
             at(13, "banishment", "locate_creature") +
-            at(17, "scrying", "teleportation_circle"),
+            at(17, "scrying", "teleportation_circle") +
+            at(9, "faerie_fire") + at(15, "find_the_path"),
 
         // ---- Unearthed Arcana 2026: Villainous Options
         "pestilence_domain" to at(
@@ -251,6 +253,15 @@ object SpellGrantData {
         "stars" to at(3, "guidance", "guiding_bolt"),
         // Telekinetic Master: "You always have the Telekinesis spell prepared."
         "psi_warrior" to at(18, "telekinesis"),
+        // A feature that lets the spell be cast for free still has to put it on
+        // the sheet; none of these did.
+        "wild_heart" to at(3, "beast_sense", "speak_with_animals") + at(10, "commune_with_nature"),
+        // A feature that lets the spell be cast for free still has to put it on
+        // the sheet; none of these did.
+        "diviner" to at(10, "see_invisibility"),
+        // A feature that lets the spell be cast for free still has to put it on
+        // the sheet; none of these did.
+        "banneret" to at(3, "comprehend_languages"),
         "shadow_sorcery" to at(3, "bane", "darkness", "inflict_wounds", "pass_without_trace") +
             at(5, "hunger_of_hadar", "nondetection") +
             at(7, "greater_invisibility", "phantasmal_killer") +
@@ -274,7 +285,8 @@ object SpellGrantData {
         // that left Cleric domains empty — a promise in prose that reached no spell list.
         "glamour" to at(3, "charm_person", "mirror_image") +
             at(6, "command"),
-        "illusionist" to at(6, "summon_beast", "summon_fey"),
+        "illusionist" to at(6, "summon_beast", "summon_fey") +
+            at(3, "minor_illusion"),
         "enchanter" to at(14, "modify_memory"),
         "necromancer" to at(6, "animate_dead"),
         "transmuter" to at(3, "alter_self") + at(10, "polymorph"),
@@ -304,6 +316,11 @@ object SpellGrantData {
     // ------------------------------------------------------------------ Species
 
     private val BY_SPECIES_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
+        // Fairy Magic: "You know the Druidcraft cantrip. When you reach character levels 3
+        // and 5, you learn Faerie Fire and Enlarge/Reduce."
+        "faerie" to at(1, "druidcraft") + at(3, "faerie_fire") + at(5, "enlarge_reduce"),
+        // Reach to the Blaze, the same shape.
+        "flamekin" to at(1, "produce_flame") + at(3, "burning_hands") + at(5, "flame_blade"),
         // Hex Magic: "You always have the Disguise Self and Hex spells prepared."
         "hexblood" to at(1, "disguise_self", "hex"),
         // Cold Fire Magic: the cantrip at once, then "you learn the Ice Knife spell and
@@ -328,6 +345,11 @@ object SpellGrantData {
     // ------------------------------------------------------------------ Feats
 
     private val BY_FEAT_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
+        // Each says "You learn the X spell" in as many words, and none put it on the sheet.
+        "child_of_the_sun" to at(1, "faerie_fire"),
+        "living_shadow" to at(1, "mage_hand"),
+        "light_bringer" to at(1, "light"),
+        "touch_of_death" to at(1, "chill_touch"),
         "fey_touched" to at(1, "misty_step"),
         "shadow_touched" to at(1, "invisibility"),
         "telekinetic" to at(1, "mage_hand"),
@@ -420,6 +442,18 @@ object SpellGrantData {
         fun element(vararg rows: List<Grant>) =
             ChoiceGrants("primordial_patron", shared + rows.toList().flatten())
 
+        val invocation = ProgressionData.INVOCATION_CHOICE_ID
+        // Twelve Eldritch Invocations hand the Warlock a spell — "You can cast Mage Armor on
+        // yourself without expending a spell slot", "You learn the Find Familiar spell" — and
+        // not one of them was putting it on the sheet. They were missed because the grant
+        // audit walked features, traits and feats, and an invocation is none of those: it is
+        // an *option* inside a choice, and nothing was checking options at all.
+        //
+        // Every one is always-prepared in effect: the invocation is permanent, and the spell
+        // comes with it whether or not the Warlock has a slot to spare.
+        fun fromInvocation(optionId: String, vararg spellIds: String) =
+            "$invocation:$optionId" to ChoiceGrants("warlock", spellIds.map { Grant(it, 1) })
+
         val choice = SubclassData.ELEMENT_CHOICE_ID
         // The Death Domain Vestige borrows a Cleric domain's list wholesale: "when you reach
         // a Warlock level equal to a Cleric level listed on the Domain Spells table for the
@@ -429,6 +463,19 @@ object SpellGrantData {
             ChoiceGrants("vestige_patron", BY_SUBCLASS_ENTRIES.toMap()[domainId].orEmpty())
 
         mapOf(
+            fromInvocation("armor_of_shadows", "mage_armor"),
+            fromInvocation("ascendant_step", "levitate"),
+            fromInvocation("fiendish_vigor", "false_life"),
+            fromInvocation("gift_of_the_depths", "water_breathing"),
+            fromInvocation("mask_of_many_faces", "disguise_self"),
+            fromInvocation("master_of_myriad_forms", "alter_self"),
+            fromInvocation("misty_visions", "silent_image"),
+            fromInvocation("one_with_shadows", "invisibility"),
+            fromInvocation("otherworldly_leap", "jump"),
+            fromInvocation("pact_chain", "find_familiar"),
+            fromInvocation("visions_of_distant_realms", "arcane_eye"),
+            fromInvocation("whispers_of_the_grave", "speak_with_dead"),
+
             "subclass:vestige_patron:domain:Life" to vestige("life_domain"),
             "subclass:vestige_patron:domain:Light" to vestige("light_domain"),
             "subclass:vestige_patron:domain:Trickery" to vestige("trickery_domain"),

@@ -1,6 +1,8 @@
 package com.pedroeu.ficha.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +53,7 @@ import com.pedroeu.ficha.ui.i18n.trf
  * where the two layouts part, so there is one implementation and no way for one device to gain
  * a creature the other cannot see.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SummonSheet(
     character: PlayerCharacter,
@@ -133,9 +136,10 @@ fun SummonSheet(
                         onSet = onSetHitPoints,
                     )
 
-                    Row(
+                    FlowRow(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalArrangement = Arrangement.spacedBy(Space.inline),
                     ) {
                         StatStone(
                             tr("AC"),
@@ -162,9 +166,10 @@ fun SummonSheet(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                     )
-                    Row(
+                    FlowRow(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalArrangement = Arrangement.spacedBy(Space.inline),
                     ) {
                         Ability.ALL.forEach { ability ->
                             val score = statblock.abilityScores[ability] ?: 10
@@ -332,6 +337,7 @@ private fun StatStone(label: String, value: String) {
  * A creature on the table is damaged far more often than it is examined, so the buttons are
  * the first thing on it rather than something to find.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun HitPointBar(
     current: Int,
@@ -369,19 +375,19 @@ private fun HitPointBar(
             color = if (current * 2 <= max) MaterialTheme.colorScheme.error
             else MaterialTheme.colorScheme.primary,
         )
-        Row(
+        OutlinedTextField(
+            value = typed,
+            onValueChange = { entry -> typed = entry.filter { c -> c.isDigit() }.take(3) },
+            label = { Text(tr("Amount")) },
+            singleLine = true,
+            shape = Corner.row,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        FlowRow(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(Space.inline),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.spacedBy(Space.tight),
         ) {
-            OutlinedTextField(
-                value = typed,
-                onValueChange = { entry -> typed = entry.filter { c -> c.isDigit() }.take(3) },
-                label = { Text(tr("Amount")) },
-                singleLine = true,
-                shape = Corner.row,
-                modifier = Modifier.weight(1f),
-            )
             OutlinedButton(
                 onClick = { onDamage(amount) },
                 shape = Corner.row,
@@ -416,12 +422,13 @@ private fun usesPerDay(name: String): Int? =
  * The same gesture the character's own trackers use, so a summon is worked the way everything
  * else on the sheet is.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun UseCounter(spent: Int, max: Int, onSpend: () -> Unit, onRestore: () -> Unit) {
-    Row(
+    FlowRow(
         Modifier.padding(bottom = Space.inline),
         horizontalArrangement = Arrangement.spacedBy(Space.tight),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(Space.tight),
     ) {
         repeat(max) { index ->
             val used = index < spent

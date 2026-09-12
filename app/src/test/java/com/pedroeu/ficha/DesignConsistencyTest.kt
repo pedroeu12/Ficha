@@ -157,4 +157,48 @@ class DesignConsistencyTest {
 
         assertTrue("use SectionDisclosure instead: $offenders", offenders.isEmpty())
     }
+
+    // ================================================================ Lists that fit
+
+    /**
+     * A list of unknown length is never drawn in a plain Row.
+     *
+     * A Row draws its children in one line and clips whatever runs off the edge. Find Familiar
+     * offers eleven forms, and nineteen once Pact of the Chain widens it: three fitted a phone
+     * and the other sixteen were on screen in the same sense that a word is on a page that was
+     * never printed. Nothing crashed and nothing looked broken — the options were simply not
+     * there, which is the worst way for a layout to fail.
+     *
+     * A variable-length row has to wrap (FlowRow) or scroll (LazyRow). A fixed handful of
+     * things is fine in a Row, so the check is for a loop inside one.
+     */
+    @Test
+    fun `a row of unknown length wraps or scrolls`() {
+        val offenders = mutableListOf<String>()
+        val components = File(ui, "components")
+            .walkTopDown().filter { it.isFile && it.extension == "kt" }
+
+        components.forEach { file ->
+            val text = file.readText()
+            Regex("""\n(\s*)Row\(""").findAll(text).forEach { match ->
+                // The body of this Row, as far as the next composable of the same kind.
+                val body = text.substring(
+                    match.range.last,
+                    minOf(text.length, match.range.last + 900),
+                )
+                val loops = Regex("""\.forEach\s*\{|repeat\(""").containsMatchIn(
+                    body.substringBefore("\n" + match.groupValues[1] + "}")
+                )
+                if (loops) {
+                    val line = text.substring(0, match.range.first).count { it == '\n' } + 2
+                    offenders += "${file.name}:$line"
+                }
+            }
+        }
+
+        assertTrue(
+            "these draw a list in a Row, which clips whatever does not fit: $offenders",
+            offenders.isEmpty(),
+        )
+    }
 }

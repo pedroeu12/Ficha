@@ -1,12 +1,14 @@
 package com.pedroeu.ficha.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -21,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.CharacterSummons
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.design.Corner
@@ -37,7 +38,7 @@ import com.pedroeu.ficha.ui.i18n.trf
  * out of the data rather than being written per spell — a [com.pedroeu.ficha.rules.SummonPick]
  * with one option has nothing to ask about.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SummonPickerSheet(
     character: PlayerCharacter,
@@ -65,6 +66,7 @@ fun SummonPickerSheet(
         Column(
             Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = Space.sheetEdge)
                 .padding(bottom = Space.sheetBottom),
             verticalArrangement = Arrangement.spacedBy(Space.betweenRows),
@@ -88,12 +90,11 @@ fun SummonPickerSheet(
                 return@Column
             }
 
-            LazyColumn(
-                Modifier.heightIn(max = 220.dp),
-                verticalArrangement = Arrangement.spacedBy(Space.tight),
-            ) {
-                items(available.size) { index ->
-                    val entry = available[index]
+            // A plain Column: a lazy list inside a scrolling sheet is a nested scrollable in
+            // the same direction, which is fragile at best, and nobody has more than a
+            // handful of summoning spells for laziness to pay for.
+            Column(verticalArrangement = Arrangement.spacedBy(Space.tight)) {
+                available.forEach { entry ->
                     DetailRow(
                         title = entry.summons.label,
                         supporting = listOfNotNull(
@@ -114,22 +115,20 @@ fun SummonPickerSheet(
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                 )
-                Row(
+                // Wrapping, not a Row. Find Familiar offers nineteen forms once Pact of the
+                // Chain widens it, and a Row draws them in one line: the first three fitted
+                // the screen and the other sixteen were off the edge and unreachable. It was
+                // already wrong with the eleven ordinary forms; the pact only made it obvious.
+                FlowRow(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Space.inline),
+                    verticalArrangement = Arrangement.spacedBy(Space.tight),
                 ) {
                     current.options.forEach { option ->
                         FilterChip(
                             selected = option === form,
                             onClick = { form = option },
-                            label = {
-                                Text(
-                                    option.name
-                                        .substringAfter('(')
-                                        .substringBefore(')')
-                                        .ifBlank { option.name }
-                                )
-                            },
+                            label = { Text(shortName(option.name)) },
                             shape = Corner.row,
                         )
                     }
@@ -142,9 +141,10 @@ fun SummonPickerSheet(
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                 )
-                Row(
+                FlowRow(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Space.inline),
+                    verticalArrangement = Arrangement.spacedBy(Space.tight),
                 ) {
                     current.castableAt.forEach { slot ->
                         FilterChip(
@@ -190,3 +190,13 @@ fun SummonPickerSheet(
         }
     }
 }
+
+/**
+ * What to print on a form's chip.
+ *
+ * The spirits are named "Bestial Spirit (Air)", where only the variant tells them apart; a
+ * familiar is named "Owl", where the whole name does. Taking what is in the brackets when
+ * there are brackets covers both without a second list to keep in step.
+ */
+private fun shortName(name: String): String =
+    if ('(' in name) name.substringAfter('(').substringBefore(')') else name

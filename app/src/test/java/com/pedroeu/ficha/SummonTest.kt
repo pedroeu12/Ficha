@@ -317,4 +317,29 @@ class SummonTest {
             )
         }
     }
+
+    /**
+     * A spell always has a level to be cast at, even with no slots left to spend.
+     *
+     * A spirit's Hit Points are "5 + 5 per spell level", so summoning at level 0 would put a
+     * creature with five Hit Points on the table rather than ten.
+     */
+    @Test
+    fun `a summoning spell is never cast at level zero`() {
+        val noSlots = PlayerCharacter(
+            id = "t", name = "T", speciesId = "human", classId = "fighter",
+            backgroundId = "soldier", level = 1,
+            baseAbilityScores = Ability.ALL.associate { it.name to 12 },
+            knownSpells = listOf(
+                KnownSpell(
+                    id = "summon_beast", name = "Summon Beast", level = 2,
+                    school = "Conjuration", description = "",
+                )
+            ),
+        )
+        val entry = CharacterSummons.available(noSlots)
+            .single { it.summons.summonId == "summon_beast" }
+        assertTrue("a known spell offers no level at all", entry.castableAt.isNotEmpty())
+        assertEquals(2, entry.castableAt.first())
+    }
 }

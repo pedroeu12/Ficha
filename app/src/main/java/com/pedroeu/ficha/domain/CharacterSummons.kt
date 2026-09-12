@@ -69,11 +69,19 @@ object CharacterSummons {
         return (fromSpells + fromFeatures).distinctBy { it.summons.summonId }
     }
 
-    /** Slot levels the character could spend on a spell of [baseLevel]. */
+    /**
+     * Slot levels the character could spend on a spell of [baseLevel].
+     *
+     * Never empty for a real spell. A character can know a summoning spell and have no slots
+     * to spend — Magic Initiate grants one free casting a day — and leaving the list empty
+     * would summon the creature at level 0, which for a spirit whose Hit Points are "5 + 5 per
+     * spell level" means a creature with 5 Hit Points instead of 10.
+     */
     private fun castableLevels(character: PlayerCharacter, baseLevel: Int): List<Int> {
         if (baseLevel == 0) return emptyList()
         val slots = CharacterCalculations.spellSlots(character)
-        return (baseLevel..9).filter { level -> (slots[level] ?: 0) > 0 }
+        val withSlots = (baseLevel..9).filter { level -> (slots[level] ?: 0) > 0 }
+        return withSlots.ifEmpty { listOf(baseLevel) }
     }
 
     /**

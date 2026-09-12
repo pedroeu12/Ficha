@@ -29,7 +29,36 @@ object RulesEngine {
      * An option nobody picked contributes nothing, which is what lets this be handed the whole
      * rulebook without asking about invocations no one took.
      */
-    fun elementsFor(character: PlayerCharacter): List<RuleElement> {
+    fun elementsFor(character: PlayerCharacter): List<RuleElement> =
+        cache.get(character, ::computeElements)
+
+    /**
+     * One entry, keyed on the character it was worked out for.
+     *
+     * The walk reads every table the character touches, and once the engine feeds a number the
+     * sheet shows — Armor Class, maximum Hit Points — it is asked again on every recomposition.
+     * A character is an immutable value that Compose hands back unchanged until something
+     * edits it, so remembering the last answer is enough: an edit produces a new instance and
+     * the entry misses. Single-entry rather than a map because one character is on screen.
+     */
+    private object cache {
+        private var key: PlayerCharacter? = null
+        private var value: List<RuleElement> = emptyList()
+
+        @Synchronized
+        fun get(
+            character: PlayerCharacter,
+            compute: (PlayerCharacter) -> List<RuleElement>,
+        ): List<RuleElement> {
+            if (key === character) return value
+            val fresh = compute(character)
+            key = character
+            value = fresh
+            return fresh
+        }
+    }
+
+    private fun computeElements(character: PlayerCharacter): List<RuleElement> {
         val answers = ChoiceResolver.answers(character)
         val all = Adapters.all(character)
 

@@ -81,6 +81,13 @@ class RulesEngineTest {
             "wizard", 3, "evoker", speciesId = "elf", lineageId = "high_elf",
         ),
         "feats" to character("fighter", 8, featIds = listOf("tough", "magic_initiate_wizard")),
+        // Draconic Resilience is "+1 Hit Point per Sorcerer level", so a multiclassed
+        // Sorcerer is where counting the character's level instead shows up as a wrong
+        // maximum. The engine's first pass did exactly that and this caught it.
+        "sorcerer 5 / fighter 3 draconic" to character(
+            "sorcerer", 5, "draconic",
+            extraClasses = listOf(Triple("fighter", 3, "champion")),
+        ),
         // The shape that breaks anything re-deriving level scope by hand.
         "cleric 3 / fighter 9" to character(
             "cleric", 3, "life_domain",

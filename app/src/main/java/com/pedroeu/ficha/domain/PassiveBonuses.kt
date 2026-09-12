@@ -2,6 +2,11 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.PassiveBonusData.Target
+import com.pedroeu.ficha.rules.Condition
+import com.pedroeu.ficha.rules.Effect
+import com.pedroeu.ficha.rules.FormulaEval
+import com.pedroeu.ficha.rules.RulesEngine
+import com.pedroeu.ficha.rules.StatTarget
 
 /** One passive bonus in effect, with the source worth naming on the sheet. */
 data class AppliedBonus(
@@ -19,35 +24,40 @@ data class AppliedBonus(
  */
 object PassiveBonuses {
 
-    fun all(character: PlayerCharacter): List<AppliedBonus> {
-        /**
-         * A per-level bonus multiplies by whichever level it belongs to. Species and feat
-         * bonuses grow with the whole character; a class or subclass bonus grows only with
-         * levels in that class, so a Sorcerer 5 / Fighter 3 gets five hit points from
-         * Draconic Resilience rather than eight.
-         */
-        fun scale(bonus: PassiveBonusData.Bonus, level: Int) = AppliedBonus(
-            label = bonus.label,
-            target = bonus.target,
-            amount = if (bonus.perLevel) bonus.amount * level else bonus.amount,
-        )
-
-        return buildList {
-            val total = character.level
-            PassiveBonusData.forSpecies(character.speciesId).forEach { add(scale(it, total)) }
-            PassiveBonusData.forLineage(character.lineageId).forEach { add(scale(it, total)) }
-            character.featIds.forEach { featId ->
-                PassiveBonusData.forFeat(featId).forEach { add(scale(it, total)) }
+    /**
+     * Read from the rules engine rather than gathered here.
+     *
+     * This was the first of the nine tables to be switched over, because it is small enough to
+     * check by eye and because the switch caught a real difference: the engine's first pass
+     * scaled a per-level class bonus by the character's level instead of the class's, so a
+     * Sorcerer 5 / Fighter 3 gained eight hit points from Draconic Resilience rather than
+     * five. Having one implementation is what makes a difference like that a failing test
+     * instead of a second answer nobody compares.
+     */
+    fun all(character: PlayerCharacter): List<AppliedBonus> =
+        RulesEngine.view<Effect.ModifyStat>(character)
+            .filter { it.effect.condition == Condition.Always }
+            .mapNotNull { applied ->
+                val target = targetOf(applied.effect.target) ?: return@mapNotNull null
+                AppliedBonus(
+                    label = applied.effect.label,
+                    target = target,
+                    amount = FormulaEval.eval(
+                        applied.effect.amount,
+                        character,
+                        applied.element.source.owningClassId,
+                    ),
+                )
             }
 
-            // Every class the character has levels in, and the subclass attached to each.
-            ClassLevels.of(character).forEach { entry ->
-                PassiveBonusData.forClass(entry.classId)
-                    .forEach { add(scale(it, entry.level)) }
-                PassiveBonusData.forSubclass(entry.subclassId)
-                    .forEach { add(scale(it, entry.level)) }
-            }
-        }
+    /** Only the targets this older type can name; the engine knows more than it does. */
+    private fun targetOf(target: StatTarget): Target? = when (target) {
+        StatTarget.ARMOR_CLASS -> Target.ARMOR_CLASS
+        StatTarget.MAX_HIT_POINTS -> Target.MAX_HIT_POINTS
+        StatTarget.SPEED -> Target.SPEED
+        StatTarget.INITIATIVE -> Target.INITIATIVE
+        StatTarget.ALL_SAVES -> Target.ALL_SAVES
+        else -> null
     }
 
     /** The total to add to one stat, and the sources that make it up. */

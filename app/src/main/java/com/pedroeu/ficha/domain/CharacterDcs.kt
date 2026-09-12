@@ -2,6 +2,7 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SaveDcData
+import com.pedroeu.ficha.rules.RulesEngine
 import com.pedroeu.ficha.data.model.Ability
 
 /**
@@ -59,53 +60,32 @@ object CharacterDcs {
         val headlineAbility = CharacterCalculations.spellcastingAbility(character)
         var primaryClaimed = false
 
-        return buildList {
-            ClassLevels.of(character).forEach { entry ->
-                val charClass = ClassData.byId(entry.classId)
-
-                charClass?.spellcastingAbility?.let { ability ->
-                    val isPrimary = !primaryClaimed && ability == headlineAbility
-                    if (isPrimary) primaryClaimed = true
-                    val base = dcFor(
-                        id = "class:${entry.classId}",
-                        label = charClass.name,
-                        ability = ability,
-                        note = "${charClass.name} spells.",
-                        isPrimary = isPrimary,
-                    )
-                    // Edit Mode can pin the headline DC and attack bonus by hand, and those
-                    // overrides belong to whichever line is the headline.
-                    add(
-                        if (isPrimary) {
-                            base.copy(
-                                dc = CharacterCalculations.spellSaveDc(character) ?: base.dc,
-                                attackBonus = CharacterCalculations.spellAttackBonus(character)
-                                    ?: base.attackBonus,
-                            )
-                        } else {
-                            base
-                        }
-                    )
-                }
-
-                // Features that force saves without granting spellcasting, e.g. a Monk's.
-                SaveDcData.forClass(entry.classId)
-                    ?.takeIf { charClass?.spellcastingAbility != it.ability }
-                    ?.let { add(dcFor("feature:${it.id}", it.label, it.ability, it.note)) }
-
-                SaveDcData.forSubclass(entry.subclassId)
-                    ?.let { add(dcFor("subclass:${it.id}", it.label, it.ability, it.note)) }
-            }
-
-            SaveDcData.forSpecies(character.speciesId)
-                ?.let { add(dcFor("species:${it.id}", it.label, it.ability, it.note)) }
-
-            SaveDcData.forLineage(character.lineageId)
-                ?.let { add(dcFor("lineage:${it.id}", it.label, it.ability, it.note)) }
-
-            character.featIds.forEach { featId ->
-                SaveDcData.forFeat(featId)
-                    ?.let { add(dcFor("feat:${it.id}", it.label, it.ability, it.note)) }
+        // Gathered by the rules engine rather than here: every source that sets a DC — a
+        // caster's Spellcasting, a Monk's features, a subclass, a species, a feat — declares
+        // it as one effect, so this only has to turn each into a number.
+        return RulesEngine.saveDcs(character).map { applied ->
+            val ability = applied.effect.ability.resolve(character) ?: Ability.CHA
+            val isPrimary = !primaryClaimed &&
+                ability == headlineAbility &&
+                applied.effect.id.startsWith("class:")
+            if (isPrimary) primaryClaimed = true
+            val base = dcFor(
+                id = applied.effect.id,
+                label = applied.effect.label,
+                ability = ability,
+                note = applied.effect.note,
+                isPrimary = isPrimary,
+            )
+            // Edit Mode can pin the headline DC and attack bonus by hand, and those overrides
+            // belong to whichever line is the headline.
+            if (isPrimary) {
+                base.copy(
+                    dc = CharacterCalculations.spellSaveDc(character) ?: base.dc,
+                    attackBonus = CharacterCalculations.spellAttackBonus(character)
+                        ?: base.attackBonus,
+                )
+            } else {
+                base
             }
         }.distinctBy { it.id }
     }

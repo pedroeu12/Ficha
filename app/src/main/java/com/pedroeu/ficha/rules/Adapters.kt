@@ -256,6 +256,14 @@ internal object Adapters {
     // ------------------------------------------------------------------ Numbers
 
     private fun passiveBonuses(character: PlayerCharacter): List<RuleElement> {
+        /**
+         * A per-level bonus grows with whichever level it belongs to.
+         *
+         * A species or feat bonus grows with the whole character; a class or subclass one
+         * grows only with levels in that class, so a Sorcerer 5 / Fighter 3 gets five hit
+         * points from Draconic Resilience rather than eight. The scope comes off the source
+         * rather than being assumed, which is the distinction this whole field exists for.
+         */
         fun bonuses(sourceId: String, source: Source, list: List<PassiveBonusData.Bonus>) =
             list.map { bonus ->
                 RuleElement(
@@ -267,7 +275,11 @@ internal object Adapters {
                         Effect.ModifyStat(
                             target = targetOf(bonus.target),
                             amount = if (bonus.perLevel) {
-                                Formula.PerLevel(bonus.amount, LevelScope.CHARACTER)
+                                Formula.PerLevel(
+                                    bonus.amount,
+                                    if (source.owningClassId != null) LevelScope.OWNING_CLASS
+                                    else LevelScope.CHARACTER,
+                                )
                             } else {
                                 Formula.Flat(bonus.amount)
                             },

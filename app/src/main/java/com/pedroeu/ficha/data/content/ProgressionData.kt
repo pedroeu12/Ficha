@@ -107,6 +107,30 @@ object ProgressionData {
         source = label,
     )
 
+    /**
+     * A spell a class feature has you name once and keep — an Arcanum, a mastered spell, a
+     * signature spell. Not the same thing as preparing spells, which the spell list handles:
+     * these are picked once, stay picked, and the feature is meaningless without the answer.
+     */
+    private fun namedSpellChoice(
+        id: String,
+        label: String,
+        prompt: String,
+        source: String,
+        classId: String,
+        spellLevel: Int,
+        count: Int = 1,
+    ) = Choice(
+        id = id,
+        label = label,
+        prompt = prompt,
+        count = count,
+        kind = ChoiceKind.SPELL,
+        options = SpellData.forClass(classId, spellLevel)
+            .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
+        source = source,
+    )
+
     private val INVOCATION_OPTIONS = listOf(
         ChoiceOption("agonizing_blast", "Agonizing Blast", "Choose one of your known Warlock cantrips that deals damage. You can add your Charisma modifier to that spell's damage rolls. Repeatable. You can gain this invocation more than once. Each time you do so, choose a different eligible cantrip.",
             minLevel = 2,
@@ -684,10 +708,42 @@ object ProgressionData {
                 feature(18, "Eldritch Invocations", "You now know ten Eldritch Invocations.", invocationChoice(18)),
                 feature(2, "Magical Cunning", "Once per Long Rest, spend 1 minute to regain expended Pact Magic spell slots."),
                 feature(9, "Contact Patron", "You always have Contact Other Plane prepared and can cast it once per Long Rest to reach your patron."),
-                feature(11, "Mystic Arcanum (Level 6)", "Choose a level 6 spell you can cast once per Long Rest without a slot."),
-                feature(13, "Mystic Arcanum (Level 7)", "Choose a level 7 spell you can cast once per Long Rest without a slot."),
-                feature(15, "Mystic Arcanum (Level 8)", "Choose a level 8 spell you can cast once per Long Rest without a slot."),
-                feature(17, "Mystic Arcanum (Level 9)", "Choose a level 9 spell you can cast once per Long Rest without a slot."),
+                feature(11, "Mystic Arcanum (Level 6)", "Choose a level 6 spell you can cast once per Long Rest without a slot.",
+                    namedSpellChoice(
+                        id = "warlock:arcanum_6",
+                        label = "Mystic Arcanum (Level 6)",
+                        prompt = "Choose the level 6 Warlock spell you can cast once per Long Rest.",
+                        source = "Level 11",
+                        classId = "warlock",
+                        spellLevel = 6,
+                    )),
+                feature(13, "Mystic Arcanum (Level 7)", "Choose a level 7 spell you can cast once per Long Rest without a slot.",
+                    namedSpellChoice(
+                        id = "warlock:arcanum_7",
+                        label = "Mystic Arcanum (Level 7)",
+                        prompt = "Choose the level 7 Warlock spell you can cast once per Long Rest.",
+                        source = "Level 13",
+                        classId = "warlock",
+                        spellLevel = 7,
+                    )),
+                feature(15, "Mystic Arcanum (Level 8)", "Choose a level 8 spell you can cast once per Long Rest without a slot.",
+                    namedSpellChoice(
+                        id = "warlock:arcanum_8",
+                        label = "Mystic Arcanum (Level 8)",
+                        prompt = "Choose the level 8 Warlock spell you can cast once per Long Rest.",
+                        source = "Level 15",
+                        classId = "warlock",
+                        spellLevel = 8,
+                    )),
+                feature(17, "Mystic Arcanum (Level 9)", "Choose a level 9 spell you can cast once per Long Rest without a slot.",
+                    namedSpellChoice(
+                        id = "warlock:arcanum_9",
+                        label = "Mystic Arcanum (Level 9)",
+                        prompt = "Choose the level 9 Warlock spell you can cast once per Long Rest.",
+                        source = "Level 17",
+                        classId = "warlock",
+                        spellLevel = 9,
+                    )),
                 feature(20, "Eldritch Master", "You can use Magical Cunning twice per Long Rest."),
             ),
             cantripsKnown = mapOf(1 to 2, 4 to 3, 10 to 4),
@@ -709,8 +765,34 @@ object ProgressionData {
                     Choice("scholar", "Scholar", "Choose one skill to gain Expertise in.", 1, ChoiceKind.EXPERTISE,
                         ChoiceOptions.fromSkills(listOf(Skill.ARCANA, Skill.HISTORY, Skill.INVESTIGATION, Skill.MEDICINE, Skill.NATURE, Skill.RELIGION)), "Level 2")),
                 feature(5, "Memorize Spell", "On a Short Rest, swap one prepared Wizard spell for another from your spellbook."),
-                feature(18, "Spell Mastery", "Choose a level 1 and a level 2 spell in your spellbook that you can cast at will."),
-                feature(20, "Signature Spells", "Choose two level 3 spells that are always prepared and castable once each per Short Rest without a slot."),
+                feature(18, "Spell Mastery", "Choose a level 1 and a level 2 spell in your spellbook that you can cast at will.",
+                    namedSpellChoice(
+                        id = "wizard:spell_mastery_1",
+                        label = "Spell Mastery (Level 1)",
+                        prompt = "Choose the level 1 Wizard spell you can cast at will.",
+                        source = "Level 18",
+                        classId = "wizard",
+                        spellLevel = 1,
+                    ),
+                    namedSpellChoice(
+                        id = "wizard:spell_mastery_2",
+                        label = "Spell Mastery (Level 2)",
+                        prompt = "Choose the level 2 Wizard spell you can cast at will.",
+                        source = "Level 18",
+                        classId = "wizard",
+                        spellLevel = 2,
+                    )),
+                feature(20, "Signature Spells", "Choose two level 3 spells that are always prepared and castable once each per Short Rest without a slot.",
+                    namedSpellChoice(
+                        id = "wizard:signature_spells",
+                        label = "Signature Spells",
+                        prompt = "Choose the two level 3 Wizard spells you always have " +
+                            "prepared and can cast once each per Short Rest.",
+                        source = "Level 20",
+                        classId = "wizard",
+                        spellLevel = 3,
+                        count = 2,
+                    )),
             ),
             cantripsKnown = mapOf(1 to 3, 4 to 4, 10 to 5),
             preparedSpells = FULL_CASTER_PREPARED,

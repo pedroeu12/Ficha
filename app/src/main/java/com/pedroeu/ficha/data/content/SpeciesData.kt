@@ -1,5 +1,10 @@
 package com.pedroeu.ficha.data.content
 
+import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.Choice
+import com.pedroeu.ficha.data.model.ChoiceKind
+import com.pedroeu.ficha.data.model.ChoiceOption
+import com.pedroeu.ficha.data.model.ChoiceOptions
 import com.pedroeu.ficha.data.model.LineageOption
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.Sourcebook
@@ -39,7 +44,20 @@ object SpeciesData {
             lineageChoiceLabel = "Elven Lineage",
             lineageOptions = listOf(
                 LineageOption("drow", "Drow", "Your darkvision extends to 120 feet and you know the Dancing Lights cantrip (Charisma)."),
-                LineageOption("high_elf", "High Elf", "You know one cantrip of your choice from the Wizard spell list (Intelligence)."),
+                LineageOption("high_elf", "High Elf", "You know one cantrip of your choice from the Wizard spell list (Intelligence).",
+                    choices = listOf(
+                        Choice(
+                            id = "lineage:high_elf:cantrip",
+                            label = "High Elf Cantrip",
+                            prompt = "Choose a cantrip from the Wizard spell list. " +
+                                "Intelligence is your spellcasting ability for it.",
+                            count = 1,
+                            kind = ChoiceKind.SPELL,
+                            options = SpellData.forClass("wizard", 0)
+                                .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
+                            source = "High Elf",
+                        )
+                    )),
                 LineageOption("wood_elf", "Wood Elf", "Your speed increases to 35 feet and you know the Druidcraft cantrip (Wisdom)."),
             ),
             bonusSkillChoiceCount = 1,
@@ -196,6 +214,10 @@ object SpeciesData {
                 Trait("Shape-Shifter", "As an action you can change your appearance and voice, including coloration, hair length, sex, height, weight, and your size between Medium and Small. You can appear as a member of another playable species, though none of your game statistics change, and you must adopt a form with the same basic arrangement of limbs. This doesn't change your clothing or equipment. While shape-shifted you have Advantage on Charisma checks, and you stay in the new form until you take an action to revert."),
             ),
             bonusSkillChoiceCount = 2,
+            bonusSkillOptions = listOf(
+                Skill.DECEPTION, Skill.INSIGHT, Skill.INTIMIDATION,
+                Skill.PERFORMANCE, Skill.PERSUASION,
+            ),
         ),
         Species(
             id = "kalashtar",
@@ -224,7 +246,21 @@ object SpeciesData {
             summary = "The \"children of Khorvaire\", descended from humans and elves, who see themselves as the bridge between peoples.",
             traits = listOf(
                 Trait("Fey Ancestry", "You have Advantage on saving throws you make to avoid or end the Charmed condition."),
-                Trait("Fey Gift", "You know the Friends cantrip. Whenever you finish a Long Rest you can replace it with a different cantrip from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for it, chosen when you select this species."),
+                Trait("Fey Gift", "You know the Friends cantrip. Whenever you finish a Long Rest you can replace it with a different cantrip from the Cleric, Druid, or Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for it, chosen when you select this species.",
+                    choices = listOf(
+                        Choice(
+                            id = "species:khoravar:casting_ability",
+                            label = "Fey Gift",
+                            prompt = "Choose your spellcasting ability for these spells. " +
+                                "The rules have you decide when you choose the species.",
+                            count = 1,
+                            kind = ChoiceKind.ABILITY_SCORE,
+                            options = ChoiceOptions.fromAbilities(
+                                listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                            ),
+                            source = "Khoravar",
+                        )
+                    )),
                 Trait("Lethargy Resilience", "When you fail a saving throw to avoid or end the Unconscious condition, you can succeed instead. Once you use this trait, you can't do so again until you finish 1d4 Long Rests."),
                 Trait("Skill Versatility", "You gain proficiency in one skill or with one tool of your choice, and whenever you finish a Long Rest you can replace it with another skill or tool proficiency."),
             ),
@@ -250,6 +286,9 @@ object SpeciesData {
                 LineageOption("wildhunt", "Wildhunt", "While shifted you have Advantage on Wisdom checks, and no creature within 30 feet of you can have Advantage on an attack roll against you unless you have the Incapacitated condition."),
             ),
             bonusSkillChoiceCount = 1,
+            bonusSkillOptions = listOf(
+                Skill.ACROBATICS, Skill.ATHLETICS, Skill.INTIMIDATION, Skill.SURVIVAL,
+            ),
         ),
         Species(
             id = "warforged",
@@ -264,7 +303,18 @@ object SpeciesData {
                 Trait("Construct Resilience", "You have Resistance to Poison damage, and Advantage on saving throws you make to avoid or end the Poisoned condition."),
                 Trait("Integrated Protection", "You gain a +1 bonus to your Armor Class, and armor you have donned can't be removed against your will while you're alive."),
                 Trait("Sentry's Rest", "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 6 hours spent in an inactive, motionless state during which you appear inert but remain conscious."),
-                Trait("Specialized Design", "You gain one skill proficiency and one tool proficiency of your choice."),
+                Trait("Specialized Design", "You gain one skill proficiency and one tool proficiency of your choice.",
+                    choices = listOf(
+                        Choice(
+                            id = "species:warforged:design_tool",
+                            label = "Specialized Design",
+                            prompt = "Choose the tool you were built knowing how to use.",
+                            count = 1,
+                            kind = ChoiceKind.TOOL,
+                            options = ChoiceOptions.fromStrings(ToolData.ALL_TOOLS),
+                            source = "Warforged",
+                        )
+                    )),
                 Trait("Tireless", "You don't gain Exhaustion levels from dehydration, malnutrition, or suffocation."),
             ),
             bonusSkillChoiceCount = 1,
@@ -310,7 +360,21 @@ object SpeciesData {
             darkvisionRange = 120,
             summary = "Known for their mischief, faeries resemble insects with humanoid features. Their size and shape may vary, but all have antennae, black eyes, chitinous skin, and insectoid legs and wings. Every faerie is born from a flower and possesses innate magic, which many use to play pranks.",
             traits = listOf(
-                Trait("Fairy Magic", "You know the Druidcraft cantrip. Starting at 3rd level, you can cast the Faerie Fire spell with this trait. Starting at 5th level, you can also cast the Enlarge/Reduce spell with this trait. Once you cast Faerie Fire or Enlarge/Reduce with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select this race)."),
+                Trait("Fairy Magic", "You know the Druidcraft cantrip. Starting at 3rd level, you can cast the Faerie Fire spell with this trait. Starting at 5th level, you can also cast the Enlarge/Reduce spell with this trait. Once you cast Faerie Fire or Enlarge/Reduce with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select this race).",
+                    choices = listOf(
+                        Choice(
+                            id = "species:faerie:casting_ability",
+                            label = "Fairy Magic",
+                            prompt = "Choose your spellcasting ability for these spells. " +
+                                "The rules have you decide when you choose the species.",
+                            count = 1,
+                            kind = ChoiceKind.ABILITY_SCORE,
+                            options = ChoiceOptions.fromAbilities(
+                                listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                            ),
+                            source = "Fairy",
+                        )
+                    )),
                 Trait("Flight", "Because of your wings, you have a flying speed equal to your walking speed. You can't use this flying speed if you're wearing medium or heavy armor. In addition, Shadowmoor faeries have Darkvision with a range of 120 feet."),
             ),
             book = Sourcebook.LORWYN,
@@ -324,7 +388,21 @@ object SpeciesData {
             summary = "Flamekin are people made from two key elements of creation: fire and stone. As a result, many flamekin feel a strong connection to the natural world.",
             traits = listOf(
                 Trait("Darkvision", "You can see in dim light within 60 feet of you as if it were bright light and in darkness as if it were dim light. You discern colors in that darkness only as shades of gray."),
-                Trait("Reach to the Blaze", "You know the Produce Flame cantrip. Starting at 3rd level, you can cast the Burning Hands spell with this trait. Starting at 5th level, you can also cast the Flame Blade spell with this trait, without requiring a material component. Once you cast Burning Hands or Flame Blade with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select "),
+                Trait("Reach to the Blaze", "You know the Produce Flame cantrip. Starting at 3rd level, you can cast the Burning Hands spell with this trait. Starting at 5th level, you can also cast the Flame Blade spell with this trait, without requiring a material component. Once you cast Burning Hands or Flame Blade with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select ",
+                    choices = listOf(
+                        Choice(
+                            id = "species:flamekin:casting_ability",
+                            label = "Reach to the Blaze",
+                            prompt = "Choose your spellcasting ability for these spells. " +
+                                "The rules have you decide when you choose the species.",
+                            count = 1,
+                            kind = ChoiceKind.ABILITY_SCORE,
+                            options = ChoiceOptions.fromAbilities(
+                                listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                            ),
+                            source = "Flamekin",
+                        )
+                    )),
             ),
             book = Sourcebook.LORWYN,
         ),
@@ -340,7 +418,21 @@ object SpeciesData {
                 Trait("Eerie Token", "As a Bonus Action, you can create a magical token by harmlessly removing a lock of hair, detaching a nail, or using some other method. While the token exists, you gain the following benefits:"),
                 Trait("Distant Message", "As a Magic action, you can send a telepathic message of 25 words or fewer to a creature holding or carrying the token, as long as you are within 10 miles of it."),
                 Trait("Remote Viewing", "If you are within 10 miles of the token, you can take a Magic action to extend your senses through the token for 1 minute, until you have the Incapacitated condition, or until you end this state (no action required). During this state, you can see and hear from the token as if you were located where it is. When this state ends, the token is harmlessly destroyed. Unless the token is destroyed early, it lasts until you finish a Long Rest. Once you create a token using this feature, you can't do so again until you finish a Long Rest."),
-                Trait("Hex Magic", "You always have the Disguise Self and Hex spells prepared. You can cast each spell once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select this species)."),
+                Trait("Hex Magic", "You always have the Disguise Self and Hex spells prepared. You can cast each spell once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select this species).",
+                    choices = listOf(
+                        Choice(
+                            id = "species:hexblood:casting_ability",
+                            label = "Hex Magic",
+                            prompt = "Choose your spellcasting ability for these spells. " +
+                                "The rules have you decide when you choose the species.",
+                            count = 1,
+                            kind = ChoiceKind.ABILITY_SCORE,
+                            options = ChoiceOptions.fromAbilities(
+                                listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                            ),
+                            source = "Hexblood",
+                        )
+                    )),
             ),
             book = Sourcebook.RAVENLOFT,
         ),
@@ -384,8 +476,32 @@ object SpeciesData {
             summary = "Reborn are individuals who have died yet inexplicably still live. Some reborn exhibit the scars of fatal ends, their ashen flesh or bloodless veins making it clear that they've escaped death.",
             traits = listOf(
                 Trait("Everlasting", "You don't gain Exhaustion levels from dehydration, malnutrition, or suffocation. You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in an inactive, motionless state, during which you retain consciousness."),
-                Trait("Knowledge from a Past Life", "You gain proficiency in one skill of your choice. In addition, you can temporarily peer into the past to aid you in the present. When you fail an ability check, you can roll 1d6 and add the number rolled to the d20, potentially turning the failure into a success. You can do this a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest."),
-                Trait("Strange Endurance", "You have Resistance to one of the following damage types of your choice: Cold, Necrotic, or Poison."),
+                Trait("Knowledge from a Past Life", "You gain proficiency in one skill of your choice. In addition, you can temporarily peer into the past to aid you in the present. When you fail an ability check, you can roll 1d6 and add the number rolled to the d20, potentially turning the failure into a success. You can do this a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+                    choices = listOf(
+                        Choice(
+                            id = "species:reborn:past_life_skill",
+                            label = "Knowledge from a Past Life",
+                            prompt = "Choose the skill your past life left you trained in.",
+                            count = 1,
+                            kind = ChoiceKind.SKILL,
+                            options = ChoiceOptions.fromSkills(Skill.ALL),
+                            source = "Reborn",
+                        )
+                    )),
+                Trait("Strange Endurance", "You have Resistance to one of the following damage types of your choice: Cold, Necrotic, or Poison.",
+                    choices = listOf(
+                        Choice(
+                            id = "species:reborn:endurance_resistance",
+                            label = "Strange Endurance",
+                            prompt = "Choose the damage type your undying body shrugs off.",
+                            count = 1,
+                            kind = ChoiceKind.DAMAGE_TYPE,
+                            options = ChoiceOptions.fromStrings(
+                                listOf("Cold", "Necrotic", "Poison")
+                            ),
+                            source = "Reborn",
+                        )
+                    )),
             ),
             book = Sourcebook.RAVENLOFT,
         ),
@@ -397,7 +513,21 @@ object SpeciesData {
             darkvisionRange = 60,
             summary = "Rimekin hail from both Lorwyn and Shadowmoor, though the first rimekin arose from flamekin during the Phyrexian invasion. These flamekin approached their problems with cold logic and rejected reactionary responses.",
             traits = listOf(
-                Trait("Cold Fire Magic", "You know the Ray of Frost cantrip. When you reach character levels 3 and 5, you learn the Ice Knife spell and the Flame Blade spell, respectively. You always have those spells prepared. You can cast each once without a spell slot, and you regain the ability to cast these spells in this way when you finish a Long Rest. You can also cast the spells using any spell slots you have of the appropriate level. When you cast Flame Blade using this trait, the spell deals Cold damage instead of Fire damage. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose the abilit"),
+                Trait("Cold Fire Magic", "You know the Ray of Frost cantrip. When you reach character levels 3 and 5, you learn the Ice Knife spell and the Flame Blade spell, respectively. You always have those spells prepared. You can cast each once without a spell slot, and you regain the ability to cast these spells in this way when you finish a Long Rest. You can also cast the spells using any spell slots you have of the appropriate level. When you cast Flame Blade using this trait, the spell deals Cold damage instead of Fire damage. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose the abilit",
+                    choices = listOf(
+                        Choice(
+                            id = "species:rimekin:casting_ability",
+                            label = "Cold Fire Magic",
+                            prompt = "Choose your spellcasting ability for these spells. " +
+                                "The rules have you decide when you choose the species.",
+                            count = 1,
+                            kind = ChoiceKind.ABILITY_SCORE,
+                            options = ChoiceOptions.fromAbilities(
+                                listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                            ),
+                            source = "Rimekin",
+                        )
+                    )),
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
             ),
             book = Sourcebook.LORWYN,

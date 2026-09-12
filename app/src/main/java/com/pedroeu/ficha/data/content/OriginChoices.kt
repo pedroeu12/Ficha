@@ -97,10 +97,14 @@ object OriginChoices {
      */
     fun forSpecies(speciesId: String?, books: Set<Sourcebook> = Sourcebook.EVERYTHING): List<Choice> {
         val species = speciesId?.let { SpeciesData.byId(it) } ?: return emptyList()
-        if (!species.grantsOriginFeat) return emptyList()
+        // Whatever the traits themselves ask — a Reborn's skill, a Warforged's tool, the
+        // ability that casts a Fairy's magic. These used to go unasked because a trait had
+        // nowhere to put a question.
+        val fromTraits = species.traits.flatMap { it.choices }
+        if (!species.grantsOriginFeat) return fromTraits
         val options = FeatData.inCategories(setOf(FeatCategory.ORIGIN), books)
-        if (options.isEmpty()) return emptyList()
-        return listOf(
+        if (options.isEmpty()) return fromTraits
+        return fromTraits + listOf(
             Choice(
                 id = "species:$speciesId:origin_feat",
                 label = "Origin Feat",
@@ -141,23 +145,20 @@ object OriginChoices {
         )
     }
 
+    /**
+     * Whatever the chosen lineage asks for.
+     *
+     * This used to be a `when` that named the High Elf and its cantrip, which meant a lineage
+     * added later asked nothing until someone remembered to extend it. The question lives on
+     * the lineage now, so there is nothing here to remember.
+     */
     fun forLineage(speciesId: String, lineageId: String?): List<Choice> {
         if (lineageId == null) return emptyList()
-        return when {
-            speciesId == "elf" && lineageId == "high_elf" -> listOf(
-                Choice(
-                    id = "lineage:high_elf:cantrip",
-                    label = "High Elf Cantrip",
-                    prompt = "Choose a cantrip from the Wizard spell list. Intelligence is your spellcasting ability for it.",
-                    count = 1,
-                    kind = ChoiceKind.SPELL,
-                    options = spellOptions("wizard", 0),
-                    source = "High Elf",
-                )
-            )
-
-            else -> emptyList()
-        }
+        return SpeciesData.byId(speciesId)
+            ?.lineageOptions
+            ?.find { it.id == lineageId }
+            ?.choices
+            .orEmpty()
     }
 
     /** Tool and cantrip grants attached to a class at level 1 that name a group. */

@@ -27,6 +27,16 @@ object FeatChoiceData {
      */
     val ABILITY_OPTIONS: Map<String, List<Ability>> = mapOf(
         // ---------------------------------------------------------- General feats
+        // These say "Increase one ability score of your choice", naming no list, so every
+        // ability is on offer. They were raising nothing at all, because a feat with no
+        // entry here is read as a feat that raises no score.
+        "delicious_pain" to Ability.ALL,
+        "love_bites" to Ability.ALL,
+        "putrefy" to Ability.ALL,
+        "rebuke" to Ability.ALL,
+        "boon_of_blazing_dawn" to Ability.ALL,
+        "boon_of_looming_shadows" to Ability.ALL,
+
         "actor" to listOf(Ability.CHA),
         "athlete" to listOf(Ability.STR, Ability.DEX),
         "charger" to listOf(Ability.STR, Ability.DEX),
@@ -199,8 +209,63 @@ object FeatChoiceData {
      * Every choice [featId] forces, ready to present. [featName] labels them so a player can
      * tell which feat is asking, which matters when several are taken at once.
      */
+
+    /**
+     * Feats whose magic says *"Intelligence, Wisdom, or Charisma is your spellcasting ability
+     * for this spell (choose when you select this feat)"*.
+     *
+     * Twenty-three of them say it, in those words, and two were asked. The rest handed the
+     * player a spell with no ability behind it, so the sheet could not work out its save DC
+     * or attack bonus — the feat was on the sheet and unusable.
+     *
+     * They are listed rather than detected from the text: a list is what a reader can check
+     * against the book, and the coverage test fails if a new feat says it and is not here.
+     */
+    private val CASTING_ABILITY_FEATS: Map<String, String> = mapOf(
+        "mark_of_detection" to "Magical Detection",
+        "mark_of_finding" to "Magical Discovery",
+        "mark_of_handling" to "Primal Connection",
+        "mark_of_healing" to "Medical Intuition",
+        "mark_of_hospitality" to "Ever Hospitable",
+        "mark_of_making" to "Artisan's Intuition",
+        "mark_of_passage" to "Magical Passage",
+        "mark_of_scribing" to "Gifted Scribe",
+        "mark_of_sentinel" to "Vigilant Guardian",
+        "mark_of_shadow" to "Cunning Intuition",
+        "mark_of_storm" to "Headwinds",
+        "mark_of_warding" to "Wards and Seals",
+        "emerald_enclave_fledgling" to "Emerald Enclave Fledgling",
+        "spellfire_spark" to "Spellfire Flame",
+        "child_of_the_sun" to "Child of the Sun",
+        "shadowmoor_hexer" to "Shadowmoor Hexer",
+        "gathered_whispers" to "Gathered Whispers",
+        "living_shadow" to "Living Shadow",
+        "second_skin" to "Second Skin",
+        "touch_of_death" to "Death Touch",
+        "fey_pact" to "Fey Pact",
+        "undead_grasp" to "Paralyzing Touch",
+        "lich_ascension" to "Frightening Gaze",
+    )
+
+    private fun castingAbilityChoice(featId: String, featName: String): Choice? {
+        val label = CASTING_ABILITY_FEATS[featId] ?: return null
+        return Choice(
+            id = "feat:$featId:casting_ability",
+            label = label,
+            prompt = "Choose your spellcasting ability for the magic this feat grants. " +
+                "The rules have you decide when you take the feat.",
+            count = 1,
+            kind = ChoiceKind.ABILITY_SCORE,
+            options = ChoiceOptions.fromAbilities(
+                listOf(Ability.INT, Ability.WIS, Ability.CHA)
+            ),
+            source = featName,
+        )
+    }
+
     fun choicesFor(featId: String, featName: String): List<Choice> = buildList {
         abilityChoice(featId, featName)?.let { add(it) }
+        castingAbilityChoice(featId, featName)?.let { add(it) }
         addAll(specificChoices(featId, featName))
     }
 
@@ -221,6 +286,18 @@ object FeatChoiceData {
 
     /** Epic Boons raise a score past the usual ceiling. */
     private fun abilityCap(featId: String): Int = if (featId.startsWith("boon_")) 30 else 20
+
+
+    /** "You know one additional language of your choice." */
+    private fun languageChoice(featId: String, featName: String) = Choice(
+        id = "feat:$featId:language",
+        label = "$featName Language",
+        prompt = "Choose 1 additional language.",
+        count = 1,
+        kind = ChoiceKind.LANGUAGE,
+        options = ChoiceOptions.fromStrings(LanguageData.ALL),
+        source = featName,
+    )
 
     private fun specificChoices(featId: String, featName: String): List<Choice> {
         MAGIC_INITIATE_LISTS[featId]?.let { (listId, ability) ->
@@ -457,6 +534,66 @@ object FeatChoiceData {
                 )
             )
 
+            // "You have proficiency in two skills of your choice. In addition, choose one
+            // skill you have proficiency in [for Expertise]. You know one additional
+            // language of your choice." Three questions; none was asked.
+            "echoing_soul" -> listOf(
+                Choice(
+                    id = "feat:echoing_soul:skills",
+                    label = "Echoing Soul Skills",
+                    prompt = "Choose 2 skills you are proficient in.",
+                    count = 2,
+                    kind = ChoiceKind.SKILL,
+                    options = ChoiceOptions.fromSkills(Skill.ALL),
+                    source = featName,
+                ),
+                Choice(
+                    id = "feat:echoing_soul:expertise",
+                    label = "Echoing Soul Expertise",
+                    prompt = "Choose 1 skill you are proficient in to gain Expertise in.",
+                    count = 1,
+                    kind = ChoiceKind.EXPERTISE,
+                    options = ChoiceOptions.fromSkills(Skill.ALL),
+                    source = featName,
+                ),
+                languageChoice("echoing_soul", featName),
+            )
+
+            "symbiotic_being" -> listOf(languageChoice("symbiotic_being", featName))
+
+            // "You know the Light cantrip. If you already know that cantrip, you learn a
+            // different Cleric cantrip of your choice."
+            "light_bringer" -> listOf(
+                Choice(
+                    id = "feat:light_bringer:spare_cantrip",
+                    label = "Light Bringer",
+                    prompt = "You learn Light. If you already knew it, choose the Cleric " +
+                        "cantrip you learn instead.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = spellOptions("cleric", 0).filterNot { it.id == "light" },
+                    source = featName,
+                )
+            )
+
+            "vampire_touched" -> listOf(
+                Choice(
+                    id = "feat:vampire_touched:spell",
+                    label = "Vampire Touched",
+                    prompt = "Choose 1 level 1 spell from the Enchantment or Illusion school.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = SpellData.ALL
+                        .filter {
+                            it.level == 1 &&
+                                (it.school.equals("Enchantment", ignoreCase = true) ||
+                                    it.school.equals("Illusion", ignoreCase = true))
+                        }
+                        .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) },
+                    source = featName,
+                )
+            )
+
             "genie_magic" -> listOf(
                 Choice(
                     id = "feat:genie_magic:spell",
@@ -465,37 +602,6 @@ object FeatChoiceData {
                     count = 1,
                     kind = ChoiceKind.SPELL,
                     options = spellOptions("sorcerer", 1),
-                    source = featName,
-                )
-            )
-
-            // Both of these say "Intelligence, Wisdom, or Charisma is your spellcasting
-            // ability for this spell (choose when you select this feat)", which is a
-            // decision separate from the score the feat raises.
-            "undead_grasp" -> listOf(
-                Choice(
-                    id = "feat:undead_grasp:casting_ability",
-                    label = "Paralyzing Touch",
-                    prompt = "Choose your spellcasting ability for Chill Touch.",
-                    count = 1,
-                    kind = ChoiceKind.ABILITY_SCORE,
-                    options = ChoiceOptions.fromAbilities(
-                        listOf(Ability.INT, Ability.WIS, Ability.CHA)
-                    ),
-                    source = featName,
-                )
-            )
-
-            "lich_ascension" -> listOf(
-                Choice(
-                    id = "feat:lich_ascension:casting_ability",
-                    label = "Frightening Gaze",
-                    prompt = "Choose your spellcasting ability for Fear.",
-                    count = 1,
-                    kind = ChoiceKind.ABILITY_SCORE,
-                    options = ChoiceOptions.fromAbilities(
-                        listOf(Ability.INT, Ability.WIS, Ability.CHA)
-                    ),
                     source = featName,
                 )
             )
@@ -531,13 +637,14 @@ object FeatChoiceData {
      * this against [FeatData].
      */
     fun sourceIds(): Set<String> =
-        ABILITY_OPTIONS.keys + MAGIC_INITIATE_LISTS.keys + FEATS_WITH_SPECIFIC_CHOICES
+        ABILITY_OPTIONS.keys + MAGIC_INITIATE_LISTS.keys +
+            CASTING_ABILITY_FEATS.keys + FEATS_WITH_SPECIFIC_CHOICES
 
     private val FEATS_WITH_SPECIFIC_CHOICES = setOf(
         "skilled", "crafter", "musician", "elemental_adept", "fey_touched", "shadow_touched",
         "spell_sniper", "ritual_caster", "skill_expert", "weapon_master", "harper_agent",
         "purple_dragon_rook", "cult_of_the_dragon_initiate", "dragonscarred",
         "boon_energy_resistance", "boon_skill", "genie_magic", "aberrant_dragonmark",
-        "undead_grasp", "lich_ascension",
+        "echoing_soul", "symbiotic_being", "light_bringer", "vampire_touched",
     )
 }

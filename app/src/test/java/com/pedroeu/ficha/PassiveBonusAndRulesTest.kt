@@ -12,7 +12,10 @@ import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterResources
-import com.pedroeu.ficha.domain.PassiveBonuses
+import com.pedroeu.ficha.rules.Effect
+import com.pedroeu.ficha.rules.FormulaEval
+import com.pedroeu.ficha.rules.RulesEngine
+import com.pedroeu.ficha.rules.StatTarget
 import com.pedroeu.ficha.domain.PlayerCharacter
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -63,11 +66,11 @@ class PassiveBonusAndRulesTest {
     @Test
     fun `the warforged bonus is named so the sheet can explain it`() {
         val warforged = character(speciesId = "warforged")
-        val sources = PassiveBonuses.sourcesFor(warforged, PassiveBonusData.Target.ARMOR_CLASS)
+        val sources = RulesEngine.statSources(warforged, StatTarget.ARMOR_CLASS)
 
         assertEquals(1, sources.size)
-        assertEquals("Integrated Protection", sources.first().label)
-        assertEquals(1, sources.first().amount)
+        assertEquals("Integrated Protection", sources.first().effect.label)
+        assertEquals(1, FormulaEval.eval(sources.first().effect.amount, warforged))
     }
 
     @Test
@@ -103,7 +106,7 @@ class PassiveBonusAndRulesTest {
 
     @Test
     fun `a character with no passive bonuses is unaffected`() {
-        assertTrue(PassiveBonuses.all(character()).isEmpty())
+        assertTrue(RulesEngine.view<Effect.ModifyStat>(character()).isEmpty())
     }
 
     @Test

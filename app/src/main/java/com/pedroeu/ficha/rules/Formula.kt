@@ -4,6 +4,7 @@ import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.FeatBonuses
 import com.pedroeu.ficha.domain.PlayerCharacter
 
 /**
@@ -28,6 +29,15 @@ sealed interface AbilityRef {
     data class Fixed(val ability: Ability) : AbilityRef
     data class ChosenIn(val choiceId: String) : AbilityRef
 
+    /**
+     * "The ability increased by this feat", written the way the rules write it.
+     *
+     * Not the same as [ChosenIn]: a feat that raises one named score asks nothing, so there is
+     * no answer to look up, and the rule still has an ability. Going through the feat means
+     * both shapes work and neither needs the caller to know which it is.
+     */
+    data class RaisedByFeat(val featId: String) : AbilityRef
+
     /** Null when the choice hasn't been answered yet, which reads as "no bonus yet". */
     fun resolve(character: PlayerCharacter): Ability? = when (this) {
         is Fixed -> ability
@@ -35,6 +45,9 @@ sealed interface AbilityRef {
             .latestSelectionFor(character, choiceId)
             .firstOrNull()
             ?.let { id -> Ability.ALL.find { it.name == id } }
+        is RaisedByFeat -> FeatBonuses.all(character)
+            .firstOrNull { it.featId == featId }
+            ?.ability
     }
 }
 
@@ -80,6 +93,20 @@ sealed interface Formula {
 
     data class PerSpellLevel(val amount: Int) : Formula
 
+    /**
+     * A number that steps up at set levels rather than growing evenly.
+     *
+     * A Monk's Unarmored Movement is 10 feet at level 2 and 30 at level 18, with three stops
+     * in between and nothing linear about it. Written as a step table it is the same kind of
+     * data as everything else here; written as arithmetic it was a `when` block inside the
+     * Speed calculation that only that calculation could see.
+     */
+    data class AtLevels(
+        /** level to value, in any order. The highest level reached wins. */
+        val steps: List<Pair<Int, Int>>,
+        val scope: LevelScope = LevelScope.OWNING_CLASS,
+    ) : Formula
+
     companion object {
         val ZERO: Formula = Flat(0)
         fun of(vararg parts: Formula): Formula = Sum(parts.toList())
@@ -119,6 +146,11 @@ object FormulaEval {
         is Formula.SpellLevel -> spellLevel
 
         is Formula.PerSpellLevel -> formula.amount * spellLevel
+
+        is Formula.AtLevels -> {
+            val level = levelFor(character, formula.scope, owningClassId)
+            formula.steps.filter { level >= it.first }.maxOfOrNull { it.second } ?: 0
+        }
     }
 
     fun levelFor(
@@ -143,6 +175,7 @@ object FormulaEval {
         is Formula.AbilityMod -> when (val a = formula.ability) {
             is AbilityRef.Fixed -> "your ${a.ability.fullName} modifier"
             is AbilityRef.ChosenIn -> "your chosen ability's modifier"
+            is AbilityRef.RaisedByFeat -> "the modifier of the ability the feat raised"
         }
         is Formula.ProficiencyBonus ->
             if (formula.times == 1) "your Proficiency Bonus" else "${formula.times} × your Proficiency Bonus"
@@ -151,5 +184,8 @@ object FormulaEval {
         is Formula.AtLeast -> describe(formula.of) + " (minimum ${formula.floor})"
         is Formula.SpellLevel -> "the spell's level"
         is Formula.PerSpellLevel -> "${formula.amount} per spell level"
+        is Formula.AtLevels -> formula.steps
+            .sortedBy { it.first }
+            .joinToString(", ") { "${it.second} from level ${it.first}" }
     }
 }

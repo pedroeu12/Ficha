@@ -94,7 +94,7 @@ object RulesEngine {
         grants: List<Choice>,
     ): RuleElement {
         val option = choice.options.find { it.id == optionId }
-        return RuleElement(
+        return Adapters.withModifiers(RuleElement(
             id = "option:${choice.id}:$optionId",
             name = option?.name ?: optionId,
             description = option?.description.orEmpty(),
@@ -105,9 +105,10 @@ object RulesEngine {
             effects = grants.map { Effect.AskOnGain(it) } +
                 listOfNotNull(
                     com.pedroeu.ficha.data.content.SummonData.EXTENSIONS_BY_OPTION[optionId]
-                ),
+                ) +
+                com.pedroeu.ficha.data.content.ModifierData.forOption(optionId),
             book = option?.book,
-        )
+        ))
     }
 
     private fun satisfies(
@@ -175,19 +176,18 @@ object RulesEngine {
     /**
      * The total a stat gains from every rule that touches it, conditions honoured.
      *
-     * [Condition.Descriptive] never contributes: it is the marker for a rule written as prose,
-     * and applying a number the engine cannot justify is worse than applying none.
+     * A condition the sheet cannot decide never contributes: [Condition.Descriptive] is the
+     * marker for a rule written as prose, and "while Raging" is a real rule the sheet has no
+     * way to know is true right now. Applying a number the engine cannot justify is worse than
+     * applying none — the player can add it themselves, but they cannot find one that is
+     * silently already in the total.
      */
-    fun statBonus(
-        character: PlayerCharacter,
-        target: StatTarget,
-        activeConditions: Set<Condition> = setOf(Condition.Always),
-    ): Int = view<Effect.ModifyStat>(character)
-        .filter { it.effect.target == target }
-        .filter { it.effect.condition in activeConditions }
-        .sumOf {
-            FormulaEval.eval(it.effect.amount, character, it.element.source.owningClassId)
-        }
+    fun statBonus(character: PlayerCharacter, target: StatTarget): Int =
+        statSources(character, target)
+            .filter { ConditionEval.holds(it.effect.condition, character) }
+            .sumOf {
+                FormulaEval.eval(it.effect.amount, character, it.element.source.owningClassId)
+            }
 
     /** The same, itemised, for a sheet that shows where a number came from. */
     fun statSources(
@@ -195,6 +195,27 @@ object RulesEngine {
         target: StatTarget,
     ): List<Applied<Effect.ModifyStat>> =
         view<Effect.ModifyStat>(character).filter { it.effect.target == target }
+
+    /**
+     * The best base value on offer for a stat, or [default] when nothing beats it.
+     *
+     * Unarmored Defense and everything shaped like it: several candidates, each with its own
+     * condition, and the rules take the highest of the ones that apply. Worth being a single
+     * function because the alternative — the one the app had — was a `when` block that had to
+     * be extended by hand for every new source and silently answered for none of them.
+     */
+    fun statBase(character: PlayerCharacter, target: StatTarget, default: Int): Int =
+        (baseSources(character, target)
+            .filter { ConditionEval.holds(it.effect.condition, character) }
+            .map { FormulaEval.eval(it.effect.amount, character, it.element.source.owningClassId) }
+            + default)
+            .max()
+
+    fun baseSources(
+        character: PlayerCharacter,
+        target: StatTarget,
+    ): List<Applied<Effect.SetStatBase>> =
+        view<Effect.SetStatBase>(character).filter { it.effect.target == target }
 
     /** How many uses a pool has, worked out from its formula. */
     fun poolMax(character: PlayerCharacter, poolId: String): Int =

@@ -3,6 +3,7 @@ package com.pedroeu.ficha.rules
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.FeatChoiceData
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.ModifierData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.PerUseChoiceData
@@ -46,6 +47,19 @@ internal object Adapters {
         addAll(passiveBonuses(character))
         addAll(saveDcs(character))
         addAll(perUseChoices(character))
+    }.map(::withModifiers)
+
+    /**
+     * A feature's conditional numbers, attached to the feature itself.
+     *
+     * Done here rather than in each builder so it applies to every kind of element at once:
+     * name the engine's id for a feature in [ModifierData] and its modifier arrives with the
+     * level gate, the owning class and the subclass requirement the feature already carries.
+     * Nothing about Armor Class or Speed has to know the feature exists.
+     */
+    fun withModifiers(element: RuleElement): RuleElement {
+        val extra = ModifierData.forElement(element.id)
+        return if (extra.isEmpty()) element else element.copy(effects = element.effects + extra)
     }
 
     // ------------------------------------------------------------------ Features

@@ -43,9 +43,25 @@ enum class StatTarget {
  */
 sealed interface Condition {
     data object Always : Condition
+
+    /** No body armor worn. A Shield is still allowed — the Barbarian's wording. */
     data object Unarmored : Condition
     data object NoShield : Condition
     data object WearingArmor : Condition
+
+    /** "…while you aren't wearing Heavy armor", which is Fast Movement's whole caveat. */
+    data object NotInHeavyArmor : Condition
+
+    /**
+     * Every part at once, for the rules that stack two clauses.
+     *
+     * "While you aren't wearing armor or wielding a Shield" is two conditions, and the three
+     * features that say it were each written out by hand with their own reading of what it
+     * meant. A Monk's came out wrong: the old Armor Class kept Unarmored Defense and quietly
+     * withheld the Shield bonus instead, so a Monk holding a Shield defended as if not.
+     */
+    data class All(val parts: List<Condition>) : Condition
+
     data object WhileRaging : Condition
     data object WhileWildShaped : Condition
     data object NotIncapacitated : Condition
@@ -53,6 +69,10 @@ sealed interface Condition {
 
     /** A condition the engine does not compute. Shown to the player, never applied. */
     data class Descriptive(val text: String) : Condition
+
+    companion object {
+        fun all(vararg parts: Condition): Condition = All(parts.toList())
+    }
 }
 
 enum class SwapWhen { LEVEL_UP, SHORT_REST, LONG_REST }
@@ -118,6 +138,23 @@ sealed interface Effect {
         /** For [StatTarget.SAVE] and [StatTarget.SKILL_CHECK], what it applies to. */
         val ability: Ability? = null,
         val skill: Skill? = null,
+    ) : Effect
+
+    /**
+     * An alternative *base* for a stat, which wins when it beats the others.
+     *
+     * Not the same shape as [ModifyStat] and the difference is the whole reason Unarmored
+     * Defense never became data. "Your base Armor Class equals 10 plus your Dexterity and
+     * Constitution modifiers" does not add to what armor gives — it replaces it, and only
+     * counts if it comes out higher. Written as a modifier it would stack with a breastplate;
+     * written as one of several candidate bases it behaves the way the rules describe, and
+     * five features that each said it slightly differently now say it once.
+     */
+    data class SetStatBase(
+        val target: StatTarget,
+        val amount: Formula,
+        val label: String,
+        val condition: Condition = Condition.Always,
     ) : Effect
 
     /**

@@ -7,8 +7,6 @@ import com.pedroeu.ficha.domain.CharacterDcs
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceGraph
-import com.pedroeu.ficha.data.content.PassiveBonusData
-import com.pedroeu.ficha.domain.PassiveBonuses
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.rules.Effect
 import com.pedroeu.ficha.rules.LevelScope
@@ -155,21 +153,28 @@ class RulesEngineTest {
     }
 
     @Test
-    fun `the engine adds the same passive bonuses`() {
-        cast().forEach { (who, pc) ->
-            listOf(
-                StatTarget.ARMOR_CLASS to PassiveBonusData.Target.ARMOR_CLASS,
-                StatTarget.MAX_HIT_POINTS to PassiveBonusData.Target.MAX_HIT_POINTS,
-                StatTarget.SPEED to PassiveBonusData.Target.SPEED,
-                StatTarget.INITIATIVE to PassiveBonusData.Target.INITIATIVE,
-            ).forEach { (engineTarget, oldTarget) ->
-                assertEquals(
-                    "$who: $engineTarget differs",
-                    PassiveBonuses.totalFor(pc, oldTarget),
-                    RulesEngine.statBonus(pc, engineTarget),
-                )
-            }
-        }
+    fun `a passive bonus counts against the level its source counts`() {
+        // This was a comparison against the old gatherer until the old gatherer was deleted;
+        // comparing the engine with a wrapper around the engine proves nothing. The numbers
+        // are written out instead, including the one the comparison originally caught: a
+        // subclass bonus scaled by the character's level rather than the subclass's, so a
+        // Sorcerer 5 / Fighter 3 gained eight Hit Points from Draconic Resilience, not five.
+        val sorcererFive = character(
+            "sorcerer", 5, subclassId = "draconic",
+            extraClasses = listOf(Triple("fighter", 3, "champion")),
+        )
+        assertEquals(5, RulesEngine.statBonus(sorcererFive, StatTarget.MAX_HIT_POINTS))
+        assertEquals(8, RulesEngine.statBonus(character("sorcerer", 8, "draconic"), StatTarget.MAX_HIT_POINTS))
+
+        // A species bonus counts the character's whole level, whatever the classes are.
+        val dwarf = character(
+            "wizard", 5, speciesId = "dwarf",
+            extraClasses = listOf(Triple("fighter", 3, "champion")),
+        )
+        assertEquals(8, RulesEngine.statBonus(dwarf, StatTarget.MAX_HIT_POINTS))
+
+        assertEquals(1, RulesEngine.statBonus(character("wizard", 3, speciesId = "warforged"), StatTarget.ARMOR_CLASS))
+        assertEquals(0, RulesEngine.statBonus(character("wizard", 3), StatTarget.ARMOR_CLASS))
     }
 
     @Test

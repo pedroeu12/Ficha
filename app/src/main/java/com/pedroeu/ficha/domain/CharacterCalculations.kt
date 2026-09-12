@@ -3,7 +3,6 @@ package com.pedroeu.ficha.domain
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.EquipmentData
 import com.pedroeu.ficha.data.content.MagicItemData
-import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SaveDcData
 import com.pedroeu.ficha.data.content.SubclassData
@@ -15,6 +14,8 @@ import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.SpellSlotTables
 import com.pedroeu.ficha.data.model.WeaponDef
+import com.pedroeu.ficha.rules.RulesEngine
+import com.pedroeu.ficha.rules.StatTarget
 import kotlin.math.floor
 
 data class AttackLine(
@@ -162,46 +163,30 @@ object CharacterCalculations {
 
     fun initiative(character: PlayerCharacter): Int {
         val dex = abilityModifiers(character)[Ability.DEX] ?: 0
-        val alertBonus = if (CharacterFeats.has(character, "alert")) proficiencyBonus(character) else 0
-        val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.INITIATIVE)
-        return adjust(character, OverridableStat.INITIATIVE, dex + alertBonus + passive)
+        // Alert's Proficiency Bonus arrives the same way the Warforged's +1 AC does — as a
+        // modifier the feat declares — rather than as a feat this function has heard of.
+        val fromRules = RulesEngine.statBonus(character, StatTarget.INITIATIVE)
+        return adjust(character, OverridableStat.INITIATIVE, dex + fromRules)
     }
 
+    /**
+     * Walking Speed: the species' base, raised by anything that raises it, under its condition.
+     *
+     * Fast Movement, Unarmored Movement and the Wood Elf's 35 feet were each written out here
+     * by name. They are rules the features state themselves, and they now arrive from the
+     * engine — so the condition on each is stated once, and the level each counts against is
+     * the feature's own. That last part is what a Monk 3 / Rogue 3 depends on: 10 feet, not
+     * the 15 a level 6 Monk gets.
+     */
     fun speed(character: PlayerCharacter): Int {
         val species = SpeciesData.byId(character.speciesId)
-        // Wood Elf lineage raises base walking speed to 35.
-        val base = if (character.lineageId == "wood_elf") 35 else species?.speed ?: 30
-
-        val equippedArmor = character.inventory
-            .filter { it.equipped && it.armorDefId != null }
-            .mapNotNull { EquipmentData.armorById(it.armorDefId!!) }
-
-        // Fast Movement stops applying in Heavy armor; Unarmored Movement needs no armor at all.
-        val inHeavyArmor = equippedArmor.any { it.category == ArmorCategory.HEAVY }
-        // Both scale on the level in their own class: a Monk 3 / Rogue 3 moves 10 feet
-        // faster, not the 15 a level 6 Monk would.
-        val barbarianLevel = ClassLevels.levelIn(character, "barbarian")
-        val monkLevel = ClassLevels.levelIn(character, "monk")
-        val barbarianFastMovement =
-            if (barbarianLevel >= 5 && !inHeavyArmor) 10 else 0
-        val monkUnarmoredMovement =
-            if (monkLevel > 0 && equippedArmor.isEmpty()) monkSpeedBonus(monkLevel) else 0
-
-        val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.SPEED)
-        return adjust(
+        val base = RulesEngine.statBase(
             character,
-            OverridableStat.SPEED,
-            base + barbarianFastMovement + monkUnarmoredMovement + passive,
+            StatTarget.SPEED,
+            default = species?.speed ?: 30,
         )
-    }
-
-    private fun monkSpeedBonus(level: Int): Int = when {
-        level >= 18 -> 30
-        level >= 14 -> 25
-        level >= 10 -> 20
-        level >= 6 -> 15
-        level >= 2 -> 10
-        else -> 0
+        val bonuses = RulesEngine.statBonus(character, StatTarget.SPEED)
+        return adjust(character, OverridableStat.SPEED, base + bonuses)
     }
 
     /** The species' size, or whatever the player typed over it in Edit Mode. */
@@ -236,21 +221,27 @@ object CharacterCalculations {
         }
 
         // Dwarven Toughness, the Tough feat, and anything else that quietly adds hit points.
-        val passive = PassiveBonuses.totalFor(character, PassiveBonusData.Target.MAX_HIT_POINTS)
+        val passive = RulesEngine.statBonus(character, StatTarget.MAX_HIT_POINTS)
         val computed = (fromLevels + passive).coerceAtLeast(1)
         return adjust(character, OverridableStat.MAX_HIT_POINTS, computed).coerceAtLeast(1)
     }
 
     /**
-     * Best AC available from the character's equipped gear, falling back to the class's
-     * Unarmored Defense when that yields more.
+     * Best AC available from the character's equipped gear, or from any rule that offers a
+     * better base than gear does.
+     *
+     * Unarmored Defense and its four relatives used to be a `when` block here, listing five
+     * features by name — which meant the sixth would have to be added by hand, and meant each
+     * of the five stated its own condition in its own words. One of them stated it wrongly: a
+     * Monk's Unarmored Defense requires no Shield, and rather than not applying, it applied
+     * and quietly withheld the Shield's bonus instead. A Monk with 16 Wisdom and a Shield came
+     * out at 10 + Dex + 3 when the rules give 10 + Dex + 2 — close enough to look right.
+     *
+     * Now the features state their own bases, the engine takes the highest whose condition
+     * holds, and a Shield adds to whatever survives that.
      */
     fun armorClass(character: PlayerCharacter): Int {
-        val mods = abilityModifiers(character)
-        val dex = mods[Ability.DEX] ?: 0
-        val con = mods[Ability.CON] ?: 0
-        val wis = mods[Ability.WIS] ?: 0
-        val cha = mods[Ability.CHA] ?: 0
+        val dex = abilityModifiers(character)[Ability.DEX] ?: 0
 
         val equipped = character.inventory.filter { it.equipped && it.armorDefId != null }
             .mapNotNull { EquipmentData.armorById(it.armorDefId!!) }
@@ -258,37 +249,14 @@ object CharacterCalculations {
         val shieldBonus = equipped.filter { it.category == ArmorCategory.SHIELD }.sumOf { it.baseAc }
         val bodyArmor = equipped.firstOrNull { it.category != ArmorCategory.SHIELD }
 
-        val armoredAc = bodyArmor?.let { armor ->
-            val dexPart = armor.maxDexBonus?.let { dex.coerceAtMost(it) } ?: dex
-            armor.baseAc + dexPart
-        }
+        // Worn armor is a base too, and the only one the engine does not supply: what is in
+        // the inventory is the player's, not a rule the character has.
+        val fromGear = bodyArmor?.let { armor ->
+            armor.baseAc + (armor.maxDexBonus?.let { dex.coerceAtMost(it) } ?: dex)
+        } ?: (10 + dex)
 
-        val wearingArmor = bodyArmor != null
-        // Each of these arrives at level 1 of its own class, or at level 3 with its subclass,
-        // so having any levels there is the whole test — the plain classId field named one
-        // class and left a multiclassed Barbarian defending as if unarmoured meant naked.
-        val isMonk = ClassLevels.has(character, "monk")
-        // A feat can set an unarmoured AC too, and Infernal Bulwark's uses whichever ability
-        // the feat raised — a formula the sheet has to finish, not print.
-        val bulwarkAbility = FeatBonuses.all(character)
-            .firstOrNull { it.featId == "infernal_bulwark" }
-            ?.ability
-        val unarmoredAc = when {
-            ClassLevels.has(character, "barbarian") && !wearingArmor -> 10 + dex + con
-            isMonk && equipped.isEmpty() -> 10 + dex + wis
-            ClassLevels.hasSubclass(character, "draconic") && !wearingArmor -> 10 + dex + cha
-            ClassLevels.hasSubclass(character, "dance") && !wearingArmor -> 10 + dex + cha
-            bulwarkAbility != null && !wearingArmor && shieldBonus == 0 ->
-                10 + dex + (mods[bulwarkAbility] ?: 0)
-            else -> null
-        }
+        val base = RulesEngine.statBase(character, StatTarget.ARMOR_CLASS, default = fromGear)
 
-        val defaultAc = 10 + dex
-        val best = listOfNotNull(armoredAc, unarmoredAc, defaultAc).max()
-
-        // A Monk's Unarmored Defense requires no shield, so only add the shield when it applies.
-        val monkUnarmoredWins = isMonk && unarmoredAc != null && best == unarmoredAc
-        val withShield = if (monkUnarmoredWins) best else best + shieldBonus
         // Magic items worn or wielded add on top of whatever is underneath them: a +1 made
         // from a breastplate is a +1 breastplate, and a Cloak of Protection helps regardless.
         val magicBonus = character.inventory
@@ -297,8 +265,8 @@ object CharacterCalculations {
             .sumOf { it.acBonus }
 
         // A Warforged's plating and anything like it applies whatever the character wears.
-        val computed = withShield + magicBonus +
-            PassiveBonuses.totalFor(character, PassiveBonusData.Target.ARMOR_CLASS)
+        val computed = base + shieldBonus + magicBonus +
+            RulesEngine.statBonus(character, StatTarget.ARMOR_CLASS)
         return adjust(character, OverridableStat.ARMOR_CLASS, computed)
     }
 

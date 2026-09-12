@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.SpellSlotTables
 import com.pedroeu.ficha.domain.CharacterCalculations
@@ -29,6 +30,13 @@ class ProgressionTest {
         backgroundId = "soldier",
         level = level,
         baseAbilityScores = Ability.ALL.associate { it.name to 15 },
+        // Every real character is trained in something: a class grants skills and so does a
+        // background. Without them, Expertise — which offers the skills you are proficient
+        // in — had nothing to offer, and the test was measuring a character that cannot exist.
+        skillProficiencies = setOf(
+            Skill.ATHLETICS.name, Skill.PERCEPTION.name,
+            Skill.STEALTH.name, Skill.INSIGHT.name,
+        ),
     )
 
     @Test

@@ -186,6 +186,7 @@ data class LevelUpState(
                 roots = fromNewFeatures + revisited,
                 answers = answered,
                 books = character.enabledSources,
+                character = character,
             )
         }
 
@@ -206,6 +207,7 @@ data class LevelUpState(
                 roots = OriginChoices.forFeat(it),
                 answers = ChoiceResolver.answers(character) + selections,
                 books = character.enabledSources,
+                character = character,
             )
         }.orEmpty()
 

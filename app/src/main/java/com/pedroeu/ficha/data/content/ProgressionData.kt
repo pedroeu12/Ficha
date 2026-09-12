@@ -7,6 +7,7 @@ import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ChoiceOption
 import com.pedroeu.ficha.data.model.ChoiceOptions
+import com.pedroeu.ficha.data.model.OptionSource
 import com.pedroeu.ficha.data.model.Skill
 
 /**
@@ -87,7 +88,20 @@ object ProgressionData {
         .map { ChoiceOption(it.id, it.name, it.description, it.school, it.book) }
 
     /** The cantrip an invocation singles out, asked as soon as the invocation is taken. */
-    private fun cantripChoice(invocationId: String, label: String, prompt: String) = Choice(
+    /**
+     * "Choose one of *your known* Warlock cantrips that deals damage."
+     *
+     * The list is the Warlock's own cantrips, not the Warlock cantrip list. Offering the
+     * catalogue turned "make a cantrip you already have stronger" into "learn a new cantrip",
+     * which is a different feature and one these invocations do not grant. [options] stays
+     * filled as a fallback for a caller with no character to read from.
+     */
+    private fun cantripChoice(
+        invocationId: String,
+        label: String,
+        prompt: String,
+        needsAttackRoll: Boolean = false,
+    ) = Choice(
         id = "invocation:$invocationId:cantrip",
         label = label,
         prompt = prompt,
@@ -95,6 +109,12 @@ object ProgressionData {
         kind = ChoiceKind.SPELL,
         options = warlockDamageCantrips(),
         source = label,
+        optionsFrom = OptionSource.KnownSpells(
+            classId = "warlock",
+            level = 0,
+            needsDamage = true,
+            needsAttackRoll = needsAttackRoll,
+        ),
     )
 
     private fun elementChoice(invocationId: String, label: String, prompt: String) = Choice(
@@ -120,6 +140,8 @@ object ProgressionData {
         classId: String,
         spellLevel: Int,
         count: Int = 1,
+        /** True where the rules say "in your spellbook" rather than "from the list". */
+        fromWhatYouKnow: Boolean = false,
     ) = Choice(
         id = id,
         label = label,
@@ -129,6 +151,11 @@ object ProgressionData {
         options = SpellData.forClass(classId, spellLevel)
             .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
         source = source,
+        optionsFrom = if (fromWhatYouKnow) {
+            OptionSource.KnownSpells(classId = classId, level = spellLevel)
+        } else {
+            OptionSource.Declared
+        },
     )
 
     private val INVOCATION_OPTIONS = listOf(
@@ -137,7 +164,8 @@ object ProgressionData {
             prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage",
             grants = listOf(
                 cantripChoice("agonizing_blast", "Agonizing Blast",
-                    "Choose the damage cantrip that adds your Charisma modifier to its damage.")
+                    "Choose one of your known Warlock cantrips that deals damage. It adds " +
+                        "your Charisma modifier to its damage.")
             )),
         ChoiceOption("armor_of_shadows", "Armor of Shadows", "You can cast Mage Armor on yourself without expending a spell slot."),
         ChoiceOption("ascendant_step", "Ascendant Step", "You can cast Levitate on yourself without expending a spell slot.",
@@ -160,7 +188,8 @@ object ProgressionData {
             prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage",
             grants = listOf(
                 cantripChoice("eldritch_spear", "Eldritch Spear",
-                    "Choose the damage cantrip whose range grows with your Warlock level.")
+                    "Choose one of your known Warlock cantrips that deals damage. Its range " +
+                        "grows with your Warlock level.")
             )),
         ChoiceOption("fiendish_vigor", "Fiendish Vigor", "You can cast False Life on yourself without expending a spell slot. When you cast the spell with this feature, you don't roll the die for the Temporary Hit Points; you automatically get the highest number on the die.",
             minLevel = 2,
@@ -244,7 +273,9 @@ object ProgressionData {
             prerequisite = "Level 2+ Warlock, a Warlock Cantrip That Deals Damage via an Attack Roll",
             grants = listOf(
                 cantripChoice("repelling_blast", "Repelling Blast",
-                    "Choose the damage cantrip whose hits push a creature 10 feet away.")
+                    "Choose one of your known Warlock cantrips that requires an attack roll. " +
+                        "Its hits push a creature 10 feet away.",
+                    needsAttackRoll = true)
             )),
         ChoiceOption("thirsting_blade", "Thirsting Blade", "You gain the Extra Attack feature for your pact weapon only. With that feature, you can attack twice with the weapon instead of once when you take the Attack action on your turn.",
             minLevel = 5,
@@ -378,14 +409,24 @@ object ProgressionData {
         masteryChoice(classId, count, level),
     )
 
+    /**
+     * "Choose N of your *skill proficiencies*."
+     *
+     * Expertise doubles a proficiency you already have; it does not hand out a new skill. All
+     * six of these offered every skill in the game, so a Rogue could double a bonus they did
+     * not have. [options] holds the full list only as a fallback for a caller with no
+     * character; the creation flow's own picker has always filtered correctly.
+     */
     private fun expertiseChoice(level: Int, id: String, count: Int = 2) = Choice(
         id = id,
         label = "Expertise",
-        prompt = "Choose $count skill proficiencies to double your proficiency bonus with.",
+        prompt = "Choose $count of your skill proficiencies to double your proficiency " +
+            "bonus with.",
         count = count,
         kind = ChoiceKind.EXPERTISE,
         options = ChoiceOptions.fromSkills(Skill.ALL),
         source = "Level $level",
+        optionsFrom = OptionSource.ProficientSkills,
     )
 
     val ALL: List<ClassProgression> = listOf(
@@ -773,6 +814,7 @@ object ProgressionData {
                         source = "Level 18",
                         classId = "wizard",
                         spellLevel = 1,
+                        fromWhatYouKnow = true,
                     ),
                     namedSpellChoice(
                         id = "wizard:spell_mastery_2",
@@ -781,6 +823,7 @@ object ProgressionData {
                         source = "Level 18",
                         classId = "wizard",
                         spellLevel = 2,
+                        fromWhatYouKnow = true,
                     )),
                 feature(20, "Signature Spells", "Choose two level 3 spells that are always prepared and castable once each per Short Rest without a slot.",
                     namedSpellChoice(
@@ -792,6 +835,7 @@ object ProgressionData {
                         classId = "wizard",
                         spellLevel = 3,
                         count = 2,
+                        fromWhatYouKnow = true,
                     )),
             ),
             cantripsKnown = mapOf(1 to 3, 4 to 4, 10 to 5),

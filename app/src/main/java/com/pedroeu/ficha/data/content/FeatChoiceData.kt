@@ -5,6 +5,7 @@ import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ChoiceOption
 import com.pedroeu.ficha.data.model.ChoiceOptions
+import com.pedroeu.ficha.data.model.OptionSource
 import com.pedroeu.ficha.data.model.Skill
 
 /**
@@ -541,7 +542,7 @@ object FeatChoiceData {
                 Choice(
                     id = "feat:echoing_soul:skills",
                     label = "Echoing Soul Skills",
-                    prompt = "Choose 2 skills you are proficient in.",
+                    prompt = "Choose 2 skills to gain proficiency in.",
                     count = 2,
                     kind = ChoiceKind.SKILL,
                     options = ChoiceOptions.fromSkills(Skill.ALL),
@@ -555,6 +556,7 @@ object FeatChoiceData {
                     kind = ChoiceKind.EXPERTISE,
                     options = ChoiceOptions.fromSkills(Skill.ALL),
                     source = featName,
+                    optionsFrom = OptionSource.ProficientSkills,
                 ),
                 languageChoice("echoing_soul", featName),
             )

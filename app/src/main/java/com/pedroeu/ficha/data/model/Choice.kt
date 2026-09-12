@@ -28,6 +28,41 @@ enum class ChoiceKind {
     LANGUAGE,
 }
 
+
+/**
+ * Where a choice's options come from.
+ *
+ * Most choices name their options outright. Some cannot: the rules say "choose one of *your
+ * known* Warlock cantrips", "a level 1 and a level 2 spell *in your spellbook*", "two of your
+ * *skill proficiencies*" — lists that only exist once there is a character to read them from.
+ *
+ * Those were written as the whole catalogue, which turns "make a cantrip you already have
+ * stronger" into "learn a new cantrip": a different feature, and one the rules do not offer.
+ * The filter belongs on the choice, so it is declared once beside the question rather than
+ * applied by whichever screen happens to draw it.
+ */
+sealed interface OptionSource {
+
+    /** The options are exactly what the choice lists. */
+    data object Declared : OptionSource
+
+    /**
+     * Spells the character already has, narrowed further.
+     *
+     * [classId] restricts to one class's list — "your known *Warlock* cantrips" is not the
+     * same as every cantrip a multiclassed character knows.
+     */
+    data class KnownSpells(
+        val classId: String = "",
+        val level: Int? = null,
+        val needsDamage: Boolean = false,
+        val needsAttackRoll: Boolean = false,
+    ) : OptionSource
+
+    /** Skills the character is already proficient in, for Expertise. */
+    data object ProficientSkills : OptionSource
+}
+
 data class ChoiceOption(
     val id: String,
     val name: String,
@@ -130,6 +165,15 @@ data class Choice(
      * and the invocation list cares about the first number.
      */
     val prerequisiteClassId: String = "",
+    /**
+     * Where [options] come from, for a choice whose list depends on the character.
+     *
+     * [OptionSource.Declared] — the default — means [options] is the list. Anything else is
+     * resolved against the character by
+     * [com.pedroeu.ficha.domain.ChoiceOptionSources], and whatever [options] holds is only a
+     * fallback for a caller with no character to read.
+     */
+    val optionsFrom: OptionSource = OptionSource.Declared,
 )
 
 /** Convenience builders for the common option shapes. */

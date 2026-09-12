@@ -41,6 +41,15 @@ object ChoiceGraph {
         roots: List<Choice>,
         answers: Map<String, List<String>>,
         books: Set<Sourcebook> = Sourcebook.EVERYTHING,
+        /**
+         * The character whose own lists some choices are drawn from.
+         *
+         * Null only where there is no character yet — character creation, which asks nothing
+         * of this shape, since every such choice arrives at level 2 or later or is answered
+         * by a picker of its own. A choice that needs a character and has none keeps the list
+         * it declared, which is a fallback rather than an answer.
+         */
+        character: PlayerCharacter? = null,
     ): List<Choice> {
         val out = mutableListOf<Choice>()
         val seen = mutableSetOf<String>()
@@ -67,7 +76,12 @@ object ChoiceGraph {
             frontier = next.filterNot { it.id in seen }
         }
 
-        return out.map { choice -> choice.limitedTo(books) }
+        return out
+            .map { choice ->
+                if (character == null) choice
+                else ChoiceOptionSources.resolve(choice, character)
+            }
+            .map { choice -> choice.limitedTo(books) }
     }
 
     /**
@@ -80,9 +94,10 @@ object ChoiceGraph {
         roots: List<Choice>,
         answers: Map<String, List<String>>,
         books: Set<Sourcebook> = Sourcebook.EVERYTHING,
+        character: PlayerCharacter? = null,
     ): List<Choice> {
         val rootIds = roots.map { it.id }.toSet()
-        return expand(roots, answers, books).filterNot { it.id in rootIds }
+        return expand(roots, answers, books, character).filterNot { it.id in rootIds }
     }
 
     /**
@@ -97,6 +112,7 @@ object ChoiceGraph {
             roots = rootsFor(character),
             answers = ChoiceResolver.answers(character),
             books = character.enabledSources,
+            character = character,
         )
 
     /** Every question the character's own classes and subclasses put to them. */

@@ -121,11 +121,16 @@ object ChoiceResolver {
 
     private fun resolve(
         character: PlayerCharacter,
-        choice: Choice,
+        raw: Choice,
         featureName: String,
         level: Int,
         classId: String = "",
     ): ResolvedChoice {
+        // Every resolved choice in the app comes through here — class features, subclass
+        // features and origin choices alike — so this is where a list that belongs to the
+        // character gets read from the character. Doing it in the choice walk alone missed
+        // class features, which do not go through it.
+        val choice = ChoiceOptionSources.resolve(raw, character)
         val ids = selectionsFor(character, choice.id, level.takeIf { it > 0 })
         return ResolvedChoice(
             choice = choice,
@@ -236,7 +241,12 @@ object ChoiceResolver {
         val classRoots = ChoiceGraph.rootsFor(character)
         val classRootIds = classRoots.map { it.id }.toSet()
         return ChoiceGraph
-            .expand(fromOrigin + classRoots, answers(character), character.enabledSources)
+            .expand(
+                fromOrigin + classRoots,
+                answers(character),
+                character.enabledSources,
+                character,
+            )
             .filterNot { it.id in classRootIds }
             .map { choice -> resolve(character, choice, choice.label, 0) }
     }

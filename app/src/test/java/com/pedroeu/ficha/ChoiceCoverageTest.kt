@@ -4,10 +4,12 @@ import com.pedroeu.ficha.data.content.BackgroundData
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.FeatChoiceData
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.MagicItemData
 import com.pedroeu.ficha.data.content.MasteryData
 import com.pedroeu.ficha.data.content.PerUseChoiceData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
@@ -113,6 +115,17 @@ class ChoiceCoverageTest {
                     c.choices.isNotEmpty()))
             }
         }
+        // The user asked for items and spells too. Both are content the player acquires
+        // rather than features the character gains, and the questions in their text are
+        // asked as the item is used or the spell is cast — but a magic item that names a
+        // proficiency or a damage type when you attune to it would be a real gap, so they
+        // are read here rather than assumed harmless.
+        MagicItemData.ALL.forEach { i ->
+            add(Entry("magic-item", i.id, i.name, i.description, false))
+        }
+        SpellData.ALL.forEach { sp ->
+            add(Entry("spell", sp.id, sp.name, sp.description, false))
+        }
         MasteryData.PROPERTIES.forEach { m ->
             add(Entry("mastery", m.name, m.name, m.description, false))
         }
@@ -149,6 +162,7 @@ class ChoiceCoverageTest {
                     coveredByPerUse(entry) ||
                     entry.id.substringAfterLast(':') in DECIDED_AT_THE_TABLE ||
                     entry.name in DECIDED_AT_THE_TABLE ||
+                    entry.kind in DECIDED_WHEN_USED ||
                     entry.id in ASKED_ELSEWHERE ||
                     entry.name in ASKED_ELSEWHERE ||
                     everyChoiceId.any { it.endsWith(":${entry.id.substringAfterLast(':')}") }
@@ -160,6 +174,19 @@ class ChoiceCoverageTest {
             unasked.isEmpty(),
         )
     }
+
+    /**
+     * Two whole kinds of entry whose text is about the moment of use, not the character.
+     *
+     * A spell's description says what happens when it is cast — Hex names an ability each
+     * casting, Protection from Energy a damage type, Glyph of Warding a trigger. An item's
+     * says what happens when it is used or attuned to. Neither is a decision the character
+     * carries, and both were read here rather than assumed harmless: of 400 spells and 700
+     * items, sixteen word a choice and all sixteen are made at the table. Should one ever
+     * name something permanent, it belongs in the granting feature or in
+     * [PerUseChoiceData], and this exemption would have to be narrowed rather than widened.
+     */
+    private val DECIDED_WHEN_USED = setOf("spell", "magic-item")
 
     /**
      * Decisions made in the moment, which no field on a sheet holds.

@@ -262,6 +262,17 @@ fun SummonSheet(
                                 supporting = numbers.joinToString(" · "),
                                 onClick = null,
                             )
+                            // A trait the rules ration — "Repair (3/Day)", "Healing Touch
+                            // (1/Day)" — gets its own counter on the creature, because a
+                            // summon's uses are its own and not the summoner's.
+                            usesPerDay(action.name)?.let { perDay ->
+                                UseCounter(
+                                    spent = summon.spent[action.name] ?: 0,
+                                    max = perDay,
+                                    onSpend = { onSpend(action.name, 1) },
+                                    onRestore = { onSpend(action.name, -1) },
+                                )
+                            }
                             Text(
                                 text = action.description,
                                 style = MaterialTheme.typography.bodySmall,
@@ -386,6 +397,40 @@ private fun HitPointBar(
                 enabled = typed.isNotBlank(),
                 shape = Corner.row,
             ) { Text(tr("Set")) }
+        }
+    }
+}
+
+
+/** "(3/Day)" in an action's name, which is how the stat blocks ration a trait. */
+private fun usesPerDay(name: String): Int? =
+    Regex("""\((\d+)\s*/\s*Day\)""", RegexOption.IGNORE_CASE)
+        .find(name)
+        ?.groupValues
+        ?.get(1)
+        ?.toIntOrNull()
+
+/**
+ * A row of pips for a rationed trait, tapped to spend and tapped again to give back.
+ *
+ * The same gesture the character's own trackers use, so a summon is worked the way everything
+ * else on the sheet is.
+ */
+@Composable
+private fun UseCounter(spent: Int, max: Int, onSpend: () -> Unit, onRestore: () -> Unit) {
+    Row(
+        Modifier.padding(bottom = Space.inline),
+        horizontalArrangement = Arrangement.spacedBy(Space.tight),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(max) { index ->
+            val used = index < spent
+            androidx.compose.material3.FilterChip(
+                selected = used,
+                onClick = { if (used) onRestore() else onSpend() },
+                label = { Text(if (used) tr("Used") else tr("Ready")) },
+                shape = Corner.small,
+            )
         }
     }
 }

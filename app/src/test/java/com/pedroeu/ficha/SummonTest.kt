@@ -270,4 +270,51 @@ class SummonTest {
             )
         }
     }
+
+    // ------------------------------------------------------------------ A creature's own uses
+
+    /**
+     * A rationed trait belongs to the creature, not the summoner.
+     *
+     * Two Steel Defenders would each have their own three Repairs, and spending one must not
+     * touch the other — the same separation their hit points have.
+     */
+    @Test
+    fun `a summon spends its own uses`() {
+        var pc = caster("artificer", 10, "battle_smith")
+        repeat(2) {
+            pc = CharacterSummons.summon(pc, "steel_defender", "steel_defender", "Steel Defender")
+        }
+        val first = pc.activeSummons.first().instanceId
+
+        pc = CharacterSummons.spend(pc, first, "Repair (3/Day)", 1)
+        assertEquals(1, pc.activeSummons.first().spent["Repair (3/Day)"])
+        assertEquals(
+            "the other defender's uses were touched",
+            null,
+            pc.activeSummons.last().spent["Repair (3/Day)"],
+        )
+
+        pc = CharacterSummons.spend(pc, first, "Repair (3/Day)", -1)
+        assertEquals(0, pc.activeSummons.first().spent["Repair (3/Day)"])
+        pc = CharacterSummons.spend(pc, first, "Repair (3/Day)", -1)
+        assertEquals("a use count never goes negative", 0, pc.activeSummons.first().spent["Repair (3/Day)"])
+    }
+
+    /** The stat blocks that ration a trait say so in its name, which is what the sheet reads. */
+    @Test
+    fun `rationed traits are named so the sheet can count them`() {
+        val perDay = Regex("""\((\d+)\s*/\s*Day\)""", RegexOption.IGNORE_CASE)
+        val rationed = StatblockData.ALL.flatMap { it.actions }.filter {
+            perDay.containsMatchIn(it.name)
+        }
+        assertTrue("no stat block rations anything, so the counter is unreachable",
+            rationed.isNotEmpty())
+        rationed.forEach {
+            assertTrue(
+                "${it.name} says it is rationed but the count cannot be read",
+                perDay.find(it.name)!!.groupValues[1].toIntOrNull()?.let { n -> n > 0 } == true,
+            )
+        }
+    }
 }

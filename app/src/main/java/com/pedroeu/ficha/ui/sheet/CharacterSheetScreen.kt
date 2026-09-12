@@ -179,8 +179,13 @@ fun CharacterSheetScreen(
             selectedInstanceId = viewing,
             onSelectCharacter = { viewing = null },
             onSelectSummon = { viewing = it },
-            onSummonSomething = { summoning = true }
-                .takeIf { CharacterSummons.available(loaded).isNotEmpty() },
+            // Null hides the button entirely: a character with nothing to summon should not
+            // be offered the gesture at all.
+            onSummonSomething = if (CharacterSummons.available(loaded).isNotEmpty()) {
+                { summoning = true }
+            } else {
+                null
+            },
             characterName = loaded.name,
         )
 
@@ -209,18 +214,6 @@ fun CharacterSheetScreen(
                 onNotes = { viewModel.setSummonNotes(openSummon.instanceId, it) },
                 modifier = Modifier.weight(1f),
             )
-            if (summoning) {
-                SummonPickerSheet(
-                    character = loaded,
-                    onDismiss = { summoning = false },
-                    onSummon = { statblockId, sourceId, label, level, classId, concentration ->
-                        viewModel.summon(
-                            statblockId, sourceId, label, level, classId, concentration,
-                        )
-                        summoning = false
-                    },
-                )
-            }
             return@Column
         }
 
@@ -250,6 +243,23 @@ fun CharacterSheetScreen(
         viewModel = viewModel,
         onDismiss = { restKind = null },
     )
+
+    // Outside the Column, beside the rest sheet, so it opens whichever sheet is showing.
+    // Inside the branch it only opened when a creature was already out, which made the
+    // button do nothing the one time it mattered most — with nothing summoned yet.
+    if (summoning) {
+        SummonPickerSheet(
+            character = loaded,
+            onDismiss = { summoning = false },
+            onSummon = { statblockId, sourceId, label, level, classId, concentration ->
+                viewModel.summon(statblockId, sourceId, label, level, classId, concentration)
+                summoning = false
+                // Back to the character's own sheet: the creature appears in the switcher
+                // above, which is where the player goes to look at it.
+                viewing = null
+            },
+        )
+    }
 }
 
 /** The narrow layout: one column at a time, chosen from a row of tabs. */

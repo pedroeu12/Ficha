@@ -14,12 +14,35 @@ android {
         applicationId = "com.pedroeu.ficha"
         minSdk = 26
         targetSdk = 35
-        versionCode = 48
-        versionName = "3.11.3"
+        versionCode = 49
+        versionName = "3.11.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    /**
+     * A signing key that is part of the project, rather than whatever the machine had.
+     *
+     * The Android plugin signs a debug build with ~/.android/debug.keystore, generating one
+     * if the machine has none. A CI runner is a fresh machine every time, so every build was
+     * signed with a brand new key — and Android refuses to update an installed app whose
+     * signature changed. That is why installing over the top always failed and the app had to
+     * be uninstalled first, losing the characters with it.
+     *
+     * This is a debug-grade key, kept in the repository on purpose and with the conventional
+     * debug password. It protects nothing: the APK it signs is published publicly on every
+     * commit. What it buys is that build 48 and build 60 are signed by the same hand, so the
+     * installer treats the second as an update to the first.
+     */
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
         }
     }
 
@@ -33,6 +56,7 @@ android {
         }
         debug {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

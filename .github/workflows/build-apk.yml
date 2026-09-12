@@ -34,6 +34,24 @@ jobs:
       - name: Build the debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      # The reason installing over the top used to fail. A runner is a fresh machine, so the
+      # Android plugin used to generate a new signing key on every build, and Android refuses
+      # to update an app whose signature changed. The key now lives in the repository, and
+      # this fails the build if anything goes back to signing with a throwaway one.
+      - name: Check the APK is signed with the project's key
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          FINGERPRINT=$("$APKSIGNER" verify --print-certs \
+            app/build/outputs/apk/debug/app-debug.apk \
+            | grep -m1 "SHA-256 digest" | awk '{print $NF}')
+          EXPECTED=$(cat app/expected-signer.sha256)
+          echo "signed by: $FINGERPRINT"
+          if [ "$FINGERPRINT" != "$EXPECTED" ]; then
+            echo "::error::The APK is signed with $FINGERPRINT, not the project key $EXPECTED."
+            echo "::error::Installing this build over an existing one would fail."
+            exit 1
+          fi
+
       # The APK is named after the commit so it is obvious which build you installed.
       - name: Name the APK after the commit
         id: apk
@@ -72,7 +90,9 @@ jobs:
             --title "Latest build — v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})" \
             --notes "Debug build of \`${{ steps.apk.outputs.sha }}\`.
 
-          The home screen shows **v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})** under the title. If your phone shows anything else after installing, the install did not replace the old app — uninstall it first, then install again.
+          The home screen shows **v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})** under the title.
+
+          **Installing over the top now works.** Every build before 49 was signed with a throwaway key, which is why updating always failed and the app had to be uninstalled first. From build 49 on the key is fixed, so each build installs as an update to the one before — but going from an older build to this one needs one last uninstall, because the old signature can never match.
 
           **Back up your characters before uninstalling.** Uninstalling deletes them along with the app. On the home screen, tap the ⋮ menu and choose **Back up characters**, then **Restore from backup** once the new build is installed. Installing over the top keeps everything; only uninstalling loses it.
 

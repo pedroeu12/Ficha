@@ -297,11 +297,15 @@ class MasteryAndPlaytestTest {
         assertTrue(granted("cleric", "grave_domain", 5).contains("revivify"))
         assertTrue(granted("druid", "circle_of_the_titan", 9).contains("destructive_wave"))
         assertTrue(granted("sorcerer", "demonic_sorcery", 3).contains("dissonant_whispers"))
-        assertTrue(granted("sorcerer", "shadow_sorcery", 5).contains("summon_undead"))
+        // Both of these read the table wrong until the grants were rebuilt from the
+        // subclass's own printed text: Shadow Sorcery's level 5 row is Hunger of Hadar and
+        // Nondetection, and the Undead patron's level 7 row is Greater Invisibility and
+        // Phantasmal Killer.
+        assertTrue(granted("sorcerer", "shadow_sorcery", 5).contains("nondetection"))
         assertTrue(granted("artificer", "reanimator", 3).contains("witch_bolt"))
         assertTrue(granted("ranger", "hollow_warden", 3).contains("wrathful_smite"))
         assertTrue(granted("warlock", "hexblade_patron", 3).contains("hex"))
-        assertTrue(granted("warlock", "undead_patron", 7).contains("death_ward"))
+        assertTrue(granted("warlock", "undead_patron", 7).contains("greater_invisibility"))
 
         // A table entry above the character's level hasn't arrived yet.
         assertFalse(granted("cleric", "pestilence_domain", 3).contains("contagion"))

@@ -37,9 +37,13 @@ object SpellGrantData {
         "artificer" to at(1, "mending"),
         // Druidic teaches Druidcraft alongside the secret language.
         "druid" to at(1, "druidcraft"),
-        "warlock" to at(1, "eldritch_blast"),
+        // Contact Patron at 9: "You always have Contact Other Plane prepared."
+        "warlock" to at(1, "eldritch_blast") + at(9, "contact_other_plane"),
         // Favored Enemy at level 1, then Paladin's Smite at 2 and Faithful Steed at 5. All
         // three are worded "you always have X prepared", so they cost nothing from the limit.
+        // Words of Creation at 20: "You always have Power Word Heal and Power Word Kill
+        // prepared."
+        "bard" to at(20, "power_word_heal", "power_word_kill"),
         "ranger" to at(1, "hunters_mark"),
         "paladin" to at(2, "divine_smite") + at(5, "find_steed"),
     )
@@ -62,7 +66,7 @@ object SpellGrantData {
             at(5, "hypnotic_pattern", "nondetection") +
             at(7, "confusion", "dimension_door") +
             at(9, "dominate_person", "modify_memory"),
-        "war_domain" to at(3, "divine_favor", "guiding_bolt", "magic_weapon", "shield_of_faith") +
+        "war_domain" to at(3, "guiding_bolt", "magic_weapon", "shield_of_faith", "spiritual_weapon") +
             at(5, "crusaders_mantle", "spirit_guardians") +
             at(7, "fire_shield", "freedom_of_movement") +
             at(9, "hold_monster", "steel_wind_strike"),
@@ -94,7 +98,7 @@ object SpellGrantData {
             at(5, "enhance_ability", "magic_weapon") +
             at(9, "haste", "protection_from_energy") +
             at(13, "compulsion", "freedom_of_movement") +
-            at(17, "flame_strike", "legend_lore"),
+            at(17, "legend_lore", "yolande_s_regal_presence"),
         "ancients" to at(3, "ensnaring_strike", "speak_with_animals") +
             at(5, "moonbeam", "misty_step") +
             at(9, "plant_growth", "protection_from_energy") +
@@ -115,16 +119,17 @@ object SpellGrantData {
         "fiend" to at(3, "burning_hands", "command", "scorching_ray", "suggestion") +
             at(5, "fireball", "stinking_cloud") +
             at(7, "fire_shield", "wall_of_fire") +
-            at(9, "flame_strike", "hallow"),
-        "archfey" to at(3, "calm_emotions", "faerie_fire", "misty_step", "phantasmal_force") +
+            at(9, "geas", "insect_plague"),
+        "archfey" to at(3, "calm_emotions", "faerie_fire", "misty_step", "phantasmal_force", "sleep") +
             at(5, "blink", "plant_growth") +
             at(7, "dominate_beast", "greater_invisibility") +
             at(9, "dominate_person", "seeming"),
         "great_old_one" to at(3, "detect_thoughts", "dissonant_whispers", "phantasmal_force", "tashas_hideous_laughter") +
             at(5, "clairvoyance", "hunger_of_hadar") +
             at(7, "confusion", "summon_aberration") +
-            at(9, "modify_memory", "telekinesis"),
-        "celestial" to at(3, "aid", "cure_wounds", "guiding_bolt", "lesser_restoration") +
+            at(9, "modify_memory", "telekinesis") +
+            at(10, "hex"),
+        "celestial" to at(3, "aid", "cure_wounds", "guiding_bolt", "lesser_restoration", "light", "sacred_flame") +
             at(5, "daylight", "revivify") +
             at(7, "guardian_of_faith", "wall_of_fire") +
             at(9, "greater_restoration", "summon_celestial"),
@@ -142,6 +147,7 @@ object SpellGrantData {
             at(9, "greater_restoration", "wall_of_force"),
         "spellfire_sorcery" to at(3, "cure_wounds", "guiding_bolt", "lesser_restoration", "scorching_ray") +
             at(5, "aura_of_vitality", "dispel_magic") +
+            at(6, "counterspell") +
             at(7, "fire_shield", "wall_of_fire") +
             at(9, "greater_restoration", "flame_strike"),
 
@@ -153,7 +159,7 @@ object SpellGrantData {
             at(17, "seeming"),
         "fey_wanderer" to at(3, "charm_person") +
             at(5, "misty_step") +
-            at(9, "dispel_magic") +
+            at(9, "summon_fey") +
             at(13, "dimension_door") +
             at(17, "mislead"),
         "hunter" to emptyList(),
@@ -205,7 +211,8 @@ object SpellGrantData {
         "demonic_sorcery" to at(3, "bane", "dissonant_whispers", "spike_growth", "web") +
             at(5, "bestow_curse", "dispel_magic") +
             at(7, "giant_insect", "hallucinatory_terrain") +
-            at(9, "contact_other_plane", "modify_memory"),
+            at(9, "contact_other_plane", "modify_memory") +
+            at(14, "summon_fiend"),
 
         // Mage Hand Legerdemain hands the Arcane Trickster its Mage Hand rather than asking
         // for it; the other two cantrips are chosen.
@@ -230,19 +237,22 @@ object SpellGrantData {
             at(9, "animate_dead", "lightning_bolt") +
             at(13, "blight", "death_ward") +
             at(17, "antilife_shell", "raise_dead"),
-        "grave_domain" to at(
-            3, "bane", "chill_touch", "detect_evil_and_good", "gentle_repose",
-            "ray_of_enfeeblement",
-        ) + at(5, "revivify", "vampiric_touch") +
-            at(7, "blight", "dispel_evil_and_good") +
-            at(9, "hold_monster", "raise_dead"),
+        "grave_domain" to at(3, "detect_evil_and_good", "false_life", "gentle_repose", "ray_of_enfeeblement", "spare_the_dying") +
+            at(5, "revivify", "vampiric_touch") +
+            at(7, "blight", "death_ward") +
+            at(9, "dispel_evil_and_good", "raise_dead"),
         "hollow_warden" to at(3, "wrathful_smite") +
-            at(5, "spike_growth") +
+            at(5, "alter_self") +
             at(9, "phantom_steed") +
-            at(13, "hallucinatory_terrain") +
-            at(17, "awaken"),
+            at(13, "dominate_beast") +
+            at(17, "steel_wind_strike"),
+        // Star Map: "While holding the map, you have the Guidance and Guiding Bolt
+        // spells prepared."
+        "stars" to at(3, "guidance", "guiding_bolt"),
+        // Telekinetic Master: "You always have the Telekinesis spell prepared."
+        "psi_warrior" to at(18, "telekinesis"),
         "shadow_sorcery" to at(3, "bane", "darkness", "inflict_wounds", "pass_without_trace") +
-            at(5, "hunger_of_hadar", "summon_undead") +
+            at(5, "hunger_of_hadar", "nondetection") +
             at(7, "greater_invisibility", "phantasmal_killer") +
             at(9, "contagion", "creation"),
         "hexblade_patron" to at(
@@ -250,10 +260,9 @@ object SpellGrantData {
         ) + at(5, "conjure_barrage", "dispel_magic") +
             at(7, "freedom_of_movement", "staggering_smite") +
             at(9, "animate_objects", "steel_wind_strike"),
-        "undead_patron" to at(
-            3, "blindness_deafness", "false_life", "phantasmal_force", "ray_of_sickness",
-        ) + at(5, "speak_with_dead", "vampiric_touch") +
-            at(7, "death_ward", "phantasmal_killer") +
+        "undead_patron" to at(3, "bane", "blindness_deafness", "phantasmal_force", "ray_of_sickness") +
+            at(5, "speak_with_dead", "summon_undead") +
+            at(7, "greater_invisibility", "phantasmal_killer") +
             at(9, "antilife_shell", "cloudkill"),
 
         // The College of Spirits and the Phantom always have one spell rather than a table.
@@ -263,25 +272,28 @@ object SpellGrantData {
         // ---- Arcane subclasses whose features name a spell they always have prepared.
         // Each of these said so in its own text and granted nothing, which is the same gap
         // that left Cleric domains empty — a promise in prose that reached no spell list.
-        "glamour" to at(3, "charm_person", "mirror_image"),
+        "glamour" to at(3, "charm_person", "mirror_image") +
+            at(6, "command"),
         "illusionist" to at(6, "summon_beast", "summon_fey"),
         "enchanter" to at(14, "modify_memory"),
         "necromancer" to at(6, "animate_dead"),
         "transmuter" to at(3, "alter_self") + at(10, "polymorph"),
-        "aberrant" to at(
-            3, "arms_of_hadar", "dissonant_whispers", "calm_emotions", "detect_thoughts",
-        ),
+        "aberrant" to at(3, "arms_of_hadar", "calm_emotions", "detect_thoughts", "dissonant_whispers", "mind_sliver") +
+            at(5, "hunger_of_hadar", "sending") +
+            at(7, "evards_black_tentacles", "summon_aberration") +
+            at(9, "rary_s_telepathic_bond", "telekinesis"),
         "elements" to at(6, "elementalism"),
-        "sea" to at(3, "fog_cloud", "gust_of_wind") +
-            at(5, "water_breathing") +
-            at(7, "control_water") +
-            at(9, "conjure_elemental"),
+        "sea" to at(3, "fog_cloud", "gust_of_wind", "ray_of_frost", "thunderwave") +
+            at(5, "lightning_bolt", "water_breathing") +
+            at(7, "control_water", "ice_storm") +
+            at(9, "conjure_elemental", "hold_monster"),
 
         // ---- Other subclasses that hand over a specific spell
         "college_of_the_moon" to at(6, "moonbeam"),
         "land" to emptyList(),
         "moon" to emptyList(),
-        "abjurer" to emptyList(),
+        "abjurer" to at(10, "counterspell", "dispel_magic"),
+
         // The Eldritch Knight is granted nothing; the Arcane Trickster's Mage Hand is
         // declared above, and a second entry here would silently win — mapOf keeps the last.
         "eldritch_knight" to emptyList(),
@@ -292,9 +304,13 @@ object SpellGrantData {
     // ------------------------------------------------------------------ Species
 
     private val BY_SPECIES_ENTRIES: List<Pair<String, List<Grant>>> = listOf(
+        // Hex Magic: "You always have the Disguise Self and Hex spells prepared."
+        "hexblood" to at(1, "disguise_self", "hex"),
+        // Cold Fire Magic: the cantrip at once, then "you learn the Ice Knife spell and
+        // the Flame Blade spell" at character levels 3 and 5, always prepared.
+        "rimekin" to at(1, "ray_of_frost") + at(3, "ice_knife") + at(5, "flame_blade"),
         // The Khoravar's Fey Gift starts as Friends and can be swapped on a Long Rest.
         "khoravar" to at(1, "friends"),
-        // Control Air and Water opens up as the Triton grows into their heritage.
     )
 
     private val BY_SPECIES: Map<String, List<Grant>> = BY_SPECIES_ENTRIES.toMap()
@@ -353,13 +369,18 @@ object SpellGrantData {
 
         // ---- Imported feats that say "you always have X prepared"
         "shadowmoor_hexer" to at(1, "hex"),
-        "gathered_whispers" to at(1, "augury"),
+        // "You learn the Message spell", alongside the always-prepared Augury.
+        "gathered_whispers" to at(1, "augury", "message"),
         "second_skin" to at(1, "alter_self"),
         "watchers" to at(1, "beast_sense", "speak_with_animals"),
         "cloying_mists" to at(1, "fog_cloud"),
         "treacherous_allure" to at(1, "charm_person"),
-        "fey_sentinel" to at(1, "entangle"),
-        "fey_tormentor" to at(1, "hex"),
+        // "When you reach character level 5, you also always have the Plant Growth
+        // spell prepared."
+        "fey_sentinel" to at(1, "entangle") + at(5, "plant_growth"),
+        // "When you reach character level 5, you also have the Bestow Curse spell
+        // prepared."
+        "fey_tormentor" to at(1, "hex") + at(5, "bestow_curse"),
         "infernal_bulwark" to at(1, "armor_of_agathys"),
         "infernal_dragoon" to at(1, "magic_weapon"),
     )
@@ -400,7 +421,18 @@ object SpellGrantData {
             ChoiceGrants("primordial_patron", shared + rows.toList().flatten())
 
         val choice = SubclassData.ELEMENT_CHOICE_ID
+        // The Death Domain Vestige borrows a Cleric domain's list wholesale: "when you reach
+        // a Warlock level equal to a Cleric level listed on the Domain Spells table for the
+        // domain you have chosen, you thereafter always have the listed spells prepared."
+        // Read from the domain's own entry rather than copied, so the two can never drift.
+        fun vestige(domainId: String) =
+            ChoiceGrants("vestige_patron", BY_SUBCLASS_ENTRIES.toMap()[domainId].orEmpty())
+
         mapOf(
+            "subclass:vestige_patron:domain:Life" to vestige("life_domain"),
+            "subclass:vestige_patron:domain:Light" to vestige("light_domain"),
+            "subclass:vestige_patron:domain:Trickery" to vestige("trickery_domain"),
+            "subclass:vestige_patron:domain:War" to vestige("war_domain"),
             "$choice:air" to element(
                 at(3, "feather_fall", "shatter"), at(5, "fly"),
                 at(7, "freedom_of_movement"), at(9, "steel_wind_strike"),
@@ -464,6 +496,27 @@ object SpellGrantData {
             .filter { it.alwaysPrepared && it.level <= level }
             .map { it.spellId }
             .toSet()
+
+    /**
+     * The same, for a grant that hangs off an answer rather than a source.
+     *
+     * A Primordial Patron's elemental spells and a Death Domain Vestige's borrowed domain
+     * are always-prepared exactly like a subclass's own list, but they were invisible to the
+     * pickers — which strip out what the character is handed anyway — so both were still
+     * offered spells they already had and could not not have.
+     */
+    fun alwaysPreparedForChoices(
+        selections: Map<String, List<String>>,
+        level: Int,
+    ): Set<String> = buildSet {
+        selections.forEach { (choiceId, optionIds) ->
+            optionIds.forEach { optionId ->
+                BY_CHOICE["$choiceId:$optionId"]?.grants.orEmpty()
+                    .filter { it.alwaysPrepared && it.level <= level }
+                    .forEach { add(it.spellId) }
+            }
+        }
+    }
 
     /** The same, for a subclass — its spell list arrives on the level in its own class. */
     fun alwaysPreparedForSubclass(subclassId: String?, level: Int): Set<String> =

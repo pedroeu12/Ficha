@@ -316,7 +316,13 @@ data class LevelUpState(
             // subclass's always-prepared list. None of it is a pick to spend.
             CharacterSpells.granted(character).map { it.spell.id } +
             SpellGrantData.alwaysPreparedForClass(classId, targetClassLevel) +
-            SpellGrantData.alwaysPreparedForSubclass(activeSubclassId, targetClassLevel)
+            SpellGrantData.alwaysPreparedForSubclass(activeSubclassId, targetClassLevel) +
+            // A grant that follows an answer — a patron's element, a vestige's domain —
+            // is always-prepared too, and was the one kind the picker still offered.
+            SpellGrantData.alwaysPreparedForChoices(
+                ChoiceResolver.answers(character) + selections,
+                targetClassLevel,
+            )
 
     val cantripOptions
         get() = SpellData.cantripsForClass(spellListClassId).filterNot { it.id in knownSpellIds }

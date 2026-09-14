@@ -93,6 +93,8 @@ class NumericPassiveCoverageTest {
             "one rolled outcome among many, lasting a minute",
         ("feat:mythal_touched" to StatTarget.ARMOR_CLASS) to
             "one rolled outcome among many, lasting a minute",
+        ("species:goliath:large_form" to StatTarget.SPEED) to
+            "only for the 10 minutes the Goliath is Large, once per Long Rest",
         ("lineage:beasthide" to StatTarget.ARMOR_CLASS) to "only while shifted",
         ("lineage:swiftstride" to StatTarget.SPEED) to "only while shifted",
         ("feat:charger" to StatTarget.SPEED) to "only during a Dash",

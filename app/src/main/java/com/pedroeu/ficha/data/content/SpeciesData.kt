@@ -86,7 +86,8 @@ object SpeciesData {
             traits = listOf(
                 Trait("Lucky", "When you roll a 1 on the d20 for an attack roll, ability check, or saving throw, you can reroll the die."),
                 Trait("Brave", "You have advantage on saving throws against being frightened."),
-                Trait("Naturally Stealthy", "You can attempt to hide even when obscured only by a creature at least one size larger than you."),
+
+                Trait("Halfling Nimbleness", "You can move through the space of any creature that is a size larger than you, but you can't stop in the same space."),                Trait("Naturally Stealthy", "You can attempt to hide even when obscured only by a creature at least one size larger than you."),
             ),
         ),
         Species(
@@ -114,7 +115,8 @@ object SpeciesData {
             summary = "Towering nomads shaped by harsh peaks, goliaths carry a spark of giant heritage in their blood.",
             traits = listOf(
                 Trait("Powerful Build", "You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift."),
-            ),
+
+                Trait("Large Form", "Starting at character level 5, you can change your size to Large as a Bonus Action if you're in a big enough space. This transformation lasts for 10 minutes or until you end it (no action required). For that duration, you have Advantage on Strength checks, and your Speed increases by 10 feet. Once you use this trait, you can't use it again until you finish a Long Rest."),            ),
             lineageChoiceLabel = "Giant Ancestry",
             lineageOptions = listOf(
                 LineageOption("cloud", "Cloud's Jaunt", "As a Bonus Action you can teleport up to 30 feet to an unoccupied space you can see. Usable a number of times equal to your Proficiency Bonus per Long Rest."),
@@ -169,7 +171,7 @@ object SpeciesData {
                 // once per Long Rest, which is why they live in PerUseChoiceData and not here:
                 // asking for one at character creation locked an Aasimar into a third of the
                 // trait for the rest of their career.
-                Trait("Celestial Revelation", "At level 3, when you use your Channel Divinity or as a Bonus Action, you can transform for 1 minute, choosing Necrotic Shroud, Radiant Consumption, or Radiant Soul each time. Once you transform you can't do so again until you finish a Long Rest."),
+                Trait("Celestial Revelation", "When you reach character level 3, you can transform as a Bonus Action using one of the options below, chosen each time you transform. The transformation lasts for 1 minute or until you end it (no action required). Once you transform, you can't do so again until you finish a Long Rest. Once on each of your turns before the transformation ends, you can deal extra damage to one target when you deal damage to it with an attack or a spell. The extra damage equals your Proficiency Bonus, and it is Radiant damage for Heavenly Wings and Inner Radiance, or Necrotic damage for Necrotic Shroud."),
             ),
         ),
         Species(
@@ -177,11 +179,12 @@ object SpeciesData {
             name = "Dragonborn",
             size = "Medium",
             speed = 30,
-            darkvisionRange = 0,
+            darkvisionRange = 60,
             summary = "Proud descendants of dragons, dragonborn carry a breath weapon and resistance tied to their ancestry.",
             traits = listOf(
-                Trait("Breath Weapon", "As an action, you exhale destructive energy in a 15-foot cone (or 30-foot line, your choice). Each creature in the area makes a Dexterity or Constitution saving throw (DC 8 + proficiency bonus + Constitution modifier) taking 1d10 damage of your ancestry's type on a fail, half as much on a save. Usable a number of times equal to your proficiency bonus per long rest."),
-                Trait("Draconic Resistance", "You have resistance to the damage type associated with your Draconic Ancestry."),
+                Trait("Breath Weapon", "When you take the Attack action on your turn, you can replace one of your attacks with an exhalation of magical energy in either a 15-foot Cone or a 30-foot Line that is 5 feet wide (choose the shape each time). Each creature in that area must make a Dexterity saving throw (DC 8 plus your Constitution modifier and Proficiency Bonus). On a failed save, a creature takes 1d10 damage of the type determined by your Draconic Ancestry trait. On a successful save, a creature takes half as much damage. This damage increases by 1d10 when you reach character levels 5 (2d10), 11 (3d10), and 17 (4d10). You can use this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest."),
+                Trait("Damage Resistance", "You have Resistance to the damage type determined by your Draconic Ancestry trait."),
+                Trait("Draconic Flight", "When you reach character level 5, you can channel draconic magic to give yourself temporary flight. As a Bonus Action, you sprout spectral wings on your back that last for 10 minutes or until you retract the wings (no action required) or have the Incapacitated condition. During that time, you have a Fly Speed equal to your Speed. Once you use this trait, you can't use it again until you finish a Long Rest."),
             ),
             lineageChoiceLabel = "Draconic Ancestry",
             lineageOptions = listOf(
@@ -349,7 +352,8 @@ object SpeciesData {
             traits = listOf(
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
                 Trait("Spider Climb", "You have a Climb Speed equal to your Speed. When you reach character level 3, you can move up, down, and across vertical surfaces and along ceilings while leaving your hands free."),
-                Trait("Vampiric Bite", "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 plus your Constitution modifier instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn't a Construct or an Undead, you can empower yourself in one of the following ways, chosen each time: regain Hit Points equal to the Piercing damage dealt, or gain a bonus equal to that damage to the next ability check or attack roll you make."),
+
+                Trait("Trace of Undeath", "You have Resistance to Necrotic damage."),                Trait("Vampiric Bite", "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 plus your Constitution modifier instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn't a Construct or an Undead, you can empower yourself in one of the following ways, chosen each time: regain Hit Points equal to the Piercing damage dealt, or gain a bonus equal to that damage to the next ability check or attack roll you make."),
                 Trait("Drain", "You regain Hit Points equal to the Piercing damage dealt."),
                 Trait("Strengthen", "You gain a bonus to the next ability check or attack roll you make within the next minute; the bonus is equal to the Piercing damage dealt. You can empower yourself with this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest."),
             ),
@@ -391,7 +395,8 @@ object SpeciesData {
             summary = "Flamekin are people made from two key elements of creation: fire and stone. As a result, many flamekin feel a strong connection to the natural world.",
             traits = listOf(
                 Trait("Darkvision", "You can see in dim light within 60 feet of you as if it were bright light and in darkness as if it were dim light. You discern colors in that darkness only as shades of gray."),
-                Trait("Reach to the Blaze", "You know the Produce Flame cantrip. Starting at 3rd level, you can cast the Burning Hands spell with this trait. Starting at 5th level, you can also cast the Flame Blade spell with this trait, without requiring a material component. Once you cast Burning Hands or Flame Blade with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select this species).",
+
+                Trait("Fire Resistance", "You have Resistance to Fire damage."),                Trait("Reach to the Blaze", "You know the Produce Flame cantrip. Starting at 3rd level, you can cast the Burning Hands spell with this trait. Starting at 5th level, you can also cast the Flame Blade spell with this trait, without requiring a material component. Once you cast Burning Hands or Flame Blade with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select this species).",
                     choices = listOf(
                         Choice(
                             id = "species:flamekin:casting_ability",
@@ -479,7 +484,8 @@ object SpeciesData {
             summary = "Reborn are individuals who have died yet inexplicably still live. Some reborn exhibit the scars of fatal ends, their ashen flesh or bloodless veins making it clear that they've escaped death.",
             traits = listOf(
                 Trait("Everlasting", "You don't gain Exhaustion levels from dehydration, malnutrition, or suffocation. You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in an inactive, motionless state, during which you retain consciousness."),
-                Trait("Knowledge from a Past Life", "You gain proficiency in one skill of your choice. In addition, you can temporarily peer into the past to aid you in the present. When you fail an ability check, you can roll 1d6 and add the number rolled to the d20, potentially turning the failure into a success. You can do this a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
+
+                Trait("Escaped Death", "You have Advantage on Death Saving Throws."),                Trait("Knowledge from a Past Life", "You gain proficiency in one skill of your choice. In addition, you can temporarily peer into the past to aid you in the present. When you fail an ability check, you can roll 1d6 and add the number rolled to the d20, potentially turning the failure into a success. You can do this a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.",
                     choices = listOf(
                         Choice(
                             id = "species:reborn:past_life_skill",
@@ -532,7 +538,8 @@ object SpeciesData {
                         )
                     )),
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
-            ),
+
+                Trait("Cold Resistance", "You have Resistance to Cold damage."),            ),
             book = Sourcebook.LORWYN,
         ),
         Species(

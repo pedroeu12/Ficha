@@ -26,6 +26,9 @@ object FeatChoiceData {
      * naming a single ability just raises it, which [com.pedroeu.ficha.domain.FeatBonuses]
      * handles without asking.
      */
+    /** "Increase your Intelligence, Wisdom, or Charisma score by 1" — the casting trio. */
+    private val CASTING_TRIO = listOf(Ability.INT, Ability.WIS, Ability.CHA)
+
     val ABILITY_OPTIONS: Map<String, List<Ability>> = mapOf(
         // ---------------------------------------------------------- General feats
         // These say "Increase one ability score of your choice", naming no list, so every
@@ -39,6 +42,29 @@ object FeatChoiceData {
         "boon_of_looming_shadows" to Ability.ALL,
 
         "actor" to listOf(Ability.CHA),
+
+        // ---------------------------------------------------------- Arcana Unleashed
+        // The eight school Adepts and their neighbours all raise the casting trio; the four
+        // familiar feats and the Iron Mind say "one ability score of your choice".
+        "abjuration_adept" to CASTING_TRIO,
+        "conjuration_adept" to CASTING_TRIO,
+        "divination_adept" to CASTING_TRIO,
+        "enchantment_adept" to CASTING_TRIO,
+        "evocation_adept" to CASTING_TRIO,
+        "illusion_adept" to CASTING_TRIO,
+        "necromancy_adept" to CASTING_TRIO,
+        "transmutation_adept" to CASTING_TRIO,
+        "magic_connoisseur" to CASTING_TRIO,
+        "spell_subterfuge" to CASTING_TRIO,
+        "boon_of_erupting_spellpower" to CASTING_TRIO,
+        "boon_of_magic_school_mastery" to CASTING_TRIO,
+        "boon_of_the_iron_mind" to Ability.ALL,
+        "elemental_familiar" to Ability.ALL,
+        "otherworldly_familiar" to Ability.ALL,
+        "soothing_familiar" to Ability.ALL,
+        "warlike_familiar" to Ability.ALL,
+        "spell_resistant" to listOf(Ability.DEX, Ability.CON),
+
         "athlete" to listOf(Ability.STR, Ability.DEX),
         "charger" to listOf(Ability.STR, Ability.DEX),
         "chef" to listOf(Ability.CON, Ability.WIS),
@@ -206,6 +232,14 @@ object FeatChoiceData {
     private val ARCANE_AND_DIVINE =
         listOf("bard", "cleric", "druid", "sorcerer", "warlock", "wizard")
 
+    /** The three lists Magic Initiate is split across, which Magic Connoisseur builds on. */
+    private val MAGIC_INITIATE_SOURCES = listOf("cleric", "druid", "wizard")
+
+    private val SCHOOLS_OF_MAGIC = listOf(
+        "Abjuration", "Conjuration", "Divination", "Enchantment",
+        "Evocation", "Illusion", "Necromancy", "Transmutation",
+    )
+
     /**
      * Every choice [featId] forces, ready to present. [featName] labels them so a player can
      * tell which feat is asking, which matters when several are taken at once.
@@ -246,6 +280,17 @@ object FeatChoiceData {
         "fey_pact" to "Fey Pact",
         "undead_grasp" to "Paralyzing Touch",
         "lich_ascension" to "Frightening Gaze",
+
+        // Arcana Unleashed. Each of these grants a cantrip or a spell and lets the player
+        // name the ability that casts it, which is the whole reason the table exists.
+        "arcane_artist" to "Arcane Artist",
+        "arcane_eloquence" to "Arcane Eloquence",
+        "arcane_infiltrator" to "Arcane Infiltrator",
+        "arcane_omens" to "Arcane Omens",
+        "arcane_overload" to "Arcane Overload",
+        "arcane_safeguard" to "Arcane Safeguard",
+        "arcane_undertaker" to "Arcane Undertaker",
+        "familiar_friend" to "Faithful Companion",
     )
 
     private fun castingAbilityChoice(featId: String, featName: String): Choice? {
@@ -360,6 +405,145 @@ object FeatChoiceData {
                     options = ChoiceOptions.fromStrings(ToolData.MUSICAL_INSTRUMENTS),
                     source = featName,
                 )
+            )
+
+            // ---------------------------------------------- Arcana Unleashed
+
+            "arcane_undertaker" -> listOf(
+                Choice(
+                    id = "feat:arcane_undertaker:cantrip",
+                    label = "Arcane Undertaker Cantrip",
+                    prompt = "Choose 1 Necromancy cantrip from the Cleric or Wizard list.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = spellOptionsAcross(
+                        listOf("cleric", "wizard"), 0, schools = setOf("Necromancy"),
+                    ),
+                    source = featName,
+                )
+            )
+
+            "portal_jumper" -> listOf(
+                Choice(
+                    id = "feat:portal_jumper:resistance",
+                    label = "Otherworldly Resilience",
+                    prompt = "Choose the damage type the planes taught you to shrug off.",
+                    count = 1,
+                    kind = ChoiceKind.DAMAGE_TYPE,
+                    options = ChoiceOptions.fromStrings(
+                        listOf("Necrotic", "Psychic", "Radiant")
+                    ),
+                    source = featName,
+                )
+            )
+
+            "spell_resistant" -> listOf(
+                Choice(
+                    id = "feat:spell_resistant:resistance",
+                    label = "Magical Resilience",
+                    prompt = "Choose the damage type you resist.",
+                    count = 1,
+                    kind = ChoiceKind.DAMAGE_TYPE,
+                    options = ChoiceOptions.fromStrings(
+                        listOf("Necrotic", "Psychic", "Radiant", "Thunder")
+                    ),
+                    source = featName,
+                )
+            )
+
+            "elemental_familiar" -> listOf(
+                Choice(
+                    id = "feat:elemental_familiar:damage",
+                    label = "Elemental Energy",
+                    prompt = "Choose the energy your familiar is imbued with. It resists that " +
+                        "type and its Energy Pulse deals it.",
+                    count = 1,
+                    kind = ChoiceKind.DAMAGE_TYPE,
+                    options = ChoiceOptions.fromStrings(
+                        listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")
+                    ),
+                    source = featName,
+                    // "until you cast Find Familiar again", so it is revisited, not fixed.
+                    changeableOnRest = true,
+                )
+            )
+
+            "otherworldly_familiar" -> listOf(
+                Choice(
+                    id = "feat:otherworldly_familiar:resistance",
+                    label = "Energy Resistance",
+                    prompt = "Choose the damage type your familiar resists while imbued.",
+                    count = 1,
+                    kind = ChoiceKind.DAMAGE_TYPE,
+                    options = ChoiceOptions.fromStrings(
+                        listOf("Necrotic", "Poison", "Psychic", "Radiant", "Thunder")
+                    ),
+                    source = featName,
+                    changeableOnRest = true,
+                )
+            )
+
+            // "Choose a level 1 and a level 2 spell from the same list you selected for the
+            // Magic Initiate feat's cantrips." Which list that is only exists as an earlier
+            // answer, and the app splits Magic Initiate into three feats rather than asking,
+            // so the options are drawn from the three lists together and the prompt says so.
+            "magic_connoisseur" -> listOf(
+                Choice(
+                    id = "feat:magic_connoisseur:spell_1",
+                    label = "Magic Connoisseur Level 1 Spell",
+                    prompt = "Choose 1 level 1 spell from the same list as your Magic Initiate " +
+                        "feat. You can cast it once per Long Rest without a slot.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = spellOptionsAcross(MAGIC_INITIATE_SOURCES, 1),
+                    source = featName,
+                    changeableOnLevelUp = true,
+                ),
+                Choice(
+                    id = "feat:magic_connoisseur:spell_2",
+                    label = "Magic Connoisseur Level 2 Spell",
+                    prompt = "Choose 1 level 2 spell from the same list as your Magic Initiate " +
+                        "feat. You can cast it once per Long Rest without a slot.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = spellOptionsAcross(MAGIC_INITIATE_SOURCES, 2),
+                    source = featName,
+                    changeableOnLevelUp = true,
+                ),
+            )
+
+            "boon_of_magic_school_mastery" -> listOf(
+                Choice(
+                    id = "feat:boon_of_magic_school_mastery:school",
+                    label = "Mastered School",
+                    prompt = "Choose the school of magic you have mastered.",
+                    count = 1,
+                    kind = ChoiceKind.OPTION,
+                    options = ChoiceOptions.fromStrings(SCHOOLS_OF_MAGIC),
+                    source = featName,
+                ),
+                Choice(
+                    id = "feat:boon_of_magic_school_mastery:rote",
+                    label = "Rote Casting",
+                    prompt = "Choose a level 1 spell from your mastered school. You always have " +
+                        "it prepared and cast it without a slot or components.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = spellOptionsAcross(ARCANE_AND_DIVINE, 1),
+                    source = featName,
+                ),
+                Choice(
+                    id = "feat:boon_of_magic_school_mastery:signature",
+                    label = "Signature Arcanum",
+                    prompt = "Choose a level 7 or lower spell from your mastered school. You " +
+                        "always have it prepared and cast it free once per Long Rest.",
+                    count = 1,
+                    kind = ChoiceKind.SPELL,
+                    options = (1..7).flatMap { spellOptionsAcross(ARCANE_AND_DIVINE, it) }
+                        .distinctBy { it.id }
+                        .sortedBy { it.name },
+                    source = featName,
+                ),
             )
 
             "elemental_adept" -> listOf(

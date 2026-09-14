@@ -513,7 +513,7 @@ object SpeciesData {
             darkvisionRange = 60,
             summary = "Rimekin hail from both Lorwyn and Shadowmoor, though the first rimekin arose from flamekin during the Phyrexian invasion. These flamekin approached their problems with cold logic and rejected reactionary responses.",
             traits = listOf(
-                Trait("Cold Fire Magic", "You know the Ray of Frost cantrip. When you reach character levels 3 and 5, you learn the Ice Knife spell and the Flame Blade spell, respectively. You always have those spells prepared. You can cast each once without a spell slot, and you regain the ability to cast these spells in this way when you finish a Long Rest. You can also cast the spells using any spell slots you have of the appropriate level. When you cast Flame Blade using this trait, the spell deals Cold damage instead of Fire damage. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose the abilit",
+                Trait("Cold Fire Magic", "You know the Ray of Frost cantrip. When you reach character levels 3 and 5, you learn the Ice Knife spell and the Flame Blade spell, respectively. You always have those spells prepared. You can cast each once without a spell slot, and you regain the ability to cast these spells in this way when you finish a Long Rest. You can also cast the spells using any spell slots you have of the appropriate level. When you cast Flame Blade using this trait, the spell deals Cold damage instead of Fire damage. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells (choose the ability when you select this species).",
                     choices = listOf(
                         Choice(
                             id = "species:rimekin:casting_ability",
@@ -531,6 +531,41 @@ object SpeciesData {
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
             ),
             book = Sourcebook.LORWYN,
+        ),
+        Species(
+            id = "duskling",
+            name = "Duskling",
+            size = "Medium",
+            speed = 30,
+            darkvisionRange = 60,
+            summary = "Dusklings are a people who've left the Feywild to settle in forested lands of both the Outer Planes and the Material Plane. The inherent magic of the Feywild still runs through them, giving dusklings the ability to suffuse themselves with magical effects.",
+            traits = listOf(
+                Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
+                Trait("Enhanced Jump", "Add 2 feet to the distance you can leap with a running High Jump and 10 feet to the distance you can leap with a running Long Jump."),
+                Trait("Inner Magic", "You have magic inside you that you can manipulate to enhance your physical or mental attributes. When you finish a Long Rest, choose one of the following benefits, which lasts until you choose a different ability. As a Bonus Action, you can switch to a different benefit. You can switch the benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. Ardor. You have Advantage on Charisma ability checks and on saving throws to avoid or end the Frightened condition. Mobility. Your Speed increases by 10 feet, and climbing and swimming don't cost you extra movement. Vigor. You gain a number of Temporary Hit Points equal to your Proficiency Bonus, and you have Advantage on Strength (Athletics) and Dexterity (Acrobatics) checks.",
+                    choices = listOf(
+                        Choice(
+                            id = "species:duskling:inner_magic",
+                            label = "Inner Magic",
+                            prompt = "Choose which benefit your inner magic is holding. You can switch on a Bonus Action, and the choice resets every Long Rest.",
+                            count = 1,
+                            kind = ChoiceKind.OPTION,
+                            options = listOf(
+                                ChoiceOption("duskling_ardor", "Ardor",
+                                    "Advantage on Charisma checks and on saves to avoid or end the Frightened condition."),
+                                ChoiceOption("duskling_mobility", "Mobility",
+                                    "Your Speed increases by 10 feet, and climbing and swimming don't cost you extra movement."),
+                                ChoiceOption("duskling_vigor", "Vigor",
+                                    "Temporary Hit Points equal to your Proficiency Bonus, and Advantage on Athletics and Acrobatics checks."),
+                            ),
+                            source = "Duskling",
+                            // The rules say "when you finish a Long Rest", so the answer is
+                            // meant to be revisited rather than fixed at creation.
+                            changeableOnRest = true,
+                        )
+                    )),
+            ),
+            book = Sourcebook.DDB_DROPS,
         ),
     )
 

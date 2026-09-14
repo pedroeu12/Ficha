@@ -1,6 +1,7 @@
 package com.pedroeu.ficha.rules
 
 import com.pedroeu.ficha.data.model.Choice
+import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -144,7 +145,11 @@ object RulesEngine {
             element.gate.levelScope,
             element.source.owningClassId,
         )
-        return level >= element.gate.level
+        if (level < element.gate.level) return false
+        if (element.gate.minSpellSlotLevel > 0 &&
+            CharacterCalculations.maxSpellLevel(character) < element.gate.minSpellSlotLevel
+        ) return false
+        return true
     }
 
     // ================================================================ Typed views

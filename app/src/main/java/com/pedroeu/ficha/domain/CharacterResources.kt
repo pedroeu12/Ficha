@@ -41,6 +41,8 @@ object CharacterResources {
                     proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
                     abilityModifiers = CharacterCalculations.abilityModifiers(character),
                     characterLevel = character.level,
+                    featAbilities = FeatBonuses.all(character)
+                        .associate { it.featId to it.ability },
                 )
             )
         }.distinctBy { it.id }

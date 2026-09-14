@@ -1,6 +1,7 @@
 package com.pedroeu.ficha
 
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.ModifierData
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ResourceData
 import com.pedroeu.ficha.data.content.SaveDcData
@@ -217,7 +218,11 @@ class ContentCoverageTest {
 
     @Test
     fun `every feat that states a flat bonus applies it`() {
-        val applied = PassiveBonusData.sourceIds()
+        // Either table counts. PassiveBonusData holds the bonuses that always apply;
+        // ModifierData holds the ones with a condition, and a feat's flat number can
+        // legitimately live in either.
+        val applied = PassiveBonusData.sourceIds() +
+            ModifierData.elementIds().map { it.removePrefix("feat:") }
         val missing = featsMatching(promisesFlatBonus)
             .filterNot { it.id in notActuallyPassive }
             .filterNot { it.id in applied }
@@ -254,6 +259,14 @@ class ContentCoverageTest {
             // Chill Touch is a melee spell attack in the 2024 rules, so it wants an attack
             // bonus and never a save.
             "touch_of_death",
+            // Arcana Unleashed's eight school Adepts. Their spells are prepared for you and
+            // cast with the spellcasting you already have — the feat names no ability of its
+            // own, so the class's DC is the DC, and a second one would be wrong.
+            "abjuration_adept", "conjuration_adept", "divination_adept", "enchantment_adept",
+            "evocation_adept", "illusion_adept", "necromancy_adept", "transmutation_adept",
+            // "Your spellcasting ability for this spell is the one chosen for the Faithful
+            // Companion benefit of your Familiar Friend feat", so the DC is that feat's.
+            "warlike_familiar",
         )
 
         fun withFeat(featId: String) = PlayerCharacter(

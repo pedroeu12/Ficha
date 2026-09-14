@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.data.content
 
+import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.CasterType
 import com.pedroeu.ficha.data.model.ClassFeature
 import com.pedroeu.ficha.data.model.ClassProgression
@@ -369,6 +370,31 @@ object ProgressionData {
     )
 
     private val FIGHTING_STYLE_OPTIONS = listOf(
+        ChoiceOption("arcane_warrior", "Arcane Warrior", "You learn two Wizard cantrips of your choice. Mage Hand and Ray of Frost are recommended. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells. Whenever you gain a level, you can replace one of these cantrips with another Wizard cantrip.",
+            grants = listOf(
+                Choice(
+                    id = "fighting_style:arcane_warrior:cantrips",
+                    label = "Arcane Warrior Cantrips",
+                    prompt = "Choose 2 Wizard cantrips.",
+                    count = 2,
+                    kind = ChoiceKind.SPELL,
+                    options = SpellData.cantripsForClass("wizard")
+                        .map { ChoiceOption(it.id, it.name, it.description, it.subtitle) },
+                    source = "Arcane Warrior",
+                    changeableOnLevelUp = true,
+                ),
+                Choice(
+                    id = "fighting_style:arcane_warrior:casting_ability",
+                    label = "Arcane Warrior",
+                    prompt = "Choose your spellcasting ability for these cantrips.",
+                    count = 1,
+                    kind = ChoiceKind.ABILITY_SCORE,
+                    options = ChoiceOptions.fromAbilities(
+                        listOf(Ability.INT, Ability.WIS, Ability.CHA)
+                    ),
+                    source = "Arcane Warrior",
+                ),
+            )),
         ChoiceOption("archery", "Archery", "You gain a +2 bonus to attack rolls you make with Ranged weapons."),
         ChoiceOption("blind_fighting", "Blind Fighting", "You have Blindsight with a range of 10 feet. Within that range, you can see anything that isn't behind Total Cover even if you have the Blinded condition or are in Darkness. Moreover, in that range you can see a creature that has the Invisible condition."),
         ChoiceOption("defense", "Defense", "While you're wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class."),

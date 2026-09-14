@@ -31,8 +31,27 @@ object ResourceData {
          * has grown into every part of their heritage.
          */
         val characterLevel: Int = level,
+        /**
+         * The ability each feat raised, for pools counted in "the ability modifier of the
+         * score increased by this feat".
+         *
+         * The feat names no ability — the player's answer does — so the number cannot be
+         * worked out from [featIds] alone, and a pool that guessed would be wrong for two
+         * players out of three.
+         */
+        val featAbilities: Map<String, Ability> = emptyMap(),
     ) {
         fun mod(ability: Ability): Int = abilityModifiers[ability] ?: 0
+
+        /**
+         * The modifier of whatever [featId] raised, never below one.
+         *
+         * One is also the answer before the player has chosen, which is the useful one: a
+         * pool of zero is dropped from the sheet entirely, so a feat taken this session would
+         * show no tracker at all until its ability question was answered.
+         */
+        fun featMod(featId: String): Int =
+            featAbilities[featId]?.let { mod(it) }?.coerceAtLeast(1) ?: 1
 
         /** Several features scale with an ability modifier but never drop below one use. */
         fun modAtLeastOne(ability: Ability): Int = mod(ability).coerceAtLeast(1)
@@ -1799,6 +1818,8 @@ object ResourceData {
         "reborn" -> listOf(
             pbPerLongRest(c, "reborn", "Knowledge from a Past Life", "Reborn"),
         )
+        // The pool is the number of times the benefit can be switched, not the benefit itself.
+        "duskling" -> listOf(pbPerLongRest(c, "duskling", "Inner Magic", "Duskling"))
 
         "orc" -> listOf(
             ResourceDef(
@@ -1917,6 +1938,15 @@ object ResourceData {
     private fun spellcastingAbilityFor(c: Context): Ability =
         ClassData.byId(c.classId)?.spellcastingAbility ?: Ability.CHA
 
+    /** A feat's pool of uses, refreshed on a Long Rest, which is how nearly all of them read. */
+    private fun featPool(featId: String, name: String, max: Int) = ResourceDef(
+        id = "feat:$featId",
+        name = name,
+        max = max,
+        recharge = Recharge.LONG_REST,
+        source = name,
+    )
+
     private fun featResources(c: Context): List<ResourceDef> = c.featIds.mapNotNull { featId ->
         when (featId) {
             "lucky" -> ResourceDef(
@@ -1927,6 +1957,26 @@ object ResourceData {
                 source = "Lucky",
                 isPointPool = true,
             )
+
+            // ---------------------------------------------- Arcana Unleashed
+            // Each says "a number of times equal to your Proficiency Bonus" or "once, until
+            // you finish a Long Rest" in as many words, which is a pool to track.
+            "arcane_infiltrator" -> featPool(featId, "Cunning Diversion", c.proficiencyBonus)
+            "arcane_omens" -> featPool(featId, "Helpful Premonition", c.proficiencyBonus)
+            "arcane_safeguard" -> featPool(featId, "Arcane Safeguard", c.proficiencyBonus)
+            "portal_jumper" -> featPool(featId, "Portal Step", c.proficiencyBonus)
+            "spell_resistant" -> featPool(featId, "Magic Resistant", c.proficiencyBonus)
+            "transmuted_anatomy" -> featPool(featId, "Resilient Anatomy", c.proficiencyBonus)
+            "familiar_friend" -> featPool(featId, "Helpful Friend", c.proficiencyBonus)
+            "arcane_artist" -> featPool(featId, "Inspiring Magic", 1)
+            "arcane_overload" -> featPool(featId, "Power Surge", 1)
+            "arcane_undertaker" -> featPool(featId, "Understanding of Death", 1)
+            "divination_adept" -> featPool(featId, "Prescient Intervention", 1)
+            "warlike_familiar" -> featPool(featId, "Battle Familiar", 1)
+            // "a number of times equal to the ability modifier of the score increased by this
+            // feat", which is whichever of the three the player raised.
+            "spell_subterfuge" ->
+                featPool(featId, "Shrouding Spells", c.featMod("spell_subterfuge"))
 
             "musician" -> ResourceDef(
                 id = "feat:musician",

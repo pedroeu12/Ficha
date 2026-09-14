@@ -457,6 +457,78 @@ object FeatData {
             "saving throw (DC 13 plus your Proficiency Bonus). On a failed save, you have Disadvantage on D20 " +
             "Tests for 1 minute. You can repeat the save at the end of each of your turns, ending the effect " +
             "early on a success.", Sourcebook.RAVENLOFT),
+
+        // ---------------------------------- Arcana Unleashed
+        Feat("arcane_artist", "Arcane Artist", "Origin Feat You gain the following benefits. Cantrip. You learn the Minor Illusion " +
+                "cantrip. Intelligence, Wisdom, or Charisma is your spellcasting ability for this " +
+                "spell (choose when you select this feat). Inspiring Magic. When you cast a spell " +
+                "from the Illusion school, you can choose one ally within 30 feet of yourself who can " +
+                "see you. That ally gains Heroic Inspiration. Once you use this benefit, you can't " +
+                "use it again until you finish a Long Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("arcane_eloquence", "Arcane Eloquence", "Origin Feat You gain the following benefits. Cantrip. You learn the Vicious Mockery " +
+                "cantrip. Intelligence, Wisdom, or Charisma is your spellcasting ability for this " +
+                "spell (choose when you select this feat). Smooth Talker. When you make a Charisma " +
+                "(Deception, Intimidation, or Persuasion) check, you can roll 1d4 and add the number " +
+                "rolled to the ability check.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("arcane_infiltrator", "Arcane Infiltrator", "Origin Feat You gain the following benefits. Cantrip. You learn the Friends cantrip. " +
+                "Intelligence, Wisdom, or Charisma is your spellcasting ability for this spell " +
+                "(choose when you select this feat). Cunning Diversion. You can take the Dodge action " +
+                "as a Bonus Action. You can use this benefit a number of times equal to your " +
+                "Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("arcane_omens", "Arcane Omens", "Origin Feat You gain the following benefits. Cantrip. You learn the Guidance " +
+                "cantrip. Intelligence, Wisdom, or Charisma is your spellcasting ability for this " +
+                "spell (choose when you select this feat). Helpful Premonition. When you or a " +
+                "creature you can see within 30 feet of yourself fails a saving throw, you can take a " +
+                "Reaction to roll 1d4 and add the number rolled to the save's total, potentially " +
+                "turning the failure into a success. You can use this benefit a number of times equal " +
+                "to your Proficiency Bonus, and you regain all expended uses when you finish a Long " +
+                "Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("arcane_overload", "Arcane Overload", "Origin Feat You gain the following benefits. Cantrip. You learn the Fire Bolt " +
+                "cantrip. Intelligence, Wisdom, or Charisma is your spellcasting ability for this " +
+                "spell (choose when you select this feat). Power Surge. When you cast an Evocation " +
+                "spell and deal damage with it, you can add your Proficiency Bonus to one damage roll " +
+                "of that spell. Once you use this benefit, you can't do so again until you finish a " +
+                "Long Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("arcane_safeguard", "Arcane Safeguard", "Origin Feat You gain the following benefits. Cantrip. You learn the Resistance " +
+                "cantrip. Intelligence, Wisdom, or Charisma is your spellcasting ability for this " +
+                "spell (choose when you select this feat). You can cast the Resistance cantrip as a " +
+                "Bonus Action. You can do so a number of times equal to your Proficiency Bonus, and " +
+                "you regain all expended uses when you finish a Long Rest. Sheltering Aid. When you " +
+                "take the Help action to assist with an ally's ability check, that ally gains a " +
+                "number of Temporary Hit Points equal to your Proficiency Bonus.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("arcane_undertaker", "Arcane Undertaker", "Origin Feat You gain the following benefits. Cantrip. You learn one Cleric or Wizard " +
+                "cantrip of your choice. The cantrip must be from the Necromancy school. " +
+                "Intelligence, Wisdom, or Charisma is your spellcasting ability for this spell " +
+                "(choose when you select this feat). Knowledge from the Dead. When you make an " +
+                "Intelligence (History) or Wisdom (Medicine) check, you can roll 1d4 and add the " +
+                "number rolled to the ability check. Understanding of Death. When you take the Help " +
+                "action to stabilize a creature with 0 Hit Points, you gain Heroic Inspiration. Once " +
+                "you use this benefit, you can't use it again until you finish a Long Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("familiar_friend", "Familiar Friend", "Origin Feat You gain the following benefits. Faithful Companion. You always have the " +
+                "Find Familiar spell prepared. Intelligence, Wisdom, or Charisma is your spellcasting " +
+                "ability for this spell (choose when you select this feat). You can cast it once " +
+                "without a spell slot or Material components, and you regain the ability to cast it " +
+                "in this way when you finish a Long Rest. You can also cast the spell using any spell " +
+                "slots you have. Fortified Familiar. When you cast the Find Familiar spell, your " +
+                "familiar's Hit Point maximum and current Hit Points are increased by an amount equal " +
+                "to twice your character level. Helpful Friend. When you make an ability check using " +
+                "a skill in which you have proficiency while your familiar is within 5 feet of you, " +
+                "you gain Advantage on the check. You can use this benefit a number of times equal to " +
+                "your Proficiency Bonus, and you regain all expended uses when you finish a Long " +
+                "Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("portal_jumper", "Portal Jumper", "Origin Feat You gain the following benefits. Otherworldly Resilience. You have " +
+                "Resistance to one of the following damage types: Necrotic, Psychic, or Radiant " +
+                "(choose when you select this feat). Portal Step. You can spend 15 feet of movement " +
+                "to teleport to an unoccupied space you can see within 15 feet of yourself. You can " +
+                "use this benefit a number of times equal to your Proficiency Bonus but only once per " +
+                "turn, and you regain all expended uses when you finish a Long Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("transmuted_anatomy", "Transmuted Anatomy", "Origin Feat You gain the following benefits. Lengthened Stride. Your Speed increases " +
+                "by 5 feet. Resilient Anatomy. You have Advantage on saving throws against effects " +
+                "that would compel you to shape-shift against your will. Additionally, when you fail " +
+                "a Constitution saving throw, you can take a Reaction to roll 1d4 and add the number " +
+                "rolled to the save, potentially turning the failure into a success. You can use this " +
+                "benefit a number of times equal to your Proficiency Bonus, and you regain all " +
+                "expended uses when you finish a Long Rest.", Sourcebook.ARCANA_UNLEASHED),
     )
 
     /** General feats, available in place of an Ability Score Improvement from level 4 on. */
@@ -1117,6 +1189,168 @@ object FeatData {
             "when you finish a Long Rest. When you cast it without a spell slot using this feature, the " +
             "spell's duration becomes 8 hours for that casting. You can also cast the spell using any spell " +
             "slots you have of the appropriate level. Charisma is your spellcasting ability for this spell.", Sourcebook.DDB_DROPS),
+
+        // ---------------------------------- Arcana Unleashed
+        Feat("abjuration_adept", "Abjuration Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Abjuration Adept Spells table, you thereafter always have the " +
+                "spells listed for that level and lower prepared. Protective Ward. When you cast a " +
+                "spell from the Abjuration school using a spell slot, you or one creature you can see " +
+                "within 30 feet of yourself gains Temporary Hit Points equal to twice the level of " +
+                "spell slot expended. Abjuration Adept Spells Spell Slot Level / Spell: 1 - Shield; 2 " +
+                "- Lesser Restoration; 3 - Protection from Energy; 4 - Banishment; 5 - Mass Cure " +
+                "Wounds.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("conjuration_adept", "Conjuration Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Conjuration Adept Spells table, you thereafter always have the " +
+                "spells listed for that level and lower prepared. Persistent Conjuration. While " +
+                "maintaining Concentration on a spell from the Conjuration school, you gain a bonus " +
+                "to Constitution saving throws to maintain this Concentration. This bonus is equal to " +
+                "the ability modifier of the score increased by this feat. Conjuration Adept Spells " +
+                "Spell Slot Level / Spell: 1 - Entangle; 2 - Misty Step; 3 - Conjure Animals; 4 - " +
+                "Dimension Door; 5 - Conjure Elemental.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("divination_adept", "Divination Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Divination Adept Spells table, you thereafter always have the " +
+                "spells listed for that level and lower prepared. Prescient Intervention. When a " +
+                "creature you can see within 60 feet of yourself makes a D20 Test, you can take a " +
+                "Reaction to give that creature Advantage or Disadvantage (your choice) on that roll. " +
+                "Once you use this benefit, you can't do so again until you finish a Long Rest. You " +
+                "can also regain use of this feature when you cast a spell from the Divination school " +
+                "using a spell slot. Divination Adept Spells Spell Slot Level / Spell: 1 - Detect " +
+                "Evil and Good; 2 - Mind Spike; 3 - Clairvoyance; 4 - Divination; 5 - Scrying.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("elemental_familiar", "Elemental Familiar", "General Feat (Prerequisite: Level 4+, Familiar Friend Feat) You gain the following " +
+                "benefits. Ability Score Increase. Increase one ability score of your choice by 1, to " +
+                "a maximum of 20. Elemental Energy. You learn how to imbue your familiar with " +
+                "elemental power. When you cast the Find Familiar spell, choose Acid, Cold, Fire, " +
+                "Lightning, or Thunder damage. Your familiar is imbued with this energy until you " +
+                "cast Find Familiar again, granting it the following benefits: Elemental Resistance. " +
+                "Your familiar has Resistance to the chosen damage type. Energy Pulse. As a Bonus " +
+                "Action, you command your familiar to unleash a burst of elemental energy. Your " +
+                "familiar must be within 120 feet of you and take a Reaction to unleash this burst. " +
+                "Each creature in a 5-foot Emanation originating from your familiar makes a Dexterity " +
+                "saving throw (DC 8 plus your spellcasting ability modifier for the Find Familiar " +
+                "spell and your Proficiency Bonus). On a failed save, a creature takes 2d4 damage of " +
+                "the chosen type, and if the creature is Medium or smaller, it has the Prone " +
+                "condition.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("enchantment_adept", "Enchantment Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Enchantment Adept Spells table, you thereafter always have the " +
+                "spells listed for that level and lower prepared. Subtle Enchantments. When you cast " +
+                "a spell from the Enchantment school using a spell slot, you can cast it without any " +
+                "Verbal, Somatic, or Material components, except Material components that are " +
+                "consumed by the spell or that have a cost specified in the spell. Enchantment Adept " +
+                "Spells Spell Slot Level / Spell: 1 - Dissonant Whispers; 2 - Enthrall; 3 - Hold " +
+                "Person; 4 - Dominate Beast; 5 - Modify Memory.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("evocation_adept", "Evocation Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Evocation Adept Spells table, you thereafter always have the spells " +
+                "listed for that level and lower prepared. Fueled Evocation. Once per turn when you " +
+                "cast an Evocation spell and deal damage, you can roll up to two of your unexpended " +
+                "Hit Point Dice and add the total rolled to one of the spell's damage rolls. Those " +
+                "Hit Point Dice are then expended. Evocation Adept Spells Spell Slot Level / Spell: 1 " +
+                "- Chromatic Orb; 2 - Shatter; 3 - Fireball; 4 - Vitriolic Sphere; 5 - Wall of Force.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("illusion_adept", "Illusion Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Illusion Adept Spells table, you thereafter always have the spells " +
+                "listed for that level and lower prepared. Masterful Illusions. When you cast a spell " +
+                "from the Illusion school using a spell slot, you can cast it without any Verbal, " +
+                "Somatic, or Material components, except Material components that are consumed by the " +
+                "spell or that have a cost specified in the spell. Additionally, creatures have " +
+                "Disadvantage on Intelligence (Investigation) checks made to discern the true nature " +
+                "of illusions created by your spells. Illusion Adept Spells Spell Slot Level / Spell: " +
+                "1 - Silent Image; 2 - Phantasmal Force; 3 - Major Image; 4 - Hallucinatory Terrain; " +
+                "5 - Seeming.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("magic_connoisseur", "Magic Connoisseur", "General Feat (Prerequisite: Level 4+, Magic Initiate Feat) You gain the following " +
+                "benefits. Ability Score Increase. Increase your Intelligence, Wisdom, or Charisma " +
+                "score by 1, to a maximum of 20. Additional Spells. Choose a level 1 and a level 2 " +
+                "spell from the same list you selected for the Magic Initiate feat's cantrips. You " +
+                "always have those spells prepared. You can cast each spell once without a spell " +
+                "slot, and you regain the ability to cast it in this way when you finish a Long Rest. " +
+                "You can also cast those spells using any spell slots you have of the appropriate " +
+                "level. The spellcasting ability for these spells is the same as the spellcasting " +
+                "ability chosen for your Magic Initiate feat's spells. Spell Change. Whenever you " +
+                "gain a new level, you can replace one of the spells you chose for this feat with a " +
+                "different spell of the same level from the chosen spell list.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("necromancy_adept", "Necromancy Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Necromancy Adept Spells table, you thereafter always have the " +
+                "spells listed for that level and lower prepared. Life Manipulation. When you cast a " +
+                "spell from the Necromancy school using a spell slot, you can immediately roll up to " +
+                "two of your unexpended Hit Point Dice. You regain Hit Points equal to the total " +
+                "rolled plus the level of spell slot expended. Those Hit Point Dice are then " +
+                "expended. Necromancy Adept Spells Spell Slot Level / Spell: 1 - Inflict Wounds; 2 - " +
+                "Ray of Enfeeblement; 3 - Vampiric Touch; 4 - Blight; 5 - Raise Dead.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("otherworldly_familiar", "Otherworldly Familiar", "General Feat (Prerequisite: Level 4+, Familiar Friend Feat) You gain the following " +
+                "benefits. Ability Score Increase. Increase one ability score of your choice by 1, to " +
+                "a maximum of 20. Otherworldly Power. When you cast the Find Familiar spell, you can " +
+                "imbue your familiar with otherworldly might, which lasts until you cast Find " +
+                "Familiar again. While imbued, your familiar gains the following benefits: Energy " +
+                "Resistance. Choose Necrotic, Poison, Psychic, Radiant, or Thunder damage. Your " +
+                "familiar has Resistance to the chosen damage type. Phase Walk. Your familiar can " +
+                "move through other creatures and objects as if they were Difficult Terrain. If your " +
+                "familiar ends its turn inside an object, it is shunted to the last unoccupied space " +
+                "it was in.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("soothing_familiar", "Soothing Familiar", "General Feat (Prerequisite: Level 4+, Familiar Friend Feat) You gain the following " +
+                "benefits. Ability Score Increase. Increase one ability score of your choice by 1, to " +
+                "a maximum of 20. Healing Beacon. Positive energy fills a 5-foot Emanation " +
+                "originating from your familiar as long as it is within 120 feet of you. Whenever an " +
+                "ally in that Emanation rolls a die to determine the number of Hit Points restored to " +
+                "a creature, that ally can treat a roll of 1 or 2 on the die as a 3.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("spell_resistant", "Spell Resistant", "General Feat (Prerequisite: Level 4+) You gain the following benefits. Ability Score " +
+                "Increase. Increase your Dexterity or Constitution score by 1, to a maximum of 20. " +
+                "Magical Resilience. You have Resistance to one of the following damage types (choose " +
+                "when you gain this feat): Necrotic, Psychic, Radiant, or Thunder. Magic Resistant. " +
+                "When you would fail a saving throw against a spell or magical effect, you can roll " +
+                "1d6 and add the number rolled to the save's total, potentially turning the failure " +
+                "into a success. You can use this benefit a number of times equal to your Proficiency " +
+                "Bonus, and you regain all expended uses when you finish a Long Rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("spell_subterfuge", "Spell Subterfuge", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Shrouding Spells. After you cast a spell " +
+                "that has a casting time of an action using a spell slot, you can take both the Dash " +
+                "and Hide actions as a Bonus Action. You can use this benefit a number of times equal " +
+                "to the ability modifier of the score increased by this feat, and you regain all " +
+                "expended uses when you finish a Long Rest. Sneaky Casting. If you have the Hide " +
+                "action's Invisible condition, casting a spell with a Verbal component or making a " +
+                "spell attack doesn't end that condition on you if you end the turn behind " +
+                "Three-Quarters Cover or Total Cover.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("transmutation_adept", "Transmutation Adept", "General Feat (Prerequisite: Level 4+, Spellcasting or Pact Magic Feature) You gain " +
+                "the following benefits. Ability Score Increase. Increase your Intelligence, Wisdom, " +
+                "or Charisma score by 1, to a maximum of 20. Additional Spells. Your prowess allows " +
+                "you to always have certain spells at the ready. When you have spell slots of a level " +
+                "specified in the Transmutation Adept Spells table, you thereafter always have the " +
+                "spells listed for that level and lower prepared. Magical Augmentation. On your turn " +
+                "when you cast a spell from the Transmutation school using a spell slot, your Speed " +
+                "increases by a number of feet equal to five times the level of spell slot expended. " +
+                "This increase lasts until the end of the turn. Transmutation Adept Spells Spell Slot " +
+                "Level / Spell: 1 - Jump; 2 - Spider Climb; 3 - Slow; 4 - Polymorph; 5 - Animate " +
+                "Objects.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("warlike_familiar", "Warlike Familiar", "General Feat (Prerequisite: Level 4+, Familiar Friend Feat) You gain the following " +
+                "benefits. Ability Score Increase. Increase one ability score of your choice by 1, to " +
+                "a maximum of 20. Battle Familiar. You always have the Battle Familiar spell " +
+                "prepared. You can cast it once without a spell slot, and you regain the ability to " +
+                "cast it in this way when you finish a Long Rest. You can also cast the spell using " +
+                "any spell slots you have of the appropriate level. Your spellcasting ability for " +
+                "this spell is the one chosen for the Faithful Companion benefit of your Familiar " +
+                "Friend feat. Intercept Attack. When a creature within 5 feet of your familiar is hit " +
+                "by an attack roll, your familiar can take a Reaction to add a bonus to the " +
+                "creature's Armor Class against that attack, potentially causing the attack to miss. " +
+                "The bonus is equal to your Proficiency Bonus.", Sourcebook.ARCANA_UNLEASHED),
     )
 
     /** Epic Boon feats, taken at level 19. */
@@ -1309,6 +1543,34 @@ object FeatData {
             "regain 10 Hit Points at the start of each of your turns for the spell's duration. The spell's " +
             "spellcasting ability is the ability increased by this feat. Once you use this benefit, you can't " +
             "do so again until you finish a Long Rest.", Sourcebook.ASTARIONS_BOOK),
+
+        // ---------------------------------- Arcana Unleashed
+        Feat("boon_of_erupting_spellpower", "Boon of Erupting Spellpower", "Epic Boon Feat (Prerequisite: Level 19+, Spellcasting or Pact Magic Feature) You " +
+                "gain the following benefits. Ability Score Increase. Increase your Intelligence, " +
+                "Wisdom, or Charisma score by 1, to a maximum of 30. Spell Overload. When you cast a " +
+                "spell that deals damage using a spell slot, you can cause its magical energy to " +
+                "surge. You can treat any 1 or 2 on a damage die rolled for the spell as a 3, and " +
+                "creatures that took damage from the spell also have the Prone condition. Once you " +
+                "use this benefit, you can't do so again until you roll Initiative or finish a Long " +
+                "or Short rest.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("boon_of_magic_school_mastery", "Boon of Magic School Mastery", "Epic Boon Feat (Prerequisite: Level 19+, Spellcasting or Pact Magic Feature) You " +
+                "gain the following benefits. Ability Score Increase. Increase your Intelligence, " +
+                "Wisdom, or Charisma score by 1, to a maximum of 30. Mastered School. Choose one of " +
+                "the eight schools of magic: Abjuration, Conjuration, Divination, Enchantment, " +
+                "Evocation, Illusion, Necromancy, or Transmutation. Your choice grants you the " +
+                "following features: Rote Casting. Choose a level 1 spell from the chosen school that " +
+                "appears on your class's spell list. You always have that spell prepared and can cast " +
+                "it without a spell slot or spell components. Signature Arcanum. Choose a level 7 or " +
+                "lower spell from the chosen school. You always have that spell prepared. You can " +
+                "cast it once without a spell slot, and you regain the ability to cast it in this way " +
+                "when you finish a Long Rest. You can also cast these prepared spells using any spell " +
+                "slots you have of the appropriate level. Repeatable. You can take this feat more " +
+                "than once, but you must choose a different school of magic each time.", Sourcebook.ARCANA_UNLEASHED),
+        Feat("boon_of_the_iron_mind", "Boon of the Iron Mind", "Epic Boon Feat (Prerequisite: Level 19+) You gain the following benefits. Ability " +
+                "Score Increase. Increase one ability score of your choice by 1, to a maximum of 30. " +
+                "Unshakable Focus. When you are maintaining Concentration on an effect, you lose " +
+                "Concentration only if you cast a spell or activate another effect that requires " +
+                "Concentration, if you have the Petrified or Unconscious condition, or if you die.", Sourcebook.ARCANA_UNLEASHED),
     )
 
     /**

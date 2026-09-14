@@ -433,10 +433,15 @@ class SpellSystemScanTest {
     fun `each class list is exactly the size the 2024 books give it`() {
         // Counted off dnd2024.wikidot.com. A spell added to or dropped from a list without
         // checking the book moves one of these, which is how a list silently drifts.
+        //
+        // Re-counted when Arcana Unleashed landed. Worth saying how: each spell's class set
+        // was read from its own page, and these totals come from the wiki's separate
+        // per-class list pages. The two are maintained apart and agree exactly, which is a
+        // real check on the import rather than a restatement of it.
         val expected = mapOf(
-            "artificer" to 81, "bard" to 149, "cleric" to 126, "druid" to 142,
-            "paladin" to 53, "ranger" to 65, "sorcerer" to 163, "warlock" to 96,
-            "wizard" to 263,
+            "artificer" to 88, "bard" to 165, "cleric" to 130, "druid" to 149,
+            "paladin" to 55, "ranger" to 68, "sorcerer" to 180, "warlock" to 119,
+            "wizard" to 297,
         )
         expected.forEach { (classId, size) ->
             assertEquals(
@@ -445,6 +450,6 @@ class SpellSystemScanTest {
                 SpellData.ALL.count { classId in it.classes },
             )
         }
-        assertEquals("the catalog is every spell in the books", 419, SpellData.ALL.size)
+        assertEquals("the catalog is every spell in the books", 456, SpellData.ALL.size)
     }
 }

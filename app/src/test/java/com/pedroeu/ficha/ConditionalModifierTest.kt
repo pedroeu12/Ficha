@@ -327,6 +327,7 @@ class ConditionalModifierTest {
             character(classId = "ranger", level = 6),
             character(classId = "ranger", subclassId = "gloom_stalker", level = 3),
             character(classId = "paladin", subclassId = "noble_genies", level = 3),
+            character(featIds = listOf("transmuted_anatomy")),
         )
         val found = carriers.flatMap { RulesEngine.elementsFor(it) }.map { it.id }.toSet()
         val missing = ModifierData.elementIds() - found
@@ -353,6 +354,8 @@ class ConditionalModifierTest {
             labels(character(classId = "warlock", level = 4, featIds = listOf("infernal_bulwark"))))
         assertTrue("Initiative Proficiency" in labels(character(featIds = listOf("alert"))))
         assertTrue("Fleet of Foot" in labels(character(speciesId = "elf", lineageId = "wood_elf")))
+        assertTrue("Lengthened Stride" in
+            labels(character(featIds = listOf("transmuted_anatomy"))))
         assertTrue("Roving" in labels(character(classId = "ranger", level = 6)))
         assertTrue("Dread Ambusher" in
             labels(character(classId = "ranger", subclassId = "gloom_stalker", level = 3)))

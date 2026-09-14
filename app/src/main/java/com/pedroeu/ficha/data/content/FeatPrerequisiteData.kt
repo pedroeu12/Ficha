@@ -47,7 +47,40 @@ object FeatPrerequisiteData {
         "mark_of_warding",
     )
 
+    private val CASTER_FEAT =
+        Requirement(minLevel = 4, feature = RequiredFeature.SPELLCASTING)
+
+    private val FAMILIAR_FEAT = Requirement(minLevel = 4, anyOf = listOf("familiar_friend"))
+
     private val BY_FEAT: Map<String, Requirement> = mapOf(
+        // ---------------------------------------------- Arcana Unleashed
+        // The eight school Adepts and Spell Subterfuge all read "Level 4+, Spellcasting or
+        // Pact Magic Feature"; the four familiar feats build on Familiar Friend.
+        "abjuration_adept" to CASTER_FEAT,
+        "conjuration_adept" to CASTER_FEAT,
+        "divination_adept" to CASTER_FEAT,
+        "enchantment_adept" to CASTER_FEAT,
+        "evocation_adept" to CASTER_FEAT,
+        "illusion_adept" to CASTER_FEAT,
+        "necromancy_adept" to CASTER_FEAT,
+        "transmutation_adept" to CASTER_FEAT,
+        "spell_subterfuge" to CASTER_FEAT,
+        "spell_resistant" to Requirement(minLevel = 4),
+        "elemental_familiar" to FAMILIAR_FEAT,
+        "otherworldly_familiar" to FAMILIAR_FEAT,
+        "soothing_familiar" to FAMILIAR_FEAT,
+        "warlike_familiar" to FAMILIAR_FEAT,
+        "magic_connoisseur" to Requirement(
+            minLevel = 4,
+            anyOf = listOf("magic_initiate_cleric", "magic_initiate_druid", "magic_initiate_wizard"),
+        ),
+        "boon_of_erupting_spellpower" to Requirement(
+            minLevel = 19, feature = RequiredFeature.SPELLCASTING,
+        ),
+        "boon_of_magic_school_mastery" to Requirement(
+            minLevel = 19, feature = RequiredFeature.SPELLCASTING,
+        ),
+
         // ---------------------------------------------- Path of the Death Knight
         "death_knight_initiate" to Requirement(
             minLevel = 4,

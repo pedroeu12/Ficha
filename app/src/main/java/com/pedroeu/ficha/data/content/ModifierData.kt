@@ -107,6 +107,13 @@ object ModifierData {
                 label = "Roving",
             ),
         ),
+        "feat:transmuted_anatomy" to listOf(
+            Effect.ModifyStat(
+                target = StatTarget.SPEED,
+                amount = Formula.Flat(5),
+                label = "Lengthened Stride",
+            ),
+        ),
         "lineage:wood_elf" to listOf(
             Effect.SetStatBase(
                 target = StatTarget.SPEED,
@@ -145,6 +152,15 @@ object ModifierData {
      * one of those questions would have applied it to a Fighter and not to a Champion.
      */
     private val BY_OPTION: Map<String, List<Effect>> = mapOf(
+        "duskling_mobility" to listOf(
+            // One of three benefits a Duskling holds at a time, swapped on a Bonus Action.
+            // Only this one carries a number, and it applies exactly while it is the answer.
+            Effect.ModifyStat(
+                target = StatTarget.SPEED,
+                amount = Formula.Flat(10),
+                label = "Inner Magic: Mobility",
+            ),
+        ),
         "defense" to listOf(
             // The most-picked Fighting Style in the game, and its +1 reached nothing: the
             // option was recorded, printed in the feature list, and never added to Armor Class.

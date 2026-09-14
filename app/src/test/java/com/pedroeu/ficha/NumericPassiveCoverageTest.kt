@@ -98,6 +98,10 @@ class NumericPassiveCoverageTest {
         ("feat:charger" to StatTarget.SPEED) to "only during a Dash",
         ("feat:defensive_duelist" to StatTarget.ARMOR_CLASS) to "a Reaction against one attack",
 
+        ("species:duskling:inner_magic" to StatTarget.SPEED) to
+            "the number belongs to the Mobility option, which declares it; the trait text " +
+                "merely lists all three benefits",
+
         // -------------------------------------------------- Somebody else's number
         ("subclass:dance:6:tandem_footwork" to StatTarget.INITIATIVE) to
             "the allies who take the Bardic Inspiration die",

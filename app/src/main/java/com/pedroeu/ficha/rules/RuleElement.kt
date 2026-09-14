@@ -50,6 +50,16 @@ data class Gate(
     val requires: List<String> = emptyList(),
     /** Answers that must have been given: choice id to option id. */
     val whenChosen: List<Pair<String, String>> = emptyList(),
+    /**
+     * A spell slot level the character must be able to cast, where the rule is written that way.
+     *
+     * Not the same as a character level and not derivable from one. Arcana Unleashed's eight
+     * "Adept" feats say "when you have spell slots of a level specified in the table, you
+     * thereafter always have the spells listed for that level and lower prepared" — so a
+     * Wizard 9 has all five and a Paladin 9, who casts nothing above level 2, has two. Reading
+     * it as a character level would hand the Paladin three spells they cannot cast.
+     */
+    val minSpellSlotLevel: Int = 0,
     /** Wording the app cannot check, printed under the element rather than enforced. */
     val statedPrerequisite: String = "",
 ) {

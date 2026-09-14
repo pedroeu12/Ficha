@@ -17,6 +17,7 @@ import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.domain.ActionCost
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterFeats
+import com.pedroeu.ficha.domain.FeatBonuses
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
@@ -201,6 +202,7 @@ internal object Adapters {
                         level = grant.level,
                         levelScope =
                             if (isClassGrant) LevelScope.OWNING_CLASS else LevelScope.CHARACTER,
+                        minSpellSlotLevel = grant.minSpellSlotLevel,
                     ),
                     effects = listOf(
                         Effect.GrantSpell(
@@ -236,6 +238,8 @@ internal object Adapters {
                     proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
                     abilityModifiers = CharacterCalculations.abilityModifiers(character),
                     characterLevel = character.level,
+                    featAbilities = FeatBonuses.all(character)
+                        .associate { it.featId to it.ability },
                 )
             ).map { def ->
                 RuleElement(

@@ -198,6 +198,10 @@ class GrantCoverageTest {
         "touch_of_death:resistance",
         // "you can command the companion", the verb.
         "reanimator:command",
+        // Arcana Unleashed. "Sheltering Aid" is the benefit's name, and Boon of Magic School
+        // Mastery lists the eight schools, Divination among them.
+        "arcane_safeguard:aid",
+        "boon_of_magic_school_mastery:divination",
         // "the shadow can aid you", the verb.
         "living_shadow:aid",
         // The feature is called Wish Magic; it grants a level 1 spell, not Wish.

@@ -25,10 +25,23 @@ object SpellGrantData {
         /** Character (or class) level at which the grant kicks in. */
         val level: Int = 1,
         val alwaysPrepared: Boolean = true,
+        /**
+         * A spell slot level the character must be able to cast, for grants written that way.
+         *
+         * "When you have spell slots of level 3, you thereafter always have Fireball prepared"
+         * is not a character level and cannot be turned into one: a Wizard reaches level 3
+         * slots at character level 5 and a Paladin never does. Zero means the grant is gated
+         * by [level] alone, which is how every other grant in these tables reads.
+         */
+        val minSpellSlotLevel: Int = 0,
     )
 
     private fun at(level: Int, vararg spellIds: String): List<Grant> =
         spellIds.map { Grant(it, level) }
+
+    /** "When you have spell slots of level [slotLevel]…", which the Adept feats are built on. */
+    private fun atSlot(slotLevel: Int, vararg spellIds: String): List<Grant> =
+        spellIds.map { Grant(it, level = 1, minSpellSlotLevel = slotLevel) }
 
     // ------------------------------------------------------------------ Classes
 
@@ -377,6 +390,38 @@ object SpellGrantData {
         "spellfire_spark" to at(1, "sacred_flame"),
         "cold_caster" to at(1, "ray_of_frost"),
         "boon_of_revelry" to at(1, "ottos_irresistible_dance"),
+
+        // ---- Arcana Unleashed. The Origin feats each name a cantrip outright.
+        "arcane_artist" to at(1, "minor_illusion"),
+        "arcane_eloquence" to at(1, "vicious_mockery"),
+        "arcane_infiltrator" to at(1, "friends"),
+        "arcane_omens" to at(1, "guidance"),
+        "arcane_overload" to at(1, "fire_bolt"),
+        "arcane_safeguard" to at(1, "resistance"),
+        "familiar_friend" to at(1, "find_familiar"),
+        "warlike_familiar" to at(1, "battle_familiar"),
+
+        // The eight school Adepts. Their tables are keyed by the level of spell slot you can
+        // cast, not by character level, so they use the slot gate: a Wizard 9 has all five
+        // rows and a Paladin 9, who casts nothing above level 2, has the first two.
+        "abjuration_adept" to atSlot(1, "shield") + atSlot(2, "lesser_restoration") +
+            atSlot(3, "protection_from_energy") + atSlot(4, "banishment") +
+            atSlot(5, "mass_cure_wounds"),
+        "conjuration_adept" to atSlot(1, "entangle") + atSlot(2, "misty_step") +
+            atSlot(3, "conjure_animals") + atSlot(4, "dimension_door") +
+            atSlot(5, "conjure_elemental"),
+        "divination_adept" to atSlot(1, "detect_evil_and_good") + atSlot(2, "mind_spike") +
+            atSlot(3, "clairvoyance") + atSlot(4, "divination") + atSlot(5, "scrying"),
+        "enchantment_adept" to atSlot(1, "dissonant_whispers") + atSlot(2, "enthrall") +
+            atSlot(3, "hold_person") + atSlot(4, "dominate_beast") + atSlot(5, "modify_memory"),
+        "evocation_adept" to atSlot(1, "chromatic_orb") + atSlot(2, "shatter") +
+            atSlot(3, "fireball") + atSlot(4, "vitriolic_sphere") + atSlot(5, "wall_of_force"),
+        "illusion_adept" to atSlot(1, "silent_image") + atSlot(2, "phantasmal_force") +
+            atSlot(3, "major_image") + atSlot(4, "hallucinatory_terrain") + atSlot(5, "seeming"),
+        "necromancy_adept" to atSlot(1, "inflict_wounds") + atSlot(2, "ray_of_enfeeblement") +
+            atSlot(3, "vampiric_touch") + atSlot(4, "blight") + atSlot(5, "raise_dead"),
+        "transmutation_adept" to atSlot(1, "jump") + atSlot(2, "spider_climb") +
+            atSlot(3, "slow") + atSlot(4, "polymorph") + atSlot(5, "animate_objects"),
 
         // ---- Paths of Villainy. Each feat names one spell you always have prepared and
         // can cast by spending Death Points rather than a spell slot.

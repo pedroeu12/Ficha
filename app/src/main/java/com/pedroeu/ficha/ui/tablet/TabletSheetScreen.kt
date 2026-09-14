@@ -32,7 +32,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.OverridableStat
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.ChoiceSection
 import com.pedroeu.ficha.ui.components.StatEditDialog
@@ -338,28 +341,32 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
         )
 
         is SheetOverlay.EditChoice -> {
-            val resolved = overlay.resolved
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(resolved.choice.label) },
-                text = {
-                    ChoiceSection(
-                        choice = resolved.choice,
-                        selected = resolved.selectedIds,
-                        onToggle = { optionId ->
-                            val current = resolved.selectedIds
-                            val next = when {
-                                current.contains(optionId) -> current - optionId
-                                current.size < resolved.choice.count -> current + optionId
-                                resolved.choice.count == 1 -> listOf(optionId)
-                                else -> current.drop(1) + optionId
-                            }
-                            viewModel.setChoiceSelection(resolved.choice.id, resolved.level, next)
-                        },
-                    )
-                },
-                confirmButton = { TextButton(onClick = onDismiss) { Text(tr("Done")) } },
-            )
+            // Looked up live, so the ticks follow the answer as it changes under the dialog.
+            val resolved = ChoiceResolver.all(character)
+                .firstOrNull { it.choice.id == overlay.choiceId }
+            if (resolved != null) {
+                val disabled = OwnedOptions.disabledFor(
+                    choice = resolved.choice,
+                    owned = OwnedOptions.of(character),
+                    currentSelection = resolved.selectedIds.toSet(),
+                    classLevels = ClassLevels.levelMap(character),
+                )
+                AlertDialog(
+                    onDismissRequest = onDismiss,
+                    title = { Text(resolved.choice.label) },
+                    text = {
+                        ChoiceSection(
+                            choice = resolved.choice,
+                            selected = resolved.selectedIds,
+                            onToggle = { optionId ->
+                                viewModel.toggleChoice(resolved.choice, resolved.level, optionId)
+                            },
+                            disabledOptionIds = disabled,
+                        )
+                    },
+                    confirmButton = { TextButton(onClick = onDismiss) { Text(tr("Done")) } },
+                )
+            }
         }
     }
 }

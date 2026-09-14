@@ -45,27 +45,43 @@ object ChoiceResolver {
     private fun levelKey(level: Int, choiceId: String) = "$level:$choiceId"
 
     /**
-     * Finds the stored selection for a choice, trying every map it could live in.
-     * [level] narrows the level-up lookup; null searches all levels.
+     * Writes an answer down, and makes it the only answer to that question.
+     *
+     * An answer can live in three maps, and one asked at several levels lives under several
+     * keys. Reading always takes the newest; writing used to add one more entry beside the
+     * others, which is how an answer changed in Edit Mode could be read back as the old one —
+     * the sheet wrote to the origin map while the level map still held the pick from level 5,
+     * and the level map wins. So a write clears every other home the answer had. There is
+     * then exactly one, and every reader agrees.
+     *
+     * A creation-time class option — a Fighting Style picked in the wizard — is kept in step
+     * as well, since the summary line that lists it reads that map directly.
      */
-    fun selectionsFor(
+    fun withAnswer(
         character: PlayerCharacter,
         choiceId: String,
-        level: Int? = null,
-    ): List<String> {
-        if (level != null) {
-            character.levelSelections[levelKey(level, choiceId)]?.let { return it }
+        level: Int,
+        optionIds: List<String>,
+    ): PlayerCharacter {
+        val otherLevels = character.levelSelections.filterKeys { it.substringAfter(':') != choiceId }
+        val classOptions = if (choiceId in character.classChoiceSelections) {
+            character.classChoiceSelections + (choiceId to optionIds)
         } else {
-            // A choice can recur at several levels (Battle Master maneuvers); gather them all.
-            val fromLevels = character.levelSelections
-                .filterKeys { it.substringAfter(':') == choiceId }
-                .values
-                .flatten()
-            if (fromLevels.isNotEmpty()) return fromLevels.distinct()
+            character.classChoiceSelections
         }
-        character.classChoiceSelections[choiceId]?.let { return it }
-        character.originChoiceSelections[choiceId]?.let { return it }
-        return emptyList()
+        return if (level > 0) {
+            character.copy(
+                levelSelections = otherLevels + (levelKey(level, choiceId) to optionIds),
+                originChoiceSelections = character.originChoiceSelections - choiceId,
+                classChoiceSelections = classOptions,
+            )
+        } else {
+            character.copy(
+                levelSelections = otherLevels,
+                originChoiceSelections = character.originChoiceSelections + (choiceId to optionIds),
+                classChoiceSelections = classOptions,
+            )
+        }
     }
 
     /**
@@ -87,13 +103,17 @@ object ChoiceResolver {
     }
 
     /**
-     * The answer given at the highest level, for a choice that restates its whole list.
+     * The current answer to a question: the one given at the highest level, or failing that
+     * the one made at creation.
      *
-     * Weapon Mastery and the Artificer's arcane plans are asked again each time the count
-     * grows, and each asking replaces the previous answer rather than adding to it. Unioning
-     * every level's answer — which is what [selectionsFor] does, correctly, for a Battle
-     * Master's maneuvers — would leave a character who changed their mind holding both the
-     * old pick and the new one.
+     * The one rule for reading an answer, whichever map it lives in. Weapon Mastery and the
+     * Artificer's plans are asked again each time the count grows and each asking restates the
+     * whole list; a Primordial Warlock re-picks its element at every level; and a cantrip
+     * named by an invocation at level 5 can be re-named at level 12. In every case the newest
+     * answer is the answer. Unioning the levels instead — which one reader did — left a
+     * one-pick question holding two picks, and a Fighter who changed their mind holding more
+     * masteries than the table allows. Choices that genuinely accumulate, a Battle Master's
+     * maneuvers, use a different id per level and never meet this.
      */
     fun latestSelectionFor(character: PlayerCharacter, choiceId: String): List<String> {
         val fromLevels = character.levelSelections
@@ -131,7 +151,10 @@ object ChoiceResolver {
         // character gets read from the character. Doing it in the choice walk alone missed
         // class features, which do not go through it.
         val choice = ChoiceOptionSources.resolve(raw, character)
-        val ids = selectionsFor(character, choice.id, level.takeIf { it > 0 })
+        // The newest answer, not the one recorded at this feature's own level: a choice the
+        // rules let you revisit is re-recorded at the level it was revisited, and reading the
+        // feature's level instead showed the old element while the spells followed the new.
+        val ids = latestSelectionFor(character, choice.id)
         return ResolvedChoice(
             choice = choice,
             selectedIds = ids,

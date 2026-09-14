@@ -5,27 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pedroeu.ficha.data.CharacterRepository
-import com.pedroeu.ficha.data.content.EquipmentData
-import com.pedroeu.ficha.data.content.SpellData
-import com.pedroeu.ficha.data.content.ToolData
 import com.pedroeu.ficha.data.model.Ability
-import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
-import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.domain.AbilityScoreGeneration
-import com.pedroeu.ficha.domain.CharacterCalculations
-import com.pedroeu.ficha.domain.Coins
-import com.pedroeu.ficha.domain.KnownSpell
-import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ScoreMethod
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class CreationViewModel(private val repository: CharacterRepository) : ViewModel() {
 
@@ -274,152 +264,11 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
     fun finish() {
         val current = _state.value
         if (!current.canAdvance) return
-        val character = buildCharacter(current)
+        val character = CharacterBuilder.build(current)
         viewModelScope.launch {
             repository.save(character)
             _savedCharacterId.value = character.id
         }
-    }
-
-    private fun buildCharacter(state: CreationState): PlayerCharacter {
-        val charClass = state.charClass
-        val background = state.background
-        val className = charClass?.name.orEmpty()
-        val now = System.currentTimeMillis()
-
-        val classSpells = charClass?.choices
-            ?.filterIsInstance<ClassChoice.CantripChoice>()
-            ?.flatMap { choice ->
-                val picked = state.classSelections[choice.id].orEmpty()
-                choice.options.filter { it.id in picked }.map { stub ->
-                    KnownSpell(
-                        id = stub.id,
-                        name = stub.name,
-                        level = stub.level,
-                        school = stub.school,
-                        description = stub.description,
-                        source = className,
-                    )
-                }
-            }.orEmpty()
-
-        // Spells picked through an origin choice: Magic Initiate, a High Elf's cantrip,
-        // a Thaumaturge's extra cantrip, and so on.
-        val originSpells = state.originChoices
-            .filter { it.kind == ChoiceKind.SPELL }
-            .flatMap { choice ->
-                state.originSelections[choice.id].orEmpty().mapNotNull { spellId ->
-                    SpellData.byId(spellId)?.let { spell ->
-                        KnownSpell(
-                            id = spell.id,
-                            name = spell.name,
-                            level = spell.level,
-                            school = spell.school,
-                            description = spell.description,
-                            source = choice.source,
-                        )
-                    }
-                }
-            }
-
-        val spells = (classSpells + originSpells).distinctBy { it.id }
-
-        val originTools = state.originChoices
-            .filter { it.kind == ChoiceKind.TOOL }
-            .flatMap { state.originSelections[it.id].orEmpty() }
-
-        // A background whose tool entry named a group is replaced by the specific pick.
-        val backgroundToolIsOpenEnded = background?.toolProficiency
-            ?.let { ToolData.optionsForOpenEndedTool(it) != null } == true
-
-        val toolProficiencies = buildList {
-            charClass?.toolProficiencies
-                ?.filterNot { it.contains("of your choice", ignoreCase = true) }
-                ?.let { addAll(it) }
-            if (background != null && !backgroundToolIsOpenEnded) add(background.toolProficiency)
-            addAll(originTools)
-        }.distinct()
-
-        val character = PlayerCharacter(
-            id = UUID.randomUUID().toString(),
-            name = state.name.trim(),
-            level = 1,
-            // Carried onto the character so level up offers the same books creation did.
-            enabledSourceIds = state.enabledSources.map { it.id }.toSet(),
-            speciesId = state.speciesId.orEmpty(),
-            lineageId = state.lineageId,
-            classId = state.classId.orEmpty(),
-            backgroundId = state.backgroundId.orEmpty(),
-            baseAbilityScores = state.resolvedBaseScores().mapKeys { it.key.name },
-            backgroundAbilityBonuses = state.backgroundBonuses.mapKeys { it.key.name },
-            skillProficiencies = state.allSkillProficiencies.map { it.name }.toSet(),
-            skillExpertise = state.expertiseChoices.map { it.name }.toSet(),
-            toolProficiencies = toolProficiencies,
-            armorTraining = charClass?.armorProficiencies.orEmpty(),
-            weaponProficiencies = charClass?.weaponProficiencies.orEmpty(),
-            classChoiceSelections = state.classSelections,
-            originChoiceSelections = state.originSelections,
-            // Level 1 feature picks are keyed by the level that granted them, matching how
-            // every later level records its own, so the sheet reads them all the same way.
-            // The Rogue's Expertise is answered through its own picker, so it's recorded
-            // against the feature that asked rather than left looking unchosen.
-            levelSelections = state.classFeatureSelections.mapKeys { (id, _) -> "1:$id" } +
-                state.level1ExpertiseChoiceIds.associate { choiceId ->
-                    "1:$choiceId" to state.expertiseChoices.map { it.name }
-                },
-            // The background's feat, plus any feat picked through an origin choice — the
-            // Human's Versatile trait grants one the same way. A background that leaves its
-            // feat open contributes nothing here: its featId is only a fallback, and adding
-            // it as well would hand the character two feats for one grant.
-            featIds = (
-                listOfNotNull(background?.takeIf { it.featChoice == null }?.featId) +
-                    state.originChoices
-                        .filter { it.kind == ChoiceKind.FEAT }
-                        .flatMap { state.originSelections[it.id].orEmpty() }
-                ).distinct(),
-            knownSpells = spells,
-            inventory = buildInventory(state),
-            coins = Coins(
-                gp = (background?.startingGold ?: 0) +
-                    (EquipmentData.STARTING_KITS[state.classId]?.goldPieces ?: 0)
-            ),
-            alignment = state.alignment,
-            appearance = state.appearance,
-            backstory = state.backstory,
-            createdAt = now,
-            updatedAt = now,
-        )
-
-        // Start the character at full health, which depends on the assembled scores.
-        return character.copy(currentHitPoints = CharacterCalculations.maxHitPoints(character))
-    }
-
-    private fun buildInventory(state: CreationState): List<InventoryItem> {
-        val kit = EquipmentData.STARTING_KITS[state.classId]
-        val items = mutableListOf<InventoryItem>()
-
-        kit?.armorIds?.groupingBy { it }?.eachCount()?.forEach { (armorId, count) ->
-            val armor = EquipmentData.armorById(armorId) ?: return@forEach
-            items += InventoryItem(
-                name = armor.name,
-                quantity = count,
-                armorDefId = armor.id,
-                equipped = true,
-            )
-        }
-        kit?.weaponIds?.groupingBy { it }?.eachCount()?.forEach { (weaponId, count) ->
-            val weapon = EquipmentData.weaponById(weaponId) ?: return@forEach
-            items += InventoryItem(
-                name = weapon.name,
-                quantity = count,
-                weaponDefId = weapon.id,
-                equipped = true,
-            )
-        }
-        kit?.otherGear?.forEach { items += InventoryItem(name = it) }
-        state.background?.equipment?.forEach { items += InventoryItem(name = it) }
-
-        return items
     }
 
     class Factory(private val repository: CharacterRepository) : ViewModelProvider.Factory {

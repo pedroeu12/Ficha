@@ -34,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.ui.components.SectionHeader
@@ -49,9 +51,12 @@ import com.pedroeu.ficha.ui.i18n.trf
  * and there is no reason a Warlock should have a harder time swapping an invocation than a
  * spell.
  *
- * Edit Mode only, and deliberately unpoliced: the count the class table allows is shown, and
- * going over it is marked but not prevented. A DM who hands out an extra invocation should
- * not have to argue with the app about it.
+ * Edit Mode only, and unpoliced on the count: the number the class table allows is shown,
+ * and going over it is marked but not prevented. A DM who hands out an extra invocation
+ * should not have to argue with the app about it. Prerequisites are another matter — an
+ * option the character does not qualify for is greyed out here exactly as it is everywhere
+ * else, with the book's wording printed under it, because a sheet that offers a level 9
+ * invocation to a level 2 Warlock is wrong rather than generous.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -63,7 +68,9 @@ fun PoolFeaturesCard(
     val pools = ChoiceResolver.poolChoices(character)
     if (pools.isEmpty()) return
 
-    var editing by remember { mutableStateOf<ResolvedChoice?>(null) }
+    // Only the id is remembered; the choice is looked up live so the dialog follows the
+    // answer as it changes rather than showing the copy it opened with.
+    var editingId by remember { mutableStateOf<String?>(null) }
 
     PoolContainer(framed) {
         Column(
@@ -81,23 +88,25 @@ fun PoolFeaturesCard(
             )
 
             pools.forEach { resolved ->
-                PoolRow(resolved) { editing = resolved }
+                PoolRow(resolved) { editingId = resolved.choice.id }
             }
         }
     }
 
-    editing?.let { resolved ->
-        PoolPickerDialog(
-            resolved = resolved,
-            onDismiss = { editing = null },
-            onToggle = { optionId ->
-                val current = resolved.selectedIds
-                // Removing always works; adding is never blocked, because the whole point of
-                // Edit Mode is that the sheet answers to the table, not the other way round.
-                val next = if (optionId in current) current - optionId else current + optionId
-                viewModel.setChoiceSelection(resolved.choice.id, resolved.level, next)
-            },
-        )
+    editingId?.let { id ->
+        val live = pools.firstOrNull { it.choice.id == id }
+        if (live != null) {
+            PoolPickerDialog(
+                character = character,
+                resolved = live,
+                onDismiss = { editingId = null },
+                // Removing always works and the count is never enforced, because the whole
+                // point of Edit Mode is that the sheet answers to the table.
+                onToggle = { optionId ->
+                    viewModel.toggleChoice(live.choice, live.level, optionId, unbounded = true)
+                },
+            )
+        }
     }
 }
 
@@ -176,10 +185,17 @@ private fun PoolRow(resolved: ResolvedChoice, onOpen: () -> Unit) {
  */
 @Composable
 private fun PoolPickerDialog(
+    character: PlayerCharacter,
     resolved: ResolvedChoice,
     onDismiss: () -> Unit,
     onToggle: (String) -> Unit,
 ) {
+    val disabled = OwnedOptions.disabledFor(
+        choice = resolved.choice,
+        owned = OwnedOptions.of(character),
+        currentSelection = resolved.selectedIds.toSet(),
+        classLevels = ClassLevels.levelMap(character),
+    )
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(resolved.choice.label) },
@@ -202,24 +218,36 @@ private fun PoolPickerDialog(
                     items(options.size, key = { options[it].id }) { index ->
                         val option = options[index]
                         val chosen = option.id in resolved.selectedIds
+                        val available = option.id !in disabled
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onToggle(option.id) }
+                                .clickable(enabled = available) { onToggle(option.id) }
                                 .padding(vertical = 5.dp),
                         ) {
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     text = option.name,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    color = if (available) MaterialTheme.colorScheme.onSurface
+                                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                 )
                                 if (option.supporting.isNotBlank()) {
                                     Text(
                                         text = option.supporting,
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                // Greyed out with no reason given reads as a bug; the book's
+                                // own wording says what is missing.
+                                if (option.prerequisite.isNotBlank()) {
+                                    Text(
+                                        text = option.prerequisite,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (available) MaterialTheme.colorScheme.secondary
+                                        else MaterialTheme.colorScheme.error,
                                     )
                                 }
                             }

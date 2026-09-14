@@ -323,7 +323,7 @@ private fun ChoiceLine(resolved: ResolvedChoice, handle: SheetHandle) {
                 PenMark(
                     description = if (resolved.isAnswered) tr("Change") else tr("Choose"),
                     glyph = "✎",
-                ) { handle.open(SheetOverlay.EditChoice(resolved)) }
+                ) { handle.open(SheetOverlay.EditChoice(resolved.choice.id)) }
             }
         }
 

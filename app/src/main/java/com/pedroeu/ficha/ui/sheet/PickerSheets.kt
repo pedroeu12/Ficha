@@ -48,10 +48,13 @@ import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.SpellDef
+import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.CustomAttack
+import com.pedroeu.ficha.domain.FeatPrerequisites
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.ChoiceChip
 import com.pedroeu.ficha.ui.components.ChoiceSection
@@ -80,6 +83,10 @@ fun FeatPickerSheet(
     var selections by remember { mutableStateOf<Map<String, List<String>>>(emptyMap()) }
 
     val already = character.featIds.toSet()
+    // What the character already has, so a feat's own picks can't duplicate it, and the
+    // levels each class is at, for a pick with a level in front of it.
+    val owned = remember(character) { OwnedOptions.of(character) }
+    val classLevels = remember(character) { ClassLevels.levelMap(character) }
     // The character's books apply here too, so a sheet can't collect off-book feats by hand.
     val fromBooks = SourceFiltering.available(FeatData.ALL, character.enabledSources)
     val results = remember(query, fromBooks) {
@@ -149,10 +156,15 @@ fun FeatPickerSheet(
                 }
                 if (open) items(entries.size, key = { entries[it].id }) { index ->
                     val feat = entries[index]
-                    val owned = feat.id in already
+                    val taken = feat.id in already
+                    // The same check the level-up flow makes. The sheet used to make none, so
+                    // a level 1 character could hand themselves a feat that wants level 4 and
+                    // two other feats first.
+                    val availability = FeatPrerequisites.check(character, feat.id)
                     SelectableCard(
-                        title = if (owned) "${feat.name} (already taken)" else feat.name,
-                        subtitle = feat.description,
+                        title = if (taken) "${feat.name} (already taken)" else feat.name,
+                        subtitle = if (availability.allowed) feat.description
+                        else "${availability.missing}. ${feat.description}",
                         selected = selectedFeatId == feat.id,
                         onClick = {
                             selectedFeatId = if (selectedFeatId == feat.id) null else feat.id
@@ -166,25 +178,27 @@ fun FeatPickerSheet(
                                         selected = selections[choice.id].orEmpty(),
                                         onToggle = { optionId ->
                                             val current = selections[choice.id].orEmpty()
-                                            val next = when {
-                                                current.contains(optionId) -> current - optionId
-                                                current.size < choice.count -> current + optionId
-                                                choice.count == 1 -> listOf(optionId)
-                                                else -> current.drop(1) + optionId
-                                            }
-                                            selections = selections + (choice.id to next)
+                                            selections = selections + (choice.id to
+                                                ChoiceGrants.nextSelection(current, optionId, choice.count))
                                         },
+                                        disabledOptionIds = OwnedOptions.disabledFor(
+                                            choice = choice,
+                                            owned = owned,
+                                            currentSelection = selections[choice.id].orEmpty().toSet(),
+                                            classLevels = classLevels,
+                                        ),
                                     )
                                 }
                                 Button(
                                     onClick = { onAdd(feat.id, selections) },
-                                    enabled = !owned && allAnswered,
+                                    enabled = !taken && allAnswered && availability.allowed,
                                     shape = Corner.row,
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     Text(
                                         when {
-                                            owned -> tr("Already taken")
+                                            taken -> tr("Already taken")
+                                            !availability.allowed -> availability.missing
                                             !allAnswered -> tr("Make every choice above first")
                                             else -> "Add ${feat.name}"
                                         }

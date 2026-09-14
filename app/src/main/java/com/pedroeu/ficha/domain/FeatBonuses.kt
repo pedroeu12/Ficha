@@ -40,7 +40,7 @@ object FeatBonuses {
             } else {
                 // The player was asked; if they haven't answered yet, nothing applies.
                 val picked = ChoiceResolver
-                    .selectionsFor(character, "feat:$featId:ability")
+                    .latestSelectionFor(character, "feat:$featId:ability")
                     .firstOrNull()
                     ?: return@mapNotNull null
                 options.find { it.name == picked } ?: return@mapNotNull null

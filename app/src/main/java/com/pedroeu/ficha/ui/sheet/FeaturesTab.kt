@@ -38,6 +38,7 @@ import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.domain.ArtificerItems
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.domain.SheetFeatures
@@ -76,7 +77,11 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
 
     var addingFeat by remember { mutableStateOf(false) }
     var addingFeature by remember { mutableStateOf(false) }
-    var editingChoice by remember { mutableStateOf<ResolvedChoice?>(null) }
+    // The id of the choice being edited, not the choice itself. The dialog stays open while
+    // the answer changes underneath it, and a remembered copy of the choice kept showing the
+    // ticks from before the first tap — so every tap after it was computed from a stale
+    // answer, and "editing invocations doesn't work" was the whole of the report.
+    var editingChoiceId by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -109,7 +114,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                                 viewModel = viewModel,
                                 editMode = editMode,
                                 choices = classChoices[entry.classId to feature.name].orEmpty(),
-                                onEditChoice = { editingChoice = it },
+                                onEditChoice = { editingChoiceId = it.choice.id },
                             )
                         }
                         // The level-1 branch options, e.g. Fighting Style or Divine Order.
@@ -154,7 +159,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                                     editMode = editMode,
                                     choices = subclassChoices[entry.classId to feature.name]
                                         .orEmpty(),
-                                    onEditChoice = { editingChoice = it },
+                                    onEditChoice = { editingChoiceId = it.choice.id },
                                 )
                             }
                     }
@@ -259,7 +264,7 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                         modifier = Modifier.padding(top = 8.dp),
                     ) {
                         originChoices.forEach { resolved ->
-                            ChoiceLine(resolved, editMode) { editingChoice = resolved }
+                            ChoiceLine(resolved, editMode) { editingChoiceId = resolved.choice.id }
                         }
                     }
                 }
@@ -324,21 +329,18 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
         )
     }
 
-    editingChoice?.let { resolved ->
-        ChoiceEditDialog(
-            resolved = resolved,
-            onDismiss = { editingChoice = null },
-            onToggle = { optionId ->
-                val current = resolved.selectedIds
-                val next = when {
-                    current.contains(optionId) -> current - optionId
-                    current.size < resolved.choice.count -> current + optionId
-                    resolved.choice.count == 1 -> listOf(optionId)
-                    else -> current.drop(1) + optionId
-                }
-                viewModel.setChoiceSelection(resolved.choice.id, resolved.level, next)
-            },
-        )
+    editingChoiceId?.let { id ->
+        // Resolved afresh on every recomposition, so the dialog shows the answer as it is now.
+        val live = (classChoices.values.flatten() + subclassChoices.values.flatten() + originChoices)
+            .firstOrNull { it.choice.id == id }
+        if (live != null) {
+            ChoiceEditDialog(
+                character = character,
+                resolved = live,
+                onDismiss = { editingChoiceId = null },
+                onToggle = { optionId -> viewModel.toggleChoice(live.choice, live.level, optionId) },
+            )
+        }
     }
 }
 
@@ -400,10 +402,21 @@ private fun ChoiceLine(
 
 @Composable
 private fun ChoiceEditDialog(
+    character: PlayerCharacter,
     resolved: ResolvedChoice,
     onDismiss: () -> Unit,
     onToggle: (String) -> Unit,
 ) {
+    // The same eligibility every other picker applies — what is already held, the level in
+    // the right class, an option another option requires. This dialog used to apply none of
+    // it, so the sheet could hand a level 2 Warlock an invocation the level-up flow would
+    // have greyed out.
+    val disabled = OwnedOptions.disabledFor(
+        choice = resolved.choice,
+        owned = OwnedOptions.of(character),
+        currentSelection = resolved.selectedIds.toSet(),
+        classLevels = ClassLevels.levelMap(character),
+    )
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(resolved.choice.label) },
@@ -412,6 +425,7 @@ private fun ChoiceEditDialog(
                 choice = resolved.choice,
                 selected = resolved.selectedIds,
                 onToggle = onToggle,
+                disabledOptionIds = disabled,
             )
         },
         confirmButton = {

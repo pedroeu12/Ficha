@@ -29,7 +29,8 @@ sealed interface SheetOverlay {
     data object AddFeat : SheetOverlay
     data object AddFeature : SheetOverlay
     data object AddTool : SheetOverlay
-    data class EditChoice(val resolved: com.pedroeu.ficha.domain.ResolvedChoice) : SheetOverlay
+    /** By id, not by value: the answer changes while the dialog is open and it has to follow. */
+    data class EditChoice(val choiceId: String) : SheetOverlay
 }
 
 /**

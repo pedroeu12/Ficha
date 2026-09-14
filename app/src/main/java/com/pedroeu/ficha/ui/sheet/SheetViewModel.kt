@@ -4,12 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.pedroeu.ficha.data.CharacterRepository
-import com.pedroeu.ficha.data.content.FeatData
-import com.pedroeu.ficha.data.content.OriginChoices
-import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.Sourcebook
-import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.Skill
@@ -17,11 +14,13 @@ import com.pedroeu.ficha.domain.ArtificerItems
 import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterHitDice
 import com.pedroeu.ficha.domain.CharacterResources
+import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.CustomFeature
 import com.pedroeu.ficha.domain.CustomResource
 import com.pedroeu.ficha.domain.DeathSaves
+import com.pedroeu.ficha.domain.FeatEdits
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.CharacterSummons
@@ -439,8 +438,6 @@ class SheetViewModel(
         character.copy(toolProficiencies = character.toolProficiencies - name)
     }
 
-    fun setLevel(level: Int) = update { it.copy(level = level.coerceIn(1, 20)) }
-
     /** Drops every manual adjustment, returning the sheet to what the rules say. */
     fun clearAllOverrides() = update { character ->
         character.copy(
@@ -580,55 +577,12 @@ class SheetViewModel(
 
     // ------------------------------------------------------------------ Feats & features
 
-    /** Adds a feat and records any picks it forces, such as Magic Initiate's spells. */
+    /** Adds a feat and applies the picks it forces, such as Magic Initiate's spells. */
     fun addFeat(featId: String, selections: Map<String, List<String>> = emptyMap()) =
-        update { character ->
-            if (character.featIds.contains(featId)) return@update character
+        update { FeatEdits.add(it, featId, selections) }
 
-            val feat = FeatData.byId(featId)
-            val learned = feat?.let {
-                OriginChoices.forFeat(it.id, it.name)
-                    .filter { choice -> choice.kind == ChoiceKind.SPELL }
-                    .flatMap { choice ->
-                        selections[choice.id].orEmpty().mapNotNull { spellId ->
-                            SpellData.byId(spellId)?.let { spell ->
-                                KnownSpell(
-                                    id = spell.id,
-                                    name = spell.name,
-                                    level = spell.level,
-                                    school = spell.school,
-                                    description = spell.description,
-                                    source = it.name,
-                                )
-                            }
-                        }
-                    }
-            }.orEmpty()
-
-            val tools = feat?.let {
-                OriginChoices.forFeat(it.id, it.name)
-                    .filter { choice -> choice.kind == ChoiceKind.TOOL }
-                    .flatMap { choice -> selections[choice.id].orEmpty() }
-            }.orEmpty()
-
-            val skills = feat?.let {
-                OriginChoices.forFeat(it.id, it.name)
-                    .filter { choice -> choice.kind == ChoiceKind.SKILL }
-                    .flatMap { choice -> selections[choice.id].orEmpty() }
-            }.orEmpty()
-
-            character.copy(
-                featIds = character.featIds + featId,
-                originChoiceSelections = character.originChoiceSelections + selections,
-                knownSpells = (character.knownSpells + learned).distinctBy { it.id },
-                toolProficiencies = (character.toolProficiencies + tools).distinct(),
-                skillProficiencies = character.skillProficiencies + skills,
-            )
-        }
-
-    fun removeFeat(featId: String) = update { character ->
-        character.copy(featIds = character.featIds - featId)
-    }
+    /** Removes a feat and everything its answers had put on the sheet. */
+    fun removeFeat(featId: String) = update { FeatEdits.remove(it, featId) }
 
     fun addCustomFeature(name: String, description: String, source: String) = update { character ->
         if (name.isBlank()) return@update character
@@ -654,20 +608,17 @@ class SheetViewModel(
         character.copy(customFeatures = character.customFeatures.filterNot { it.id == featureId })
     }
 
-    /** Re-records a choice, used by Edit Mode and by rests that let you swap a pick. */
-    fun setChoiceSelection(choiceId: String, level: Int, optionIds: List<String>) =
-        update { character ->
-            if (level > 0) {
-                character.copy(
-                    levelSelections = character.levelSelections + ("$level:$choiceId" to optionIds)
-                )
-            } else {
-                character.copy(
-                    originChoiceSelections =
-                        character.originChoiceSelections + (choiceId to optionIds)
-                )
-            }
-        }
+    /**
+     * Ticks or unticks one option of a choice, from Edit Mode or a rest that lets a pick be
+     * swapped.
+     *
+     * The current answer is read from the character at the moment of the tap, never from the
+     * screen that showed it: a dialog that remembered its own copy computed every tap after
+     * the first from a stale answer. What the new answer grants is applied, and what the old
+     * one granted is taken back, in the same step.
+     */
+    fun toggleChoice(choice: Choice, level: Int, optionId: String, unbounded: Boolean = false) =
+        update { ChoiceGrants.toggle(it, choice, level, optionId, unbounded) }
 
     // ------------------------------------------------------------------ Free text
 

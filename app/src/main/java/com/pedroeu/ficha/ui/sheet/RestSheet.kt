@@ -271,18 +271,7 @@ fun RestSheet(
                             choice = resolved.choice,
                             selected = resolved.selectedIds,
                             onToggle = { optionId ->
-                                val current = resolved.selectedIds
-                                val next = when {
-                                    current.contains(optionId) -> current - optionId
-                                    current.size < resolved.choice.count -> current + optionId
-                                    resolved.choice.count == 1 -> listOf(optionId)
-                                    else -> current.drop(1) + optionId
-                                }
-                                viewModel.setChoiceSelection(
-                                    resolved.choice.id,
-                                    resolved.level,
-                                    next,
-                                )
+                                viewModel.toggleChoice(resolved.choice, resolved.level, optionId)
                             },
                         )
                     }

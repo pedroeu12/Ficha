@@ -42,7 +42,7 @@ object CharacterMasteries {
         // The Weapon Master feat grants one more kind of weapon on top of the class's.
         if ("weapon_master" in CharacterFeats.heldBy(character)) {
             ChoiceResolver
-                .selectionsFor(character, "feat:weapon_master:mastery")
+                .latestSelectionFor(character, "feat:weapon_master:mastery")
                 .forEach { weaponId -> addMastery(weaponId, "Weapon Master") }
         }
     }.distinctBy { it.weaponId }

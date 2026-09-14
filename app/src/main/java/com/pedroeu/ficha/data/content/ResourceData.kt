@@ -79,6 +79,15 @@ object ResourceData {
      * of curated pools, and threading two dozen additions through its branches would bury them.
      */
     private fun sweptSubclassResources(c: Context): List<ResourceDef> = buildList {
+        if (c.subclassId == "diviner" && c.level >= 10) add(
+            ResourceDef(
+                id = "diviner:third_eye",
+                name = "The Third Eye",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "The Third Eye",
+            )
+        )
         if (c.subclassId == "gloom_stalker" && c.level >= 3) add(
             ResourceDef(
                 id = "gloom_stalker:dreadful_strike",

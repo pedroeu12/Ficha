@@ -93,22 +93,27 @@ class SpiritualGuardianTest {
             listOf("distract", "protect", "strike"),
             choice!!.options.map { it.id },
         )
-        assertEquals("it reads off the Rage tracker", "barbarian:rage", choice.resourceId)
+        // It used to read off the Rage tracker, and that is exactly the bug: the tracker
+        // asks when a use is spent, so the question arrived once, at the moment you raged.
+        // "While your Rage is active, when you hit a creature … it suffers one of the
+        // following effects of your choice" — the choice belongs to the hit and costs nothing.
+        assertEquals("no pool: the choice is free and made on every hit", "", choice.resourceId)
 
         val creationChoices = SubclassData.byId("spiritual_guardian")!!.features.flatMap { it.choices }
         assertTrue("nothing here is answered at creation", creationChoices.isEmpty())
     }
 
     @Test
-    fun `the hit effect is offered from level 3 and asked on the rage tracker`() {
+    fun `the hit effect is offered from level 3, apart from the rage tracker`() {
         assertTrue(
             PerUseChoices.all(barbarian(3)).any {
                 it.choice.id == "spiritual_guardian:spiritual_protectors"
             },
         )
         assertTrue(
+            "spending a Rage is not when this is decided, so it must not sit on that tracker",
             PerUseChoices.forResource(barbarian(3), "barbarian:rage")
-                .any { it.choice.id == "spiritual_guardian:spiritual_protectors" },
+                .none { it.choice.id == "spiritual_guardian:spiritual_protectors" },
         )
     }
 

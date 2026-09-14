@@ -36,16 +36,283 @@ data class PerUseChoice(
 
 object PerUseChoiceData {
 
+    /** "…damage of your choice", which several of these are and nothing more. */
+    private fun damageTypes(types: List<String>): List<ChoiceOption> =
+        types.map { ChoiceOption(it.lowercase(), it, "The strike or the aura deals or turns aside $it damage.") }
+
+
     val ALL: List<PerUseChoice> = listOf(
 
         // ---------------------------------------------------------------- Barbarian
+        PerUseChoice(
+            id = "wild_heart:rage_of_the_wilds",
+            label = "Rage of the Wilds",
+            prompt = "Which animal answers this Rage? You choose again every time you rage.",
+            source = "Rage of the Wilds",
+            resourceId = "barbarian:rage",
+            subclassId = "wild_heart",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "bear", "Bear",
+                    "While your Rage is active, you have Resistance to every damage type except Force, Necrotic, Psychic, and Radiant.", "While raging",
+                ),
+                ChoiceOption(
+                    "eagle", "Eagle",
+                    "When you activate your Rage you can Disengage and Dash as part of that Bonus Action, and take both as a Bonus Action while it lasts.", "While raging",
+                ),
+                ChoiceOption(
+                    "wolf", "Wolf",
+                    "While your Rage is active, your allies have Advantage on attack rolls against any enemy of yours within 5 feet of you.", "While raging",
+                ),
+            ),
+        ),
+        PerUseChoice(
+            id = "wild_heart:power_of_the_wilds",
+            label = "Power of the Wilds",
+            prompt = "And which power? A second choice on the same Rage, made again every time you rage.",
+            source = "Power of the Wilds",
+            resourceId = "barbarian:rage",
+            subclassId = "wild_heart",
+            minLevel = 14,
+            options = listOf(
+                ChoiceOption(
+                    "falcon", "Falcon",
+                    "While your Rage is active, you have a Fly Speed equal to your Speed if you aren't wearing any armor.", "While raging",
+                ),
+                ChoiceOption(
+                    "lion", "Lion",
+                    "While your Rage is active, every enemy within 5 feet of you has Disadvantage on attack rolls against targets other than you or another Barbarian who has this feature.", "While raging",
+                ),
+                ChoiceOption(
+                    "ram", "Ram",
+                    "While your Rage is active, you can cause a Large or smaller creature you hit to have the Prone condition.", "While raging",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Cleric
+        PerUseChoice(
+            id = "arcana_domain:modify_magic",
+            label = "Modify Magic",
+            prompt = "How is this spell changed? You choose again each time you spend a use.",
+            source = "Modify Magic",
+            resourceId = "cleric:channel_divinity",
+            subclassId = "arcana_domain",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "fortifying", "Fortifying Spell",
+                    "One target of the spell gains Temporary Hit Points equal to your Wisdom modifier plus the spell's level.",
+                ),
+                ChoiceOption(
+                    "piercing", "Piercing Spell",
+                    "The spell ignores Resistance to the damage it deals.",
+                ),
+                ChoiceOption(
+                    "reaching", "Reaching Spell",
+                    "The spell's range increases by 30 feet, or its touch range becomes 30 feet.",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Monk
+        PerUseChoice(
+            id = "elements:elemental_strikes",
+            label = "Elemental Strikes",
+            prompt = "Which element rides this strike? You choose again on every hit while " +
+                "your Elemental Attunement is active.",
+            source = "Elemental Attunement",
+            subclassId = "elements",
+            minLevel = 3,
+            options = damageTypes(listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")),
+        ),
+        PerUseChoice(
+            id = "elements:elemental_epitome",
+            label = "Elemental Epitome",
+            prompt = "Which damage are you resisting? You choose again at the start of each " +
+                "of your turns.",
+            source = "Elemental Epitome",
+            subclassId = "elements",
+            minLevel = 17,
+            options = damageTypes(listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")),
+        ),
+        PerUseChoice(
+            id = "open_hand:open_hand_technique",
+            label = "Open Hand Technique",
+            prompt = "What does this strike do? You choose again on every hit from your " +
+                "Flurry of Blows.",
+            source = "Open Hand Technique",
+            subclassId = "open_hand",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "addle", "Addle",
+                    "The target can't make Opportunity Attacks until the start of your next turn.", "On a hit",
+                ),
+                ChoiceOption(
+                    "push", "Push",
+                    "The target must succeed on a Strength saving throw or be pushed up to 15 feet away from you.", "On a hit",
+                ),
+                ChoiceOption(
+                    "topple", "Topple",
+                    "The target must succeed on a Dexterity saving throw or have the Prone condition.", "On a hit",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Paladin
+        PerUseChoice(
+            id = "noble_genies:elemental_shielding",
+            label = "Aura of Elemental Shielding",
+            prompt = "Which damage does the aura turn aside? You choose again at the start of " +
+                "each of your turns, no action required.",
+            source = "Aura of Elemental Shielding",
+            subclassId = "noble_genies",
+            minLevel = 7,
+            options = damageTypes(listOf("Acid", "Cold", "Fire", "Lightning", "Thunder")),
+        ),
+
+        // ---------------------------------------------------------------- Ranger
+        PerUseChoice(
+            id = "gloom_stalker:stalkers_flurry",
+            label = "Stalker's Flurry",
+            prompt = "Which extra effect rides this Dreadful Strike? You choose again each time.",
+            source = "Stalker's Flurry",
+            resourceId = "gloom_stalker:dreadful_strike",
+            subclassId = "gloom_stalker",
+            minLevel = 11,
+            options = listOf(
+                ChoiceOption(
+                    "sudden_strike", "Sudden Strike",
+                    "Make another attack with the same weapon against a different creature within reach or range.",
+                ),
+                ChoiceOption(
+                    "mote_of_darkness", "Mote of Darkness",
+                    "A 5-foot-radius Sphere of Darkness fills the target's space, and the target has Disadvantage on attack rolls while in it.",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Sorcerer
+        PerUseChoice(
+            id = "aberrant:revelation_in_flesh",
+            label = "Revelation in Flesh",
+            prompt = "Which alteration is showing? One per Sorcery Point spent, and chosen " +
+                "again each time you alter yourself.",
+            source = "Revelation in Flesh",
+            resourceId = "sorcerer:sorcery_points",
+            subclassId = "aberrant",
+            minLevel = 14,
+            options = listOf(
+                ChoiceOption(
+                    "aquatic", "Aquatic Adaptation",
+                    "You gain a Swim Speed equal to twice your Speed and can breathe underwater.",
+                ),
+                ChoiceOption(
+                    "glistening", "Glistening Flesh",
+                    "Your body is covered in mucus that lets you move across difficult terrain without the extra cost, and you cannot be Grappled or Restrained.",
+                ),
+                ChoiceOption(
+                    "perception", "Perception of the Beyond",
+                    "You gain Darkvision with a range of 60 feet and Blindsight with a range of 10 feet.",
+                ),
+                ChoiceOption(
+                    "wormlike", "Wormlike Movement",
+                    "Your body becomes slithering and boneless; you can move through a space as narrow as 1 inch and gain a Climb Speed equal to your Speed.",
+                ),
+            ),
+        ),
+        PerUseChoice(
+            id = "demonic_sorcery:abyssal_rupture",
+            label = "Abyssal Rupture",
+            prompt = "What does the rupture do? You choose when you activate Innate Sorcery, " +
+                "and again as a Bonus Action while it lasts.",
+            source = "Abyssal Rupture",
+            resourceId = "sorcerer:innate_sorcery",
+            subclassId = "demonic_sorcery",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "demonic_lash", "Demonic Lash",
+                    "Make a melee spell attack against a target within 5 feet of the rupture; on a hit it takes 1d8 Slashing damage, and a Large or smaller target can be pulled up to 10 feet toward the centre.",
+                ),
+                ChoiceOption(
+                    "terrifying_screams", "Terrifying Screams",
+                    "Each creature in the rupture must succeed on a Wisdom saving throw against your spell save DC or take 1d4 Psychic damage.",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Warlock
+        PerUseChoice(
+            id = "archfey:steps_of_the_fey",
+            label = "Steps of the Fey",
+            prompt = "Which step is this? You choose again every time you cast Misty Step.",
+            source = "Steps of the Fey",
+            resourceId = "archfey:steps_of_the_fey",
+            subclassId = "archfey",
+            minLevel = 3,
+            options = listOf(
+                ChoiceOption(
+                    "refreshing", "Refreshing Step",
+                    "Immediately after you teleport, you or one creature you can see within 10 feet of yourself gains Temporary Hit Points equal to 1d10 plus your Charisma modifier.",
+                ),
+                ChoiceOption(
+                    "taunting", "Taunting Step",
+                    "Each creature of your choice within 5 feet of the space you left must succeed on a Wisdom saving throw against your spell save DC or have Disadvantage on attack rolls against creatures other than you until the start of your next turn.",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Wizard
+        PerUseChoice(
+            id = "diviner:third_eye",
+            label = "The Third Eye",
+            prompt = "Which sense do you open? It lasts until you start a rest, and you choose " +
+                "again the next time.",
+            source = "The Third Eye",
+            resourceId = "diviner:third_eye",
+            subclassId = "diviner",
+            minLevel = 10,
+            options = listOf(
+                ChoiceOption(
+                    "darkvision", "Darkvision",
+                    "You gain Darkvision with a range of 120 feet.",
+                ),
+                ChoiceOption(
+                    "comprehension", "Greater Comprehension",
+                    "You can read any language, however it is written or spoken.",
+                ),
+                ChoiceOption(
+                    "see_invisibility", "See Invisibility",
+                    "You can cast See Invisibility without expending a spell slot.",
+                ),
+            ),
+        ),
+
+        // ---------------------------------------------------------------- Fighter
+        PerUseChoice(
+            id = "hell_knight:hell_forged_weapon",
+            label = "Hell-Forged Weapon",
+            prompt = "Which hellfire is in the blade? You choose again each time you imbue " +
+                "the weapon.",
+            source = "Hell-Forged Weapon",
+            subclassId = "hell_knight",
+            minLevel = 3,
+            options = damageTypes(listOf("Cold", "Fire", "Necrotic")),
+        ),
+
         PerUseChoice(
             id = "spiritual_guardian:spiritual_protectors",
             label = "Spiritual Protectors",
             prompt = "What do the spirits do on this hit? You choose again on every hit you " +
                 "land while your Rage is active.",
             source = "Spiritual Protectors",
-            resourceId = "barbarian:rage",
+            // No pool. "While your Rage is active, when you hit a creature … it suffers one of
+            // the following effects of your choice" — the choice belongs to the hit and costs
+            // nothing. Hanging it off the Rage tracker asked it once, at the moment you raged,
+            // which turned three effects per hit into one effect per Rage.
             subclassId = "spiritual_guardian",
             minLevel = 3,
             options = listOf(
@@ -414,6 +681,53 @@ object PerUseChoiceData {
         ),
 
         // ---------------------------------------------------------------- Aasimar
+        PerUseChoice(
+            id = "duskling:inner_magic",
+            label = "Inner Magic",
+            prompt = "Which benefit is your inner magic holding? Chosen on a Long Rest and " +
+                "switched again on a Bonus Action, as often as your Proficiency Bonus allows.",
+            source = "Inner Magic",
+            resourceId = "duskling:inner_magic",
+            speciesId = "duskling",
+            options = listOf(
+                ChoiceOption(
+                    "duskling_ardor", "Ardor",
+                    "You have Advantage on Charisma checks and on saving throws to avoid or " +
+                        "end the Frightened condition.",
+                ),
+                ChoiceOption(
+                    "duskling_mobility", "Mobility",
+                    "Your Speed increases by 10 feet, and climbing and swimming don't cost " +
+                        "you extra movement.",
+                ),
+                ChoiceOption(
+                    "duskling_vigor", "Vigor",
+                    "Temporary Hit Points equal to your Proficiency Bonus, and Advantage on " +
+                        "Strength (Athletics) and Dexterity (Acrobatics) checks.",
+                ),
+            ),
+        ),
+        PerUseChoice(
+            id = "dhampir:vampiric_bite",
+            label = "Vampiric Bite",
+            prompt = "What does the bite take from them? You choose again with every bite.",
+            source = "Vampiric Bite",
+            resourceId = "dhampir:vampiric_bite",
+            speciesId = "dhampir",
+            options = listOf(
+                ChoiceOption(
+                    "heal", "Regain Hit Points",
+                    "You regain Hit Points equal to the Piercing damage the bite dealt.",
+                    "On a bite",
+                ),
+                ChoiceOption(
+                    "bonus", "Empowering Bonus",
+                    "You gain a bonus equal to the Piercing damage dealt to the next ability " +
+                        "check or attack roll you make.",
+                    "On a bite",
+                ),
+            ),
+        ),
         PerUseChoice(
             id = "aasimar:celestial_revelation",
             label = "Celestial Revelation",

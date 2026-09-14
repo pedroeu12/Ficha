@@ -546,6 +546,47 @@ object FeatChoiceData {
                 ),
             )
 
+            // "You gain proficiency in one of the following skills … You also know one
+            // additional language of your choice." Two sentences, neither of them asked.
+            "symbiotic_being" -> listOf(
+                Choice(
+                    id = "feat:symbiotic_being:skill",
+                    label = "Second Mind",
+                    prompt = "Choose the skill the second mind knows.",
+                    count = 1,
+                    kind = ChoiceKind.SKILL,
+                    options = ChoiceOptions.fromSkills(
+                        listOf(
+                            Skill.ARCANA, Skill.DECEPTION, Skill.HISTORY, Skill.INTIMIDATION,
+                            Skill.INSIGHT, Skill.INVESTIGATION, Skill.NATURE, Skill.RELIGION,
+                            Skill.PERCEPTION, Skill.PERSUASION,
+                        )
+                    ),
+                    source = featName,
+                ),
+                languageChoice(featId, featName),
+            )
+
+            // "Choose one of the following skills … if you lack proficiency you gain it,
+            // and if you already have it you gain Expertise." Never asked, so neither landed.
+            "keen_mind" -> listOf(
+                Choice(
+                    id = "feat:keen_mind:skill",
+                    label = "Lore Knowledge",
+                    prompt = "Choose the field you have studied. You gain proficiency in it, " +
+                        "or Expertise if you are already proficient.",
+                    count = 1,
+                    kind = ChoiceKind.SKILL,
+                    options = ChoiceOptions.fromSkills(
+                        listOf(
+                            Skill.ARCANA, Skill.HISTORY, Skill.INVESTIGATION,
+                            Skill.NATURE, Skill.RELIGION,
+                        )
+                    ),
+                    source = featName,
+                )
+            )
+
             "elemental_adept" -> listOf(
                 Choice(
                     id = "feat:elemental_adept:damage",
@@ -642,6 +683,7 @@ object FeatChoiceData {
                     // its rules text read identically wherever the choice is made.
                     options = MasteryData.weaponOptions(),
                     source = featName,
+                    changeableOnRest = true,
                 )
             )
 
@@ -704,6 +746,7 @@ object FeatChoiceData {
                     kind = ChoiceKind.DAMAGE_TYPE,
                     options = ChoiceOptions.fromStrings(ALL_DAMAGE),
                     source = featName,
+                    changeableOnRest = true,
                 )
             )
 
@@ -731,6 +774,7 @@ object FeatChoiceData {
                     kind = ChoiceKind.SKILL,
                     options = ChoiceOptions.fromSkills(Skill.ALL),
                     source = featName,
+                    changeableOnRest = true,
                 ),
                 Choice(
                     id = "feat:echoing_soul:expertise",
@@ -741,6 +785,7 @@ object FeatChoiceData {
                     options = ChoiceOptions.fromSkills(Skill.ALL),
                     source = featName,
                     optionsFrom = OptionSource.ProficientSkills,
+                    changeableOnRest = true,
                 ),
                 languageChoice("echoing_soul", featName),
             )

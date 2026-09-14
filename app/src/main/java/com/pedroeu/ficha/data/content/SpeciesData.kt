@@ -259,6 +259,9 @@ object SpeciesData {
                                 listOf(Ability.INT, Ability.WIS, Ability.CHA)
                             ),
                             source = "Khoravar",
+                            // "Whenever you finish a Long Rest you can replace it
+                            // with a different cantrip."
+                            changeableOnRest = true,
                         )
                     )),
                 Trait("Lethargy Resilience", "When you fail a saving throw to avoid or end the Unconscious condition, you can succeed instead. Once you use this trait, you can't do so again until you finish 1d4 Long Rests."),
@@ -346,7 +349,7 @@ object SpeciesData {
             traits = listOf(
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
                 Trait("Spider Climb", "You have a Climb Speed equal to your Speed. When you reach character level 3, you can move up, down, and across vertical surfaces and along ceilings while leaving your hands free."),
-                Trait("Vampiric Bite", "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 plus your Constitution modifier instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn't a Construct or an Undead, you can empower yourself in one of the following ways:"),
+                Trait("Vampiric Bite", "When you use your Unarmed Strike and deal damage, you can choose to bite with your fangs. You deal Piercing damage equal to 1d4 plus your Constitution modifier instead of the normal damage of an Unarmed Strike. In addition, when you deal this damage to a creature that isn't a Construct or an Undead, you can empower yourself in one of the following ways, chosen each time: regain Hit Points equal to the Piercing damage dealt, or gain a bonus equal to that damage to the next ability check or attack roll you make."),
                 Trait("Drain", "You regain Hit Points equal to the Piercing damage dealt."),
                 Trait("Strengthen", "You gain a bonus to the next ability check or attack roll you make within the next minute; the bonus is equal to the Piercing damage dealt. You can empower yourself with this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest."),
             ),
@@ -388,7 +391,7 @@ object SpeciesData {
             summary = "Flamekin are people made from two key elements of creation: fire and stone. As a result, many flamekin feel a strong connection to the natural world.",
             traits = listOf(
                 Trait("Darkvision", "You can see in dim light within 60 feet of you as if it were bright light and in darkness as if it were dim light. You discern colors in that darkness only as shades of gray."),
-                Trait("Reach to the Blaze", "You know the Produce Flame cantrip. Starting at 3rd level, you can cast the Burning Hands spell with this trait. Starting at 5th level, you can also cast the Flame Blade spell with this trait, without requiring a material component. Once you cast Burning Hands or Flame Blade with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select ",
+                Trait("Reach to the Blaze", "You know the Produce Flame cantrip. Starting at 3rd level, you can cast the Burning Hands spell with this trait. Starting at 5th level, you can also cast the Flame Blade spell with this trait, without requiring a material component. Once you cast Burning Hands or Flame Blade with this trait, you can't cast that spell with it again until you finish a long rest. You can also cast either of those spells using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for these spells when you cast them with this trait (choose when you select this species).",
                     choices = listOf(
                         Choice(
                             id = "species:flamekin:casting_ability",
@@ -415,7 +418,7 @@ object SpeciesData {
             summary = "Hexbloods are individuals infused with fey magic as a result of eldritch energy or mysterious witchcraft. Many hexbloods are transformed into such beings after making a deal with a powerful hag, but other strange forces can result in the birth of a hexblood.",
             traits = listOf(
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
-                Trait("Eerie Token", "As a Bonus Action, you can create a magical token by harmlessly removing a lock of hair, detaching a nail, or using some other method. While the token exists, you gain the following benefits:"),
+                Trait("Eerie Token", "As a Bonus Action, you can create a magical token by harmlessly removing a lock of hair, detaching a nail, or using some other method. While the token exists, you gain the following benefits. Distant Message. As a Magic action, you can send a telepathic message of 25 words or fewer to a creature holding or carrying the token, as long as you are within 10 miles of it. Remote Viewing. If you are within 10 miles of the token, you can take a Magic action to extend your senses through the token for 1 minute, until you have the Incapacitated condition, or until you end this state (no action required). During this state, you can see and hear from the token as if you were located where it is. When this state ends, the token is harmlessly destroyed. You can create the token again after you finish a Long Rest."),
                 Trait("Distant Message", "As a Magic action, you can send a telepathic message of 25 words or fewer to a creature holding or carrying the token, as long as you are within 10 miles of it."),
                 Trait("Remote Viewing", "If you are within 10 miles of the token, you can take a Magic action to extend your senses through the token for 1 minute, until you have the Incapacitated condition, or until you end this state (no action required). During this state, you can see and hear from the token as if you were located where it is. When this state ends, the token is harmlessly destroyed. Unless the token is destroyed early, it lasts until you finish a Long Rest. Once you create a token using this feature, you can't do so again until you finish a Long Rest."),
                 Trait("Hex Magic", "You always have the Disguise Self and Hex spells prepared. You can cast each spell once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have of the appropriate level. Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait (choose the ability when you select this species).",
@@ -542,28 +545,7 @@ object SpeciesData {
             traits = listOf(
                 Trait("Darkvision", "You have Darkvision with a range of 60 feet."),
                 Trait("Enhanced Jump", "Add 2 feet to the distance you can leap with a running High Jump and 10 feet to the distance you can leap with a running Long Jump."),
-                Trait("Inner Magic", "You have magic inside you that you can manipulate to enhance your physical or mental attributes. When you finish a Long Rest, choose one of the following benefits, which lasts until you choose a different ability. As a Bonus Action, you can switch to a different benefit. You can switch the benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. Ardor. You have Advantage on Charisma ability checks and on saving throws to avoid or end the Frightened condition. Mobility. Your Speed increases by 10 feet, and climbing and swimming don't cost you extra movement. Vigor. You gain a number of Temporary Hit Points equal to your Proficiency Bonus, and you have Advantage on Strength (Athletics) and Dexterity (Acrobatics) checks.",
-                    choices = listOf(
-                        Choice(
-                            id = "species:duskling:inner_magic",
-                            label = "Inner Magic",
-                            prompt = "Choose which benefit your inner magic is holding. You can switch on a Bonus Action, and the choice resets every Long Rest.",
-                            count = 1,
-                            kind = ChoiceKind.OPTION,
-                            options = listOf(
-                                ChoiceOption("duskling_ardor", "Ardor",
-                                    "Advantage on Charisma checks and on saves to avoid or end the Frightened condition."),
-                                ChoiceOption("duskling_mobility", "Mobility",
-                                    "Your Speed increases by 10 feet, and climbing and swimming don't cost you extra movement."),
-                                ChoiceOption("duskling_vigor", "Vigor",
-                                    "Temporary Hit Points equal to your Proficiency Bonus, and Advantage on Athletics and Acrobatics checks."),
-                            ),
-                            source = "Duskling",
-                            // The rules say "when you finish a Long Rest", so the answer is
-                            // meant to be revisited rather than fixed at creation.
-                            changeableOnRest = true,
-                        )
-                    )),
+                Trait("Inner Magic", "You have magic inside you that you can manipulate to enhance your physical or mental attributes. When you finish a Long Rest, choose one of the following benefits, which lasts until you choose a different ability. As a Bonus Action, you can switch to a different benefit. You can switch the benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. Ardor. You have Advantage on Charisma ability checks and on saving throws to avoid or end the Frightened condition. Mobility. Your Speed increases by 10 feet, and climbing and swimming don't cost you extra movement. Vigor. You gain a number of Temporary Hit Points equal to your Proficiency Bonus, and you have Advantage on Strength (Athletics) and Dexterity (Acrobatics) checks."),
             ),
             book = Sourcebook.DDB_DROPS,
         ),

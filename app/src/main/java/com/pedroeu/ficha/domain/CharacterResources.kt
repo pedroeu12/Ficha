@@ -1,11 +1,11 @@
 package com.pedroeu.ficha.domain
 
-import com.pedroeu.ficha.data.content.FeatureText
-import com.pedroeu.ficha.data.content.ResourceData
 import com.pedroeu.ficha.data.content.ResourceOptionData
 import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.ResourceDef
 import com.pedroeu.ficha.data.model.ResourceOption
+import com.pedroeu.ficha.rules.FormulaEval
+import com.pedroeu.ficha.rules.RulesEngine
 
 /** A resource paired with how much of it the character has spent. */
 data class ResourceState(
@@ -23,27 +23,31 @@ data class ResourceState(
  */
 object CharacterResources {
 
+    /**
+     * Every pool the character has, from the rules engine and from their own additions.
+     *
+     * Which pools exist, what each one holds and when it comes back is the engine's answer.
+     * This used to gather them itself, with its own reading of which level a pool scales on
+     * beside the engine's reading of the same thing — two implementations of one question,
+     * and the kind of pair that drifts silently because nothing compares them.
+     */
     fun definitions(character: PlayerCharacter): List<ResourceDef> {
-        // Each class's pools scale on the level in that class, so a Fighter 5 / Cleric 3 has
-        // a level 5 Fighter's Second Wind and a level 3 Cleric's Channel Divinity. Species
-        // and feat pools are gathered once, from the first class, to avoid duplicates.
-        val classes = ClassLevels.of(character)
-        val derived = classes.flatMapIndexed { index, entry ->
-            ResourceData.forContext(
-                ResourceData.Context(
-                    classId = entry.classId,
-                    subclassId = entry.subclassId,
-                    // Only the first pass carries the species and feats.
-                    speciesId = if (index == 0) character.speciesId else "",
-                    lineageId = if (index == 0) character.lineageId else null,
-                    featIds = if (index == 0) CharacterFeats.heldBy(character) else emptyList(),
-                    level = entry.level,
-                    proficiencyBonus = CharacterCalculations.proficiencyBonus(character),
-                    abilityModifiers = CharacterCalculations.abilityModifiers(character),
-                    characterLevel = character.level,
-                    featAbilities = FeatBonuses.all(character)
-                        .associate { it.featId to it.ability },
-                )
+        val derived = RulesEngine.pools(character).map { applied ->
+            ResourceDef(
+                id = applied.effect.poolId,
+                name = applied.element.name,
+                max = FormulaEval.eval(
+                    applied.effect.max,
+                    character,
+                    applied.element.source.owningClassId,
+                ),
+                recharge = applied.effect.recharge,
+                source = applied.element.source.label,
+                notes = applied.effect.notes,
+                description = applied.element.description,
+                isPointPool = applied.effect.isPointPool,
+                actionCost = applied.effect.actionCost.label,
+                spellId = applied.effect.castsSpellId,
             )
         }.distinctBy { it.id }
 
@@ -67,15 +71,7 @@ object CharacterResources {
                 if (override == null) def else def.copy(max = override)
             }
             .filter { it.max > 0 }
-            .map { def ->
-                def.copy(
-                    options = optionsFor(character, def.id),
-                    // Custom pools are the player's own words; everything else borrows the
-                    // rules text from the feature that granted it.
-                    description = if (def.isCustom) def.description
-                    else def.description.ifBlank { FeatureText.forName(def.name) },
-                )
-            }
+            .map { def -> def.copy(options = optionsFor(character, def.id)) }
     }
 
     /**

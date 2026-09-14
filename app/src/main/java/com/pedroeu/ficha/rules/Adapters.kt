@@ -3,6 +3,7 @@ package com.pedroeu.ficha.rules
 import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.FeatChoiceData
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.FeatureText
 import com.pedroeu.ficha.data.content.ModifierData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.PassiveBonusData
@@ -245,8 +246,10 @@ internal object Adapters {
                 RuleElement(
                     id = "pool:${def.id}",
                     name = def.name,
-                    description = def.description,
-                    source = sourceFor(def.id.substringBefore(':'), entry.classId),
+                    // The tracker prints the feature's own words, and the table leaves the
+                    // field blank where the feature it came from carries them instead.
+                    description = def.description.ifBlank { FeatureText.forName(def.name) },
+                    source = sourceFor(def.id, entry.classId),
                     gate = Gate.ALWAYS,
                     effects = listOf(
                         Effect.LimitedUses(
@@ -256,6 +259,7 @@ internal object Adapters {
                             isPointPool = def.isPointPool,
                             actionCost = ActionCost.of(def),
                             castsSpellId = def.spellId,
+                            notes = def.notes,
                         )
                     ) + def.options.map { option ->
                         Effect.AskOnUse(
@@ -514,13 +518,33 @@ internal object Adapters {
     private fun classOf(subclassId: String): String =
         SubclassData.byId(subclassId)?.classId.orEmpty()
 
-    private fun sourceFor(sourceId: String, classId: String): Source = when {
-        ClassData.byId(sourceId) != null -> Source.Class(sourceId)
-        SubclassData.byId(sourceId) != null -> Source.Subclass(sourceId, classOf(sourceId))
-        SpeciesData.byId(sourceId) != null -> Source.Species(sourceId)
-        FeatData.byId(sourceId) != null -> Source.Feat(sourceId)
-        else -> Source.Class(classId)
+    /**
+     * What a content id names, whichever way the id is written.
+     *
+     * Ids in the tables come in two shapes: a bare owner ("fiend", "mark_of_healing") and a
+     * kinded path ("feat:mark_of_healing", "subclass:fiend:dark_ones_blessing"). This read
+     * only the text before the first colon, so every kinded id resolved to its *kind* — "feat"
+     * names nothing, so the whole lot fell through to the character's class and a Dragonmark's
+     * free castings were captioned "Cleric". Trying each segment in turn costs nothing and
+     * reads both shapes.
+     *
+     * Lineages were missing outright, so a High Elf's cantrip was the class's too.
+     */
+    private fun sourceFor(sourceId: String, classId: String): Source {
+        sourceId.split(':').forEach { segment ->
+            ClassData.byId(segment)?.let { return Source.Class(segment) }
+            SubclassData.byId(segment)?.let { return Source.Subclass(segment, classOf(segment)) }
+            SpeciesData.byId(segment)?.let { return Source.Species(segment) }
+            FeatData.byId(segment)?.let { return Source.Feat(segment) }
+            lineageOwner(segment)?.let { return Source.Lineage(segment, it) }
+        }
+        return Source.Class(classId)
     }
+
+    /** The species a lineage id belongs to, or null when the id names no lineage. */
+    private fun lineageOwner(lineageId: String): String? = SpeciesData.ALL
+        .firstOrNull { species -> species.lineageOptions.any { it.id == lineageId } }
+        ?.id
 
     private fun slug(name: String): String =
         name.lowercase().replace(Regex("[^a-z0-9]+"), "_").trim('_')

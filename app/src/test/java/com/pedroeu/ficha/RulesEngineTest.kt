@@ -2,9 +2,11 @@ package com.pedroeu.ficha
 
 import com.pedroeu.ficha.data.content.PerUseChoiceData
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.data.content.ResourceData
 import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
+import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterDcs
 import com.pedroeu.ficha.domain.CharacterFeats
 import com.pedroeu.ficha.domain.CharacterResources
@@ -12,6 +14,7 @@ import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceGraph
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.FeatBonuses
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.rules.Effect
 import com.pedroeu.ficha.rules.LevelScope
@@ -180,27 +183,65 @@ class RulesEngineTest {
         )
     }
 
+    /** The pools the resource table holds, read the way the old gatherer read them. */
+    private fun poolsFromTable(pc: PlayerCharacter) =
+        ClassLevels.of(pc).flatMapIndexed { index, entry ->
+            ResourceData.forContext(
+                ResourceData.Context(
+                    classId = entry.classId,
+                    subclassId = entry.subclassId,
+                    speciesId = if (index == 0) pc.speciesId else "",
+                    lineageId = if (index == 0) pc.lineageId else null,
+                    featIds = if (index == 0) CharacterFeats.heldBy(pc) else emptyList(),
+                    level = entry.level,
+                    proficiencyBonus = CharacterCalculations.proficiencyBonus(pc),
+                    abilityModifiers = CharacterCalculations.abilityModifiers(pc),
+                    characterLevel = pc.level,
+                    featAbilities = FeatBonuses.all(pc).associate { it.featId to it.ability },
+                )
+            )
+        }.distinctBy { it.id }
+
     @Test
-    fun `the engine finds the same limited-use pools`() {
+    fun `the engine finds the same limited-use pools the table holds`() {
         cast().forEach { (who, pc) ->
             val fromEngine = RulesEngine.pools(pc).map { it.effect.poolId }.toSet()
-            val fromTables = CharacterResources.definitions(pc)
-                .filterNot { it.isCustom }
-                .map { it.id }
-                .toSet()
-            assertEquals("$who: pools differ", fromTables, fromEngine)
+            assertEquals("$who: pools differ", poolsFromTable(pc).map { it.id }.toSet(), fromEngine)
+            assertEquals(
+                "$who: the reader and the engine disagree",
+                fromEngine,
+                CharacterResources.definitions(pc).filterNot { it.isCustom }.map { it.id }.toSet(),
+            )
         }
     }
 
     @Test
     fun `the engine works out the same maximum for every pool`() {
         cast().forEach { (who, pc) ->
-            CharacterResources.definitions(pc).filterNot { it.isCustom }.forEach { def ->
-                assertEquals(
-                    "$who: ${def.id} maximum differs",
-                    def.max,
-                    RulesEngine.poolMax(pc, def.id),
-                )
+            val fromEngine = CharacterResources.definitions(pc).associate { it.id to it.max }
+            poolsFromTable(pc).forEach { def ->
+                assertEquals("$who: ${def.id} maximum differs", def.max, RulesEngine.poolMax(pc, def.id))
+                assertEquals("$who: ${def.id} reaches the sheet wrong", def.max, fromEngine[def.id])
+            }
+        }
+    }
+
+    /**
+     * A pool says where it came from, and the id is not the answer.
+     *
+     * Pool ids are written "feat:mark_of_healing", and the source was read from the text
+     * before the first colon — so "feat" named nothing, every kinded id fell through to the
+     * character's class, and a Dragonmark's free castings were captioned "Cleric".
+     */
+    @Test
+    fun `a pool is captioned with what granted it`() {
+        val marked = character("cleric", 8, "life_domain", featIds = listOf("mark_of_healing"))
+        val pool = CharacterResources.definitions(marked).first { it.id == "feat:mark_of_healing" }
+        assertEquals("Mark of Healing", pool.source)
+
+        cast().forEach { (who, pc) ->
+            CharacterResources.definitions(pc).filterNot { it.isCustom }.forEach {
+                assertTrue("$who: ${it.id} has no source", it.source.isNotBlank())
             }
         }
     }

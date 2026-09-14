@@ -195,6 +195,8 @@ sealed interface Effect {
         val actionCost: ActionCost = ActionCost.OTHER,
         /** A spell this pool exists to cast for free, when that is what it is. */
         val castsSpellId: String = "",
+        /** A caveat the tracker prints under the pool, where the rules attach one. */
+        val notes: String = "",
     ) : Effect
 
     // ---------------------------------------------------------------- Summoning

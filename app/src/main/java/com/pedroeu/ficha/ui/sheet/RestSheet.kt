@@ -48,6 +48,8 @@ import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.RestEngine
 import com.pedroeu.ficha.domain.RestOutcome
@@ -273,6 +275,12 @@ fun RestSheet(
                             onToggle = { optionId ->
                                 viewModel.toggleChoice(resolved.choice, resolved.level, optionId)
                             },
+                            disabledOptionIds = OwnedOptions.disabledFor(
+                                choice = resolved.choice,
+                                owned = OwnedOptions.of(character),
+                                currentSelection = resolved.selectedIds.toSet(),
+                                classLevels = ClassLevels.levelMap(character),
+                            ),
                         )
                     }
                 }

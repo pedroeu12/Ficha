@@ -143,10 +143,9 @@ fun SkillsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     }
 
     editingSkill?.let { skill ->
-        val stripped = character.copy(skillBonuses = emptyMap(), skillOverrides = emptyMap())
         StatEditDialog(
             title = skill.displayName,
-            rulesValue = CharacterCalculations.skillBonus(stripped, skill),
+            rulesValue = CharacterCalculations.unpinnedSkill(character, skill),
             currentBonus = character.skillBonuses[skill.name],
             currentOverride = character.skillOverrides[skill.name],
             onDismiss = { editingSkill = null },

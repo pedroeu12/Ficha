@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,11 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pedroeu.ficha.domain.ChoiceResolver
-import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.OverridableStat
-import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
-import com.pedroeu.ficha.ui.components.ChoiceSection
+import com.pedroeu.ficha.ui.components.ChoiceEditDialog
 import com.pedroeu.ficha.ui.components.StatEditDialog
 import com.pedroeu.ficha.ui.components.TextEditDialog
 import com.pedroeu.ficha.ui.i18n.tr
@@ -201,11 +198,9 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
 
         is SheetOverlay.AbilityScore -> StatEditDialog(
             title = tr(overlay.ability.fullName),
-            // The rules figure alone: base plus origin plus improvements, before anything
-            // the player has pinned on top of it.
-            rulesValue = (character.baseAbilityScores[overlay.ability.name] ?: 10) +
-                (character.backgroundAbilityBonuses[overlay.ability.name] ?: 0) +
-                (character.abilityScoreImprovements[overlay.ability.name] ?: 0),
+            // The rules figure alone, before anything the player has pinned on top of it.
+            rulesValue = com.pedroeu.ficha.domain.CharacterCalculations
+                .unpinnedAbilityScore(character, overlay.ability),
             currentBonus = character.abilityScoreBonuses[overlay.ability.name],
             currentOverride = character.abilityScoreOverrides[overlay.ability.name],
             onDismiss = onDismiss,
@@ -220,7 +215,7 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
         is SheetOverlay.SavingThrow -> StatEditDialog(
             title = trf("{0} — saving throw", tr(overlay.ability.fullName)),
             rulesValue = com.pedroeu.ficha.domain.CharacterCalculations
-                .savingThrowBonus(character, overlay.ability),
+                .unpinnedSavingThrow(character, overlay.ability),
             currentBonus = character.saveBonuses[overlay.ability.name],
             currentOverride = character.saveOverrides[overlay.ability.name],
             onDismiss = onDismiss,
@@ -233,7 +228,7 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
         is SheetOverlay.SkillAdjust -> StatEditDialog(
             title = tr(overlay.skill.displayName),
             rulesValue = com.pedroeu.ficha.domain.CharacterCalculations
-                .skillBonus(character, overlay.skill),
+                .unpinnedSkill(character, overlay.skill),
             currentBonus = character.skillBonuses[overlay.skill.name],
             currentOverride = character.skillOverrides[overlay.skill.name],
             onDismiss = onDismiss,
@@ -342,31 +337,18 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
 
         is SheetOverlay.EditChoice -> {
             // Looked up live, so the ticks follow the answer as it changes under the dialog.
-            val resolved = ChoiceResolver.all(character)
+            ChoiceResolver.all(character)
                 .firstOrNull { it.choice.id == overlay.choiceId }
-            if (resolved != null) {
-                val disabled = OwnedOptions.disabledFor(
-                    choice = resolved.choice,
-                    owned = OwnedOptions.of(character),
-                    currentSelection = resolved.selectedIds.toSet(),
-                    classLevels = ClassLevels.levelMap(character),
-                )
-                AlertDialog(
-                    onDismissRequest = onDismiss,
-                    title = { Text(resolved.choice.label) },
-                    text = {
-                        ChoiceSection(
-                            choice = resolved.choice,
-                            selected = resolved.selectedIds,
-                            onToggle = { optionId ->
-                                viewModel.toggleChoice(resolved.choice, resolved.level, optionId)
-                            },
-                            disabledOptionIds = disabled,
-                        )
-                    },
-                    confirmButton = { TextButton(onClick = onDismiss) { Text(tr("Done")) } },
-                )
-            }
+                ?.let { resolved ->
+                    ChoiceEditDialog(
+                        character = character,
+                        resolved = resolved,
+                        onDismiss = onDismiss,
+                        onToggle = { optionId ->
+                            viewModel.toggleChoice(resolved.choice, resolved.level, optionId)
+                        },
+                    )
+                }
         }
     }
 }

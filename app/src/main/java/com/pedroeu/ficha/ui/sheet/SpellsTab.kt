@@ -239,17 +239,9 @@ fun SpellsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: B
     }
 
     editingStat?.let { stat ->
-        val stripped = character.copy(statOverrides = emptyMap(), statBonuses = emptyMap())
-        val rulesValue = when (stat) {
-            OverridableStat.SPELL_SAVE_DC -> CharacterCalculations.spellSaveDc(stripped) ?: 0
-            OverridableStat.SPELL_ATTACK_BONUS -> CharacterCalculations.spellAttackBonus(stripped) ?: 0
-            OverridableStat.MAX_PREPARED_SPELLS -> CharacterCalculations.maxPreparedSpells(stripped)
-            OverridableStat.CANTRIPS_KNOWN -> CharacterCalculations.maxCantripsKnown(stripped)
-            else -> 0
-        }
         StatEditDialog(
             title = stat.label,
-            rulesValue = rulesValue,
+            rulesValue = CharacterCalculations.unpinnedStat(character, stat),
             currentBonus = character.statBonuses[stat.name],
             currentOverride = character.statOverrides[stat.name],
             onDismiss = { editingStat = null },

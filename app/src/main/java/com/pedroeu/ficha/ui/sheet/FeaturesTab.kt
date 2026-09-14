@@ -42,7 +42,7 @@ import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
 import com.pedroeu.ficha.domain.SheetFeatures
-import com.pedroeu.ficha.ui.components.ChoiceSection
+import com.pedroeu.ficha.ui.components.ChoiceEditDialog
 import com.pedroeu.ficha.ui.components.DetailRow
 import com.pedroeu.ficha.ui.components.EditableText
 import androidx.compose.foundation.clickable
@@ -398,40 +398,6 @@ private fun ChoiceLine(
             }
         }
     }
-}
-
-@Composable
-private fun ChoiceEditDialog(
-    character: PlayerCharacter,
-    resolved: ResolvedChoice,
-    onDismiss: () -> Unit,
-    onToggle: (String) -> Unit,
-) {
-    // The same eligibility every other picker applies — what is already held, the level in
-    // the right class, an option another option requires. This dialog used to apply none of
-    // it, so the sheet could hand a level 2 Warlock an invocation the level-up flow would
-    // have greyed out.
-    val disabled = OwnedOptions.disabledFor(
-        choice = resolved.choice,
-        owned = OwnedOptions.of(character),
-        currentSelection = resolved.selectedIds.toSet(),
-        classLevels = ClassLevels.levelMap(character),
-    )
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(resolved.choice.label) },
-        text = {
-            ChoiceSection(
-                choice = resolved.choice,
-                selected = resolved.selectedIds,
-                onToggle = onToggle,
-                disabledOptionIds = disabled,
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text(tr("Done")) }
-        },
-    )
 }
 
 @Composable

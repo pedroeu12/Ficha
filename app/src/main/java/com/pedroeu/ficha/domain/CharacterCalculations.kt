@@ -515,6 +515,72 @@ object CharacterCalculations {
     fun carriedWeight(character: PlayerCharacter): Double =
         character.inventory.sumOf { it.weightLb * it.quantity }
 
+    /**
+     * The character with its current hit points brought back inside its maximum.
+     *
+     * Anything that lowers the maximum leaves the current total above it: pinning Constitution
+     * down in Edit Mode, giving back the Tough feat, dropping a level. Damage and healing
+     * clamp themselves, so the sheet looked right until one of those happened and then read
+     * "45 / 30" until the character next took a hit.
+     *
+     * Applied to every edit rather than at each of the dozen places that can move the maximum,
+     * because the list of those is exactly the kind of thing nobody keeps in their head.
+     */
+    fun withHitPointsInRange(character: PlayerCharacter): PlayerCharacter {
+        val max = maxHitPoints(character)
+        return if (character.currentHitPoints <= max) character
+        else character.copy(currentHitPoints = max)
+    }
+
+    // ------------------------------------------------------------------ What the rules say
+
+    /**
+     * The number before the player's own pin on it — what an edit dialog offers to restore.
+     *
+     * Every dialog that lets a number be pinned has to show what it is pinning *over*, and
+     * that means computing it with this one pin cleared. Each screen did its own clearing:
+     * the Skills tab cleared the skill maps, the Spells tab the stat maps, the Stats tab the
+     * stat maps again — and the tablet cleared nothing at all, so opening a pinned skill or
+     * saving throw showed the pinned number labelled "rules value" and offered to reset it to
+     * itself.
+     *
+     * Only the maps the dialog itself writes are cleared. A Strength pinned by hand is a real
+     * input to Athletics, and clearing it would answer a question nobody asked.
+     */
+    fun unpinnedStat(character: PlayerCharacter, stat: OverridableStat): Int {
+        val bare = character.copy(statOverrides = emptyMap(), statBonuses = emptyMap())
+        return when (stat) {
+            OverridableStat.MAX_HIT_POINTS -> maxHitPoints(bare)
+            OverridableStat.ARMOR_CLASS -> armorClass(bare)
+            OverridableStat.INITIATIVE -> initiative(bare)
+            OverridableStat.SPEED -> speed(bare)
+            OverridableStat.PROFICIENCY_BONUS -> proficiencyBonus(bare)
+            OverridableStat.PASSIVE_PERCEPTION -> passivePerception(bare)
+            OverridableStat.SPELL_SAVE_DC -> spellSaveDc(bare) ?: 0
+            OverridableStat.SPELL_ATTACK_BONUS -> spellAttackBonus(bare) ?: 0
+            OverridableStat.MAX_PREPARED_SPELLS -> maxPreparedSpells(bare)
+            OverridableStat.CANTRIPS_KNOWN -> maxCantripsKnown(bare)
+        }
+    }
+
+    fun unpinnedSkill(character: PlayerCharacter, skill: Skill): Int =
+        skillBonus(character.copy(skillBonuses = emptyMap(), skillOverrides = emptyMap()), skill)
+
+    fun unpinnedSavingThrow(character: PlayerCharacter, ability: Ability): Int =
+        savingThrowBonus(character.copy(saveBonuses = emptyMap(), saveOverrides = emptyMap()), ability)
+
+    /**
+     * A score as its origins add up to it: base, background, improvements and feats.
+     *
+     * The feats matter and were being left out. A Fighter who took Skill Expert has 15
+     * Dexterity by the rules, and the dialog said 14 — so resetting the score to "what the
+     * rules say" quietly removed the feat's increase.
+     */
+    fun unpinnedAbilityScore(character: PlayerCharacter, ability: Ability): Int =
+        finalAbilityScores(
+            character.copy(abilityScoreOverrides = emptyMap(), abilityScoreBonuses = emptyMap())
+        )[ability] ?: 10
+
     /** True when any manual adjustment is in play, so the sheet can offer to reset them. */
     fun hasManualAdjustments(character: PlayerCharacter): Boolean =
         character.abilityScoreOverrides.isNotEmpty() ||

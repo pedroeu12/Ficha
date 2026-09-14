@@ -66,9 +66,18 @@ class SheetViewModel(
         _editMode.value = !_editMode.value
     }
 
+    /**
+     * Every change to the character goes through here, and leaves it in a legal state.
+     *
+     * The clamp is the only thing added: an edit that lowers the maximum — Constitution pinned
+     * down, the Tough feat given back — used to leave the current total above it, and the
+     * sheet read "45 / 30" until the character next took damage. Doing it here rather than at
+     * each of the dozen edits that can move the maximum is the difference between a rule and a
+     * list of places to remember.
+     */
     private fun update(transform: (PlayerCharacter) -> PlayerCharacter) {
         val current = _character.value ?: return
-        val updated = transform(current)
+        val updated = CharacterCalculations.withHitPointsInRange(transform(current))
         _character.value = updated
         viewModelScope.launch { repository.save(updated) }
     }

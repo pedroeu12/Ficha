@@ -96,10 +96,9 @@ fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bo
     }
 
     editingStat?.let { stat ->
-        val rulesValue = rulesValueFor(character, stat)
         StatEditDialog(
             title = stat.label,
-            rulesValue = rulesValue,
+            rulesValue = CharacterCalculations.unpinnedStat(character, stat),
             currentBonus = character.statBonuses[stat.name],
             currentOverride = character.statOverrides[stat.name],
             onDismiss = { editingStat = null },
@@ -115,9 +114,11 @@ fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bo
         val base = character.baseAbilityScores[ability.name] ?: 10
         val background = character.backgroundAbilityBonuses[ability.name] ?: 0
         val improvements = character.abilityScoreImprovements[ability.name] ?: 0
+        val fromFeats = CharacterCalculations.unpinnedAbilityScore(character, ability) -
+            (base + background + improvements)
         StatEditDialog(
             title = ability.fullName,
-            rulesValue = base + background + improvements,
+            rulesValue = CharacterCalculations.unpinnedAbilityScore(character, ability),
             currentBonus = character.abilityScoreBonuses[ability.name],
             currentOverride = character.abilityScoreOverrides[ability.name],
             onDismiss = { editingAbility = null },
@@ -126,25 +127,9 @@ fun StatsTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode: Bo
                 viewModel.setAbilityScore(ability, override)
                 editingAbility = null
             },
-            supportingText = "Base $base, origin +$background, improvements +$improvements.",
+            supportingText = "Base $base, origin +$background, improvements +$improvements" +
+                if (fromFeats != 0) ", feats +$fromFeats." else ".",
         )
-    }
-}
-
-/** The value the rules alone produce, ignoring any bonus or override already stored. */
-private fun rulesValueFor(character: PlayerCharacter, stat: OverridableStat): Int {
-    val stripped = character.copy(statOverrides = emptyMap(), statBonuses = emptyMap())
-    return when (stat) {
-        OverridableStat.MAX_HIT_POINTS -> CharacterCalculations.maxHitPoints(stripped)
-        OverridableStat.ARMOR_CLASS -> CharacterCalculations.armorClass(stripped)
-        OverridableStat.INITIATIVE -> CharacterCalculations.initiative(stripped)
-        OverridableStat.SPEED -> CharacterCalculations.speed(stripped)
-        OverridableStat.PROFICIENCY_BONUS -> CharacterCalculations.proficiencyBonus(stripped)
-        OverridableStat.PASSIVE_PERCEPTION -> CharacterCalculations.passivePerception(stripped)
-        OverridableStat.SPELL_SAVE_DC -> CharacterCalculations.spellSaveDc(stripped) ?: 0
-        OverridableStat.SPELL_ATTACK_BONUS -> CharacterCalculations.spellAttackBonus(stripped) ?: 0
-        OverridableStat.MAX_PREPARED_SPELLS -> CharacterCalculations.maxPreparedSpells(stripped)
-        OverridableStat.CANTRIPS_KNOWN -> CharacterCalculations.maxCantripsKnown(stripped)
     }
 }
 

@@ -75,7 +75,9 @@ fun ResourcesCard(
 ) {
     val resources = CharacterResources.states(character)
     var showAdd by remember { mutableStateOf(false) }
-    var editingMax by remember { mutableStateOf<ResourceState?>(null) }
+    // The pool's id, not a copy of it: a remembered snapshot shows the numbers as they
+    // were when the dialog opened rather than as they are.
+    var editingMaxId by remember { mutableStateOf<String?>(null) }
     var collapsed by remember { mutableStateOf(emptySet<ActionCost>()) }
 
     // You get one Action, one Bonus Action and one Reaction a round, so that is the split a
@@ -133,7 +135,7 @@ fun ResourcesCard(
                             onUse = { choiceId, optionId ->
                                 viewModel.spendResourceOn(state.def.id, choiceId, optionId)
                             },
-                            onEditMax = { editingMax = state },
+                            onEditMax = { editingMaxId = state.def.id },
                             onDelete = { viewModel.removeCustomResource(state.def.id) },
                         )
                     }
@@ -158,16 +160,20 @@ fun ResourcesCard(
         )
     }
 
-    editingMax?.let { state ->
+    editingMaxId?.let { poolId ->
+        val live = resources.firstOrNull { it.def.id == poolId } ?: return@let
         StatEditDialog(
-            title = trf("{0} — maximum uses", state.def.name),
-            rulesValue = state.def.max,
+            title = trf("{0} — maximum uses", live.def.name),
+            // The derived maximum, not the one already pinned: definitions() applies the
+            // override before it returns, so this said "rules value 10" about a pin of 10.
+            rulesValue = com.pedroeu.ficha.rules.RulesEngine.poolMax(character, poolId)
+                .takeIf { it > 0 } ?: live.def.max,
             currentBonus = null,
-            currentOverride = character.resourceMaxOverrides[state.def.id],
-            onDismiss = { editingMax = null },
+            currentOverride = character.resourceMaxOverrides[poolId],
+            onDismiss = { editingMaxId = null },
             onConfirm = { _, override ->
-                viewModel.setResourceMax(state.def.id, override)
-                editingMax = null
+                viewModel.setResourceMax(poolId, override)
+                editingMaxId = null
             },
             allowNegative = false,
             supportingText = tr("Set a maximum of 0 to hide this tracker entirely."),

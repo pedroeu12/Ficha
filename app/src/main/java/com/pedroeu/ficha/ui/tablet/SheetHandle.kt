@@ -81,22 +81,15 @@ class SheetHandle(
         }
     }
 
-    /** The rules value behind an overridable stat, so a dialog can show what it is replacing. */
-    fun rulesValue(stat: OverridableStat): Int = com.pedroeu.ficha.domain.CharacterCalculations
-        .let { calc ->
-            when (stat) {
-                OverridableStat.MAX_HIT_POINTS -> calc.maxHitPoints(character)
-                OverridableStat.ARMOR_CLASS -> calc.armorClass(character)
-                OverridableStat.INITIATIVE -> calc.initiative(character)
-                OverridableStat.SPEED -> calc.speed(character)
-                OverridableStat.PROFICIENCY_BONUS -> calc.proficiencyBonus(character)
-                OverridableStat.PASSIVE_PERCEPTION -> calc.passivePerception(character)
-                OverridableStat.SPELL_SAVE_DC -> calc.spellSaveDc(character) ?: 0
-                OverridableStat.SPELL_ATTACK_BONUS -> calc.spellAttackBonus(character) ?: 0
-                OverridableStat.MAX_PREPARED_SPELLS -> calc.maxPreparedSpells(character)
-                OverridableStat.CANTRIPS_KNOWN -> calc.maxCantripsKnown(character)
-            }
-        }
+    /**
+     * The rules value behind an overridable stat, so a dialog can show what it is replacing.
+     *
+     * Read with the player's own pin cleared. This used to read it *with* the pin, so the
+     * tablet's dialog showed the pinned number as the rules number and offered to reset it
+     * to itself.
+     */
+    fun rulesValue(stat: OverridableStat): Int =
+        com.pedroeu.ficha.domain.CharacterCalculations.unpinnedStat(character, stat)
 
     /** True when the player has pinned or nudged this number by hand. */
     fun isAdjusted(stat: OverridableStat): Boolean =

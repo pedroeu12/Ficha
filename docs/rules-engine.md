@@ -1,6 +1,6 @@
 # A unified rules engine
 
-**Status: Phase 0 done, Phase 1 begun, Phase 3 done.** The schema below is built and in the
+**Status: Phase 0 done, Phase 1 mostly done (7 of 9 readers), Phase 3 done.** The schema below is built and in the
 repository. What follows describes it; the section at the end records how much of the app
 actually runs through it.
 
@@ -276,45 +276,52 @@ engine. The phases above are what keeps that from being one unreviewable change.
 
 # Where the migration actually stands
 
-Measured, not estimated. Numbers come from walking thirteen level-20 characters, one per class
-with its first subclass, through `RulesEngine.elementsFor` and counting distinct elements and
-effects.
+Measured, not estimated. The numbers come from walking thirteen level-20 characters — one per
+class, each with its first subclass — through `RulesEngine.elementsFor` and counting distinct
+elements and effects.
 
 ## Reachable through the engine: all of it
 
 Every one of the nine tables is read by an adapter and emitted as `RuleElement`s. Across those
-thirteen characters the engine produces **375 elements carrying 212 effects**: 68 questions
-asked on gain, 55 spell grants, 40 limited-use pools, 15 save DCs, 14 on-use questions, 14
-swappable answers, 6 calculated modifiers. A conformance test holds each of those against the
-old path for sixteen character shapes, multiclass splits included.
+thirteen characters the engine produces **368 elements carrying 207 effects**: 68 questions
+asked on gain, 55 spell grants, 45 limited-use pools, 16 swappable answers, 15 save DCs, 6
+calculated modifiers and 2 on-use questions. A conformance test holds each against the table it
+came from, for sixteen character shapes, multiclass splits included.
 
-179 of the 375 elements carry no effect at all. Most are correct — a feature whose whole
-content is rules text has nothing for the sheet to compute — but some are not, and they are the
-honest measure of what is left to describe.
+179 of the 368 elements carry no effect at all. Most are correct — a feature whose whole content
+is rules text has nothing for the sheet to compute — and the rest are the honest measure of what
+is left to describe.
 
-## Load-bearing: 4 of 9 systems
+## Load-bearing: 7 of 9 systems
 
 | System | Reads the engine? |
 |---|---|
 | Passive and conditional modifiers | **yes — the only path** |
 | Save DCs (`CharacterDcs`) | **yes** |
 | Armor Class, Speed, Initiative, Hit Points (`CharacterCalculations`) | **yes** |
-| Granted spells (`CharacterSpells`) | no — reads `SpellGrantData` |
-| Limited uses (`CharacterResources`) | no — reads `ResourceData` |
-| Choices (`ChoiceResolver`, `ChoiceGraph`) | no — reads the content types directly |
-| On-use choices (`PerUseChoices`) | no |
-| Attacks (`CharacterAttacks`) | no |
+| Granted spells (`CharacterSpells`) | **yes** |
+| Limited uses (`CharacterResources`) | **yes** |
+| On-use choices (`PerUseChoices`) | **yes** |
 | Summons (`CharacterSummons`) | **yes — born in the engine** |
+| Choices (`ChoiceResolver`, `ChoiceGraph`) | no — reads the content types directly |
+| Attacks (`CharacterAttacks`) | no |
 
-One reader is gone rather than switched: `PassiveBonuses` was a gatherer walking the bonus
-tables, then a thin wrapper around the engine, and is now deleted. Nothing outside `rules/`
-gathers a modifier any more, and `CharacterCalculations` moved from *partly* to reading the
-engine for every number it derives.
+Every switch has paid for itself, and in the same currency: each one deleted a second reading of
+a question the engine already answered, and the second reading was wrong.
 
-Each switch has paid for itself. The first caught a per-level class bonus being scaled by the
-character's level, so a Sorcerer 5 / Fighter 3 gained eight Hit Points from Draconic Resilience
-instead of five. The third — the one described below — caught four features whose numbers were
-printed on the sheet and applied nowhere, and one that was applied wrongly.
+- **Passive bonuses** caught a per-level class bonus scaled by the character's level, so a
+  Sorcerer 5 / Fighter 3 gained eight Hit Points from Draconic Resilience instead of five.
+- **Conditional modifiers** caught five features whose numbers were printed on the sheet and
+  applied nowhere, Defense Fighting Style among them.
+- **Granted spells** caught the old path looking a subclass's grants up by id alone, without
+  checking the subclass belonged to the class it was filed under. A test had been asserting
+  that a Cleric carrying the Druid's Circle of the Stars received its spells, and it passed.
+- **On-use choices** had the mirror of that hole: the table gated by level without checking the
+  subclass was held, so a level 5 Berserker was offered the Spiritual Guardian's decision.
+- **Limited uses** caught a caption read from an id prefix. Pool ids are written
+  `feat:mark_of_healing`; the adapter read the text before the first colon, `feat` named
+  nothing, and every kinded id fell through to the character's class — so a Dragonmark's free
+  castings were filed under "Cleric". Lineages had no case at all.
 
 ## Declaring effects natively: summons and modifiers
 
@@ -323,58 +330,48 @@ the second: `ModifierData` is written in the vocabulary directly, keyed by the e
 the feature that grants each one, so the level it arrives at, the class it counts against and
 the subclass or feat it depends on all come from the feature rather than being restated.
 
-## What conditional modifiers cost, and what they found
-
-This was flagged as the thinnest part of the schema, on the grounds that `ModifyStat` appeared
-once across thirteen characters while `CharacterCalculations` held a dozen conditions as code.
-Moving them needed four additions, which is the honest price:
-
-- `Effect.SetStatBase` — an *alternative base* rather than a bonus. Unarmored Defense replaces
-  what armor gives and only counts when it is higher; written as a modifier it would stack.
-- `Condition.All` — two clauses at once, for "while you aren't wearing armor or wielding a
-  Shield". Three features say it and each had been read differently.
-- `Condition.NotInHeavyArmor` — Fast Movement's caveat.
-- `Formula.AtLevels` — a step table, for Unarmored Movement's 10/15/20/25/30.
-
 `Condition.Descriptive`, the escape hatch whose use-count is the signal that the closed list is
 too narrow, is still used **zero** times. A test asserts it.
 
-What the migration found, in content that had shipped:
+## One answer, one place
 
-| Feature | Was |
-|---|---|
-| Defense Fighting Style | +1 AC recorded, displayed, never applied — the most-picked style in the game |
-| Gloom Stalker's Dread Ambusher | Wisdom to Initiative, printed mid-paragraph, never applied |
-| Ranger's Roving | +10 Speed at level 6, never applied |
-| Oath of the Noble Genies' Genie's Splendor | an Unarmored Defense nobody had wired |
-| Monk's Unarmored Defense | applied *with* a Shield, withholding the Shield's bonus instead of not applying |
+Three maps hold the answers to the game's questions — class choices made at creation, level-up
+selections keyed by level, and origin choices — and a question asked again at several levels
+lives under several keys. That was storage, and it leaked into meaning: one reader unioned the
+levels, another read the level the feature was granted at, and Edit Mode wrote to a third place
+the first two never consulted.
 
-`NumericPassiveCoverageTest` is what makes that a category rather than five fixes: it reads the
-text the app ships, finds every sentence promising a standing change to Armor Class, Speed,
-Initiative or Hit Point maximum, and fails the build unless each is either applied or listed
-with a reason it should not be. Fifteen are listed, every one of them either momentary (a
-Bladesong, a Wild Shape form, the turn after a Dash) or somebody else's number (the ally who
-drank the elixir). Writing new content that states a number and forgetting to declare it now
-fails the build.
+`ChoiceResolver.latestSelectionFor` is now the one rule for reading an answer, and `withAnswer`
+the one rule for writing it — a write clears every other home the answer had, so there is
+exactly one and every reader agrees. `ChoiceGrants` is the other half: one `apply` and one
+`revoke` for what an answer puts on the sheet, used by creation, level up, Edit Mode and the
+rests alike, where each of those used to have its own `when (choice.kind)` with its own gaps.
 
 ## What still does not fit
 
 1. **Momentary conditions** — "while Raging", "while shifted", "while the Bladesong is up" are
    real rules the schema can name and the sheet cannot decide, because it does not track the
    moment. `ConditionEval.isComputable` says so explicitly and such a modifier contributes
-   nothing rather than guessing. Tracking those states is the next thing that would make them
-   computable, and it is a sheet feature, not a schema one.
-2. **Spell mechanics** — 419 spells stay prose. Confirmed by the choice audit: sixteen word a
-   choice and all sixteen are made at the table.
+   nothing rather than guessing. Tracking those states is a sheet feature, not a schema one.
+2. **Spell mechanics** — 419 spells stay prose.
 3. **Magic items** — 418, of which roughly 40 change a printed number or grant a spell. The
-   numeric ones already reach Armor Class through the equipped item's own field; the rest stay
-   catalogue entries.
+   numeric ones already reach Armor Class through the equipped item's own field.
 4. **Multiclass spell slots** — stays in `CharacterCalculations`, fed caster types.
 5. **DM-facing text** — stays prose.
+6. **Two shapes for a level 1 class option.** `ClassData.choices` holds the older `ClassChoice`
+   type and `ProgressionData` holds a `Choice` for the same decision, with the same id and the
+   same option ids. Nothing checks they agree, and the creation wizard filters one out by id so
+   the player is not asked twice. Where the ids ever drift, a pick made against one list becomes
+   invisible to the other — the engine reads only the progression table. Collapsing the two is
+   the next structural job and the last place where one idea has two spellings.
+7. **A feature with two grants and one question.** The engine models a choice, and a feature
+   that grants two separate things needs two — College of the Moon grants a cantrip *and* a
+   skill, the Banneret a language *and* a skill. Three such features had one question each and
+   the other grant reached nothing. Nothing in the schema makes the pair structural; the check
+   that found them is a text scan.
 
 ## What to migrate next
 
-`CharacterSpells` and `CharacterResources`, in that order. Both have a table of their own that
-the engine already reads through an adapter, so the switch is a reader change rather than a
-content rewrite, and both are systems where a missing grant is exactly the bug class this was
-built to end.
+`ChoiceResolver` and `ChoiceGraph`, which is the largest remaining reader and the one that would
+let `Effect.AskOnGain` become the single definition of a question rather than one of two. It is
+also the prerequisite for item 6 above.

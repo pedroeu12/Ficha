@@ -1,5 +1,10 @@
 package com.pedroeu.ficha.rules
 
+import com.pedroeu.ficha.data.content.BackgroundData
+import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.SpeciesData
+import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Sourcebook
 
 /** Where a rule came from, which decides whose level gates it and what caption it carries. */
@@ -32,6 +37,25 @@ sealed interface Source {
             is Subclass -> classId
             is Option -> owner.owningClassId
             else -> null
+        }
+
+    /**
+     * How the sheet names where a rule came from: "Life Domain", "Magic Initiate", "High Elf".
+     *
+     * Worked out from the source itself rather than from the character's first class, which
+     * is what the old spell reader did — so a grant from a multiclassed character's second
+     * subclass was captioned with its raw id.
+     */
+    val label: String
+        get() = when (this) {
+            is Class -> ClassData.byId(id)?.name ?: id
+            is Subclass -> SubclassData.byId(id)?.name ?: id
+            is Species -> SpeciesData.byId(id)?.name ?: id
+            is Lineage -> SpeciesData.byId(speciesId)?.lineageOptions?.find { it.id == id }?.name ?: id
+            is Background -> BackgroundData.byId(id)?.name ?: id
+            is Feat -> FeatData.byId(id)?.name ?: id
+            is Option -> owner.label
+            is Item, is Spell, is Statblock, is Custom -> id
         }
 }
 

@@ -66,6 +66,8 @@ fun SummonSheet(
     onDismiss: () -> Unit,
     onSpend: (String, Int) -> Unit,
     onNotes: (String) -> Unit,
+    /** Edit Mode's way to correct a creature's maximum, for a rolled or house-ruled one. */
+    onSetMaxHitPoints: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val statblock = CharacterSummons.statblockOf(summon)
@@ -131,9 +133,11 @@ fun SummonSheet(
                         current = summon.currentHp,
                         max = summon.maxHp,
                         temp = summon.tempHp,
+                        editMode = editMode,
                         onDamage = onDamage,
                         onHeal = onHeal,
                         onSet = onSetHitPoints,
+                        onSetMax = onSetMaxHitPoints,
                     )
 
                     FlowRow(
@@ -337,7 +341,9 @@ private fun StatStone(label: String, value: String) {
  * Hit points, with the one gesture that matters in play: take some, get some back.
  *
  * A creature on the table is damaged far more often than it is examined, so the buttons are
- * the first thing on it rather than something to find.
+ * the first thing on it rather than something to find. Temporary hit points are set the same
+ * way the character's are, and Edit Mode can correct the maximum for a creature whose hit
+ * points were rolled or ruled at the table.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -345,9 +351,11 @@ private fun HitPointBar(
     current: Int,
     max: Int,
     temp: Int,
+    editMode: Boolean,
     onDamage: (Int) -> Unit,
     onHeal: (Int) -> Unit,
     onSet: (Int, Int?) -> Unit,
+    onSetMax: (Int) -> Unit,
 ) {
     var typed by rememberSaveable { mutableStateOf("") }
     val amount = typed.toIntOrNull() ?: 1
@@ -405,6 +413,20 @@ private fun HitPointBar(
                 enabled = typed.isNotBlank(),
                 shape = Corner.row,
             ) { Text(tr("Set")) }
+            // Temporary hit points from a spell or a feature, tracked on the creature the
+            // way they are tracked on the character.
+            OutlinedButton(
+                onClick = { typed.toIntOrNull()?.let { onSet(current, it) } },
+                enabled = typed.isNotBlank(),
+                shape = Corner.row,
+            ) { Text(tr("Temp HP")) }
+            if (editMode) {
+                OutlinedButton(
+                    onClick = { typed.toIntOrNull()?.let { onSetMax(it) } },
+                    enabled = typed.isNotBlank(),
+                    shape = Corner.row,
+                ) { Text(tr("Set max")) }
+            }
         }
     }
 }

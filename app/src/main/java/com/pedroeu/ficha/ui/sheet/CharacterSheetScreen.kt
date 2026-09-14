@@ -209,6 +209,7 @@ fun CharacterSheetScreen(
                 onSetHitPoints = { hp, temp ->
                     viewModel.setSummonHitPoints(openSummon.instanceId, hp, temp)
                 },
+                onSetMaxHitPoints = { viewModel.setSummonMaxHitPoints(openSummon.instanceId, it) },
                 onDismiss = {
                     viewModel.dismissSummon(openSummon.instanceId)
                     viewing = null

@@ -96,6 +96,8 @@ object SubclassData {
         classId: String,
         level: Int,
         count: Int = 1,
+        /** "…and whenever you gain a level, you can replace one of the spells." */
+        changeableOnLevelUp: Boolean = false,
     ) = Choice(
         id = id,
         label = label,
@@ -105,6 +107,7 @@ object SubclassData {
         options = SpellData.forClass(classId, level)
             .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
         source = source,
+        changeableOnLevelUp = changeableOnLevelUp,
     )
 
     /**
@@ -487,6 +490,7 @@ object SubclassData {
                         options = SpellData.forClass("wizard", 0)
                             .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
                         source = "Arcana Domain",
+                        changeableOnLevelUp = true,
                     ),
                     Choice(
                         id = "subclass:arcana_domain:skill",
@@ -653,6 +657,7 @@ object SubclassData {
                         classId = "wizard",
                         level = 1,
                         count = 2,
+                        changeableOnLevelUp = true,
                     )),
                 f(14, "Peerless Skill", "When you make an ability check or attack roll and fail, you can expend one use of Bardic Inspiration; roll the Bardic Inspiration die, and add the number rolled to the d20, potentially turning a failure into a success. On a failure, the Bardic Inspiration isn't expended."),
             )),
@@ -713,7 +718,10 @@ object SubclassData {
                         ChoiceOption("polar", "Polar", "Fog Cloud, Hold Person, Ray of Frost, Sleet Storm, Cone of Cold."),
                         ChoiceOption("temperate", "Temperate", "Misty Step, Shocking Grasp, Sleep, Lightning Bolt, Ice Storm."),
                         ChoiceOption("tropical", "Tropical", "Acid Splash, Ray of Sickness, Web, Stinking Cloud, Polymorph."),
-                    ), "Level 3")),
+                        // "Whenever you finish a Long Rest, choose one type of land" — the
+                        // whole subclass's spell list follows this, and it was settled once
+                        // at level 3 and never asked again.
+                    ), "Level 3", changeableOnRest = true)),
                 f(3, "Land's Aid", "As a Magic action, you can expend a use of your Wild Shape and choose a point within 60 feet of yourself. Vitality-giving flowers and life-draining thorns appear for a moment in a 10-foot-radius Sphere centered on that point. Each creature of your choice in the Sphere must make a Constitution saving throw against your spell save DC, taking 2d6 Necrotic damage on a failed save or half as much damage on a successful one. One creature of your choice in that area regains 2d6 Hit Points. The damage and healing increase by 1d6 when you reach Druid levels 10 (3d6) and 14 (4d6)."),
                 f(6, "Natural Recovery", "You can cast one of the level 1+ spells that you have prepared from your Circle Spells feature without expending a spell slot, and you must finish a Long Rest before you do so again. In addition, when you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your Druid level (round up), and none of them can be level 6+. For example, if you're a level 6 Druid, you can recover up to three levels' worth of spell slots. You can recover a level 3 spell slot, a level 2 and a level 1 spell slot, or three level 1 spell slots. Once you recover spell slots with this feature, you can't do so again until you finish a Long Rest."),
                 f(10, "Nature's Ward", "You are immune to the Poisoned condition, and you have Resistance to a damage type associated with your current land choice in the Circle Spells feature, as shown in the Nature's Ward table. Nature's Ward Land Type • Resistance. Arid • Fire. Polar • Cold. Temperate • Lightning. Tropical • Poison."),
@@ -882,7 +890,7 @@ object SubclassData {
             "Magic tattoos that reshape themselves to grant a suite of physical and magical effects.",
             listOf(
                 f(3, "Magic Tattoos", "Your tattoos' save DC is 8 plus your Wisdom modifier plus your Proficiency Bonus, and you can reshape one tattoo on a Long Rest."),
-                f(3, "Beast Tattoos", "You gain two animal tattoos.",
+                f(3, "Beast Tattoos", "You gain two animal tattoos. Whenever you finish a Long Rest, you can reshape one of them, replacing it with another animal tattoo.",
                     Choice("beast_tattoos", "Beast Tattoos", "Choose two animal tattoos.", 2, ChoiceKind.OPTION, listOf(
                         ChoiceOption("bat", "Bat", "You know Dancing Lights and gain Blindsight out to 10 feet."),
                         ChoiceOption("butterfly", "Butterfly", "You know Light and can use Dexterity for High Jumps."),
@@ -890,18 +898,18 @@ object SubclassData {
                         ChoiceOption("horse", "Horse", "You know Message and gain 10 feet of Speed when you use Step of the Wind."),
                         ChoiceOption("tortoise", "Tortoise", "You know Spare the Dying and gain +1 AC when you use Patient Defense."),
                     ), "Level 3", changeableOnRest = true)),
-                f(6, "Celestial Tattoo", "You gain a tattoo depicting a celestial phenomenon.",
+                f(6, "Celestial Tattoo", "You gain a tattoo depicting a celestial phenomenon. Whenever you finish a Long Rest, you can reshape it, replacing it with another celestial tattoo.",
                     Choice("celestial_tattoo", "Celestial Tattoo", "Choose a celestial tattoo.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("comet", "Comet", "Spend a Focus Point to add a Martial Arts die to a Search check."),
                         ChoiceOption("eclipse", "Eclipse", "Spend a Focus Point to add a Martial Arts die to a Stealth check when you Hide."),
                         ChoiceOption("sunburst", "Sunburst", "Spend a Focus Point to add a Martial Arts die to a Study check."),
                     ), "Level 6", changeableOnRest = true)),
-                f(11, "Nature Tattoo", "You gain a tattoo depicting a natural feature.",
+                f(11, "Nature Tattoo", "You gain a tattoo depicting a natural feature. Whenever you finish a Long Rest, you can reshape it, replacing it with another nature tattoo.",
                     Choice("nature_tattoo", "Nature Tattoo", "Choose a nature tattoo.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("sea_storm", "Sea Storm", "Resistance to Cold, Lightning, or Thunder damage, changeable on a rest."),
                         ChoiceOption("volcano", "Volcano", "Resistance to Acid, Fire, or Poison damage, changeable on a rest."),
                     ), "Level 11", changeableOnRest = true)),
-                f(17, "Monster Tattoo", "You gain a tattoo depicting a mighty creature.",
+                f(17, "Monster Tattoo", "You gain a tattoo depicting a mighty creature. Whenever you finish a Long Rest, you can reshape it, replacing it with another monster tattoo.",
                     Choice("monster_tattoo", "Monster Tattoo", "Choose a monster tattoo.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("beholder", "Beholder", "Gain a Fly Speed and fire four eye rays dealing Force damage."),
                         ChoiceOption("chromatic_dragon", "Chromatic Dragon", "Replace an attack with a 30-foot Cone of elemental damage."),
@@ -1290,7 +1298,7 @@ object SubclassData {
             "Transform energy and matter at reality's forge.",
             listOf(
                 f(3, "Transmutation Savant", "Add two Transmutation spells of level 2 or lower to your spellbook free, and one more at each new spell level."),
-                f(3, "Transmuter's Stone", "Create a stone that grants Constitution save proficiency plus a benefit you choose.",
+                f(3, "Transmuter's Stone", "Create a stone that grants Constitution save proficiency plus a benefit you choose. Whenever you finish a Long Rest, you can change the benefit the stone grants.",
                     Choice("transmuters_stone", "Transmuter's Stone", "Choose the stone's benefit.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("darkvision", "Darkvision", "The bearer gains or extends Darkvision by 60 feet."),
                         ChoiceOption("speed", "Speed", "The bearer's Speed increases by 10 feet."),
@@ -1382,6 +1390,16 @@ object SubclassData {
             listOf(
                 f(3, "Moon's Inspiration", "The primal and ever-changing power of the moon flows through you, granting you the following benefits. Inspired Eclipse. When you take a Bonus Action to give a creature a Bardic Inspiration die, you can have the Invisible condition and teleport up to 30 feet to an unoccupied space you can see as part of that Bonus Action. This invisibility lasts until the start of your next turn and ends early immediately after you make an attack roll, deal damage, or cast a spell. Lunar Vitality. Once per turn when you restore Hit Points to a creature with a spell, you can expend a Bardic Inspiration die and increase the amount of Hit Points restored by a number equal to a roll of the Bardic Inspiration die. The creature's Speed also increases by 10 feet until the end of its next turn."),
                 f(3, "Primal Lore", "You learn Druidic and one cantrip from the Druid spell list. It counts as a Bard spell for you but doesn't count against the number of cantrips you know. Whenever you gain a Bard level, you can replace this cantrip with another cantrip of your choice from the Druid spell list. Additionally, choose one of the following skills: Animal Handling, Insight, Medicine, Nature, Perception, or Survival. You have proficiency in that skill.",
+                    // The feature grants two things and the app asked for one: the cantrip
+                    // went unasked, so a College of the Moon Bard was quietly short a cantrip.
+                    Choice("moon_primal_cantrip", "Primal Lore Cantrip",
+                        "Choose a Druid cantrip. It doesn't count against your cantrips known, " +
+                            "and you can swap it whenever you gain a Bard level.",
+                        1, ChoiceKind.SPELL,
+                        SpellData.forClass("druid", 0)
+                            .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
+                        "Level 3",
+                        changeableOnLevelUp = true),
                     Choice("moon_primal_skill", "Primal Lore", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
                         ChoiceOptions.fromSkills(listOf(Skill.ANIMAL_HANDLING, Skill.INSIGHT, Skill.MEDICINE, Skill.NATURE, Skill.PERCEPTION, Skill.SURVIVAL)), "Level 3")),
                 f(6, "Blessing of Moonlight", "You always have the Moonbeam spell prepared. When you cast Moonbeam, you can modify the spell so that you glow faintly while the spell is active. While glowing, you shed Dim Light out to 5 feet, and whenever a creature fails its saving throw against the effects of this Moonbeam, another creature of your choice that you can see within 60 feet of yourself regains 2d4 Hit Points. Once you use this feature to modify a casting of Moonbeam, you can't use it again until you finish a Long Rest."),
@@ -1406,6 +1424,15 @@ object SubclassData {
             "A paragon of valor and leadership who rallies fellow adventurers to the causes of justice and freedom.",
             listOf(
                 f(3, "Knightly Envoy", "You know how to conduct yourself with grace as a noble ambassador. You gain the following benefits. Comprehension. You can cast the Comprehend Languages spell but only as a Ritual. Charisma is your spellcasting ability for it. Polyglot. You learn one language from the language tables in the Player's Handbook or chapter 2 of this book. When you finish a Long Rest, you can replace a language learned from this benefit with another language you have heard, seen signed, or read in the past 24 hours. Well Spoken. You gain proficiency in one of the following skills of your choice: Insight, Intimidation, Persuasion, or Performance.",
+                    // Polyglot grants a language and the app never asked which, the same way
+                    // Primal Lore's cantrip went unasked: a feature with two grants had one
+                    // question. The rules let it be traded on a Long Rest.
+                    Choice("banneret_language", "Polyglot",
+                        "Choose the language you learned. You can replace it after a Long Rest " +
+                            "with another you have heard, seen signed, or read in the past 24 hours.",
+                        1, ChoiceKind.LANGUAGE,
+                        ChoiceOptions.fromStrings(LanguageData.ALL), "Level 3",
+                        changeableOnRest = true),
                     Choice("banneret_skill", "Well Spoken", "Choose a skill you gain proficiency in.", 1, ChoiceKind.SKILL,
                         ChoiceOptions.fromSkills(listOf(Skill.INSIGHT, Skill.INTIMIDATION, Skill.PERSUASION, Skill.PERFORMANCE)), "Level 3")),
                 f(3, "Group Recovery", "When you use your Second Wind to regain Hit Points, you can choose allies within a 30-foot Emanation originating from yourself, up to a number equal to your Charisma modifier (minimum of one). Each of those allies regains Hit Points equal to 1d4 plus your Fighter level. Once you use this ability you can't use it again until you finish a Short or Long Rest."),

@@ -357,6 +357,11 @@ object FeatChoiceData {
                     kind = ChoiceKind.SPELL,
                     options = spellOptions(listId, 0),
                     source = featName,
+                    // "Spell Change. Whenever you gain a new level, you can replace one of the
+                    // spells you chose for this feat with a different spell of the same level."
+                    // Magic Connoisseur, which repeats the clause, carried it; the feat the
+                    // clause is printed on did not.
+                    changeableOnLevelUp = true,
                 ),
                 Choice(
                     id = "feat:$featId:spell",
@@ -366,6 +371,7 @@ object FeatChoiceData {
                     kind = ChoiceKind.SPELL,
                     options = spellOptions(listId, 1),
                     source = featName,
+                    changeableOnLevelUp = true,
                 ),
             )
         }
@@ -788,6 +794,25 @@ object FeatChoiceData {
                     changeableOnRest = true,
                 ),
                 languageChoice("echoing_soul", featName),
+            )
+
+            // "Versatile Merc. When you finish a Long Rest, choose a skill in which you have
+            // proficiency. You have Expertise in that skill until you finish your next Long
+            // Rest." The feat recorded its ability increase and asked nothing about the skill,
+            // so the Expertise it grants reached no number on the sheet.
+            "zhentarim_tactics" -> listOf(
+                Choice(
+                    id = "feat:zhentarim_tactics:expertise",
+                    label = "Versatile Merc",
+                    prompt = "Choose 1 skill you are proficient in. You have Expertise in it " +
+                        "until your next Long Rest.",
+                    count = 1,
+                    kind = ChoiceKind.EXPERTISE,
+                    options = ChoiceOptions.fromSkills(Skill.ALL),
+                    source = featName,
+                    optionsFrom = OptionSource.ProficientSkills,
+                    changeableOnRest = true,
+                ),
             )
 
             "symbiotic_being" -> listOf(languageChoice("symbiotic_being", featName))

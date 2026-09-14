@@ -175,6 +175,38 @@ object CharacterSummons {
         }
     )
 
+    /**
+     * Re-sets a creature's maximum by hand, for a table that rolled its hit points or a stat
+     * block the app has slightly wrong. Current hit points never exceed the new maximum.
+     */
+    fun setMaxHitPoints(
+        character: PlayerCharacter,
+        instanceId: String,
+        max: Int,
+    ): PlayerCharacter = character.copy(
+        activeSummons = character.activeSummons.map { summon ->
+            if (summon.instanceId != instanceId) summon
+            else summon.copy(
+                maxHp = max.coerceAtLeast(1),
+                currentHp = summon.currentHp.coerceAtMost(max.coerceAtLeast(1)),
+            )
+        }
+    )
+
+    /**
+     * What a Long Rest does to the creatures on the table.
+     *
+     * Every 2024 summoning spell lasts an hour at most and takes concentration, and neither
+     * survives eight hours of rest. A companion that is a feature rather than a spell — a
+     * Steel Defender, a Vestige Companion — stays, and like the character it loses its
+     * temporary hit points.
+     */
+    fun afterLongRest(character: PlayerCharacter): PlayerCharacter = character.copy(
+        activeSummons = character.activeSummons
+            .filterNot { it.concentration }
+            .map { if (it.tempHp == 0) it else it.copy(tempHp = 0) }
+    )
+
     /** Damage lands on temporary hit points first, as it does for the character. */
     fun damage(character: PlayerCharacter, instanceId: String, amount: Int): PlayerCharacter =
         character.copy(

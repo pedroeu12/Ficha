@@ -353,7 +353,7 @@ object FeatData {
         Feat("echoing_soul", "Echoing Soul", "Dark Gift Feat (Prerequisite: Ravenloft Campaign) You experience echoes from a past or alternate " +
             "life. You gain the following features. Channelled Prowess. You have proficiency in two skills of " +
             "your choice. In addition, choose one skill you have proficiency in. You gain Expertise in that " +
-            "skill. Whenever you finish a Long Rest you can change your choice of for this benefit. Inherent " +
+            "skill. Whenever you finish a Long Rest, you can change your choice for this benefit. Inherent " +
             "Tongues. You know one additional language of your choice, which you choose from the language " +
             "tables in the Player's Handbook. Intrusive Echoes. Immediately after you make a D20 Test and " +
             "roll a 1 on the d20, memories and sensations from your soul's other life threaten to overtake " +

@@ -3,6 +3,7 @@ package com.pedroeu.ficha.domain
 import com.pedroeu.ficha.data.content.PerUseChoice
 import com.pedroeu.ficha.data.content.PerUseChoiceData
 import com.pedroeu.ficha.data.model.ChoiceOption
+import com.pedroeu.ficha.rules.RulesEngine
 
 /** A per-use choice the character has, together with what they currently have it set to. */
 data class ActiveChoice(
@@ -23,12 +24,19 @@ data class ActiveChoice(
  */
 object PerUseChoices {
 
-    /** Every per-use choice this character has reached, in the order the table lists them. */
-    fun all(character: PlayerCharacter): List<ActiveChoice> {
-        val classes = ClassLevels.of(character)
-
-        return PerUseChoiceData.ALL
-            .filter { choice -> qualifies(character, classes, choice) }
+    /**
+     * Every per-use choice this character has reached, in the order the table lists them.
+     *
+     * Which ones those are is the rules engine's answer: the element that carries the
+     * question is gated on the level in the class that grants it, or the character's level
+     * for a species, and this no longer re-derives that. A Druid 3 / Rogue 5 reaches Starry
+     * Form and a Druid 1 / Rogue 7 does not, for the same reason every other feature does.
+     */
+    fun all(character: PlayerCharacter): List<ActiveChoice> =
+        RulesEngine.choicesOnUse(character)
+            // A pool's own on-use options are asked from the pool's tracker, not from here.
+            .mapNotNull { applied -> PerUseChoiceData.byId(applied.effect.choice.id) }
+            .distinctBy { it.id }
             .map { choice ->
                 val selectedId = character.perUseChoices[choice.id]
                 ActiveChoice(
@@ -36,22 +44,6 @@ object PerUseChoices {
                     selected = choice.options.find { it.id == selectedId },
                 )
             }
-    }
-
-    private fun qualifies(
-        character: PlayerCharacter,
-        classes: List<ClassLevel>,
-        choice: PerUseChoice,
-    ): Boolean = when {
-        // A subclass feature advances on the level in *that* class, so a Druid 3 / Rogue 5
-        // reaches Starry Form and a Druid 1 / Rogue 7 does not.
-        choice.subclassId.isNotBlank() -> classes.any {
-            it.subclassId == choice.subclassId && it.level >= choice.minLevel
-        }
-        choice.speciesId.isNotBlank() ->
-            character.speciesId == choice.speciesId && character.level >= choice.minLevel
-        else -> false
-    }
 
     /** The per-use choices attached to a limited-use pool, for its tracker to ask about. */
     fun forResource(character: PlayerCharacter, resourceId: String): List<ActiveChoice> =

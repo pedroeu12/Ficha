@@ -113,6 +113,9 @@ class SheetViewModel(
     fun setSummonHitPoints(instanceId: String, current: Int, temp: Int? = null) =
         update { CharacterSummons.setHitPoints(it, instanceId, current, temp) }
 
+    fun setSummonMaxHitPoints(instanceId: String, max: Int) =
+        update { CharacterSummons.setMaxHitPoints(it, instanceId, max) }
+
     fun renameSummon(instanceId: String, name: String) =
         update { CharacterSummons.rename(it, instanceId, name) }
 

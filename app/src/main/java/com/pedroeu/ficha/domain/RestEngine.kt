@@ -100,6 +100,9 @@ object RestEngine {
         )
         rested = CharacterResources.withRestored(rested, Recharge.LONG_REST)
         rested = PerUseChoices.clearAll(rested)
+        // A summoned spirit does not outlast the night; a companion does, without its
+        // temporary hit points.
+        rested = CharacterSummons.afterLongRest(rested)
 
         return RestOutcome(
             character = rested,

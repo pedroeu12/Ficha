@@ -44,18 +44,22 @@ object SpeciesData {
             lineageChoiceLabel = "Elven Lineage",
             lineageOptions = listOf(
                 LineageOption("drow", "Drow", "Your darkvision extends to 120 feet and you know the Dancing Lights cantrip (Charisma)."),
-                LineageOption("high_elf", "High Elf", "You know one cantrip of your choice from the Wizard spell list (Intelligence).",
+                LineageOption("high_elf", "High Elf", "You know one cantrip of your choice from the Wizard spell list (Intelligence). Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list.",
                     choices = listOf(
                         Choice(
                             id = "lineage:high_elf:cantrip",
                             label = "High Elf Cantrip",
                             prompt = "Choose a cantrip from the Wizard spell list. " +
-                                "Intelligence is your spellcasting ability for it.",
+                                "Intelligence is your spellcasting ability for it, and you " +
+                                "can replace it whenever you finish a Long Rest.",
                             count = 1,
                             kind = ChoiceKind.SPELL,
                             options = SpellData.forClass("wizard", 0)
                                 .map { ChoiceOption(it.id, it.name, it.description, it.subtitle, it.book) },
                             source = "High Elf",
+                            // The rules grant the swap and the app never offered it, so a
+                            // High Elf's cantrip was settled at creation for twenty levels.
+                            changeableOnRest = true,
                         )
                     )),
                 LineageOption("wood_elf", "Wood Elf", "Your speed increases to 35 feet and you know the Druidcraft cantrip (Wisdom)."),

@@ -469,7 +469,16 @@ internal object Adapters {
     // ------------------------------------------------------------------ Choose on use
 
     private fun perUseChoices(character: PlayerCharacter): List<RuleElement> =
-        PerUseChoiceData.ALL.map { perUse ->
+        PerUseChoiceData.ALL.filter { perUse ->
+            // The gate carries the level; whether the character *has* the subclass or the
+            // species is decided here, because a level in the class is not the subclass. Left
+            // to the level alone, a Berserker was handed the Spiritual Guardian's decision.
+            when {
+                perUse.subclassId.isNotBlank() -> ClassLevels.hasSubclass(character, perUse.subclassId)
+                perUse.speciesId.isNotBlank() -> character.speciesId == perUse.speciesId
+                else -> false
+            }
+        }.map { perUse ->
             RuleElement(
                 id = "peruse:${perUse.id}",
                 name = perUse.label,

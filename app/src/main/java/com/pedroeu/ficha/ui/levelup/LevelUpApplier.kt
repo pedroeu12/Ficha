@@ -4,6 +4,7 @@ import com.pedroeu.ficha.data.content.ClassData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.Multiclassing
@@ -108,7 +109,9 @@ internal object LevelUpApplier {
 
         // The skills, expertise, tools, languages and spells the level's answers hand over —
         // a feat's as much as a feature's — applied by the one function that knows how.
-        val granted = ChoiceGrants.apply(leveled, allChoices + state.featChoices, state.selections)
+        val withAnswers = ChoiceGrants.apply(leveled, allChoices + state.featChoices, state.selections)
+        // Two more spells in a Wizard's book is not two more prepared.
+        val granted = CharacterSpells.withPreparedWithinLimit(withAnswers)
 
         // Gaining a level raises max HP; current hit points rise by the same amount so the
         // character isn't suddenly wounded by levelling up.

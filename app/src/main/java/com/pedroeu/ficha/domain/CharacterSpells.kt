@@ -1,13 +1,11 @@
 package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.content.ClassData
-import com.pedroeu.ficha.data.content.FeatData
 import com.pedroeu.ficha.data.content.ProgressionData
-import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.model.SpellSlotTables
-import com.pedroeu.ficha.data.content.SpellGrantData
-import com.pedroeu.ficha.data.content.SubclassData
+import com.pedroeu.ficha.rules.RulesEngine
+import com.pedroeu.ficha.rules.SpellGrantMode
 
 /**
  * The character's full spell list: the ones they chose, plus the ones the rules simply hand
@@ -17,6 +15,11 @@ import com.pedroeu.ficha.data.content.SubclassData
  * That way a Cleric who reaches level 5, or anyone who picks up a dragonmark feat, sees the
  * new spells immediately — and characters made before this existed stop being short of the
  * spells they should always have had.
+ *
+ * Which spells those are is the rules engine's answer. This used to walk the grant table
+ * itself, with its own reading of whose level a grant counts against — the same reading the
+ * engine also had, spelled a second time — and the engine's is the one that is held against
+ * the table by a test.
  */
 object CharacterSpells {
 
@@ -28,25 +31,29 @@ object CharacterSpells {
     )
 
     /**
-     * Spells granted with no choice involved, filtered to the character's level and resolved
+     * Spells granted with no choice involved, in force at the character's level and resolved
      * to real catalog entries. A grant naming a spell the catalog doesn't have is skipped
      * rather than shown as a blank row; [unresolvedGrants] exists so tests can catch that.
      */
     fun granted(character: PlayerCharacter): List<GrantedSpell> =
-        grantsInEffect(character).mapNotNull { (sourceId, grant) ->
-            SpellData.byId(grant.spellId)?.let { spell ->
-                GrantedSpell(
-                    spell = spell,
-                    source = sourceLabel(sourceId, character),
-                    alwaysPrepared = grant.alwaysPrepared,
-                )
+        RulesEngine.grantedSpells(character)
+            // "Added to your class's spell list" is a list to prepare from, not a spell held.
+            .filter { it.effect.mode != SpellGrantMode.ADDED_TO_CLASS_LIST }
+            .mapNotNull { applied ->
+                SpellData.byId(applied.effect.spellId)?.let { spell ->
+                    GrantedSpell(
+                        spell = spell,
+                        source = applied.element.source.label,
+                        alwaysPrepared = applied.effect.mode == SpellGrantMode.ALWAYS_PREPARED,
+                    )
+                }
             }
-        }.distinctBy { it.spell.id }
+            .distinctBy { it.spell.id }
 
     /** Grant ids that don't match anything in the spell catalog. Should always be empty. */
     fun unresolvedGrants(character: PlayerCharacter): List<String> =
-        grantsInEffect(character)
-            .map { it.second.spellId }
+        RulesEngine.grantedSpells(character)
+            .map { it.effect.spellId }
             .filter { SpellData.byId(it) == null }
             .distinct()
 
@@ -222,40 +229,39 @@ object CharacterSpells {
     fun isGranted(character: PlayerCharacter, spellId: String): Boolean =
         granted(character).any { it.spell.id == spellId }
 
-    private fun grantsInEffect(
-        character: PlayerCharacter,
-    ): List<Pair<String, SpellGrantData.Grant>> {
-        // A subclass's spell list advances on the level in that class, so a Cleric 3 who
-        // multiclasses into Fighter still has only their level 3 domain spells.
-        val classes = ClassLevels.of(character)
-        return classes.flatMapIndexed { index, entry ->
-            SpellGrantData.forSources(
-                classId = entry.classId,
-                subclassId = entry.subclassId,
-                speciesId = if (index == 0) character.speciesId else "",
-                lineageId = if (index == 0) character.lineageId else null,
-                featIds = if (index == 0) CharacterFeats.heldBy(character) else emptyList(),
-                // A grant can hang off an answer rather than a source: the Primordial
-                // Patron's list follows the element it chose, which changes on any level up.
-                selections = ChoiceResolver.answers(character),
-            ).filter { (sourceId, grant) ->
-                // Species and feat grants key off total character level; class and subclass
-                // grants key off the level in that class.
-                val isClassGrant = sourceId == entry.classId || sourceId == entry.subclassId
-                grant.level <= if (isClassGrant) entry.level else character.level
-            }
-        }.distinctBy { it.second.spellId }
-    }
+    /** The classes whose spells are written into a book rather than prepared by knowing them. */
+    private val LEARNS_INTO_SPELLBOOK = setOf("wizard")
 
-    /** Turns a source id into something worth printing under the spell's name. */
-    private fun sourceLabel(sourceId: String, character: PlayerCharacter): String = when (sourceId) {
-        character.classId -> ClassData.byId(sourceId)?.name ?: sourceId
-        character.subclassId -> SubclassData.byId(sourceId)?.name ?: sourceId
-        character.speciesId -> SpeciesData.byId(sourceId)?.name ?: sourceId
-        character.lineageId -> SpeciesData.byId(character.speciesId)
-            ?.lineageOptions?.find { it.id == sourceId }?.name ?: sourceId
+    fun learnsIntoSpellbook(classId: String): Boolean = classId in LEARNS_INTO_SPELLBOOK
 
-        else -> FeatData.byId(sourceId)?.name ?: sourceId
+    /**
+     * A spellbook is not a prepared list.
+     *
+     * For every caster but one, knowing a spell and having it prepared are the same fact, and
+     * [KnownSpell.prepared] carries both. The Wizard is the exception: its book grows by two
+     * spells at every level and the table says how many of them may be carried at a time — a
+     * level 3 Wizard has ten written down and prepares four. Learning wrote them all in as
+     * prepared, so the sheet read "10 / 4" in red from the second level onward, and the number
+     * the rules cap was the one the app had no way to respect.
+     *
+     * Applied where spells are learned rather than where they are counted, so what is stored
+     * is already legal and the player rearranges it at any rest. The spells kept are the
+     * earliest, which on a fresh book is the ones just chosen; anything past the limit stays
+     * in the book, unprepared, which is exactly where the rules leave it.
+     */
+    fun withPreparedWithinLimit(character: PlayerCharacter): PlayerCharacter {
+        if (ClassLevels.of(character).none { learnsIntoSpellbook(it.classId) }) return character
+
+        val granted = granted(character).map { it.spell.id }.toSet()
+        var room = CharacterCalculations.maxPreparedSpells(character)
+        val capped = character.knownSpells.map { spell ->
+            // Cantrips are always ready and a granted spell is always prepared; neither is
+            // spent against the limit, so neither is touched.
+            if (spell.level == 0 || spell.id in granted || !spell.prepared) return@map spell
+            if (room > 0) spell.also { room-- } else spell.copy(prepared = false)
+        }
+        return if (capped == character.knownSpells) character
+        else character.copy(knownSpells = capped)
     }
 
     private fun GrantedSpell.toKnownSpell() = KnownSpell(

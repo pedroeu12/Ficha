@@ -7,6 +7,7 @@ import com.pedroeu.ficha.data.model.ChoiceKind
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.domain.CharacterCalculations
+import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.domain.KnownSpell
@@ -137,9 +138,11 @@ internal object CharacterBuilder {
             state.originChoices + state.classFeatureChoices,
             state.originSelections + state.classFeatureSelections,
         )
+        // A Wizard starts with six spells in the book and prepares four of them.
+        val legal = CharacterSpells.withPreparedWithinLimit(granted)
 
         // Start the character at full health, which depends on the assembled scores.
-        return granted.copy(currentHitPoints = CharacterCalculations.maxHitPoints(granted))
+        return legal.copy(currentHitPoints = CharacterCalculations.maxHitPoints(legal))
     }
 
     private fun buildInventory(state: CreationState): List<InventoryItem> {

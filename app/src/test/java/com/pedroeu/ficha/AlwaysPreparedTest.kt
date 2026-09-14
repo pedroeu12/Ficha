@@ -1,5 +1,7 @@
 package com.pedroeu.ficha
 
+import com.pedroeu.ficha.data.content.ClassData
+import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterSpells
@@ -67,7 +69,12 @@ class AlwaysPreparedTest {
     /** Features that promise one spell in a sentence rather than through a table. */
     @Test
     fun `a feature that names a spell in its text grants it too`() {
-        assertTrue("guidance" in prepared(character("cleric", 3, "stars")))
+        // Circle of the Stars is a Druid's, and this asked for a Cleric holding it. The old
+        // spell path granted a subclass's list from the subclass id alone, so the nonsense
+        // character worked; the engine counts the level in the class that owns the subclass,
+        // which is zero for a Cleric, and refuses. See `a subclass grants nothing to a class
+        // that does not own it` below for the rule made explicit.
+        assertTrue("guidance" in prepared(character("druid", 3, "stars")))
         assertTrue("telekinesis" in prepared(character("fighter", 18, "psi_warrior")))
         assertTrue("hex" in prepared(character("warlock", 10, "great_old_one")))
         assertTrue("counterspell" in prepared(character("wizard", 10, "abjurer")))
@@ -75,6 +82,31 @@ class AlwaysPreparedTest {
         assertTrue("summon_fiend" in prepared(character("sorcerer", 14, "demonic_sorcery")))
         assertTrue("contact_other_plane" in prepared(character("warlock", 9)))
         assertTrue("power_word_heal" in prepared(character("bard", 20)))
+    }
+
+    /**
+     * A subclass's spells belong to the class that offers it, and to no other.
+     *
+     * The old path looked a subclass's grants up by id alone, so a character carrying a
+     * subclass id from another class — which a mis-saved sheet or a hand-edited backup can
+     * produce — was handed that subclass's whole list. The engine gates every grant on the
+     * level in the class that owns it, so there is no level to reach.
+     */
+    @Test
+    fun `a subclass grants nothing to a class that does not own it`() {
+        SubclassData.ALL
+            .filter { SpellGrantData.alwaysPreparedForSubclass(it.id, 20).isNotEmpty() }
+            .forEach { subclass ->
+                val wrongClass = ClassData.ALL.first { it.id != subclass.classId }
+                val impostor = character(wrongClass.id, 20, subclass.id)
+                val theirs = SpellGrantData.alwaysPreparedForSubclass(subclass.id, 20)
+                val have = prepared(impostor)
+                assertTrue(
+                    "${wrongClass.id} does not have ${subclass.id} and was handed its spells: " +
+                        "${theirs intersect have}",
+                    (theirs intersect have).isEmpty(),
+                )
+            }
     }
 
     /** A species can promise a spell as readily as a subclass, and two of them do. */

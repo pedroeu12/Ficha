@@ -1,12 +1,17 @@
 package com.pedroeu.ficha
 
+import com.pedroeu.ficha.data.content.PerUseChoiceData
 import com.pedroeu.ficha.data.content.ProgressionData
+import com.pedroeu.ficha.data.content.SpellGrantData
 import com.pedroeu.ficha.data.content.SubclassData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterDcs
+import com.pedroeu.ficha.domain.CharacterFeats
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.ChoiceGraph
+import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.ClassLevels
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.rules.Effect
 import com.pedroeu.ficha.rules.LevelScope
@@ -99,20 +104,80 @@ class RulesEngineTest {
 
     // ================================================================ Conformance
 
+    /**
+     * Held against the grant table itself, read the way the old spell reader read it, now
+     * that CharacterSpells reads the engine — comparing the engine with a reader of the
+     * engine would prove nothing.
+     */
     @Test
-    fun `the engine grants the same spells the old path grants`() {
+    fun `the engine grants the same spells the grant table grants`() {
         cast().forEach { (who, pc) ->
             val fromEngine = RulesEngine.grantedSpells(pc)
                 .filter { it.effect.mode != SpellGrantMode.ADDED_TO_CLASS_LIST }
                 .map { it.effect.spellId }
                 .toSet()
-            val fromTables = CharacterSpells.granted(pc).map { it.spell.id }.toSet()
-            assertEquals("$who: granted spells differ", fromTables, fromEngine intersect fromTables)
-            assertTrue(
-                "$who: the engine grants spells the old path does not: ${fromEngine - fromTables}",
-                (fromEngine - fromTables).isEmpty(),
+            val fromTables = ClassLevels.of(pc).flatMapIndexed { index, entry ->
+                SpellGrantData.forSources(
+                    classId = entry.classId,
+                    subclassId = entry.subclassId,
+                    speciesId = if (index == 0) pc.speciesId else "",
+                    lineageId = if (index == 0) pc.lineageId else null,
+                    featIds = if (index == 0) CharacterFeats.heldBy(pc) else emptyList(),
+                    selections = ChoiceResolver.answers(pc),
+                ).filter { (sourceId, grant) ->
+                    val isClassGrant = sourceId == entry.classId || sourceId == entry.subclassId
+                    grant.level <= if (isClassGrant) entry.level else pc.level
+                }
+            }.map { it.second.spellId }.toSet()
+            assertEquals("$who: granted spells differ", fromTables, fromEngine)
+            assertEquals(
+                "$who: the reader and the engine disagree",
+                fromEngine,
+                CharacterSpells.granted(pc).map { it.spell.id }.toSet(),
             )
         }
+    }
+
+    @Test
+    fun `a granted spell is captioned with the name of what granted it`() {
+        val multi = character(
+            "cleric", 3, "life_domain",
+            extraClasses = listOf(Triple("paladin", 2, null)),
+        )
+        val sources = CharacterSpells.granted(multi).associate { it.spell.id to it.source }
+        assertEquals("Life Domain", sources["bless"])
+        // The second class's grant used to be captioned with its raw id.
+        assertEquals("Paladin", sources["divine_smite"])
+    }
+
+    /** The old table gated on-use decisions by subclass held; the engine must too. */
+    @Test
+    fun `the engine offers a choose-on-use decision only where the character holds its source`() {
+        cast().forEach { (who, pc) ->
+            val classes = ClassLevels.of(pc)
+            val expected = PerUseChoiceData.ALL.filter { choice ->
+                when {
+                    choice.subclassId.isNotBlank() -> classes.any {
+                        it.subclassId == choice.subclassId && it.level >= choice.minLevel
+                    }
+                    choice.speciesId.isNotBlank() ->
+                        pc.speciesId == choice.speciesId && pc.level >= choice.minLevel
+                    else -> false
+                }
+            }.map { it.id }.toSet()
+            val fromEngine = RulesEngine.choicesOnUse(pc)
+                .map { it.effect.choice.id }
+                .filter { PerUseChoiceData.byId(it) != null }
+                .toSet()
+            assertEquals("$who: on-use decisions differ", expected, fromEngine)
+        }
+        // And the shape the level gate alone gets wrong: the class, at level, without the
+        // subclass.
+        val berserker = character("barbarian", 5, "berserker")
+        assertTrue(
+            "a Berserker was offered the Spiritual Guardian's decision",
+            RulesEngine.choicesOnUse(berserker).none { it.effect.choice.id.startsWith("spiritual_guardian:") },
+        )
     }
 
     @Test

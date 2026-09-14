@@ -79,6 +79,144 @@ object ResourceData {
      * of curated pools, and threading two dozen additions through its branches would bury them.
      */
     private fun sweptSubclassResources(c: Context): List<ResourceDef> = buildList {
+        if (c.subclassId == "zealot" && c.level >= 10) add(
+            ResourceDef(
+                id = "zealot:zealous_presence",
+                name = "Zealous Presence",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Zealous Presence",
+            )
+        )
+        if (c.subclassId == "zealot" && c.level >= 14) add(
+            ResourceDef(
+                id = "zealot:rage_of_the_gods",
+                name = "Rage of the Gods",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Rage of the Gods",
+            )
+        )
+        if (c.subclassId == "draconic" && c.level >= 14) add(
+            ResourceDef(
+                id = "draconic:dragon_wings",
+                name = "Dragon Wings",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Dragon Wings",
+            )
+        )
+        if (c.subclassId == "wild_magic" && c.level >= 18) add(
+            ResourceDef(
+                id = "wild_magic:tamed_surge",
+                name = "Tamed Surge",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Tamed Surge",
+            )
+        )
+        if (c.subclassId == "grave_domain" && c.level >= 17) add(
+            ResourceDef(
+                id = "grave_domain:divine_reaper",
+                name = "Divine Reaper",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Divine Reaper",
+            )
+        )
+        if (c.subclassId == "battle_master" && c.level >= 7) add(
+            ResourceDef(
+                id = "battle_master:know_your_enemy",
+                name = "Know Your Enemy",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Know Your Enemy",
+            )
+        )
+        if (c.subclassId == "clockwork" && c.level >= 14) add(
+            ResourceDef(
+                id = "clockwork:trance_of_order",
+                name = "Trance of Order",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Trance of Order",
+            )
+        )
+        if (c.subclassId == "clockwork" && c.level >= 18) add(
+            ResourceDef(
+                id = "clockwork:clockwork_cavalcade",
+                name = "Clockwork Cavalcade",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Clockwork Cavalcade",
+            )
+        )
+        if (c.subclassId == "glamour" && c.level >= 3) add(
+            ResourceDef(
+                id = "glamour:beguiling_magic",
+                name = "Beguiling Magic",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Beguiling Magic",
+            )
+        )
+        if (c.subclassId == "mercy" && c.level >= 11) add(
+            ResourceDef(
+                id = "mercy:flurry_of_healing_and_harm",
+                name = "Flurry of Healing and Harm",
+                max = c.modAtLeastOne(Ability.WIS),
+                recharge = Recharge.LONG_REST,
+                source = "Flurry of Healing and Harm",
+            )
+        )
+        if (c.subclassId == "aberrant" && c.level >= 18) add(
+            ResourceDef(
+                id = "aberrant:warping_implosion",
+                name = "Warping Implosion",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Warping Implosion",
+            )
+        )
+        if (c.subclassId == "arcana_domain" && c.level >= 6) add(
+            ResourceDef(
+                id = "arcana_domain:dispelling_recovery",
+                name = "Dispelling Recovery",
+                max = 1,
+                recharge = Recharge.SHORT_REST,
+                source = "Dispelling Recovery",
+            )
+        )
+        if (c.subclassId == "vestige_patron" && c.level >= 10) add(
+            ResourceDef(
+                id = "vestige_patron:vestige_recovery",
+                name = "Vestige Recovery",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Vestige Recovery",
+            )
+        )
+        if (c.subclassId == "vestige_patron" && c.level >= 14) add(
+            ResourceDef(
+                id = "vestige_patron:semblance_of_life",
+                name = "Semblance of Life",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Semblance of Life",
+            )
+        )
+        if (c.subclassId == "reanimator" && c.level >= 15) add(
+            ResourceDef(
+                id = "reanimator:facilitated_revival",
+                name = "Facilitated Revival",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Refined Reanimation",
+                description = "You can cast Raise Dead without expending a spell slot and " +
+                    "without Material components, using Tinker's Tools or another type of " +
+                    "Artisan's Tools you are proficient with as the Spellcasting Focus.",
+            )
+        )
         if (c.subclassId == "diviner" && c.level >= 10) add(
             ResourceDef(
                 id = "diviner:third_eye",
@@ -1838,6 +1976,15 @@ object ResourceData {
         )
         // The pool is the number of times the benefit can be switched, not the benefit itself.
         "duskling" -> listOf(pbPerLongRest(c, "duskling", "Inner Magic", "Duskling"))
+        "hexblood" -> listOf(
+            ResourceDef(
+                id = "hexblood:eerie_token",
+                name = "Eerie Token",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Eerie Token",
+            )
+        )
 
         "orc" -> listOf(
             ResourceDef(
@@ -1856,7 +2003,14 @@ object ResourceData {
             ),
         )
 
-        "dragonborn" -> listOf(
+        "dragonborn" -> listOfNotNull(
+            if (c.characterLevel >= 5) ResourceDef(
+                id = "dragonborn:draconic_flight",
+                name = "Draconic Flight",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Draconic Flight",
+            ) else null,
             ResourceDef(
                 id = "dragonborn:breath_weapon",
                 name = "Breath Weapon",
@@ -1885,7 +2039,15 @@ object ResourceData {
             ),
         )
 
-        "goliath" -> listOf(
+        "goliath" -> listOfNotNull(
+            // Large Form arrives at character level 5 and is once per Long Rest.
+            if (c.characterLevel >= 5) ResourceDef(
+                id = "goliath:large_form",
+                name = "Large Form",
+                max = 1,
+                recharge = Recharge.LONG_REST,
+                source = "Large Form",
+            ) else null,
             ResourceDef(
                 id = "goliath:giant_ancestry",
                 name = "Giant Ancestry",

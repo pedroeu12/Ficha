@@ -296,20 +296,27 @@ class ProgressionTest {
     }
 
     @Test
-    fun `the playtest subclasses from the unearthed arcana document are present`() {
-        val expected = listOf(
+    fun `the subclasses from the arcane updates document are all present`() {
+        // They arrived as Unearthed Arcana and Arcana Unleashed has since printed five of
+        // them, so the flag moved while the subclasses stayed. Only the Tattooed Warrior is
+        // still playtest material.
+        val published = listOf(
             "arcane_archer" to "fighter",
-            "tattooed_warrior" to "monk",
             "conjurer" to "wizard",
             "enchanter" to "wizard",
             "necromancer" to "wizard",
             "transmuter" to "wizard",
         )
-        expected.forEach { (id, classId) ->
+        published.forEach { (id, classId) ->
             val subclass = SubclassData.byId(id)
-            assertNotNull("missing playtest subclass $id", subclass)
+            assertNotNull("missing subclass $id", subclass)
             assertEquals(classId, subclass!!.classId)
-            assertTrue("$id should be flagged as playtest material", subclass.isPlaytest)
+            assertFalse("$id has been printed, so it is not playtest", subclass.isPlaytest)
         }
+
+        val tattooed = SubclassData.byId("tattooed_warrior")
+        assertNotNull("missing playtest subclass tattooed_warrior", tattooed)
+        assertEquals("monk", tattooed!!.classId)
+        assertTrue("tattooed_warrior is still playtest material", tattooed.isPlaytest)
     }
 }

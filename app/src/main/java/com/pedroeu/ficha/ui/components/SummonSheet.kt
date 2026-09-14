@@ -187,6 +187,8 @@ fun SummonSheet(
         val defences = listOfNotNull(
             statblock.resistances.takeIf { it.isNotEmpty() }
                 ?.let { tr("Resistances") to it.joinToString(", ") },
+            statblock.vulnerabilities.takeIf { it.isNotEmpty() }
+                ?.let { tr("Vulnerabilities") to it.joinToString(", ") },
             statblock.immunities.takeIf { it.isNotEmpty() }
                 ?.let { tr("Immunities") to it.joinToString(", ") },
             statblock.conditionImmunities.takeIf { it.isNotEmpty() }

@@ -1,12 +1,69 @@
 # Auditoria contra dnd2024.wikidot.com
 
-> **Situação: resolvido.** Este relatório é o levantamento original, mantido como
-> registro do que foi encontrado. Tudo abaixo já foi corrigido ou importado, e o
-> app agora acompanha o wiki item a item: 419 magias (todos os níveis), 185
-> talentos, 61 antecedentes, 24 espécies, 418 itens mágicos e 68 subclasses. As
-> fontes viraram dado de primeira classe — cada opção nomeia seu livro, e um
-> personagem só recebe o que os livros escolhidos na criação permitem. O conteúdo
-> que só existia em 2014 foi removido.
+> **Situação: em dia com o wiki (14/09/2026).** Este relatório é o levantamento
+> original de agosto, mantido como registro. Abaixo dele, a varredura seguinte.
+
+## Varredura de 14/09/2026 — Arcana Unleashed
+
+O wiki publicou um livro novo, **Arcana Unleashed** (com o apêndice *Deadfall*),
+mais o drop de setembro/2026 do D&D Beyond. A comparação foi feita item a item:
+cada índice do wiki foi baixado e cruzado com um despejo dos dados do app, e a
+conferência final não sobrou nada em nenhum domínio.
+
+| Domínio | Wiki | App | Faltando |
+| --- | --- | --- | --- |
+| Espécies | 25 | 25 | 0 |
+| Antecedentes | 71 | 71 | 0 |
+| Talentos | 191 | 213 (22 a mais: UA e o Magic Initiate dividido em três) | 0 |
+| Magias | 456 | 456 | 0 |
+| Itens mágicos | 462 | 487 (25 a mais: UA e variantes) | 0 |
+| Subclasses | 76 | 87 (11 a mais: UA/Villainous) | 0 |
+| Equipamento de aventura | 91 | 116 | 0 |
+
+O que entrou: 1 espécie (Duskling), 10 antecedentes, 29 talentos, 37 magias,
+72 itens mágicos e 41 itens de equipamento.
+
+### O que a varredura encontrou além do livro novo
+
+1. **Sete subclasses publicadas continuavam marcadas como playtest.** As de
+   terror que Ravenloft imprimiu e as escolas de mago que Arcana Unleashed
+   imprimiu. Não é rótulo: o seletor lê o livro, e um personagem criado só com
+   os livros básicos tinha a subclasse recusada.
+2. **Treze magias de invocação não tinham criatura.** Summon Aberration,
+   Celestial, Construct, Dragon e Fiend — o resto da família 2024 — mais
+   Giant Insect, Homunculus Servant, Phantom Steed, Sticks to Snakes e Animate
+   Objects. A magia aparecia na ficha e não punha nada na mesa.
+3. **Quarenta e um itens do capítulo de equipamento nunca foram catalogados.**
+   Balde, Sino, Luneta, Escada. Quem procurava, não achava e digitava à mão.
+4. **Arcane Archer** trocou de característica no nível 15 entre o playtest e o
+   livro (Arcane Burst virou Indomitable Teleport), e o **Transmuter** renomeou
+   Shapechanger para Shape-Shifter.
+5. A descrição do **Rimekin** estava truncada no meio de uma palavra.
+
+### Regras novas que o livro exigiu do motor
+
+- **Concessão travada pelo nível do espaço de magia.** Os oito talentos "Adept"
+  dizem "quando você tiver espaços de magia de um nível listado na tabela" — não
+  é nível de personagem e não dá para converter: um Mago 9 tem as cinco linhas e
+  um Paladino 9 tem duas. `Gate.minSpellSlotLevel`.
+- **Reserva contada pelo modificador do atributo que o talento aumentou.** O
+  talento não nomeia atributo nenhum; a resposta do jogador nomeia.
+- **Vulnerabilidade em bloco de estatísticas.** O Espírito Vegetal é o primeiro
+  que tem uma, e uma ficha que lista o que a criatura resiste e esconde o que a
+  mata é pior que uma que não lista nada.
+
+### Testes de categoria que passaram a existir
+
+- `SummonTest`: lê o texto do catálogo e falha o build para qualquer magia que
+  conjure uma criatura sem bloco de estatísticas.
+- `ContentCoverageTest`: o catálogo de equipamento não pode encolher.
+- `SpellSystemScanTest`: os tamanhos das listas por classe foram recontados das
+  páginas por classe do wiki, que são mantidas separadamente das páginas de cada
+  magia — e batem exatamente.
+
+---
+
+# Levantamento original (22/08/2026)
 
 Comparação automatizada entre os dados do app e o wiki `dnd2024.wikidot.com`,
 feita em 22/08/2026. A referência foi baixada do wiki, convertida para JSON e

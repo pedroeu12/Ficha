@@ -387,6 +387,160 @@ object EquipmentData {
             "Burns for 1 hour, shedding Bright Light in a 5-foot radius."),
         GearDef("blanket", "Blanket", "Adventuring Gear", 0.5, 3.0,
             "Thick wool, warm enough for a night without a fire."),
+
+        // ---- The rest of the Player's Handbook equipment table, plus the climate and
+        // disguise gear the later books add. Forty-one rows the catalogue never had: a
+        // player looking for a Bucket, a Bell or a Spyglass found nothing and typed it in
+        // by hand, which is the same gap as a missing spell, only quieter.
+        GearDef("ammunition", "Ammunition", "Adventuring Gear", 0.0, 0.0,
+            "Ammunition is required by a weapon that has the Ammunition property. A weapon's " +
+                "description specifies the type of ammunition used by the weapon. The Ammunition " +
+                "table lists the different types and the amount you get when you buy them."),
+        GearDef("barrel", "Barrel", "Adventuring Gear", 2.0, 70.0,
+            "A Barrel holds up to 40 gallons of liquid or up to 4 cubic feet of dry goods."),
+        GearDef("basket", "Basket", "Adventuring Gear", 0.4, 2.0,
+            "A Basket holds up to 40 pounds within 2 cubic feet."),
+        GearDef("bell", "Bell", "Adventuring Gear", 1.0, 0.0,
+            "When rung as a Utilize action, a Bell produces a sound that can be heard up to 60 " +
+                "feet away."),
+        GearDef("block_and_tackle", "Block and Tackle", "Adventuring Gear", 1.0, 5.0,
+            "A Block and Tackle allows you to hoist up to four times the weight you can normally " +
+                "lift."),
+        GearDef("bright_fungal_cloak", "Bright Fungal Cloak", "Adventuring Gear", 25.0, 0.0,
+            "While wearing a Bright Fungal Cloak, you can take a Bonus Action to furl or unfurl " +
+                "it. When the cloak is unfurled, it sheds Bright Light in a 5-foot radius and Dim " +
+                "Light for an additional 5 feet. One pound of fungus is sewn into a Bright Fungal " +
+                "Cloak. This fungus can be eaten as food. Once all the fungus is consumed, the cloak " +
+                "becomes a mundane set of Traveler's Clothes."),
+        GearDef("glass_bottle", "Glass Bottle", "Adventuring Gear", 2.0, 2.0,
+            "A Glass Bottle holds up to 1 1/2 pints."),
+        GearDef("bucket", "Bucket", "Adventuring Gear", 0.05, 2.0,
+            "A Bucket holds up to half a cubic foot of contents."),
+        GearDef("crossbow_bolt_case", "Crossbow Bolt Case", "Adventuring Gear", 1.0, 1.0,
+            "A Crossbow Bolt Case holds up to 20 Bolts."),
+        GearDef("map_or_scroll_case", "Map or Scroll Case", "Adventuring Gear", 1.0, 1.0,
+            "A Map or Scroll Case holds up to 10 sheets of paper or 5 sheets of parchment."),
+        GearDef("chest", "Chest", "Adventuring Gear", 5.0, 25.0,
+            "A Chest holds up to 12 cubic feet of contents."),
+        GearDef("climbers_kit", "Climber's Kit", "Adventuring Gear", 25.0, 12.0,
+            "A Climber's Kit includes boot tips, gloves, pitons, and a harness. As a Utilize " +
+                "action, you can use the Climber's Kit to anchor yourself; when you do, you can't " +
+                "fall more than 25 feet from the anchor point, and you can't move more than 25 feet " +
+                "from there without undoing the anchor as a Bonus Action."),
+        GearDef("fine_clothes", "Fine Clothes", "Adventuring Gear", 15.0, 6.0,
+            "Fine Clothes are made of expensive fabrics and adorned with expertly crafted " +
+                "details. Some events and locations admit only people wearing these clothes."),
+        GearDef("travelers_clothes", "Traveler's Clothes", "Adventuring Gear", 2.0, 4.0,
+            "Traveler's Clothes are resilient garments designed for travel in various " +
+                "environments."),
+        GearDef("desert_clothing", "Desert Clothing", "Adventuring Gear", 5.0, 0.0,
+            "When you are wearing Desert Clothing and not wearing Medium or Heavy armor, you " +
+                "automatically succeed on saving throws against the effects of extreme heat. See " +
+                "chapter 3 of the Dungeon Master's Guide for rules on extreme heat."),
+        GearDef("devil_mask", "Devil Mask", "Adventuring Gear", 25.0, 0.0,
+            "While you are wearing a Devil Mask, other creatures have Disadvantage on " +
+                "Intelligence (Investigation) and Wisdom (Insight) checks made to discern your true " +
+                "identity or intentions."),
+        GearDef("flask", "Flask", "Adventuring Gear", 0.02, 1.0,
+            "A Flask holds up to 1 pint."),
+        GearDef("garb_of_light_and_shadow", "Garb of Light and Shadow", "Adventuring Gear", 50.0, 0.0,
+            "This garb appeals to Fey from one Domain of Delight, such as the Gloaming Court or " +
+                "the Summer Court. While wearing the garb, you have Advantage on ability checks to " +
+                "influence Fey associated with that Domain of Delight."),
+        GearDef("genie_robe", "Genie Robe", "Adventuring Gear", 50.0, 0.0,
+            "This robe appeals to Elementals associated with a particular Elemental Plane (Air, " +
+                "Earth, Fire, Water). While wearing a Genie Robe, you have Advantage on ability " +
+                "checks made to influence Elementals associated with that plane."),
+        GearDef("hunting_trap", "Hunting Trap", "Adventuring Gear", 5.0, 25.0,
+            "As a Utilize action, you can set a Hunting Trap, which is a sawtooth steel ring that " +
+                "snaps shut when a creature steps on a pressure plate in the center. The trap is " +
+                "affixed by a heavy chain to an immobile object, such as a tree or a spike driven " +
+                "into the ground. A creature that steps on the plate must succeed on a DC 13 " +
+                "Dexterity saving throw or take 1d4 Piercing damage and have its Speed reduced to 0 " +
+                "until the start of its next turn. Thereafter, until the creature breaks free of the " +
+                "trap, its movement is limited by the length of the chain (typically 3 feet). A " +
+                "creature can use its action to make a DC 13 Strength (Athletics) check, freeing " +
+                "itself or another creature within its reach on a success. Each failed check deals 1 " +
+                "Piercing damage to the trapped creature."),
+        GearDef("jug", "Jug", "Adventuring Gear", 0.02, 4.0,
+            "A Jug holds up to 1 gallon."),
+        GearDef("ladder", "Ladder", "Adventuring Gear", 0.1, 25.0,
+            "A Ladder is 10 feet tall. You must climb to move up or down it."),
+        GearDef("lamp", "Lamp", "Adventuring Gear", 0.5, 1.0,
+            "A Lamp burns Oil as fuel to cast Bright Light in a 15-foot radius and Dim Light for " +
+                "an additional 30 feet."),
+        GearDef("bullseye_lantern", "Bullseye Lantern", "Adventuring Gear", 10.0, 2.0,
+            "A Bullseye Lantern burns Oil as fuel to cast Bright Light in a 60-foot Cone and Dim " +
+                "Light for an additional 60 feet."),
+        GearDef("locking_spellbook", "Locking Spellbook", "Adventuring Gear", 35.0, 0.0,
+            "This 100-page leather-bound tome can be used as a Spellbook. It is closed with a " +
+                "lock that comes with a key. As a Utilize action, a creature can try to pick the lock " +
+                "using Thieves' Tools, doing so with a successful DC 15 Dexterity (Sleight of Hand) " +
+                "check."),
+        GearDef("magnifying_glass", "Magnifying Glass", "Adventuring Gear", 100.0, 0.0,
+            "A Magnifying Glass grants Advantage on any ability check made to appraise or inspect " +
+                "a highly detailed item. Lighting a fire with a Magnifying Glass requires light as " +
+                "bright as sunlight to focus, tinder to ignite, and about 5 minutes for the fire to " +
+                "ignite."),
+        GearDef("map", "Map", "Adventuring Gear", 1.0, 0.0,
+            "If you consult an accurate Map, you gain a +5 bonus to Wisdom (Survival) checks you " +
+                "make to find your way in the place represented on it."),
+        GearDef("mirror", "Mirror", "Adventuring Gear", 5.0, 0.5,
+            "A handheld steel Mirror is useful for personal cosmetics but also for peeking around " +
+                "corners and reflecting light as a signal."),
+        GearDef("monster_camouflage", "Monster Camouflage", "Adventuring Gear", 50.0, 0.0,
+            "A suit of Monster Camouflage looks like a Beast or Monstrosity, such as an owlbear. " +
+                "To discern that you're disguised, a creature must take the Study action to inspect " +
+                "your appearance and succeed on a DC 10 Intelligence (Investigation or Nature) check. " +
+                "The creature has Advantage on this check if it is within 30 feet of you and " +
+                "automatically succeeds on this check if you do anything the monster you're disguised " +
+                "as couldn't do."),
+        GearDef("net", "Net", "Adventuring Gear", 1.0, 3.0,
+            "When you take the Attack action, you can replace one of your attacks with throwing a " +
+                "Net. Target a creature you can see within 15 feet of yourself. The target must " +
+                "succeed on a Dexterity saving throw (DC 8 plus your Dexterity modifier and " +
+                "Proficiency Bonus) or have the Restrained condition until it escapes. The target " +
+                "succeeds automatically if it is Huge or larger. To escape, the target or a creature " +
+                "within 5 feet of it must take an action to make a DC 10 Strength (Athletics) check, " +
+                "freeing the Restrained creature on a success. Destroying the Net (AC 10; 5 HP; " +
+                "Immunity to Bludgeoning, Poison, and Psychic damage) also frees the target, ending " +
+                "the effect."),
+        GearDef("paper", "Paper", "Adventuring Gear", 0.2, 0.0,
+            "One sheet of Paper can hold about 250 handwritten words."),
+        GearDef("basic_poison", "Basic Poison", "Adventuring Gear", 100.0, 0.0,
+            "As a Bonus Action, you can use a vial of Basic Poison to coat one weapon or up to " +
+                "three pieces of ammunition. A creature that takes Piercing or Slashing damage from " +
+                "the poisoned weapon or ammunition takes an extra 1d4 Poison damage. Once applied, " +
+                "the poison retains potency for 1 minute or until its damage is dealt, whichever " +
+                "comes first."),
+        GearDef("portable_ram", "Portable Ram", "Adventuring Gear", 4.0, 35.0,
+            "You can use a Portable Ram to break down doors. When doing so, you gain a +4 bonus " +
+                "to the Strength check. One other character can help you use the ram, giving you " +
+                "Advantage on this check."),
+        GearDef("sack", "Sack", "Adventuring Gear", 0.01, 0.5,
+            "A Sack holds up to 30 pounds within 1 cubic foot."),
+        GearDef("signal_whistle", "Signal Whistle", "Adventuring Gear", 0.05, 0.0,
+            "When blown as a Utilize action, a Signal Whistle produces a sound that can be heard " +
+                "up to 600 feet away."),
+        GearDef("iron_spikes", "Iron Spikes", "Adventuring Gear", 1.0, 5.0,
+            "Iron Spikes come in bundles of ten. As a Utilize action, you can use a blunt object, " +
+                "such as a Light Hammer, to hammer a spike into wood, earth, or a similar material. " +
+                "You can do so to jam a door shut or to then tie a Rope or Chain to the Spike."),
+        GearDef("spyglass", "Spyglass", "Adventuring Gear", 1000.0, 1.0,
+            "Objects viewed through a Spyglass are magnified to twice their size."),
+        GearDef("string", "String", "Adventuring Gear", 0.1, 0.0,
+            "String is 10 feet long. You can tie a knot in it as a Utilize action."),
+        GearDef("vial", "Vial", "Adventuring Gear", 1.0, 0.0,
+            "A Vial holds up to 4 ounces."),
+        GearDef("warm_fungal_clothing", "Warm Fungal Clothing", "Adventuring Gear", 15.0, 0.0,
+            "When you're wearing Warm Fungal Clothing, you automatically succeed on saving throws " +
+                "against the effects of extreme cold. See chapter 3 of the Dungeon Master's Guide for " +
+                "rules on extreme cold. One pound of fungus is sewn into Fungal Clothing. This fungus " +
+                "can be eaten as food. Once all the fungus is consumed, this becomes a mundane set of " +
+                "Traveler's Clothes."),
+        GearDef("winter_camouflage", "Winter Camouflage", "Adventuring Gear", 50.0, 0.0,
+            "While you wear Winter Camouflage in an appropriate environment, you have Advantage " +
+                "on Dexterity (Stealth) checks."),
     )
 
     /** Default level-1 gear granted by each class, keyed by class id. */

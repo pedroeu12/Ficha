@@ -1,6 +1,7 @@
 package com.pedroeu.ficha
 
 import com.pedroeu.ficha.data.content.StatblockData
+import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SummonData
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterSummons
@@ -237,6 +238,68 @@ class SummonTest {
             }
         }
     }
+
+    @Test
+    fun `the rest of the summon family arrives with the right numbers`() {
+        // Spot checks on the newly added spirits, read off the wiki's own stat blocks. The
+        // sweep above proves each spell has *a* creature; these prove it is the right one.
+        val pc = caster("wizard", 20)
+        fun ac(id: String, level: Int) = StatblockData.byId(id)!!.armorClassFor(pc, level, "wizard")
+        fun hp(id: String, level: Int) = StatblockData.byId(id)!!.hitPointsFor(pc, level, "wizard")
+
+        // "Armor Class 11 + the spell's level", "Hit Points 40 + 10 for each level above 4".
+        assertEquals(11 + 4, ac("aberrant_spirit_slaad", 4))
+        assertEquals(40 + 10 * 4, hp("aberrant_spirit_slaad", 4))
+        // The Defender carries the +2, the Avenger does not.
+        assertEquals(11 + 5, ac("celestial_spirit_avenger", 5))
+        assertEquals(13 + 5, ac("celestial_spirit_defender", 5))
+        // Constructs are 13 + level and gain 15 per level rather than 10.
+        assertEquals(13 + 6, ac("construct_spirit_stone", 6))
+        assertEquals(40 + 15 * 6, hp("construct_spirit_stone", 6))
+        // The Yugoloth is the sturdiest Fiend, the Devil the frailest.
+        assertEquals(60 + 15 * 6, hp("fiendish_spirit_yugoloth", 6))
+        assertEquals(40 + 15 * 6, hp("fiendish_spirit_devil", 6))
+        // Arcana Unleashed's three.
+        assertEquals(13 + 5, ac("plant_spirit_tree", 5))
+        assertEquals(50 + 10 * 5, hp("plant_spirit_vine", 5))
+        assertEquals(60 + 10 * 6, hp("dinosaur_spirit_tyrannosaur", 6))
+        assertEquals(30 + 5 * 2, hp("battle_familiar_brute", 2))
+        assertEquals(20 + 5 * 2, hp("battle_familiar_flyer", 2))
+    }
+
+    @Test
+    fun `a plant spirit's vulnerability is on its sheet`() {
+        // The first summon in the app with one, and a stat block that lists what it resists
+        // while dropping what kills it is worse than one that lists neither.
+        assertEquals(listOf("Fire"), StatblockData.byId("plant_spirit_tree")!!.vulnerabilities)
+        assertEquals(listOf("Slashing"), StatblockData.byId("plant_spirit_vine")!!.vulnerabilities)
+    }
+
+    @Test
+    fun `every spell that summons a creature has a stat block to summon`() {
+        // The gap this closes is the one the new book opened: Arcana Unleashed added three
+        // spells that put a creature on the table, and a spell whose text conjures something
+        // the app has no stat block for is a spell that does nothing when cast. Read from the
+        // catalogue's own text so the next book is checked the moment it is imported.
+        // "It uses the X stat block" is the 2024 books' own marker for a creature the caster
+        // manages: its own Hit Points, its own turn, its own dismissal. Spells that make an
+        // object, an effect or a creature the DM picks from the Monster Manual say something
+        // else, and the sheet has nothing to track for them.
+        val conjures = Regex("(?i)uses the [A-Za-z' ]{0,40}?stat block")
+        val missing = SpellData.ALL
+            .filter { conjures.containsMatchIn(it.description) }
+            .filter { SummonData.forSpell(it.id) == null }
+            .map { it.name }
+            .filterNot { it in SUMMONED_BY_THE_TABLE }
+
+        assertTrue(
+            "these spells conjure a creature the summon tab cannot produce: $missing",
+            missing.isEmpty(),
+        )
+    }
+
+    /** Spells that print a stat block the sheet deliberately does not track. */
+    private val SUMMONED_BY_THE_TABLE = setOf<String>()
 
     @Test
     fun `every stat block can be worked out for a real character`() {

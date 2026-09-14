@@ -1,6 +1,7 @@
 package com.pedroeu.ficha
 
 import com.pedroeu.ficha.data.content.FeatData
+import com.pedroeu.ficha.data.content.EquipmentData
 import com.pedroeu.ficha.data.content.ModifierData
 import com.pedroeu.ficha.data.content.PassiveBonusData
 import com.pedroeu.ficha.data.content.ResourceData
@@ -213,6 +214,32 @@ class ContentCoverageTest {
         assertTrue(
             "these subclasses promise an always-prepared spell and grant nothing: $missing",
             missing.isEmpty(),
+        )
+    }
+
+    @Test
+    fun `the equipment catalogue carries the whole gear table`() {
+        // The gear list was 75 rows against the book's 91, and the gap was invisible because
+        // nothing compared them: a player looking for a Bucket, a Bell or a Spyglass found
+        // nothing and typed it in. Pinned by count and by a handful of names, so a row
+        // deleted by accident fails here rather than in someone's inventory.
+        assertTrue(
+            "the gear catalogue has shrunk: ${EquipmentData.GEAR.size}",
+            EquipmentData.GEAR.size >= 116,
+        )
+        val names = EquipmentData.GEAR.map { it.name }.toSet()
+        val expected = listOf(
+            "Bell", "Bucket", "Barrel", "Basket", "Chest", "Flask", "Jug", "Ladder", "Lamp",
+            "Mirror", "Net", "Paper", "Sack", "Spyglass", "String", "Vial", "Hunting Trap",
+            "Magnifying Glass", "Signal Whistle", "Portable Ram", "Climber's Kit",
+            // The climate and disguise gear the later books add.
+            "Desert Clothing", "Winter Camouflage", "Monster Camouflage", "Devil Mask",
+            "Genie Robe", "Locking Spellbook", "Bright Fungal Cloak", "Warm Fungal Clothing",
+            "Garb of Light and Shadow",
+        )
+        assertTrue(
+            "missing from the gear catalogue: ${expected - names}",
+            names.containsAll(expected),
         )
     }
 

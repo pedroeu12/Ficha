@@ -735,9 +735,741 @@ object StatblockData {
 
     // ================================================================ The catalogue
 
+    // ================================================================ Summon Plant
+
+    private fun plant(
+        id: String, variant: String, acBase: Int, speed: String,
+        vulnerabilities: List<String>, actions: List<StatblockAction>,
+    ) = Statblock(
+        id = id,
+        name = "Plant Spirit ($variant)",
+        size = "Large",
+        creatureType = "Plant",
+        armorClass = spiritAc(acBase),
+        hitPoints = spiritHp(50, 10),
+        speed = speed,
+        abilityScores = scores(17, 13, 14, 10, 13, 10),
+        sharesProficiencyBonus = true,
+        senses = "Passive Perception 11",
+        vulnerabilities = vulnerabilities,
+        actions = actions + StatblockAction(
+            name = "Multiattack",
+            kind = ActionKind.TRAIT,
+            description = "The spirit makes a number of attacks equal to half this spell's " +
+                "level (round down).",
+        ),
+    )
+
+    private val SLAM = StatblockAction(
+        name = "Slam",
+        description = "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. " +
+            "Hit: 1d10 + 3 plus the spell's level Bludgeoning damage.",
+        toHit = SPELL_ATTACK,
+        damageDice = "1d10",
+        damageBonus = Formula.Sum(listOf(Formula.Flat(3), Formula.SpellLevel)),
+        damageType = "Bludgeoning",
+        reach = "5 ft.",
+    )
+
+    private val PLANTS = listOf(
+        // The Tree is the only one with the +2 to Armor Class, and the only one that burns.
+        plant(
+            "plant_spirit_tree", "Tree", 13, "40 ft.", listOf("Fire"),
+            listOf(
+                SLAM,
+                StatblockAction(
+                    name = "Siege Monster",
+                    kind = ActionKind.TRAIT,
+                    description = "The spirit deals double damage to objects and structures.",
+                ),
+            ),
+        ),
+        plant(
+            "plant_spirit_fungus", "Fungus", 11, "40 ft.", listOf("Slashing"),
+            listOf(
+                StatblockAction(
+                    name = "Spore Spray",
+                    description = "Melee or Ranged Attack Roll: bonus equals your spell attack " +
+                        "modifier, reach 5 ft. or range 30 ft. Hit: 1d4 plus the spell's level " +
+                        "Poison damage, and the target has the Poisoned condition until the end " +
+                        "of its next turn. If the target already has the Poisoned condition, it " +
+                        "instead takes an extra 3d4 Poison damage.",
+                    toHit = SPELL_ATTACK,
+                    damageDice = "1d4",
+                    damageBonus = Formula.SpellLevel,
+                    damageType = "Poison",
+                    reach = "5 ft. or range 30 ft.",
+                ),
+            ),
+        ),
+        plant(
+            "plant_spirit_vine", "Vine", 11, "40 ft., Climb 40 ft.", listOf("Slashing"),
+            listOf(
+                SLAM,
+                StatblockAction(
+                    name = "Twist Away",
+                    kind = ActionKind.BONUS_ACTION,
+                    description = "The spirit takes the Dash or Disengage action.",
+                ),
+            ),
+        ),
+    )
+
+    val PLANT_FORMS: List<String> = PLANTS.map { it.id }
+
+    // ================================================================ Summon Dinosaur
+
+    private fun dinosaur(
+        id: String, variant: String, acBase: Int, actions: List<StatblockAction>,
+    ) = Statblock(
+        id = id,
+        name = "Dinosaur Spirit ($variant)",
+        size = "Huge",
+        creatureType = "Beast (Dinosaur)",
+        armorClass = spiritAc(acBase),
+        hitPoints = spiritHp(60, 10),
+        speed = "40 ft.",
+        abilityScores = scores(21, 10, 15, 4, 12, 9),
+        sharesProficiencyBonus = true,
+        senses = "Passive Perception 11",
+        actions = actions + listOf(
+            StatblockAction(
+                name = "Multiattack",
+                kind = ActionKind.TRAIT,
+                description = "The spirit makes a number of attacks equal to half this spell's " +
+                    "level (round down).",
+            ),
+            StatblockAction(
+                name = "Tough",
+                kind = ActionKind.TRAIT,
+                description = "Add half the spell's level (round down) to any Strength or " +
+                    "Constitution saving throw the spirit makes.",
+            ),
+        ),
+    )
+
+    private val DINO_SLAM = StatblockAction(
+        name = "Slam",
+        description = "Melee Attack Roll: bonus equals your spell attack modifier, reach 10 ft. " +
+            "Hit: 1d10 + 5 plus the spell's level Bludgeoning damage.",
+        toHit = SPELL_ATTACK,
+        damageDice = "1d10",
+        damageBonus = Formula.Sum(listOf(Formula.Flat(5), Formula.SpellLevel)),
+        damageType = "Bludgeoning",
+        reach = "10 ft.",
+    )
+
+    private val DINOSAURS = listOf(
+        dinosaur(
+            "dinosaur_spirit_ankylosaur", "Ankylosaur", 13,
+            listOf(
+                DINO_SLAM,
+                StatblockAction(
+                    name = "Siege Monster",
+                    kind = ActionKind.TRAIT,
+                    description = "The spirit deals double damage to objects and structures.",
+                ),
+            ),
+        ),
+        dinosaur(
+            "dinosaur_spirit_triceratops", "Triceratops", 11,
+            listOf(
+                StatblockAction(
+                    name = "Gore",
+                    description = "Melee Attack Roll: bonus equals your spell attack modifier, " +
+                        "reach 5 ft. Hit: 1d10 + 5 plus the spell's level Piercing damage. If " +
+                        "the target is a Huge or smaller creature and the spirit moved 20+ feet " +
+                        "straight toward it immediately before the hit, the target takes an " +
+                        "extra 1d10 Piercing damage and has the Prone condition.",
+                    toHit = SPELL_ATTACK,
+                    damageDice = "1d10",
+                    damageBonus = Formula.Sum(listOf(Formula.Flat(5), Formula.SpellLevel)),
+                    damageType = "Piercing",
+                    reach = "5 ft.",
+                ),
+                DINO_SLAM,
+            ),
+        ),
+        dinosaur(
+            "dinosaur_spirit_tyrannosaur", "Tyrannosaur", 11,
+            listOf(
+                StatblockAction(
+                    name = "Bite",
+                    description = "Melee Attack Roll: bonus equals your spell attack modifier, " +
+                        "reach 10 ft. Hit: 2d10 + 5 plus the spell's level Piercing damage. If " +
+                        "the target is a Large or smaller creature, it has the Grappled " +
+                        "condition (escape DC equal to your spell save DC), and it has the " +
+                        "Restrained condition until the grapple ends.",
+                    toHit = SPELL_ATTACK,
+                    damageDice = "2d10",
+                    damageBonus = Formula.Sum(listOf(Formula.Flat(5), Formula.SpellLevel)),
+                    damageType = "Piercing",
+                    reach = "10 ft.",
+                ),
+                DINO_SLAM,
+            ),
+        ),
+    )
+
+    val DINOSAUR_FORMS: List<String> = DINOSAURS.map { it.id }
+
+    // ================================================================ Battle Familiar
+
+    private fun battleFamiliar(
+        id: String, variant: String, acBase: Int, hp: Int, speed: String,
+        extra: List<StatblockAction>,
+    ) = Statblock(
+        id = id,
+        name = "Battle Familiar ($variant)",
+        size = "Medium",
+        creatureType = "Celestial, Fey, or Fiend",
+        armorClass = spiritAc(acBase),
+        hitPoints = spiritHp(hp, 5),
+        speed = speed,
+        abilityScores = scores(16, 16, 12, 8, 13, 10),
+        sharesProficiencyBonus = true,
+        senses = "Passive Perception 11",
+        conditionImmunities = listOf("Charmed", "Frightened"),
+        actions = extra + listOf(
+            StatblockAction(
+                name = "Rend",
+                description = "Melee Attack Roll: bonus equals your spell attack modifier, " +
+                    "reach 5 ft. Hit: 1d8 + 3 plus the spell's level Force damage.",
+                toHit = SPELL_ATTACK,
+                damageDice = "1d8",
+                damageBonus = Formula.Sum(listOf(Formula.Flat(3), Formula.SpellLevel)),
+                damageType = "Force",
+                reach = "5 ft.",
+            ),
+            StatblockAction(
+                name = "Multiattack",
+                kind = ActionKind.TRAIT,
+                description = "The familiar makes a number of Rend attacks equal to half this " +
+                    "spell's level (round down). It can replace one with Prowl if available.",
+            ),
+            StatblockAction(
+                name = "Talented",
+                kind = ActionKind.TRAIT,
+                description = "Add half the spell's level (round down) to any ability check or " +
+                    "saving throw the familiar makes.",
+            ),
+        ),
+    )
+
+    private val BATTLE_FAMILIARS = listOf(
+        // The Brute is the sturdier one: +2 Armor Class and ten more Hit Points.
+        battleFamiliar("battle_familiar_brute", "Brute", 13, 30, "40 ft., Swim 30 ft.", emptyList()),
+        battleFamiliar(
+            "battle_familiar_flyer", "Flyer", 11, 20, "40 ft., Fly 30 ft. (hover), Swim 30 ft.",
+            listOf(
+                StatblockAction(
+                    name = "Flyby",
+                    kind = ActionKind.TRAIT,
+                    description = "The familiar doesn't provoke an Opportunity Attack when it " +
+                        "flies out of an enemy's reach.",
+                ),
+            ),
+        ),
+        battleFamiliar(
+            "battle_familiar_stalker", "Stalker", 11, 20, "40 ft., Swim 30 ft.",
+            listOf(
+                StatblockAction(
+                    name = "Prowl",
+                    kind = ActionKind.BONUS_ACTION,
+                    description = "The familiar moves up to half its Speed without provoking " +
+                        "Opportunity Attacks. At the end of this movement, it can take the " +
+                        "Hide action.",
+                ),
+            ),
+        ),
+    )
+
+    val BATTLE_FAMILIAR_FORMS: List<String> = BATTLE_FAMILIARS.map { it.id }
+
+    private val HEALING_TOUCH = StatblockAction(
+        name = "Healing Touch (1/Day)",
+        description = "The spirit touches another creature. The target regains Hit Points " +
+            "equal to 2d8 + the spell's level.",
+    )
+
+    // ================================================================ The rest of the
+    // 2024 Summon family, plus four older spells that print a stat block of their own.
+    //
+    // These were not missing by choice: Summon Beast, Undead, Fey and Elemental were written
+    // first and the other five were never added, so a Wizard with Summon Fiend had a spell on
+    // the sheet and nothing to put on the table. A test now reads the catalogue's own text and
+    // fails the build for any spell whose creature has no stat block.
+
+    private fun spirit(
+        id: String, name: String, size: String, type: String,
+        acBase: Int, hp: Int, hpPer: Int, speed: String,
+        str: Int, dex: Int, con: Int, int: Int, wis: Int, cha: Int,
+        actions: List<StatblockAction>,
+        resistances: List<String> = emptyList(),
+        immunities: List<String> = emptyList(),
+        conditionImmunities: List<String> = emptyList(),
+        senses: String = "",
+        languages: String = "",
+    ) = Statblock(
+        id = id,
+        name = name,
+        size = size,
+        creatureType = type,
+        armorClass = spiritAc(acBase),
+        hitPoints = spiritHp(hp, hpPer),
+        speed = speed,
+        abilityScores = scores(str, dex, con, int, wis, cha),
+        sharesProficiencyBonus = true,
+        resistances = resistances,
+        immunities = immunities,
+        conditionImmunities = conditionImmunities,
+        senses = senses,
+        languages = languages,
+        actions = actions,
+    )
+
+    private fun multiattack(who: String) = StatblockAction(
+        name = "Multiattack",
+        kind = ActionKind.TRAIT,
+        description = "The $who makes a number of attacks equal to half this spell's level " +
+            "(round down).",
+    )
+
+    /** "Bonus equals your spell attack modifier … plus the spell's level." */
+    private fun spiritAttack(
+        name: String, dice: String, bonus: Int, type: String, reach: String, text: String,
+    ) = StatblockAction(
+        name = name,
+        description = text,
+        toHit = SPELL_ATTACK,
+        damageDice = dice,
+        damageBonus = Formula.Sum(listOf(Formula.Flat(bonus), Formula.SpellLevel)),
+        damageType = type,
+        reach = reach,
+    )
+
+    private val ABERRANT = listOf(
+        spirit(
+            "aberrant_spirit_beholderkin", "Aberrant Spirit (Beholderkin)", "Medium",
+            "Aberration", 11, 40, 10, "30 ft., Fly 30 ft. (hover)",
+            16, 10, 15, 16, 10, 6,
+            listOf(
+                spiritAttack(
+                    "Eye Ray", "1d8", 3, "Psychic", "range 150 ft.",
+                    "Ranged Attack Roll: bonus equals your spell attack modifier, range 150 ft. " +
+                        "Hit: 1d8 + 3 + the spell's level Psychic damage.",
+                ),
+                multiattack("spirit"),
+            ),
+            immunities = listOf("Psychic"),
+            senses = "Darkvision 60 ft., Passive Perception 10",
+            languages = "Deep Speech, understands the languages you know",
+        ),
+        spirit(
+            "aberrant_spirit_slaad", "Aberrant Spirit (Slaad)", "Medium", "Aberration",
+            11, 40, 10, "30 ft.", 16, 10, 15, 16, 10, 6,
+            listOf(
+                spiritAttack(
+                    "Claw", "1d10", 3, "Slashing", "5 ft.",
+                    "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. " +
+                        "Hit: 1d10 + 3 + the spell's level Slashing damage, and the target " +
+                        "can't regain Hit Points until the start of the spirit's next turn.",
+                ),
+                multiattack("spirit"),
+                StatblockAction(
+                    name = "Regeneration",
+                    kind = ActionKind.TRAIT,
+                    description = "The spirit regains 5 Hit Points at the start of its turn if " +
+                        "it has at least 1 Hit Point.",
+                ),
+            ),
+            immunities = listOf("Psychic"),
+            senses = "Darkvision 60 ft., Passive Perception 10",
+            languages = "Deep Speech, understands the languages you know",
+        ),
+        spirit(
+            "aberrant_spirit_mind_flayer", "Aberrant Spirit (Mind Flayer)", "Medium",
+            "Aberration", 11, 40, 10, "30 ft.", 16, 10, 15, 16, 10, 6,
+            listOf(
+                spiritAttack(
+                    "Psychic Slam", "1d8", 3, "Psychic", "5 ft.",
+                    "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. " +
+                        "Hit: 1d8 + 3 + the spell's level Psychic damage.",
+                ),
+                multiattack("spirit"),
+                StatblockAction(
+                    name = "Whispering Aura",
+                    kind = ActionKind.TRAIT,
+                    description = "At the start of each of the spirit's turns, it emits psionic " +
+                        "energy if it doesn't have the Incapacitated condition. Wisdom Saving " +
+                        "Throw: DC equals your spell save DC, each creature (other than you) " +
+                        "within 5 feet of the spirit. Failure: 2d6 Psychic damage.",
+                ),
+            ),
+            immunities = listOf("Psychic"),
+            senses = "Darkvision 60 ft., Passive Perception 10",
+            languages = "Deep Speech, understands the languages you know",
+        ),
+    )
+
+    private val CELESTIAL = listOf(
+        spirit(
+            "celestial_spirit_avenger", "Celestial Spirit (Avenger)", "Large", "Celestial",
+            11, 40, 10, "30 ft., Fly 40 ft.", 16, 14, 16, 10, 14, 16,
+            listOf(
+                spiritAttack(
+                    "Radiant Bow", "2d6", 2, "Radiant", "range 600 ft.",
+                    "Ranged Attack Roll: bonus equals your spell attack modifier, range 600 ft. " +
+                        "Hit: 2d6 + 2 + the spell's level Radiant damage.",
+                ),
+                multiattack("spirit"),
+                HEALING_TOUCH,
+            ),
+            resistances = listOf("Radiant"),
+            conditionImmunities = listOf("Charmed", "Frightened"),
+            senses = "Darkvision 60 ft., Passive Perception 12",
+            languages = "Celestial, understands the languages you know",
+        ),
+        spirit(
+            // The Defender is the one with the +2 to Armor Class.
+            "celestial_spirit_defender", "Celestial Spirit (Defender)", "Large", "Celestial",
+            13, 40, 10, "30 ft., Fly 40 ft.", 16, 14, 16, 10, 14, 16,
+            listOf(
+                spiritAttack(
+                    "Radiant Mace", "1d10", 3, "Radiant", "5 ft.",
+                    "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. " +
+                        "Hit: 1d10 + 3 + the spell's level Radiant damage, and the spirit can " +
+                        "choose itself or another creature it can see within 10 feet of the " +
+                        "target. The chosen creature gains 1d10 Temporary Hit Points.",
+                ),
+                multiattack("spirit"),
+                HEALING_TOUCH,
+            ),
+            resistances = listOf("Radiant"),
+            conditionImmunities = listOf("Charmed", "Frightened"),
+            senses = "Darkvision 60 ft., Passive Perception 12",
+            languages = "Celestial, understands the languages you know",
+        ),
+    )
+
+    private val CONSTRUCT_SLAM = spiritAttack(
+        "Slam", "1d8", 4, "Bludgeoning", "5 ft.",
+        "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. Hit: 1d8 + 4 " +
+            "+ the spell's level Bludgeoning damage.",
+    )
+
+    private fun construct(id: String, variant: String, extra: StatblockAction?) = spirit(
+        id, "Construct Spirit ($variant)", "Medium", "Construct",
+        13, 40, 15, "30 ft.", 18, 10, 18, 14, 11, 5,
+        listOfNotNull(CONSTRUCT_SLAM, multiattack("spirit"), extra),
+        resistances = listOf("Poison"),
+        conditionImmunities = listOf(
+            "Charmed", "Exhaustion", "Frightened", "Paralyzed", "Poisoned",
+        ),
+        senses = "Darkvision 60 ft., Passive Perception 10",
+        languages = "Understands the languages that you know",
+    )
+
+    private val CONSTRUCTS = listOf(
+        construct(
+            "construct_spirit_clay", "Clay",
+            StatblockAction(
+                name = "Berserk Lashing",
+                kind = ActionKind.REACTION,
+                description = "Trigger: the spirit takes damage from a creature. Response: the " +
+                    "spirit makes a Slam attack against that creature if possible, or moves up " +
+                    "to half its Speed toward it without provoking Opportunity Attacks.",
+            ),
+        ),
+        construct(
+            "construct_spirit_metal", "Metal",
+            StatblockAction(
+                name = "Heated Body",
+                kind = ActionKind.TRAIT,
+                description = "A creature that hits the spirit with a melee attack, or that " +
+                    "starts its turn grappling it, takes 1d10 Fire damage.",
+            ),
+        ),
+        construct(
+            "construct_spirit_stone", "Stone",
+            StatblockAction(
+                name = "Stony Lethargy",
+                kind = ActionKind.TRAIT,
+                description = "When a creature starts its turn within 10 feet of the spirit, " +
+                    "the spirit can target it. Wisdom Saving Throw: DC equals your spell save " +
+                    "DC. Failure: until the start of its next turn, the target can't make " +
+                    "Opportunity Attacks and its Speed is halved.",
+            ),
+        ),
+    )
+
+    private val DRACONIC_SPIRIT = spirit(
+        "draconic_spirit", "Draconic Spirit", "Large", "Dragon",
+        14, 50, 10, "30 ft., Fly 60 ft., Swim 30 ft.", 19, 14, 17, 10, 14, 14,
+        listOf(
+            spiritAttack(
+                "Rend", "1d6", 4, "Piercing", "10 ft.",
+                "Melee Attack Roll: bonus equals your spell attack modifier, reach 10 ft. " +
+                    "Hit: 1d6 + 4 + the spell's level Piercing damage.",
+            ),
+            StatblockAction(
+                name = "Breath Weapon",
+                description = "Dexterity Saving Throw: DC equals your spell save DC, each " +
+                    "creature in a 30-foot Cone. Failure: 2d6 damage of a type this spirit has " +
+                    "Resistance to (your choice when you cast the spell). Success: half damage.",
+            ),
+            StatblockAction(
+                name = "Multiattack",
+                kind = ActionKind.TRAIT,
+                description = "The spirit makes a number of Rend attacks equal to half this " +
+                    "spell's level (round down), and it uses Breath Weapon.",
+            ),
+            StatblockAction(
+                name = "Shared Resistances",
+                kind = ActionKind.TRAIT,
+                description = "When you summon the spirit, choose one of its Resistances. You " +
+                    "have Resistance to the chosen damage type until the spell ends.",
+            ),
+        ),
+        resistances = listOf("Acid", "Cold", "Fire", "Lightning", "Poison"),
+        conditionImmunities = listOf("Charmed", "Frightened", "Poisoned"),
+        senses = "Blindsight 30 ft., Darkvision 60 ft., Passive Perception 12",
+        languages = "Draconic, understands the languages you know",
+    )
+
+    private fun fiend(
+        id: String, variant: String, hp: Int, speed: String,
+        attack: StatblockAction, extra: StatblockAction?,
+    ) = spirit(
+        id, "Fiendish Spirit ($variant)", "Large", "Fiend",
+        12, hp, 15, speed, 13, 16, 15, 10, 10, 16,
+        listOfNotNull(
+            attack, multiattack("spirit"),
+            StatblockAction(
+                name = "Magic Resistance",
+                kind = ActionKind.TRAIT,
+                description = "The spirit has Advantage on saving throws against spells and " +
+                    "other magical effects.",
+            ),
+            extra,
+        ),
+        resistances = listOf("Fire"),
+        immunities = listOf("Poison"),
+        conditionImmunities = listOf("Poisoned"),
+        senses = "Darkvision 60 ft., Passive Perception 10",
+        languages = "Abyssal, Infernal, Telepathy 60 ft.",
+    )
+
+    private val FIENDS = listOf(
+        fiend(
+            "fiendish_spirit_demon", "Demon", 50, "40 ft., Climb 40 ft.",
+            spiritAttack(
+                "Bite", "1d12", 3, "Necrotic", "5 ft.",
+                "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. Hit: " +
+                    "1d12 + 3 + the spell's level Necrotic damage.",
+            ),
+            StatblockAction(
+                name = "Death Throes",
+                kind = ActionKind.TRAIT,
+                description = "When the spirit drops to 0 Hit Points or the spell ends, it " +
+                    "explodes. Dexterity Saving Throw: DC equals your spell save DC, each " +
+                    "creature in a 10-foot Emanation. Failure: 2d10 plus this spell's level " +
+                    "Fire damage. Success: half damage.",
+            ),
+        ),
+        fiend(
+            "fiendish_spirit_devil", "Devil", 40, "40 ft., Fly 60 ft.",
+            spiritAttack(
+                "Fiery Strike", "2d6", 3, "Fire", "5 ft. or range 150 ft.",
+                "Melee or Ranged Attack Roll: bonus equals your spell attack modifier, reach " +
+                    "5 ft. or range 150 ft. Hit: 2d6 + 3 + the spell's level Fire damage.",
+            ),
+            StatblockAction(
+                name = "Devil's Sight",
+                kind = ActionKind.TRAIT,
+                description = "Magical Darkness doesn't impede the spirit's Darkvision.",
+            ),
+        ),
+        fiend(
+            "fiendish_spirit_yugoloth", "Yugoloth", 60, "40 ft.",
+            spiritAttack(
+                "Claws", "1d8", 3, "Slashing", "5 ft.",
+                "Melee Attack Roll: bonus equals your spell attack modifier, reach 5 ft. Hit: " +
+                    "1d8 + 3 + the spell's level Slashing damage. Immediately after the attack " +
+                    "hits or misses, the spirit can teleport up to 30 feet to an unoccupied " +
+                    "space it can see.",
+            ),
+            null,
+        ),
+    )
+
+    private fun insect(id: String, variant: String, speed: String, extra: StatblockAction?) =
+        spirit(
+            id, "Giant Insect ($variant)", "Large", "Beast",
+            11, 30, 10, speed, 17, 13, 15, 4, 14, 3,
+            listOfNotNull(
+                spiritAttack(
+                    "Poison Jab", "1d6", 3, "Piercing", "10 ft.",
+                    "Melee Attack Roll: bonus equals your spell attack modifier, reach 10 ft. " +
+                        "Hit: 1d6 + 3 plus the spell's level Piercing damage plus 1d4 Poison " +
+                        "damage.",
+                ),
+                multiattack("insect"),
+                StatblockAction(
+                    name = "Spider Climb",
+                    kind = ActionKind.TRAIT,
+                    description = "The insect can climb difficult surfaces, including along " +
+                        "ceilings, without needing to make an ability check.",
+                ),
+                extra,
+            ),
+            senses = "Darkvision 60 ft., Passive Perception 12",
+            languages = "Understands the languages you know",
+        )
+
+    private val INSECTS = listOf(
+        insect(
+            "giant_insect_centipede", "Centipede", "40 ft., Climb 40 ft.",
+            StatblockAction(
+                name = "Venomous Spew",
+                kind = ActionKind.BONUS_ACTION,
+                description = "Constitution Saving Throw: your spell save DC, one creature the " +
+                    "insect can see within 10 feet. Failure: the target has the Poisoned " +
+                    "condition until the start of the insect's next turn.",
+            ),
+        ),
+        insect(
+            "giant_insect_spider", "Spider", "40 ft., Climb 40 ft.",
+            spiritAttack(
+                "Web Bolt", "1d10", 3, "Bludgeoning", "range 60 ft.",
+                "Ranged Attack Roll: bonus equals your spell attack modifier, range 60 ft. " +
+                    "Hit: 1d10 + 3 plus the spell's level Bludgeoning damage, and the target's " +
+                    "Speed is reduced to 0 until the start of the insect's next turn.",
+            ),
+        ),
+        insect("giant_insect_wasp", "Wasp", "40 ft., Climb 40 ft., Fly 40 ft.", null),
+    )
+
+    private val HOMUNCULUS = Statblock(
+        id = "homunculus_servant",
+        name = "Homunculus Servant",
+        size = "Tiny",
+        creatureType = "Construct",
+        armorClass = Formula.Flat(13),
+        hitPoints = spiritHp(0, 5),
+        speed = "20 ft., Fly 30 ft.",
+        abilityScores = scores(4, 15, 12, 10, 10, 7),
+        sharesProficiencyBonus = true,
+        immunities = listOf("Poison"),
+        conditionImmunities = listOf("Exhaustion", "Poisoned"),
+        senses = "Darkvision 60 ft., Passive Perception 10",
+        languages = "Telepathy 1 mile (works only with you)",
+        actions = listOf(
+            spiritAttack(
+                "Force Strike", "1d6", 0, "Force", "5 ft. or range 30 ft.",
+                "Melee or Ranged Attack Roll: bonus equals your spell attack modifier, reach " +
+                    "5 ft. or range 30 ft. Hit: 1d6 plus the spell's level Force damage.",
+            ),
+            StatblockAction(
+                name = "Channel Magic",
+                kind = ActionKind.REACTION,
+                description = "Trigger: you cast a spell with a range of touch while the " +
+                    "homunculus is within 120 feet of you. Response: the homunculus delivers " +
+                    "the spell through its touch.",
+            ),
+            StatblockAction(
+                name = "Evasion",
+                kind = ActionKind.TRAIT,
+                description = "On a Dexterity save for half damage the homunculus takes none " +
+                    "on a success and half on a failure. Not while Incapacitated.",
+            ),
+            StatblockAction(
+                name = "Magic Bond",
+                kind = ActionKind.TRAIT,
+                description = "Add the spell's level to any ability check or saving throw the " +
+                    "homunculus makes.",
+            ),
+        ),
+    )
+
+    private fun animatedObject(id: String, size: String, hp: Int, damage: String) = Statblock(
+        id = id,
+        name = "Animated Object ($size)",
+        size = size,
+        creatureType = "Construct",
+        armorClass = Formula.Flat(15),
+        hitPoints = Formula.Flat(hp),
+        speed = "30 ft.",
+        abilityScores = scores(16, 10, 10, 3, 3, 1),
+        sharesProficiencyBonus = true,
+        immunities = listOf("Poison", "Psychic"),
+        conditionImmunities = listOf(
+            "Charmed", "Exhaustion", "Frightened", "Paralyzed", "Poisoned",
+        ),
+        senses = "Blindsight 30 ft., Passive Perception 6",
+        languages = "Understands the languages that you know",
+        actions = listOf(
+            StatblockAction(
+                name = "Slam",
+                description = "Melee Attack Roll: bonus equals your spell attack modifier, " +
+                    "reach 5 ft. Hit: $damage Force damage.",
+                toHit = SPELL_ATTACK,
+                damageDice = damage.substringBefore(" +"),
+                damageType = "Force",
+                reach = "5 ft.",
+            ),
+        ),
+    )
+
+    private val ANIMATED_OBJECTS = listOf(
+        animatedObject("animated_object_medium", "Medium", 10, "1d4 + 3"),
+        animatedObject("animated_object_large", "Large", 20, "2d6 + 3"),
+        animatedObject("animated_object_huge", "Huge", 40, "2d12 + 3"),
+    )
+
+    private val PHANTOM_STEED = Statblock(
+        id = "phantom_steed",
+        name = "Phantom Steed",
+        size = "Large",
+        creatureType = "Beast (Riding Horse)",
+        armorClass = Formula.Flat(11),
+        hitPoints = Formula.Flat(11),
+        // "except it has a Speed of 100 feet and can travel 13 miles in an hour."
+        speed = "100 ft.",
+        abilityScores = scores(16, 10, 11, 2, 11, 7),
+        senses = "Passive Perception 10",
+        notes = "Fades when the spell ends, giving the rider 1 minute to dismount. The spell " +
+            "ends early if the steed takes any damage.",
+        actions = listOf(
+            StatblockAction(
+                name = "Hooves",
+                description = "Melee Attack Roll: +4, reach 5 ft. Hit: 1d6 + 3 Bludgeoning " +
+                    "damage.",
+                toHit = Formula.Flat(4),
+                damageDice = "1d6",
+                damageBonus = Formula.Flat(3),
+                damageType = "Bludgeoning",
+                reach = "5 ft.",
+            ),
+        ),
+    )
+
+    val ABERRANT_FORMS: List<String> = ABERRANT.map { it.id }
+    val CELESTIAL_FORMS: List<String> = CELESTIAL.map { it.id }
+    val CONSTRUCT_FORMS: List<String> = CONSTRUCTS.map { it.id }
+    val FIENDISH_FORMS: List<String> = FIENDS.map { it.id }
+    val GIANT_INSECT_FORMS: List<String> = INSECTS.map { it.id }
+    val ANIMATED_OBJECT_FORMS: List<String> = ANIMATED_OBJECTS.map { it.id }
+
     val ALL: List<Statblock> =
         BESTIAL + UNDEAD + FEY + ELEMENTAL + VESTIGES + FAMILIARS + PACT_FAMILIARS +
-            listOf(STEEL_DEFENDER, SKELETON, ZOMBIE, OTHERWORLDLY_STEED)
+            PLANTS + DINOSAURS + BATTLE_FAMILIARS +
+            ABERRANT + CELESTIAL + CONSTRUCTS + FIENDS + INSECTS + ANIMATED_OBJECTS +
+            listOf(
+                STEEL_DEFENDER, SKELETON, ZOMBIE, OTHERWORLDLY_STEED,
+                DRACONIC_SPIRIT, HOMUNCULUS, PHANTOM_STEED,
+            )
+
 
     private val byId: Map<String, Statblock> = ALL.associateBy { it.id }
 

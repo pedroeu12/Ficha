@@ -53,6 +53,18 @@ object MagicItemData {
      */
     private val ATTACK_BONUSES: Map<String, Int> = mapOf(
         "weapon_plus_1" to 1,
+        // Arcana Unleashed. Keyhole's Dagger and the Wave-Swept Weapon are left out on
+        // purpose: their bonus belongs to one rarity tier of an item whose rarity varies, and
+        // the sheet has no way to say which tier the player was given.
+        "diamond_staff" to 3,
+        "dissuader" to 1,
+        "grave_reaper" to 2,
+        "life_sapping_blade" to 1,
+        "mage_breaker" to 1,
+        "namers_needle" to 1,
+        "staff_of_the_lost" to 1,
+        "staff_of_the_spirit_aegis" to 3,
+        "thayan_sword" to 1,
         "weapon_plus_2" to 2,
         "weapon_plus_3" to 3,
         "berserker_axe" to 1,
@@ -92,6 +104,8 @@ object MagicItemData {
      */
     private val AC_BONUSES: Map<String, Int> = mapOf(
         "armor_plus_1" to 1,
+        // The Idol of Good Fortunes also grants +1, but only as a Tarnished (Rare) idol.
+        "tramontane_armor" to 1,
         "armor_plus_2" to 2,
         "armor_plus_3" to 3,
         "shield_plus_1" to 1,
@@ -4081,10 +4095,931 @@ object MagicItemData {
                 "and those strikes deal your choice of Force damage or their normal damage type."),
     )
 
+    /**
+     * Arcana Unleashed, its Deadfall appendix, and the handful of core items still missing.
+     *
+     * Imported whole from the reference wiki, which is how a catalogue stays a catalogue: the
+     * book's own list is 72 items longer than the app's was, and picking the interesting ones
+     * would have left a DM handing out something the sheet has never heard of.
+     */
+    private val ARCANA_UNLEASHED_ITEMS = listOf(
+        item("arcane_chantelaine", "Arcane Chantelaine", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare This ornate clasp has six spectral keys attached to it. As a " +
+                "Magic action, you can touch one of the keys to a closed door, window, gate, " +
+                "container, or hatch to cast the Arcane Lock spell on it. Once a key is used, it " +
+                "disappears. When all six keys have disappeared, the chatelaine disappears.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("arcanists_bestiary", "Arcanist's Bestiary", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement) Hundreds of pages of illustrations, " +
+                "tables, and diagrams about a wide variety of monsters fill this magical tome. Charm " +
+                "Monster. While holding the book, you can cast the Charm Monster spell (spell save DC " +
+                "15) from it. The target has Disadvantage on the saving throw against this spell if " +
+                "it isn't a Humanoid. You can't cast this spell again in this way until the next " +
+                "dawn. Extensive Knowledge. When you become attuned to the book, you gain proficiency " +
+                "in one of the following skills of your choice: Arcana, History, Nature, or Religion. " +
+                "Whenever you finish a Long Rest, you can change your choice. If your Attunement to " +
+                "the book ends, you lose this proficiency. Monster Primer. While carrying the book, " +
+                "whenever you take a Study action to make an Intelligence (Arcana) check to recall " +
+                "information about an Aberration, Construct, Elemental, Fey, or Monstrosity you can " +
+                "see, on a successful check, you learn whether that creature has any Immunities, " +
+                "Resistances, or Vulnerabilities. If the creature has any, you know what they are.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("bellows_of_strangulation", "Bellows of Strangulation", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare This bellows has 6 charges. While you are holding it, you can " +
+                "take a Magic action and use one of three command words to cause one of the following " +
+                "effects: First Command Word. You expend 1 charge to cause the bellows to suck the " +
+                "energy from one creature you can see within 60 feet. The creature must succeed on a " +
+                "DC 15 Constitution saving throw or have the Incapacitated condition for 1 minute. " +
+                "The creature repeats the save at the end of each of its turns, ending the effect on " +
+                "itself on a success. Second Command Word. You expend 3 charges to cause the bellows " +
+                "to suck the energy from creatures in a 30-foot Cone. Each creature in that area must " +
+                "succeed on a DC 15 Constitution saving throw or have the Incapacitated condition for " +
+                "1 minute. An affected creature repeats the save at the end of each of its turns, " +
+                "ending the effect on itself on a success. Third Command Word. You expend 5 charges " +
+                "to cast the Cloudkill spell (spell DC 17) from the bellows. Regaining Charges. The " +
+                "bellows regains 1d6+1 charges daily at dawn. If you expend the last charge, roll " +
+                "1d20. On a 1, the bellows explodes in a harmless burst of wind and is lost forever.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("blood_amulet", "Blood Amulet", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement) This delicate amulet looks like a " +
+                "diminutive beating heart impaled with spikes. It has 3 charges and regains 1d3 " +
+                "charges daily at dawn. Whenever you deal damage to a creature, you can expend 1 " +
+                "charge to deal an extra 2d10 Necrotic damage to the target and force it to make a DC " +
+                "15 Constitution saving throw. On a failed save, the target gains 1 Exhaustion level.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("blossom_rod", "Blossom Rod", ItemRarity.UNCOMMON,
+            "Rod",
+            "Rod, Rarity Varies (Requires Attunement by a Spellcaster) This rod is made of " +
+                "intertwined, living plant stems. Budding (Uncommon). Multicolored leaves decorate " +
+                "the rod's stems, and a few buds cluster near each end. While you hold the rod, you " +
+                "can cast Druidcraft or Plant Growth (Overgrowth only) from it. Once the rod has been " +
+                "used to cast Plant Growth, it can't be used to cast this spell again until the next " +
+                "dawn. While you hold the rod, as a Magic action, you can rejuvenate nonmagical " +
+                "plants in a 5-foot Cube you can see within 15 feet of yourself. The rejuvenated " +
+                "plants remain verdant for 1d4 days, after which they grow or wither as normal plants " +
+                "would. Flowering (Rare). Both ends of the rod bear colorful, fragrant flowers. While " +
+                "you hold the rod, you can cast Insect Plague from it, using your spell save DC. When " +
+                "you do so, the insects appear as bumblebees. Once the rod has been used to cast this " +
+                "spell, it can't be used to cast this spell again until the next dawn. Somniferous " +
+                "(Very Rare). Robust bursts of flowers grow along the rod's length. While you hold " +
+                "the rod, you can take a Magic action to expel a puff of sleep-inducing pollen in a " +
+                "30-foot Emanation originating from you. Creatures of your choice in the Emanation " +
+                "must succeed on a DC 17 Constitution saving throw or have the Unconscious condition " +
+                "for 1 hour. Creatures that don't sleep, such as elves, or that have Immunity to the " +
+                "Exhaustion condition automatically succeed on the save. The effect ends on a target " +
+                "if it takes damage or a creature within 5 feet of it takes an action to shake it " +
+                "awake. Once the rod has produced this effect, it can't do so again until the next " +
+                "dawn.",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("boon_companions_bands", "Boon Companion's Bands", ItemRarity.UNCOMMON,
+            "Ring",
+            "Ring, Uncommon Boon Companions' Bands come in pairs and bear matching engravings. " +
+                "While wearing one of the bands, when you cast a spell or use a feature that forces " +
+                "other creatures in its area of effect to make a saving throw, you can protect the " +
+                "creature wearing the matching band if the creature is in the effect's area. That " +
+                "creature automatically succeeds on its saving throw against the effect, and it takes " +
+                "no damage if it would normally take half damage on a successful save. Once this " +
+                "property is used by either band, the bands can't be used again until the next dawn. " +
+                "If one of the bands in a pair is destroyed, the other one crumbles to dust.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("conjurers_canopy", "Conjurer's Canopy", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common You can take a Magic action and use a command word to plunge " +
+                "this magical walking stick into the ground, where it stands straight up and projects " +
+                "a canopy of transparent force in a 20-foot Cube originating from the stick. The " +
+                "canopy lasts for 1 hour or until you end the effect early as a Magic action. The " +
+                "canopy protects creatures and objects within that area from ordinary weather " +
+                "phenomena such as rain or snow. The atmosphere within the canopy's area is " +
+                "comfortable and dry, regardless of the weather. Creatures, objects, and magical " +
+                "effects can still pass through the canopy as usual. When the canopy disappears, the " +
+                "stick can't be used again for 1d12 hours.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("crystal_ball_of_ominous_portent", "Crystal Ball of Ominous Portent", ItemRarity.LEGENDARY,
+            WONDROUS,
+            "Wondrous Item, Legendary (Requires Attunement) Black-and-scarlet clouds of ominous " +
+                "magic swirl inside this crystal orb. While touching the orb, you can cast Hex or " +
+                "Scrying (save DC 17) with it. In addition, when a creature you can see within 60 " +
+                "feet succeeds on a D20 Test, you can take a Reaction to turn the roll into a 1. Once " +
+                "used, this property can't be used again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("diamond_staff", "Diamond Staff", ItemRarity.LEGENDARY,
+            "Staff",
+            "Staff, Legendary (Requires Attunement by a Sorcerer, Warlock, or Wizard) This " +
+                "6-foot-long scepter is carved from a single enormous crystal, with a perfect " +
+                "transparent globe at its head. This staff has 20 charges and can be wielded as a " +
+                "magic Quarterstaff that grants a +3 bonus to attack rolls and damage rolls made with " +
+                "it. Adept. While holding the staff, you have Advantage on Intelligence (Arcana) " +
+                "checks. Dazzling Light. While holding the staff, you can expend 1 charge and use a " +
+                "command word tocause light to shine from the staff. The staff emits Bright Light in " +
+                "a 40-foot radius and Dim Light for an additional 40 feet. The staff stops glowing " +
+                "after 1 minute or when you use a command word to deactivate it. Spells. While " +
+                "holding the staff, you can cast one of the spells on the following table from it, " +
+                "using your spell save DC. The table indicates how many charges you must expend to " +
+                "cast the spell. Spell Charge Cost Detect Magic 0 Light 0 Identify 1 Maze 8 Knock 2 " +
+                "Tongues 0 Legend Lore 5 True Seeing 3 Stunning Hit. When you hit with a melee attack " +
+                "using the staff, you can expend 2 charges, and the target must succeed on a DC 17 " +
+                "Constitution saving throw or have the Stunned condition until the end of your next " +
+                "turn. Regaining Charges. The staff regains 1d6+4 expended charges daily at dawn. If " +
+                "you expend the last charge, roll 1d20. On a 1, the staff is destroyed.",
+            attunement = true, attunementNote = "by a Sorcerer, Warlock, or Wizard", book = Sourcebook.ARCANA_UNLEASHED),
+        item("dictation_quill", "Dictation Quill", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common When you take a Magic action to set this magic quill next to " +
+                "Paper or Parchment and a bottle of Ink and use a command word, the quill writes your " +
+                "next spoken or signed words, in the language you're using, at a rate of 25 words per " +
+                "minute. The quill writes for 1 hour; until it has no Paper, Parchment, or Ink; or " +
+                "until you use another command word to stop it (no action required).",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("dispelling_ammunition", "Dispelling Ammunition", ItemRarity.UNCOMMON,
+            "Weapon (Any Ammunition)",
+            "Weapon (Any Ammunition), Uncommon When a target takes damage from this magical piece " +
+                "of ammunition, any ongoing spell of level 3 or lower on the target ends. Once it " +
+                "deals damage to a target, the ammunition is no longer magical.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("dissuader", "Dissuader", ItemRarity.RARE,
+            "Staff",
+            "Staff, Rare (Requires Attunement) This staff can be wielded as a magic Quarterstaff " +
+                "that grants a +1 bonus to attack rolls and damage rolls made with it. It also has " +
+                "the following additional properties. Once one of these properties is used, that " +
+                "property can't be used again until the next dawn. Calm Emotions. You can cast the " +
+                "Calm Emotions spell (save DC 15) from the staff. Dissuading Aura. As a Magic action " +
+                "while holding the staff, you can create a 30-foot Emanation of mental unrest " +
+                "originating from you that lasts for 1 minute. Whenever the Emanation enters the " +
+                "space of a creature you can see and whenever a creature you can see enters the " +
+                "Emanation or ends its turn there, you can force that creature to make a DC 15 Wisdom " +
+                "saving throw. On a failed save, the creature has the Frightened condition until the " +
+                "start of its next turn. Repel. When a creature enters a space within 5 feet of you, " +
+                "you can take a Reaction to create a shock wave of force. Each creature of your " +
+                "choice in a 30-foot Emanation originating from you must succeed on a DC 15 Strength " +
+                "saving throw or be pushed up to 30 feet straight away from you.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("dream_weaver", "Dream Weaver", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement) This magic tapestry can be hung on a wall " +
+                "or another suitable vertical surface. The tapestry magically unravels and reweaves " +
+                "itself to illustrate the content and emotions of your most recent dreams. You gain " +
+                "the following benefits while the tapestry is hung and you are within 30 feet of it. " +
+                "Dream Wisdom. During a Long Rest, you can spend an hour studying the tapestry. At " +
+                "the end of the Long Rest, roll 1d20 and record the number rolled. Once before you " +
+                "finish a Long Rest, you can replace any D20 Test you make with this result. You must " +
+                "choose to do so before you roll the D20 Test. Message Recorder. If you are targeted " +
+                "by the Dream spell, the tapestry records the appearance and name of the spell's " +
+                "caster in its design. Mind Wall. While you have the Unconscious condition, you have " +
+                "Advantage on Intelligence, Wisdom, and Charisma saving throws.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("elocutionists_lexicon", "Elocutionist's Lexicon", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common While holding this magic dictionary, you can take a Magic " +
+                "action and try to recall a specific word. The book automatically opens to the page " +
+                "containing the exact word you're searching for.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("ensorcelled_missive", "Ensorcelled Missive", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common This item functions as a sheet of Parchment. After writing on " +
+                "it, you can take a Magic action to fold or roll the sheet and seal it while speaking " +
+                "or signing a word or short phrase. If a creature unseals the sheet without using the " +
+                "same word or phrase, the writing on the sheet appears as if it were written in an " +
+                "unknown and unintelligible script.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("enspelled_armor", "Enspelled Armor", ItemRarity.UNCOMMON,
+            "Armor (Any Light, Medium, or Heavy)",
+            "Armor (Any Light, Medium, or Heavy), Rarity Varies (Requires Attunement) Bound into " +
+                "this armor is a spell of level 8 or lower. The spell is determined when the armor is " +
+                "created and must belong to the Abjuration or Illusion school of magic. The armor has " +
+                "6 charges and regains 1d6 expended charges daily at dawn. While wearing the armor, " +
+                "you can expend 1 charge to cast its spell. The level of the spell bound into the " +
+                "armor determines the spell's saving throw DC and attack bonus, as well as the " +
+                "armor's rarity, as shown in the following table. Spell Level Rarity Save DC Attack " +
+                "Bonus Cantrip Uncommon 13 +5 1 Uncommon 13 +5 2 Rare 13 +5 3 Rare 15 +7 4 Very Rare " +
+                "15 +7 5 Very Rare 17 +9 6 Legendary 17 +9 7 Legendary 18 +10 8 Legendary 18 +10",
+            attunement = true, book = Sourcebook.DMG),
+        item("enspelled_staff", "Enspelled Staff", ItemRarity.UNCOMMON,
+            "Staff",
+            "Staff, Rarity Varies (Requires Attunement by a Spellcaster) Bound into this staff is " +
+                "a spell of level 8 or lower. The spell is determined when the staff is created and " +
+                "can be of any school of magic. The staff has 6 charges and regains 1d6 expended " +
+                "charges daily at dawn. While holding the staff, you can expend 1 charge to cast its " +
+                "spell. If you expend the staff's last charge, roll 1d20. On a 1, the staff loses its " +
+                "properties and becomes a nonmagical Quarterstaff. The level of the spell bound into " +
+                "the staff determines the spell's saving throw DC and attack bonus, as well as the " +
+                "staff's rarity, as shown in the following table. Spell Level Rarity Save DC Attack " +
+                "Bonus Cantrip Uncommon 13 +5 1 Uncommon 13 +5 2 Rare 13 +5 3 Rare 15 +7 4 Very Rare " +
+                "15 +7 5 Very Rare 17 +9 6 Legendary 17 +9 7 Legendary 18 +10 8 Legendary 18 +10",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.DMG),
+        item("enspelled_weapon", "Enspelled Weapon", ItemRarity.UNCOMMON,
+            "Weapon (Any Simple or Martial)",
+            "Weapon (Any Simple or Martial), Rarity Varies (Requires Attunement) Bound into this " +
+                "weapon is a spell of level 8 or lower. The spell is determined when the weapon is " +
+                "created and must belong to the Conjuration, Divination, Evocation, Necromancy, or " +
+                "Transmutation school of magic. The weapon has 6 charges and regains 1d6 expended " +
+                "charges daily at dawn. While holding the weapon, you can expend 1 charge to cast its " +
+                "spell. The level of the spell bound into the weapon determines the spell's saving " +
+                "throw DC and attack bonus, as well as the weapon's rarity, as shown in the following " +
+                "table. Spell Level Rarity Save DC Attack Bonus Cantrip Uncommon 13 +5 1 Uncommon 13 " +
+                "+5 2 Rare 13 +5 3 Rare 15 +7 4 Very Rare 15 +7 5 Very Rare 17 +9 6 Legendary 17 +9 7 " +
+                "Legendary 18 +10 8 Legendary 18 +10",
+            attunement = true, book = Sourcebook.DMG),
+        item("evergreen_fertilizer", "Evergreen Fertilizer", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common Once sprinkled on the soil around a nonmagical plant, this " +
+                "pungent powder keeps the plant healthy for the next 365 days.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("eyes_of_deceit", "Eyes of Deceit", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon These tinted crystal lenses shroud your eyes. While wearing " +
+                "them, you gain a +5 bonus to Charisma (Deception) checks.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("goading_ammunition", "Goading Ammunition", ItemRarity.UNCOMMON,
+            "Weapon (Any Ammunition)",
+            "Weapon (Any Ammunition), Uncommon If this piece of magic ammunition hits a creature " +
+                "and deals damage, the target makes a DC 13 Charisma saving throw. On a failed save, " +
+                "the target can't take Reactions until the start of its next turn, as it sputters and " +
+                "rages impotently. Once it hits a target, the ammunition is no longer magical.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("grave_reaper", "Grave Reaper", ItemRarity.LEGENDARY,
+            "Weapon (Sickle)",
+            "Weapon (Sickle), Legendary (Requires Attunement) You gain a +2 bonus to attack rolls " +
+                "and damage rolls made with this magic weapon. When you hit a creature with it, the " +
+                "target takes an extra 2d8 Necrotic damage. Soul Lantern. While holding this weapon, " +
+                "you can cast the Spirit Lantern spell. When you cast the spell using the weapon, the " +
+                "conjured lantern can hold up to five soul fragments, and the spell's save DC is 17. " +
+                "Once the weapon has been used to cast the spell, it can't be used to cast it again " +
+                "until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("homeward_compass", "Homeward Compass", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common While holding this small brass compass, you can take a Magic " +
+                "action to orient the compass to your current location. Thereafter, the compass's " +
+                "needle always points toward that location. The compass can be oriented to only one " +
+                "location at a time. As a Magic action, you can end the compass's current " +
+                "orientation. When it isn't oriented to a particular location, or if the compass is " +
+                "on a different plane of existence than the location to which it is oriented, the " +
+                "compass's needle spins aimlessly.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("idol_of_good_fortunes", "Idol of Good Fortunes", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Rarity Varies (Requires Attunement) This idol resembles an elephant " +
+                "sitting on its haunches, smiling regally behind its uplifted trunk. Blemished " +
+                "(Uncommon). The idol is made of tarnished bronze, with minor dings and dents " +
+                "scattered over its surface. You can cast the Augury spell from the idol. The idol " +
+                "speaks the omen aloud in response. Once the idol has been used to cast this spell, " +
+                "it can't be used to cast this spell again until the next dawn. Tarnished (Rare). The " +
+                "idol is made of gold, with a patina of dust settled into its crevices. While attuned " +
+                "to the idol, you gain a +1 bonus to your Armor Class. Additionally, while holding " +
+                "the idol, you can take a Magic action to touch a nonmagical trade bar or gemstone. " +
+                "The item is then transformed into coinage equivalent to its value. For example, if " +
+                "you take a Magic action to touch a 5-pound silver bar while holding the idol, the " +
+                "bar is transformed into 25 GP worth of coins. Golden (Very Rare). The idol is made " +
+                "of gleaming gold, and the elephant's eyes are set with shining rubies. While holding " +
+                "the idol, you can cast Globe of Invulnerability from it. Once the idol has been used " +
+                "to cast this spell, it can't be used to cast this spell again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("keyholes_dagger", "Keyholes Dagger", ItemRarity.UNCOMMON,
+            "Weapon (Dagger)",
+            "Weapon (Dagger), Rarity Varies (Requires Attunement) The hilt of this magic weapon " +
+                "is adorned with ornate, decorative keyholes outlined in golden filigree. Three " +
+                "(Uncommon). Three ornamental keyholes adorn the weapon's hilt. You have a +1 bonus " +
+                "to attack rolls and damage rolls made with this magic weapon. When you take the " +
+                "Attack action, you can transform this weapon into a Handaxe or Mace. It remains " +
+                "transformed in this way until the start of your next turn, at which point it reverts " +
+                "back to its Dagger form. Regardless of the weapon's form, you can use your choice of " +
+                "your Strength or Dexterity modifier for the attack and damage rolls; you must use " +
+                "the same modifier for both rolls. Ten (Rare). Ten ornamental keyholes adorn the " +
+                "weapon's hilt. Your bonus to attack rolls and damage rolls made with this magic " +
+                "weapon increases to +2. Additionally, when you transform the weapon, you can now " +
+                "transform it into any Simple Melee weapon. Many (Very Rare). Overlapping ornamental " +
+                "keyholes adorn the weapon's hilt in a dizzying pattern. Your bonus to attack rolls " +
+                "and damage rolls made with this magic weapon increases to +3. When you transform the " +
+                "weapon, you can now also transform it into a Battleaxe, Longsword, Rapier, Scimitar, " +
+                "or Warhammer. Additionally, when you miss with an attack roll using this weapon, you " +
+                "can reroll the attack, potentially turning the miss into a hit. You must use the " +
+                "second roll. Once used, this property can't be used again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("life_sapping_blade", "Life-Sapping Blade", ItemRarity.RARE,
+            "Weapon (Any Melee Weapon with the Finesse Property)",
+            "Weapon (Any Melee Weapon with the Finesse Property), Rare (Requires Attunement) This " +
+                "thin, black, iron blade is popular among Thayan assassins and spies. You gain a +1 " +
+                "bonus to attack rolls and damage rolls made with this magic weapon. When you hit " +
+                "with an attack roll using this weapon, the target takes an extra 2d4 Necrotic " +
+                "damage, and it can't regain Hit Points until the end of its next turn. If a creature " +
+                "is reduced to 0 Hit Points by an attack using this weapon, the creature immediately " +
+                "dies and can be restored to life only by a Resurrection or True Resurrection spell.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("lucky_foot", "Lucky Foot", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common When you roll a 1 on a saving throw or ability check, you can " +
+                "use this preserved rabbit foot's magic to reroll the die. You must use the new roll, " +
+                "and the foot disintegrates.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("mage_breaker", "Mage Breaker", ItemRarity.RARE,
+            "Weapon (Dagger)",
+            "Weapon (Dagger), Rare You gain a +1 bonus to attack rolls and damage rolls made with " +
+                "this magic weapon. When you hit a concentrating creature with an attack roll using " +
+                "this weapon and deal damage, the creature has Disadvantage on the saving throw it " +
+                "makes to maintain Concentration.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("mages_manacle", "Mage's Manacle", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare As a Magic action while wearing this bracelet, you can target a " +
+                "Large or smaller creature within 5 feet of yourself that has the Grappled or " +
+                "Incapacitated condition. The target must succeed on a DC 15 Dexterity saving throw " +
+                "or become magically bound to you by a spectral chain and manacle that spring from " +
+                "the bracelet. While bound in this way, the creature has the Restrained condition. " +
+                "When you move, the creature moves with you. A creature remains bound for 8 hours or " +
+                "until you release it (no action required). If the manacle takes damage from a " +
+                "Disintegrate spell, it is destroyed; nothing else can break or harm it. Once the " +
+                "manacle has bound a creature, it can't be used again this way until the next dawn.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("magewrights_gloves", "Magewright's Gloves", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon (Requires Attunement) While you wear these gloves, you work " +
+                "as efficiently as two characters when determining how much time it takes to craft " +
+                "nonmagical items using any of the following tools: Alchemist's Supplies, Brewer's " +
+                "Supplies, Calligrapher's Supplies, Cartographer's Tools, Glassblower's Tools, or " +
+                "Jeweler's Tools.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("martialists_quarterstaff", "Martialist's Quarterstaff", ItemRarity.UNCOMMON,
+            "Weapon (Quarterstaff)",
+            "Weapon (Quarterstaff), Uncommon (Requires Attunement) This magic Quarterstaff has 4 " +
+                "charges and regains 1d4 expended charges daily at dawn. It has the following " +
+                "additional properties. Searing Smite. You can expend 2 charges to cast the Searing " +
+                "Smite spell (DC 13). Throw. When you take the Attack action, you can expend 1 charge " +
+                "to imbue the staff with magical velocity. Until the end of your next turn, the staff " +
+                "gains the Thrown property, with a normal range of 20 feet and a long range of 60 " +
+                "feet, and immediately after you make a ranged attack with the weapon, it flies back " +
+                "to your hand. Trip. When you make a melee attack with this weapon, you can expend 1 " +
+                "charge to give yourself Advantage on the attack roll. If the attack hits, the target " +
+                "makes a DC 13 Strength saving throw. On a failed save, the target has the Prone " +
+                "condition.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("masqueraders_brooch", "Masquerader's Brooch", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement) A Masquerader's Brooch comes in various " +
+                "shapes and sizes but always looks slightly tarnished. You gain the following " +
+                "benefits while wearing the brooch. Illusory Fashion. As a Bonus Action while wearing " +
+                "or holding the brooch, you can project a magical illusion over your clothing, armor, " +
+                "weapons, equipment, and other belongings on your person. The illusion lasts for 1 " +
+                "hour and ends early if the brooch is removed. Each time you use this benefit, you " +
+                "determine the extent and nature of the illusion. It could be as minor as changing " +
+                "the color of your garments or as extensive as making a suit of armor appear as an " +
+                "evening gown and a sheathed weapon appear as a satin sash. The changes wrought by " +
+                "this illusion fail to hold up to physical inspection. A creature that takes the " +
+                "Study action to examine your appearance discerns the illusion with a successful DC " +
+                "13 Intelligence (Investigation) check. Shifting Guise. As a Magic action while " +
+                "wearing or holding the brooch, you can cast Alter Self from it (Change Appearance " +
+                "option only; no Concentration required).",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("mechanical_wonder", "Mechanical Wonder", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, varies A Mechanical Wonder is a semi-autonomous object imbued with " +
+                "magical power. Mechanical Wonders vary greatly in size and form depending on their " +
+                "function. A Mechanical Wonder is a dormant object until activated. To activate a " +
+                "Mechanical Wonder, you must wind the wonder with a handheld key unique to that " +
+                "wonder. It takes 1 minute to wind a Mechanical Wonder. While you wind it, you must " +
+                "take the Utilize action each turn. Once wound, a Mechanical Wonder remains activated " +
+                "for the duration specified in the wonder's description below. Domestic Wonder " +
+                "(Uncommon). This bipedal wonder is designed to assist with household duties. It " +
+                "vaguely resembles whatever species its creator used as inspiration. An activated " +
+                "domestic wonder uses the Domestic Wonder stat block. The wonder is an ally to you " +
+                "and your allies. In combat, the wonder shares your Initiative count, but it takes " +
+                "its turn immediately after yours. It obeys your verbal commands (no action required " +
+                "by you). If you don't issue any, it takes the Dodge action and uses its movement to " +
+                "avoid danger. The domestic wonder is destroyed if it drops to 0 Hit Points. Flying " +
+                "Wonder (Common). An activated flying wonder uses the Flying Wonder stat block. The " +
+                "wonder is an ally to you and your allies. In combat, the wonder shares your " +
+                "Initiative count, but it takes its turn immediately after yours. It obeys your " +
+                "verbal commands (no action required by you). If you don't issue any, it takes the " +
+                "Dodge action and uses its movement to avoid danger. The flying wonder is destroyed " +
+                "if it drops to 0 Hit Points. Gyrocopter Wonder (Rare). This wagon-sized vehicle is " +
+                "made of brassy metal and has a spiral-shaped propeller atop it. Its midsection is " +
+                "open on two sides. Once wound, the gyrocopter wonder remains active for 8 hours. " +
+                "While active, the gyrocopter can be used as a vehicle; it requires one pilot. The " +
+                "gyrocopter wonder is a Huge object that weighs 500 pounds and has the following " +
+                "statistics: AC 14, HP 50, Speed 5 ft., and Fly Speed 20 ft. The gyrocopter can bear " +
+                "up to 2,000 pounds of cargo; if it bears any more than this, it deactivates. Eight " +
+                "spectral cords are mounted to the inside of the cargo bay. A creature riding in the " +
+                "gyrocopter wonder can take a Utilize action to attach itself to or detach itself " +
+                "from one of these cords. A creature attached to a cord can leap from the gyrocopter " +
+                "wonder and glide, moving up to 5 feet horizontally for every 1 foot it descends in " +
+                "the air. If a creature attached to a cord is ever more than 500 feet away from the " +
+                "gyrocopter, the cord immediately disappears and returns to the wonder. Mobility " +
+                "Wonder (Common). While inactive, the mobility wonder resembles a metal turtle shell " +
+                "with straps. It is designed to be worn on your back or flank, depending on your " +
+                "anatomy. Once wound, the mobility wonder transforms into a personal transport device " +
+                "and remains active for 24 hours. While active, the mobility wonder increases your " +
+                "Speed to 30 feet. Other creatures can't remove your mobility wonder from you unless " +
+                "you allow it.",
+            book = Sourcebook.HEROES_OF_FAERUN),
+        item("namers_needle", "Namer's Needle", ItemRarity.RARE,
+            "Weapon (Dagger)",
+            "Weapon (Dagger), Rare You gain a +1 bonus to attack rolls and damage rolls made with " +
+                "this magic weapon. Identify Target. When you hit a creature with an attack roll " +
+                "using this weapon, you can compel the target to reveal its identity. The target " +
+                "makes a DC 15 Wisdom saving throw. On a failed save, the target says or signs its " +
+                "name clearly and emphatically. On a successful save, the target is immune to this " +
+                "effect for the next 24 hours. If the creature can't speak or sign a language, it " +
+                "automatically succeeds on the save. Named Target. When you hit a creature with an " +
+                "attack roll using this weapon, you can say or sign the target's name clearly and " +
+                "emphatically to turn the hit into a Critical Hit. Once this property is used, it " +
+                "can't be used again until the next dawn.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("necklace_of_the_beastly_familiar", "Necklace of the Beastly Familiar", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Rarity Varies (Requires Attunement by a Spellcaster) This bejeweled " +
+                "necklace comes with a matching charm that can be worn by your familiar. A variety of " +
+                "these necklaces exist, each set with a different kind of gemstone. Familiar. While " +
+                "wearing this necklace, you can cast the Find Familiar spell from it. Once the " +
+                "necklace has been used to cast this spell, it can't be used to cast it again until " +
+                "the next dawn. Beast Transformation. While your familiar is within 60 feet of you, " +
+                "you can take a Magic action to activate the necklace. Your familiar shape-shifts " +
+                "into a Beast form for 10 minutes. The type of gemstone in the necklace determines " +
+                "the Beast form (see the table below). While your familiar is transformed, its stat " +
+                "block is replaced by the stat block of the Beast form, but it retains its alignment, " +
+                "personality, creature type, Hit Points, and Hit Point Dice. Equipment the familiar " +
+                "is wearing or carrying doesn't change size or shape to match the Beast form, and any " +
+                "equipment that the Beast form can't wear or carry falls to the ground. Your familiar " +
+                "gains a number of Temporary Hit Points equal to the Hit Points of the Beast form. " +
+                "These Temporary Hit Points vanish if any remain when the transformation ends. The " +
+                "transformation ends early on your familiar if it has no Temporary Hit Points left. " +
+                "Gemstone Rarity Beast Azurite Uncommon Giant Octopus Chrysoprase Rare Giant Scorpion " +
+                "Zircon Rare Hippopotamus Topaz Very Rare Mammoth Fire Opal Legendary Tyrannosaurus " +
+                "Rex",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("orb_of_divination_detection", "Orb of Divination Detection", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon (Requires Attunement) This glass orb is a useful defense " +
+                "against meddlesome mages and magic-wielding spies. Detect Divination. When you are " +
+                "targeted by a spell from the Divination school, the orb glows bright green for the " +
+                "spell's duration. Spellcasting Focus. This orb can be used as an Arcane Focus.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("orb_of_sorcery", "Orb of Sorcery", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon (Requires Attunement by a Sorcerer) Ribbons of varicolored " +
+                "light swirl inside this magical glass orb. Sorcerous Reservoir. While holding this " +
+                "orb, you can take a Magic action to regain up to 2 expended Sorcery Points. Once " +
+                "this property is used, it can't be used again until the next dawn. Spellcasting " +
+                "Focus. You can use the orb as a Spellcasting Focus for your Sorcerer spells.",
+            attunement = true, attunementNote = "by a Sorcerer", book = Sourcebook.ARCANA_UNLEASHED),
+        item("potion_of_dragons_breath", "Potion of Dragon's Breath", ItemRarity.UNCOMMON,
+            "Potion",
+            "Potion, Uncommon When you drink this potion, you gain the effect of the Dragon's " +
+                "Breath spell for 1 minute (save DC 13, no Concentration required). The damage type " +
+                "associated with that spell is determined by the color of the potion when the potion " +
+                "was created, as shown in the table below. Light catches off the glittery liquid " +
+                "inside this potion, which is made from the pulverized scale of a chromatic dragon. " +
+                "Color Damage Type Black Acid Blue Lightning Green Poison Red Fire White Cold",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("potion_of_giant_strength", "Potion of Giant Strength", ItemRarity.UNCOMMON,
+            "Potion",
+            "Potion, Rarity Varies When you drink this potion, your Strength score changes for 1 " +
+                "hour. The type of giant determines the score (see the table below). The potion has " +
+                "no effect on you if your Strength is equal to or greater than that score. This " +
+                "potion's transparent liquid has floating in it a sliver of light resembling a " +
+                "giant's fingernail. Potion Strength Rarity Potion of Giant Strength (hill) 21 " +
+                "Uncommon Potion of Giant Strength (frost) or Potion of Giant Strength (stone) 23 " +
+                "Rare Potion of Giant Strength (fire) 25 Rare Potion of Giant Strength (cloud) 27 " +
+                "Very Rare Potion of Giant Strength (storm) 29 Legendary",
+            book = Sourcebook.DMG),
+        item("potion_of_tirelessness", "Potion of Tirelessness", ItemRarity.UNCOMMON,
+            "Potion",
+            "Potion, Uncommon After you drink this potion, you don't need to sleep, and magic " +
+                "can't put you to sleep. This effect lasts 24 hours. For the duration, you can finish " +
+                "a Long Rest in 4 hours if you spend those hours in a state of quiet focus, during " +
+                "which you retain consciousness. This pale red potion is as thick as molasses, yet it " +
+                "slides out of the bottle as readily as oil.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("prismatic_rune", "Prismatic Rune", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement by a Spellcaster) A magical rune is etched " +
+                "on this small stone made of multicolored quartz. When you finish a Long Rest, choose " +
+                "one of the following damage types: Acid, Cold, Fire, Lightning, or Thunder. The rune " +
+                "is imbued with the chosen damage type until you finish another Long Rest. Charges. " +
+                "The rune has 6 charges and regains 1d6 expended charges daily at dawn. When you cast " +
+                "a spell that deals damage, you can expend 1 charge to change the spell's damage type " +
+                "to the damage type chosen for the rune.",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("quaals_feather_token", "Quaal's Feather Token", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Rarity Varies This object looks like a feather. Different types of " +
+                "feather tokens exist, each with a different single-use effect. The DM chooses the " +
+                "kind of token or determines it randomly by rolling on the Quaal's Feather Tokens " +
+                "table. The type of token determines its rarity. Quaal's Feather Tokens 1d100 Token " +
+                "Rarity 1-20 Anchor Uncommon 21-35 Bird Rare 36-50 Fan Uncommon 51-65 Swan Boat Rare " +
+                "66-90 Tree Uncommon 91-00 Whip Rare Anchor (Uncommon) You can take a Magic action to " +
+                "touch the token to a boat or ship. For the next 24 hours, the vessel can't be moved " +
+                "by any means. Touching the token to the vessel again ends the effect. When the " +
+                "effect ends, the token disappears. Bird (Rare) You can take a Magic action to toss " +
+                "the token 5 feet into the air. The token disappears and an enormous, multicolored " +
+                "bird takes its place. The bird has the statistics of a Roc, but it can't attack. It " +
+                "obeys your simple commands and can carry up to 500 pounds while flying at its " +
+                "maximum speed (16 miles per hour for a maximum of 144 miles per day, with a 1-hour " +
+                "rest for every 3 hours of flying) or 1,000 pounds at half that speed. The bird " +
+                "disappears after flying its maximum distance for a day or if it drops to 0 Hit " +
+                "Points. You can dismiss the bird as a Magic action. Fan (Uncommon) If you are on a " +
+                "boat or ship, you can take a Magic action to toss the token up to 10 feet in the " +
+                "air. The token disappears, and a giant flapping fan takes its place. The fan floats " +
+                "and creates a strong wind. This wind can fill the sails of one ship, increasing its " +
+                "speed by 5 miles per hour for 8 hours. You can dismiss the fan as a Magic action. " +
+                "Swan Boat (Rare) You can take a Magic action to touch the token to a body of water " +
+                "at least 60 feet in diameter. The token disappears, and a 50-foot-long, 20-foot-wide " +
+                "boat shaped like a swan takes its place. The boat is self-propelled and moves across " +
+                "water at a speed of 6 miles per hour. You can take a Magic action while on the boat " +
+                "to command it to move or to turn up to 90 degrees. The boat remains for 24 hours and " +
+                "then disappears. You can dismiss the boat as a Magic action. Tree (Uncommon) You " +
+                "must be outdoors to use this token. You can take a Magic action to touch it to an " +
+                "unoccupied space on the ground. The token disappears, and in its place a nonmagical " +
+                "oak tree springs into existence. The tree is 60 feet tall and has a 5-foot-diameter " +
+                "trunk, and its branches at the top spread out in a 20-foot radius. Whip (Rare) You " +
+                "can take a Magic action to throw the token to a point within 10 feet of yourself. " +
+                "The token disappears, and a floating whip takes its place. You can then take a Bonus " +
+                "Action to make a melee spell attack against a creature within 10 feet of the whip, " +
+                "with an attack bonus of +9. On a hit, the target takes 1d6 + 5 Force damage. As a " +
+                "Bonus Action, you can direct the whip to fly up to 20 feet and repeat the attack " +
+                "against a creature within 10 feet of the whip. The whip disappears after 1 hour, " +
+                "when you take a Magic action to dismiss it, or when you die or have the " +
+                "Incapacitated condition.",
+            book = Sourcebook.DMG),
+        item("queen_ehlissas_marvelous_nightingale", "Queen Ehlissa's Marvelous Nightingale", ItemRarity.ARTIFACT,
+            WONDROUS,
+            "Wondrous Item, Artifact (Requires Attunement) Queen Ehlissa's Marvelous Nightingale " +
+                "is named for its first owner, a queen from the eastern Flanaess in the world of " +
+                "Greyhawk. Its origin is unknown, but one legend holds that it was made to console " +
+                "the queen when a beloved pet songbird met its unfortunate end. This mechanical " +
+                "songbird has crystal eyes, golden feathers, and a small windup key on its back. As a " +
+                "Magic action, you can cause the bird to spring to life for 10 minutes, during which " +
+                "time it sings a beautiful melody audible within 300 feet, or you can revert the bird " +
+                "to its mechanical form. When the nightingale becomes mechanical again, it can't come " +
+                "to life again for 1 hour. Ensemble Casting. The nightingale has 6 charges and " +
+                "regains 1d6+1 expended charges daily at dawn. As a Bonus Action while the " +
+                "nightingale is singing and within 60 feet of you, you can expend charges to cast one " +
+                "of the spells on the table below from the nightingale (save DC 18). The table shows " +
+                "the number of charges you must expend to cast the spell. Spell Charges Calm Emotions " +
+                "1 Compulsion 3 Delayed Blast Fireball 6 Detect Evil and Good 0 Greater Restoration 4 " +
+                "Prismatic Spray 6 Slow 2 Speak with Animals 0 Aura of Truth. While the nightingale " +
+                "sings, the effect of a Zone of Truth spell (save DC 18) fills a 15-foot Emanation " +
+                "originating from the nightingale. While attuned to the nightingale, you know which " +
+                "creatures succeed on or fail the saving throw against this effect. Counterspell. " +
+                "While the nightingale sings, you can take a Reaction to cast Counterspell (save DC " +
+                "18) in response to that spell's trigger. Once this property is used, it can't be " +
+                "used again until the next dawn. Random Properties.The Artifact has the following " +
+                "random properties (see the \"Artifacts\" section in the Dungeon Master's Guide): 2 " +
+                "minor beneficial properties 1 major beneficial property 1 minor detrimental property " +
+                "Destroying the Nightingale. The nightingale is destroyed if it is released into a " +
+                "whirlwind in Limbo.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("ring_of_candor", "Ring of Candor", ItemRarity.UNCOMMON,
+            "Ring",
+            "Ring, Uncommon While wearing this simple metal band, you gain a +5 bonus to Wisdom " +
+                "(Insight) checks. In addition, you can cast Zone of Truth (save DC 13) from the " +
+                "ring. You can't cast Zone of Truth in this way again until the next dawn.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("ring_of_dedicated_focus", "Ring of Dedicated Focus", ItemRarity.UNCOMMON,
+            "Ring",
+            "Ring, Uncommon (Requires Attunement) The magical spike on the side of this ring " +
+                "allows you to sharpen your focus at a moment's notice. When you fail a Constitution " +
+                "saving throw to maintain Concentration, you can roll up to two of your unexpended " +
+                "Hit Dice and add the total rolled to your save, potentially turning the failure into " +
+                "a success. The rolled Hit Dice are then expended.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("robe_of_thayan_arcana", "Robe of Thayan Arcana", ItemRarity.VERY_RARE,
+            WONDROUS,
+            "Wondrous Item, Very Rare (Requires Attunement by a Sorcerer, Warlock, or Wizard) " +
+                "Mysterious symbols decorate this deep-red robe. You gain the following benefits " +
+                "while wearing the robe. Combat Mage. Your spell save DC and spell attack bonus each " +
+                "increase by 1. Empowered Magic. When you roll damage for a spell, you can treat any " +
+                "1 on a damage die as a 2. Spellcasting Focus. You can use the robe as a Spellcasting " +
+                "Focus for your spells.",
+            attunement = true, attunementNote = "by a Sorcerer, Warlock, or Wizard", book = Sourcebook.ARCANA_UNLEASHED),
+        item("scarlet_spellbook", "Scarlet Spellbook", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement by a Wizard) Irregular scraps of red cloth " +
+                "cover this weathered tome. While attuned to this item, you can use it as a Spellbook " +
+                "and an Arcane Focus. Arcane Stamina. When you use your Arcane Recovery feature, you " +
+                "also regain Hit Points equal to 2d6 plus half your Wizard level (round down). " +
+                "Improved Spell Recall. When you use your Memorize Spell feature, you can replace an " +
+                "additional level 1+ Wizard spell you have prepared for your Spellcasting feature " +
+                "with another level 1+ spell inscribed in this book.",
+            attunement = true, attunementNote = "by a Wizard", book = Sourcebook.ARCANA_UNLEASHED),
+        item("scholars_anchoring_bangle", "Scholar's Anchoring Bangle", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement) This heavy magical bracelet inures your " +
+                "mind against potential distractions. While wearing this bracelet, you gain the " +
+                "following benefits. Deep Knowledge. When you take the Study action and make an " +
+                "Intelligence check using a skill in which you have proficiency, you can treat a d20 " +
+                "roll of 9 or lower as a 10. Single-Minded Focus. When you fail a Constitution saving " +
+                "throw to maintain Concentration, you can take a Reaction to succeed instead. Once " +
+                "you use this property, it can't be used again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("secret_keepers_circlet", "Secret Keeper's Circlet", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement) This circlet allows the wearer to wipe " +
+                "from their memory any knowledge of a specific deed or time in their life, making it " +
+                "useful for those who fear mages plumbing their minds with magic. While wearing this " +
+                "circlet, you can take a Magic action to specify a trigger such as \"after I leave " +
+                "this temple\" or \"when I cast the Animate Dead spell.\" For the next 24 hours, if that " +
+                "trigger occurs, the circlet erases your memories of everything from the time you " +
+                "chose the trigger until the trigger occurred. No magic short of a Wish spell can " +
+                "restore your memory of this time. Once you use this property, you can't use it again " +
+                "until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("snipers_bracelet", "Sniper's Bracelet", ItemRarity.COMMON,
+            "Weapon (Heavy Crossbow, Light Crossbow, Longbow, Musket, Pistol, or Shortbow)",
+            "Weapon (Heavy Crossbow, Light Crossbow, Longbow, Musket, Pistol, or Shortbow), " +
+                "Common (Requires Attunement) As a Magic action while touching this weapon, you can " +
+                "transform it into a bracelet or back into its weapon form. While in bracelet form, " +
+                "it can't be used to make attacks. If the weapon lacks ammunition while in its weapon " +
+                "form, it produces its own, automatically creating one piece of magic ammunition when " +
+                "you make a ranged attack roll with it. The ammunition vanishes the instant after it " +
+                "hits or misses a target.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("spell_component_ring", "Spell Component Ring", ItemRarity.COMMON,
+            "Ring",
+            "Ring, Common This steel ring has a discreet chamber lined with a mystical " +
+                "inscription. As a Magic action, choose one spell you have prepared that requires a " +
+                "Material component; the required Material component must neither have a cost " +
+                "specified nor be consumed by the spell. You store that spell's Material component in " +
+                "the ring's chamber. Whenever you cast the chosen spell, you don't need to have a " +
+                "hand free to access its Material component, provided you are wearing the ring. The " +
+                "ring can hold the Material component for one spell at a time.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("spell_duelists_trophy", "Spell Duelist's Trophy", ItemRarity.RARE,
+            WONDROUS,
+            "Wondrous Item, Rare (Requires Attunement by a Spellcaster) This withered hand or " +
+                "talon is attached to a leather cord that can be worn like a necklace or bracelet. " +
+                "You gain the following benefits while wearing the trophy. Dispelling Touch. When you " +
+                "hit a creature with a melee spell attack, you can activate the trophy to cast the " +
+                "Dispel Magic spell as part of that attack, targeting the hit creature. Once this " +
+                "property has been used, it can't be used again until the next dawn. Helping Hand. " +
+                "When you cast a spell using a spell slot, you can cast it without any Somatic " +
+                "components. Mage Hand. You can cast the Mage Hand cantrip from the trophy.",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("spell_fuelling_armor", "Spell-Fuelling Armor", ItemRarity.VERY_RARE,
+            "Armor (Any Light, Medium, or Heavy)",
+            "Armor (Any Light, Medium, or Heavy), Very Rare (Requires Attunement by a " +
+                "Spellcaster) Channels bearing arcane runes intersect across this armor, which is " +
+                "favored by spellcasting Thayan knights. Potent Spellcasting. When you roll damage " +
+                "for a spell while wearing this armor, you can treat any 1 on a damage die as a 2. " +
+                "Resurgent Power. When you finish a Short Rest while wearing this armor, you can " +
+                "choose a number of expended spell slots to recover. The spell slots' levels must " +
+                "have a combined total equal to 3 or less. For example, you can recover one level 3 " +
+                "spell slot or three level 1 spell slots. Once used, this property can't be used " +
+                "again until the next dawn.",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("spell_slingers_puppet", "Spell-Slinger's Puppet", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon (Requires Attunement) As a Bonus Action while holding this " +
+                "ventriloquist's doll, you can pull the cord on the doll's back to cause the doll to " +
+                "levitate to an unoccupied space you can see within 30 feet of yourself and hover " +
+                "there. While the doll hovers, you can take a Bonus Action to cause the doll to move " +
+                "up to 30 feet to another unoccupied space you can see within 30 feet of yourself. " +
+                "The doll hovers for 1 minute or until you end the effect as a Bonus Action. While " +
+                "the doll is within 30 feet of you, you can speak using the doll's mouth rather than " +
+                "your own. This allows you to, for instance, cast a spell with a Verbal component " +
+                "even if you can't speak.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("spirit_binding_censer", "Spirit-Binding Censer", ItemRarity.ARTIFACT,
+            WONDROUS,
+            "Wondrous Item, Artifact (Requires Attunement) This brass censer is comfortingly warm " +
+                "to the touch. Spellcasting. The censer has 10 charges and regains 1d6 charges daily " +
+                "at dawn. While holding the censer, you can cast a spell on the Censer Spells table " +
+                "from it (save DC 18). The table indicates how many charges you must expend to cast " +
+                "the spell. Spell Charge Cost Banishment 4 Bless 1 Circle of Power 5 Dispel Magic 3 " +
+                "Remove Curse 3 Protective Incense. As a Magic action while holding the censer, you " +
+                "can cause magical smoke to billow from the censer, filling a 30-foot Emanation " +
+                "originating from the censer for 1 hour or until you end it (no action required). The " +
+                "area of the Emanation is Lightly Obscured, and creatures of your choice (including " +
+                "yourself) gain the benefits of the Protection from Evil and Good spell while within " +
+                "the Emanation. Once used, this property can't be used again until the next dawn. " +
+                "Spirit Imprisonment. When a creature dies within 30 feet of you while you're holding " +
+                "the censer, you can siphon the creature's soul into the censer, trapping it within. " +
+                "While a creature's soul is trapped within the censer, that creature can't be " +
+                "restored to life. If the creature had a trait that would allow it to revive, such as " +
+                "a Barbed Devil's Diabolical Restoration trait or a Lich's Spirit Jar trait, that " +
+                "trait doesn't function while the creature's soul is trapped. The censer can contain " +
+                "only one soul at a time. A creature's soul remains trapped within the censer for 100 " +
+                "years, until you take a Magic action to release the soul, or until the censer is " +
+                "destroyed (see \"Destroying the Censer\" below). Random Properties. The censer has the " +
+                "following random properties (see the Dungeon Master's Guide): 1 minor beneficial " +
+                "property 1 major beneficial property Destroying the Censer. If it doesn't contain a " +
+                "soul, the censer is destroyed after being submerged in the River Styx for 1 year.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("staff_of_skulls", "Staff of Skulls", ItemRarity.UNCOMMON,
+            "Staff",
+            "Staff, Rarity Varies (Requires Attunement by a Spellcaster) This staff is made of " +
+                "polished, interlocking bones. Runes are carved along its length. Ominous (Uncommon). " +
+                "A skull adorns the top of the staff. While you hold the staff, you can cast Chill " +
+                "Touch from it, using your spell attack bonus. Additionally, you have Advantage on " +
+                "Charisma (Intimidation) checks made while holding the staff, and the staff's eye " +
+                "sockets glow a disquieting green, shedding Dim Light in a 5-foot radius. Chattering " +
+                "(Rare). Several skulls fused together adorn the top of the staff. When a creature " +
+                "you can see within 30 feet of you makes an attack roll, you can take a Reaction to " +
+                "impose Disadvantage on that roll, as the skulls' eyes glow green and their teeth " +
+                "chatter unnervingly. Pulverizing (Very Rare).The entire staff is made of fused " +
+                "skulls. While you hold the staff, you can take a Magic action to point the staff at " +
+                "a Humanoid you can see. That creature makes a DC 17 Constitution saving throw. On a " +
+                "failed save, the creature takes 10d8 Necrotic damage and has the Prone condition as " +
+                "it's crushed from the inside. On a successful save, the creature takes half as much " +
+                "damage only. Once used, this property can't be used again until the next dawn.",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("staff_of_the_lost", "Staff of the Lost", ItemRarity.VERY_RARE,
+            "Staff",
+            "Staff, Very Rare (Requires Attunement) This staff can be wielded as a magic " +
+                "Quarterstaff that grants a +1 bonus to attack rolls and damage rolls made with it. " +
+                "The staff has 3 charges. While holding the staff, you can expend 1 charge to cast " +
+                "either Maze (save DC 18) or Teleport from it. When the staff has no more charges " +
+                "remaining, it loses its magic and becomes a nonmagical Quarterstaff. Curse. This " +
+                "staff is cursed. Becoming attuned to it extends the curse to you. As long as you " +
+                "remain cursed, you are unwilling to part with the staff, keeping it on your person " +
+                "at all times. While attuned to this staff, you never know which way is north, and " +
+                "you have Disadvantage on Wisdom (Survival) checks made to navigate. Additionally, " +
+                "whenever you expend a charge from the staff, roll 1d20. On a 1, 1d4 Minotaurs of " +
+                "Baphomet materialize, each appearing in an unoccupied space within 30 feet of you. " +
+                "The minotaurs begin combat with you immediately.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("staff_of_the_spirit_aegis", "Staff of the Spirit Aegis", ItemRarity.LEGENDARY,
+            "Staff",
+            "Staff, Legendary (Requires Attunement) This weathered bone staff is topped with a " +
+                "skull and decorated with vertebrae. It can be wielded as a magic Quarterstaff that " +
+                "grants a +3 bonus to attack rolls and damage rolls made with it. While holding the " +
+                "staff, you have Resistance to Necrotic damage. Aura of Haunted Power. As a Magic " +
+                "action while holding the staff, you can cause it to radiate supernatural power that " +
+                "fills a 30-foot Emanation originating from you. Creatures of your choice in this " +
+                "Emanation (including yourself) gain the following benefits: Undead Deterrent. Undead " +
+                "have Disadvantage on attack rolls against the creatures. Unholy Protection. The " +
+                "creatures have Resistance to Cold, Necrotic, and Psychic damage, and they have " +
+                "Advantage on saving throws to avoid or end the Frightened condition. The Emanation " +
+                "lasts for 1 hour or until you end it (no action required). Once used, this property " +
+                "can't be used again until the next dawn. Illuminating Sight. As a Bonus Action while " +
+                "holding the staff, you can cause the eye sockets of the skull atop the staff to emit " +
+                "an unearthly glow; this glow lasts until you stop it (no action required). While the " +
+                "staff glows, it sheds Bright Light in a 15-foot radius and Dim Light for an " +
+                "additional 15 feet. Invisible creatures and objects are visible as long as they are " +
+                "in the staff's Bright Light or Dim Light.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("sweeping_broom", "Sweeping Broom", ItemRarity.COMMON,
+            WONDROUS,
+            "Wondrous Item, Common As a Magic action, you can use this unassuming broom's command " +
+                "word, choosing a point you can see on the ground within 60 feet of yourself. The " +
+                "broom animates and sweeps dust and detritus from the ground in a 20-foot square " +
+                "centered on the chosen point. It sweeps that area until you take another Magic " +
+                "action to deactivate it.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("thayan_sword", "Thayan Sword", ItemRarity.RARE,
+            "Weapon (Greatsword, Longsword, or Scimitar)",
+            "Weapon (Greatsword, Longsword, or Scimitar), Rare (Requires Attunement) Thayan " +
+                "Swords are often awarded to premier Thayan knights when they complete their " +
+                "training. You gain a +1 bonus to attack rolls and damage rolls made with this magic " +
+                "weapon. Knight of the Arcane. The sword has 4 charges and regains 1d4 charges daily " +
+                "at dawn. While holding the sword, you can expend 1 charge to cast one of the " +
+                "following spells (save DC 15): Searing Smite Thunderous Smite Wrathful Smite " +
+                "Resurgent Warrior. If you're reduced to 0 Hit Points but not killed outright while " +
+                "holding this sword, you can drop to 1 Hit Point instead. Once used, this property " +
+                "can't be used again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("thespians_playbill", "Thespian's Playbill", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon (Requires Attunement) While holding this magical theater " +
+                "program, whenever you take the Study action and make an Intelligence check, you gain " +
+                "a bonus to the check equal to your Charisma modifier (minimum of +1).",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("thiefs_thimble", "Thief's Thimble", ItemRarity.UNCOMMON,
+            WONDROUS,
+            "Wondrous Item, Uncommon (Requires Attunement) This magic thimble aids thieves in " +
+                "foiling traps. While wearing this thimble, if you trigger a trap and take damage, " +
+                "the thimble takes the damage instead. The thimble has 30 Hit Points. If the thimble " +
+                "is reduced to 0 Hit Points, it breaks, and you take any remaining damage.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("tramontane_armor", "Tramontane Armor", ItemRarity.VERY_RARE,
+            "Armor (Any Light or Medium)",
+            "Armor (Any Light or Medium), Very Rare (Requires Attunement) You gain a +1 bonus to " +
+                "Armor Class while wearing this armor. The armor is enchanted to look like a " +
+                "scholarly or priestly robe. Mountain Walker. While you're wearing this armor, " +
+                "Difficult Terrain composed of heavy snow, ice, rubble, or undergrowth doesn't cost " +
+                "you extra movement. Grasping Tendrils. As a Magic action, you can activate the " +
+                "armor, causing the hems of its sleeves and body to extend into ribbonlike tendrils. " +
+                "As a Bonus Action while the armor is active, you can force each creature of your " +
+                "choice in a 20-foot Emanation originating from you to make a DC 15 Strength saving " +
+                "throw. On a failed save, a creature has the Grappled condition (escape DC 15) and is " +
+                "pulled up to 20 feet straight toward you. The armor remains active for 1 minute or " +
+                "until you take another Magic action to deactivate it. Once you activate the armor, " +
+                "it can't be activated again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("travelers_pearl", "Traveler's Pearl", ItemRarity.LEGENDARY,
+            WONDROUS,
+            "Wondrous Item, Legendary (Requires Attunement) By using a command word while holding " +
+                "this pearl, you can cast the Teleport spell from it. Once this property is used, it " +
+                "can't be used again until the next dawn.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("trick_weapon", "Trick Weapon", ItemRarity.COMMON,
+            "Weapon (Any Simple or Martial Melee Weapon)",
+            "Weapon (Any Simple or Martial Melee Weapon), Common As a Magic action while touching " +
+                "this weapon, you can transform it into a mundane item or back into its weapon form. " +
+                "It can't be used to make attacks while transformed into a mundane item. Different " +
+                "Trick Weapons transform into different items. The DM chooses the mundane item or " +
+                "determines it randomly by rolling on the following table. 1d10 The Weapon Transforms " +
+                "Into A … 1 Bracelet 2 Comb 3 Crutch 4 Fake Coin 5 Hairpin 6 Jingle Bell 7 Pendant " +
+                "Necklace 8 Playing Card 9 Quill Pen 10 Spoon",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("universal_pantograph", "Universal Pantograph", ItemRarity.ARTIFACT,
+            WONDROUS,
+            "Wondrous Item, Artifact This cubical box measures 2 feet on each side. It appears to " +
+                "be made of oak and bound in silver, and its surface is engraved with motifs of " +
+                "marionettes and laughing children. When a nonmagical item is placed in the box and " +
+                "the lid is closed, a perfect duplicate of the item appears next to the box. Clone. " +
+                "As a Magic action, you can cause the pantograph to grow large enough for a Medium " +
+                "creature to crouch within. You can revert the pantograph to its normal size as a " +
+                "Magic action, harmlessly shunting anything that can't fit inside to the nearest " +
+                "unoccupied space. When a creature is inside the pantograph, you can close the " +
+                "pantograph's lid and sprinkle the pantograph with diamond dust worth at least 100 " +
+                "GP. If you do, the diamond dust is consumed, and you cast the Clone spell, targeting " +
+                "the creature inside the pantograph. After the spell's casting time is finished, the " +
+                "creature is harmlessly shunted from the pantograph, and the pantograph's lid then " +
+                "can't be opened for 120 days, during which time the duplicate from the spell grows " +
+                "within. Once the clone is finished forming, it is harmlessly shunted from the " +
+                "pantograph, and the pantograph returns to its original size. A clone created by the " +
+                "pantograph doesn't need to be contained within a vessel and endures indefinitely " +
+                "while inert. Destroying the Pantograph. If the pantograph doesn't contain a clone, " +
+                "it is destroyed after being submerged in a bog in the Feywild for 999 years.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("wand_of_enthralling", "Wand of Enthralling", ItemRarity.UNCOMMON,
+            "Wand",
+            "Wand, Uncommon (Requires Attunement by a Spellcaster) This wand has 4 charges and " +
+                "regains 1d4 expended charges daily at dawn. While holding it, you can expend 1 " +
+                "charge to cast Enthrall (save DC 15) from it.",
+            attunement = true, attunementNote = "by a Spellcaster", book = Sourcebook.ARCANA_UNLEASHED),
+        item("wand_of_freshness", "Wand of Freshness", ItemRarity.UNCOMMON,
+            "Wand",
+            "Wand, Uncommon This wand has 4 charges and regains 1d4+1 expended charges daily at " +
+                "dawn. While holding it, you can expend 1 charge to cast the Purify Food and Drink " +
+                "spell from it.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("wand_of_slumber", "Wand of Slumber", ItemRarity.RARE,
+            "Wand",
+            "Wand, Rare (Requires Attunement) This wand has 7 charges. While holding it, you can " +
+                "cast one of the spells on the following table from it. The table indicates how many " +
+                "charges you must expend to cast the spell. Spell Charge Cost Catnap 3 Sleep (save DC " +
+                "15) 1 Regaining Charges. The wand regains 1d6 + 1 expended charges daily at dawn. If " +
+                "you expend the wand's last charge, roll 1d20. On a 1, the wand crumbles into sand " +
+                "and is destroyed.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("wand_of_teeth", "Wand of Teeth", ItemRarity.RARE,
+            "Wand",
+            "Wand, Rare This wand has 10 charges. While holding it, you can take a Magic action " +
+                "to expend up to 3 charges to spray a wave of sharp, spectral teeth in the direction " +
+                "you point it. Each creature in a 30-foot Cone makes a DC 15 Dexterity saving throw. " +
+                "Roll a number of d8s equal to the number of charges expended. On a failed save, a " +
+                "creature takes Piercing damage equal to the total rolled and has the Poisoned " +
+                "condition until the start of your next turn; on a successful save, a creature takes " +
+                "half as much damage only. Regaining Charges. The wand regains 1d10 expended charges " +
+                "daily at dawn. If you expend the wand's last charge, roll 1d20. On a 1, the wand " +
+                "explodes into harmless splinters and is destroyed.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+        item("wave_swept_weapon", "Wave-Swept Weapon", ItemRarity.UNCOMMON,
+            "Weapon (Greatsword, Longsword, Rapier, Scimitar, or Shortsword)",
+            "Weapon (Greatsword, Longsword, Rapier, Scimitar, or Shortsword), Rarity Varies " +
+                "(Requires Attunement) This weapon is covered in oceanic motifs, from wavelike " +
+                "etchings on its blade to stylized sea monsters embroidered onto its leather hilt. " +
+                "Barnacled (Uncommon). Barnacles dot this blade's guard and the flat sides of its " +
+                "etched blade. You have a +1 bonus to attack rolls and damage rolls made with this " +
+                "magic weapon. While holding this weapon, you can take a Magic action to touch up to " +
+                "a gallon of liquid and infuse it with brine, turning fresh water into saltwater, for " +
+                "instance. Aquatic (Rare). The wavelike etchings on this weapon's blade glow with " +
+                "light, shedding Bright Light in a 5-foot radius and Dim Light for an additional 5 " +
+                "feet. Your bonus to attack rolls and damage rolls made with this magic weapon " +
+                "increases to +2. While you hold the weapon, you can breathe underwater, and you have " +
+                "a Swim Speed of 30 feet. Ascendant (Very Rare). The sea monsters embroidered on this " +
+                "weapon's hilt are studded with chips of colorful gemstones. Your bonus to attack " +
+                "rolls and damage rolls made with this magic weapon increases to +3. While you hold " +
+                "this weapon, you have a Fly Speed of 30 feet; when you use this Fly Speed, a salty " +
+                "sea breeze carries you through the air.",
+            attunement = true, book = Sourcebook.ARCANA_UNLEASHED),
+        item("workshop_wrecker", "Workshop Wrecker", ItemRarity.VERY_RARE,
+            WONDROUS,
+            "Wondrous Item, Very Rare When this 3-inch-diameter metal ball is activated as a " +
+                "Magic action, it moves at a rapid speed, bouncing off walls and defying any attempts " +
+                "to capture it. The ball remains active for 1 minute or until you deactivate it by " +
+                "using a command word while within 30 feet of it (no action required). Once the ball " +
+                "is used, it can't be used again until the next dawn. When you activate the ball and " +
+                "at the beginning of each of your turns while the ball is active, each creature in " +
+                "the area makes a Dexterity saving throw, taking Bludgeoning damage on a failed save. " +
+                "The save DC and amount of damage dealt depend on the approximate size of the area in " +
+                "which the ball is active, as shown on the following table. Area Save DC Bludgeoning " +
+                "Damage 15-foot Cube 18 6d6+5 30-foot Cube 17 4d6+4 50-foot Cube 15 2d6+2 100-foot " +
+                "Cube 14 1d6+1 A nonmagical object that isn't being worn or carried also takes the " +
+                "damage if it is in the area. In confined areas larger than a 100-foot Cube, the " +
+                "amount of damage caused by the ball is negligible. If the ball is activated in an " +
+                "unconfined area, it flies off in a random direction at a rate of 300 feet per round.",
+            book = Sourcebook.ARCANA_UNLEASHED),
+    )
+
     val ALL: List<MagicItem> =
         (ARMOR_AND_SHIELDS + WEAPONS + RINGS + WANDS_AND_STAFFS + WONDROUS_ITEMS + POTIONS +
             MORE_ARMOR + MORE_WEAPONS + MORE_RINGS + MORE_WANDS_AND_STAFFS + MORE_WONDROUS +
-            IMPORTED)
+            IMPORTED + ARCANA_UNLEASHED_ITEMS)
             .sortedBy { it.name }
 
     // Open-ended plans are looked up by id like anything else, they just aren't browsable.

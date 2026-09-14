@@ -104,14 +104,18 @@ class NewSourcebookContentTest {
     }
 
     @Test
-    fun `the artificer has all five subclasses`() {
-        // The playtest Reanimator sits alongside them and is labelled as such.
+    fun `the artificer has all six subclasses`() {
+        // Five from Eberron: Forge of the Artificer, and the Reanimator, which was a playtest
+        // subclass until Ravenloft printed it.
         val names = SubclassData.forClass("artificer")
             .filterNot { it.isPlaytest }
             .map { it.name }
             .sorted()
         assertEquals(
-            listOf("Alchemist", "Armorer", "Artillerist", "Battle Smith", "Cartographer"),
+            listOf(
+                "Alchemist", "Armorer", "Artillerist", "Battle Smith", "Cartographer",
+                "Reanimator",
+            ),
             names,
         )
     }

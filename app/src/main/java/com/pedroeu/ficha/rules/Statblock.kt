@@ -40,6 +40,14 @@ data class Statblock(
     val abilityScores: Map<Ability, Int>,
     val actions: List<StatblockAction> = emptyList(),
     val resistances: List<String> = emptyList(),
+    /**
+     * Damage the creature takes double of.
+     *
+     * The first summon to have any is Arcana Unleashed's Plant Spirit — a Tree burns, a Fungus
+     * and a Vine are cut apart — and a stat block that lists what it resists while silently
+     * dropping what kills it is worse than one that lists neither.
+     */
+    val vulnerabilities: List<String> = emptyList(),
     val immunities: List<String> = emptyList(),
     val conditionImmunities: List<String> = emptyList(),
     val senses: String = "",

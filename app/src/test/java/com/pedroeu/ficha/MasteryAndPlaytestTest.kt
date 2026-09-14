@@ -9,6 +9,7 @@ import com.pedroeu.ficha.data.content.MasteryData
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.SubclassData
+import com.pedroeu.ficha.data.model.Sourcebook
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.InventoryItem
 import com.pedroeu.ficha.domain.CharacterAttacks
@@ -237,20 +238,52 @@ class MasteryAndPlaytestTest {
 
     // ------------------------------------------------------------- Playtest subclasses
 
+    /**
+     * Still playtest, checked against the reference wiki rather than against memory.
+     *
+     * Seven of the twelve that used to be listed here have since been printed — the Horror
+     * subclasses in Ravenloft: The Horrors Within, the wizard schools and the Arcane Archer in
+     * Arcana Unleashed — and carried the playtest flag for months afterwards. That is not a
+     * label problem: a character built with the core books and nothing else was refused a
+     * published subclass, because the picker reads the book and the book still said "may
+     * change or be withdrawn". These are the ones the wiki still files under Unearthed Arcana.
+     */
     private val playtestSubclasses = listOf(
         "pestilence_domain" to "cleric",
         "circle_of_the_titan" to "druid",
         "hell_knight" to "fighter",
         "demonic_sorcery" to "sorcerer",
-        "reanimator" to "artificer",
-        "college_of_spirits" to "bard",
-        "grave_domain" to "cleric",
-        "hollow_warden" to "ranger",
-        "phantom" to "rogue",
-        "shadow_sorcery" to "sorcerer",
         "hexblade_patron" to "warlock",
-        "undead_patron" to "warlock",
     )
+
+    /** The ones that graduated, and the book each landed in. */
+    private val publishedSincePlaytest = listOf(
+        "arcane_archer" to Sourcebook.ARCANA_UNLEASHED,
+        "conjurer" to Sourcebook.ARCANA_UNLEASHED,
+        "enchanter" to Sourcebook.ARCANA_UNLEASHED,
+        "necromancer" to Sourcebook.ARCANA_UNLEASHED,
+        "transmuter" to Sourcebook.ARCANA_UNLEASHED,
+        "college_of_spirits" to Sourcebook.RAVENLOFT,
+        "grave_domain" to Sourcebook.RAVENLOFT,
+        "hollow_warden" to Sourcebook.RAVENLOFT,
+        "phantom" to Sourcebook.RAVENLOFT,
+        "reanimator" to Sourcebook.RAVENLOFT,
+        "shadow_sorcery" to Sourcebook.RAVENLOFT,
+        "undead_patron" to Sourcebook.RAVENLOFT,
+    )
+
+    @Test
+    fun `a subclass its book has printed is no longer playtest`() {
+        publishedSincePlaytest.forEach { (id, book) ->
+            val subclass = SubclassData.byId(id)
+            assertNotNull("$id is missing", subclass)
+            assertEquals("$id is printed in ${book.displayName}", book, subclass!!.book)
+            assertFalse(
+                "$id is published, so a core-books character must be offered it",
+                subclass.isPlaytest,
+            )
+        }
+    }
 
     @Test
     fun `every playtest subclass is present, on the right class, and marked as playtest`() {

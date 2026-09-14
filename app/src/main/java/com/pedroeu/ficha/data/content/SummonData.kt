@@ -59,6 +59,101 @@ object SummonData {
             duration = "1 hour",
             concentration = true,
         ),
+        "summon_aberration" to Effect.Summons(
+            summonId = "summon_aberration",
+            label = "Summon Aberration",
+            pick = SummonPick.FromList(StatblockData.ABERRANT_FORMS),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        "summon_celestial" to Effect.Summons(
+            summonId = "summon_celestial",
+            label = "Summon Celestial",
+            pick = SummonPick.FromList(StatblockData.CELESTIAL_FORMS),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        "summon_construct" to Effect.Summons(
+            summonId = "summon_construct",
+            label = "Summon Construct",
+            pick = SummonPick.FromList(StatblockData.CONSTRUCT_FORMS),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        "summon_dragon" to Effect.Summons(
+            summonId = "summon_dragon",
+            label = "Summon Dragon",
+            pick = SummonPick.Fixed("draconic_spirit"),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        "summon_fiend" to Effect.Summons(
+            summonId = "summon_fiend",
+            label = "Summon Fiend",
+            pick = SummonPick.FromList(StatblockData.FIENDISH_FORMS),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        "giant_insect" to Effect.Summons(
+            summonId = "giant_insect",
+            label = "Giant Insect",
+            pick = SummonPick.FromList(StatblockData.GIANT_INSECT_FORMS),
+            duration = "10 minutes",
+            concentration = true,
+        ),
+        "homunculus_servant" to Effect.Summons(
+            summonId = "homunculus_servant",
+            label = "Homunculus Servant",
+            pick = SummonPick.Fixed("homunculus_servant"),
+            duration = "Until dismissed",
+        ),
+        "phantom_steed" to Effect.Summons(
+            summonId = "phantom_steed",
+            label = "Phantom Steed",
+            pick = SummonPick.Fixed("phantom_steed"),
+            duration = "1 hour",
+        ),
+        // "Choose up to four nonmagical sticks … each shape-shifted target uses the Venomous
+        // Snake stat block." Four creatures at once, which the tab already handles.
+        "sticks_to_snakes" to Effect.Summons(
+            summonId = "sticks_to_snakes",
+            label = "Sticks to Snakes",
+            pick = SummonPick.Fixed("pact_venomous_snake"),
+            count = Formula.Flat(4),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        // Sized by the objects animated rather than by the slot, so the size is the choice.
+        "animate_objects" to Effect.Summons(
+            summonId = "animate_objects",
+            label = "Animate Objects",
+            pick = SummonPick.FromList(StatblockData.ANIMATED_OBJECT_FORMS),
+            duration = "1 minute",
+            concentration = true,
+        ),
+        "summon_plant" to Effect.Summons(
+            summonId = "summon_plant",
+            label = "Summon Plant",
+            pick = SummonPick.FromList(StatblockData.PLANT_FORMS),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        "summon_dinosaur" to Effect.Summons(
+            summonId = "summon_dinosaur",
+            label = "Summon Dinosaur",
+            pick = SummonPick.FromList(StatblockData.DINOSAUR_FORMS),
+            duration = "1 hour",
+            concentration = true,
+        ),
+        // Not a spirit but the same shape: one creature, chosen at casting, scaling with the
+        // slot. It replaces a Find Familiar familiar rather than joining it, which the sheet
+        // cannot enforce — so the note says so where the player will read it.
+        "battle_familiar" to Effect.Summons(
+            summonId = "battle_familiar",
+            label = "Battle Familiar",
+            pick = SummonPick.FromList(StatblockData.BATTLE_FAMILIAR_FORMS),
+            duration = "1 hour",
+        ),
         "find_familiar" to Effect.Summons(
             summonId = "find_familiar",
             label = "Find Familiar",

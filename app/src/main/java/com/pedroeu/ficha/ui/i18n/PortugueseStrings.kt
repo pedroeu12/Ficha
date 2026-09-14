@@ -149,6 +149,7 @@ object PortugueseStrings {
             "outra coisa que queira na ficha.",
         "Defenses" to "Defesas",
         "Resistances" to "Resistências",
+        "Vulnerabilities" to "Vulnerabilidades",
         "Conditions" to "Condições",
         "Equipped Armor" to "Armadura Equipada",
         "Equipment Training & Proficiencies" to "Treinamento e Proficiências",

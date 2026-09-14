@@ -18,6 +18,16 @@ import com.pedroeu.ficha.data.model.SubclassFeature
 object SubclassData {
 
     private val UA = Sourcebook.UA_ARCANE
+
+    /**
+     * The books those playtests became.
+     *
+     * Twelve subclasses were imported from Unearthed Arcana and stayed marked as playtest
+     * after the books printed them. That is not cosmetic: a character built with the core
+     * books and nothing else was refused a published subclass, because the picker reads the
+     * book and the book said "may change or be withdrawn".
+     */
+    private val RAVEN = Sourcebook.RAVENLOFT
     private val EFOTA = Sourcebook.EBERRON
     private val HOF = Sourcebook.HEROES_OF_FAERUN
 
@@ -827,14 +837,14 @@ object SubclassData {
                 f(10, "Ever-Ready Shot", "When you roll Initiative, you regain one expended use of Arcane Shot."),
                 f(10, "Additional Arcane Shot", "Learn one more Arcane Shot option.",
                     arcaneShotChoice("arcane_shot_10", 1, 10)),
-                f(15, "Arcane Burst", "When you use Indomitable, push creatures in a 10-foot Emanation up to 20 feet away on a failed Strength save."),
+                f(15, "Indomitable Teleport", "When you use your Indomitable feature and succeed on the saving throw, you can teleport up to 60 feet to an unoccupied space you can see."),
                 f(15, "Additional Arcane Shot", "Learn one more Arcane Shot option.",
                     arcaneShotChoice("arcane_shot_15", 1, 15)),
                 f(18, "Masterful Shots", "When a creature misses you, take a Reaction to move half your Speed away and shoot back."),
                 f(18, "Additional Arcane Shot", "Learn one more Arcane Shot option.",
                     arcaneShotChoice("arcane_shot_18", 1, 18)),
             ),
-            book = UA),
+            book = ARCANA),
 
         // ================================================================= Monk
         Subclass("mercy", "monk", "Warrior of Mercy",
@@ -1253,7 +1263,7 @@ object SubclassData {
                 f(10, "Focused Conjuration", "Taking damage can't break your Concentration on Conjuration spells."),
                 f(14, "Splintered Summons", "Summon Aberration, Construct, Dragon, Elemental, or Fey spells summon two creatures instead of one."),
             ),
-            book = UA),
+            book = ARCANA),
         Subclass("enchanter", "wizard", "Enchanter",
             "Entrance and beguile others with magic that clouds the mind.",
             listOf(
@@ -1266,7 +1276,7 @@ object SubclassData {
                 f(10, "Instinctive Charm", "As a Reaction, force an attacker to miss and possibly redirect the attack at another creature."),
                 f(14, "Alter Memories", "You always have Modify Memory prepared and can target a second creature with it."),
             ),
-            book = UA),
+            book = ARCANA),
         Subclass("necromancer", "wizard", "Necromancer",
             "Command the powers of death and undeath.",
             listOf(
@@ -1277,7 +1287,7 @@ object SubclassData {
                 f(10, "Harvest Undead", "When you become Bloodied, take a Reaction to destroy an Undead you control and regain hit points."),
                 f(14, "Death's Master", "Bolster your Undead with Temporary Hit Points, and make dying Undead explode with necrotic energy."),
             ),
-            book = UA),
+            book = ARCANA),
         Subclass("transmuter", "wizard", "Transmuter",
             "Transform energy and matter at reality's forge.",
             listOf(
@@ -1291,10 +1301,10 @@ object SubclassData {
                 f(3, "Wondrous Alteration", "You always have Alter Self prepared, cast it free once per Long Rest, and each of its options gains a bonus."),
                 f(6, "Empowered Transmutation", "Cast a non-damaging Transmutation spell as if using a slot one level higher."),
                 f(10, "Potent Stone", "Your Transmuter's Stone grants two benefits, adding Mighty Build and Tremorsense as options."),
-                f(10, "Shapechanger", "You always have Polymorph prepared, cast it free once per Long Rest, and keep your mind and spells when targeting yourself."),
+                f(10, "Shape-Shifter", "You always have Polymorph prepared, cast it free once per Long Rest, and keep your mind and spells when targeting yourself."),
                 f(14, "Master Transmuter", "Consume the stone for Major Transformation, Panacea, Restore Life, or Restore Youth."),
             ),
-            book = UA),
+            book = ARCANA),
 
         // ================================================================= Artificer
 
@@ -1611,7 +1621,7 @@ object SubclassData {
                 f(9, "Improved Reanimation", "Whenever you create a Reanimated Companion it gains one more of the following options of your choice. Bloated: the companion becomes Large or Medium (your choice); whenever it hits a Large or smaller creature with its Dreadful Swipe, that creature can also be pushed up to 10 feet away, and you add your Intelligence modifier to the damage dealt by its Death Burst. Gaunt: its Speed increases to 45 feet and it gains a Climb Speed equal to its Speed, able to climb difficult surfaces including ceilings without an ability check; whenever a creature of your choice starts its turn within a 10-foot Emanation originating from your companion, it must succeed on a Wisdom saving throw against your spell save DC or have the Frightened condition until the start of its next turn. Moist: it gains a Swim Speed equal to its Speed, and whenever it is hit by an attack roll from a creature within 10 feet of it, the attacker takes Acid damage equal to your Intelligence modifier."),
                 f(15, "Promethean Reanimation", "Facilitated Revival: when you cast Revivify or Raise Dead, the cost of any Material components needed for that spell is halved. Improved Companion: the damage of your Reanimated Companion's Death Burst increases to 4d6, and Necrotic damage dealt by your companion ignores Resistance. Life Transfer: when you take damage, you can take a Reaction to cause your Reanimated Companion to drop to 0 Hit Points. The companion immediately dies, triggering its Death Burst, and you regain a number of Hit Points equal to your Artificer level."),
             ),
-            book = HORROR),
+            book = RAVEN),
 
         Subclass("college_of_spirits", "bard", "College of Spirits",
             "A Bard who uses occult trappings to conjure legendary and long-dead spirits — capricious entities whose gifts are never entirely under the Bard's control.",
@@ -1628,7 +1638,7 @@ object SubclassData {
                 f(6, "Empowered Channeling", "Your ability to channel spirits improves. You gain the following benefits. Power from Beyond. Once per turn, when you cast a Bard spell with a spell slot that deals damage or restores Hit Points, roll 1d6. You gain a bonus equal to the number rolled to one of the spell's damage rolls or to the total Hit Points the spell restores. Spiritual Manifestation. You always have the Spirit Guardians spell prepared. You can cast the spell once without a spell slot, and you regain the ability to cast it in this way when you finish a Long Rest. Whenever you cast the spell, you can modify it so the spirits also guard against worldly threats. When you cast the spell in this way, you and allies within the spell's Emanation have Half Cover. Once you modify the spell in this way, you can't do so again until you finish a Short or Long Rest."),
                 f(14, "Mystical Connection", "You gain mastery over the spirits you call forth. Whenever you roll on the Spirits from Beyond table, you can roll the die twice and choose which of the two effects to bestow. If you roll the same number on both dice, you can instead choose any effect on the table."),
             ),
-            book = HORROR),
+            book = RAVEN),
 
         Subclass("grave_domain", "cleric", "Grave Domain",
             "A Cleric who guards the boundary between life and death, staving off the grave for those with work left to do and destroying the Undead who defy it.",
@@ -1639,7 +1649,7 @@ object SubclassData {
                 f(6, "Sentinel at Death's Door", "When you or a Bloodied creature you can see within 60 feet of yourself is hit with an attack roll, you can take a Reaction to halve that attack's damage (round down). If the triggering attack roll was a Critical Hit, any effects triggered by a Critical Hit are canceled. You can use this feature a number of times equal to your Wisdom modifier (minimum of once). You regain all expended uses when you finish a Long Rest."),
                 f(17, "Divine Reaper", "Your deep connection to this domain renders you a hallowed harbinger of death, granting you the following benefits. Enhanced Necromancy. When you cast a spell of level 5 or lower from the Necromancy school that targets one creature, or when you cast a spell from the Grave Domain Spells table, you can expend a use of Channel Divinity to target a second creature within the spell's range. If the spell requires costly or consumed Material components, you must provide Material components for each target. Keeper of Souls. When an enemy dies within 60 feet of you, you or one creature you can see within 60 feet of yourself regains Hit Points equal to twice your Cleric level. You can't use this feature if you have the Incapacitated condition. Once you use this feature, you can't use it again until you finish a Short or Long Rest, unless you expend a level 6+ spell slot (no action required) to restore your use of it."),
             ),
-            book = HORROR),
+            book = RAVEN),
 
         Subclass("hollow_warden", "ranger", "Hollow Warden",
             "A Ranger who venerates the ancient, bloodthirsty terrors of fallow soil and sharpened claws, transforming into a merciless guardian of dark and wild places.",
@@ -1658,7 +1668,7 @@ object SubclassData {
                 f(11, "Rot and Violence", "Your dedication to wild eldritch beings alters you further. When transformed using Wrath of the Wild, you gain the following additional benefits. Menacing Aura. When a creature fails its saving throw against your Unnerving Aura, it also can't regain Hit Points or take Reactions until the start of your next turn. Strangling Roots. When you hit a creature with an attack roll using a weapon, you can activate the Sap or Slow mastery property in addition to a different mastery property you're using with that weapon."),
                 f(15, "Ancient Might", "You become wholly suffused with the wild's ancient and terrible power, granting you the following benefits. Ominous Strikes. When you hit a creature that has the Frightened condition with an attack roll, that attack deals extra damage equal to your Wisdom modifier. Persistent Wrath. If you're reduced to 0 Hit Points but not killed outright while transformed using Wrath of the Wild, you can surge with wild power. Your Hit Points instead change to a number equal to twice your Ranger level. Once you use this feature, you can't do so again until you finish a Long Rest. You can also expend a level 4+ spell slot (no action required) to restore your use of this feature. Timeless. You have Immunity to the Exhaustion condition."),
             ),
-            book = HORROR),
+            book = RAVEN),
 
         Subclass("phantom", "rogue", "Phantom",
             "A Rogue who walks the veil between life and death, shepherding opponents to the grave and stealing knowledge from the souls who have passed on.",
@@ -1672,7 +1682,7 @@ object SubclassData {
                 f(13, "Ghost Walk", "As a Bonus Action, you assume a spectral form, gaining the benefits below for 10 minutes or until you end them (no action required). Once you use this feature, you can't use it again until you finish a Long Rest unless you destroy one of your soul trinkets from Tokens of the Departed (no action required) to restore your use of it. Flight. You gain a Fly Speed of 10 feet and can hover. Hazy Form. Attack rolls have Disadvantage against you. Incorporeal Movement. You can move through creatures and objects as if they were Difficult Terrain, but you take 1d10 Force damage if you end your turn inside a creature or an object."),
                 f(17, "Death's Friend", "Your association with death has become so close that you gain the following benefits. Death's Lament. When you use Wails from the Grave, you can deal the feature's Necrotic damage to both the first and the second creature. Draw of Death. When you roll Initiative, you gain one soul trinket for your Tokens of the Departed if you have none remaining."),
             ),
-            book = HORROR),
+            book = RAVEN),
 
         Subclass("shadow_sorcery", "sorcerer", "Shadow Sorcery",
             "A Sorcerer whose innate magic comes from the Shadowfell itself, commanding darkness, undeath, and woe with ease.",
@@ -1683,7 +1693,7 @@ object SubclassData {
                 f(14, "Shadow Walk", "While in Dim Light or Darkness, you can take a Bonus Action to teleport up to 120 feet to an unoccupied space you can see that is also in Dim Light or Darkness."),
                 f(18, "Umbral Form", "As a Bonus Action you adopt a shadowy form for 1 minute, until you have the Incapacitated condition, or until you end the form (no action required). Incorporeal Movement: you can move through occupied spaces as if they were Difficult Terrain, taking 1d10 Force damage if you end your turn in such a space. Shadow Resilience: you have Resistance to all damage except Force and Radiant damage. Strength of the Grave: if you would drop to 0 Hit Points and not die outright, you can make a Charisma saving throw (DC 5 plus half the damage taken); on a success your Hit Points instead change to a number equal to three times your Sorcerer level. Once you use this feature you can't use it again until you finish a Long Rest unless you spend 6 Sorcery Points (no action required) to restore your use of it."),
             ),
-            book = HORROR),
+            book = RAVEN),
 
         Subclass("hexblade_patron", "warlock", "Hexblade Patron",
             "A Warlock bound to a sentient magic weapon and the cursed forces within its blade, which bestows malignant curses and punishing blows.",
@@ -1705,7 +1715,7 @@ object SubclassData {
                 f(10, "Necrotic Husk", "Necrotic Resilience: you have Resistance to Necrotic damage, and while using your Form of Dread you have Immunity to Necrotic damage. Unholy Resuscitation: if you drop to 0 Hit Points and don't die outright, you can cause your body to erupt with deathly energy. Each creature of your choice in a 30-foot Emanation originating from you makes a Constitution saving throw against your spell save DC, taking Necrotic damage equal to 2d10 plus your Warlock level on a failure or half as much on a success. Your Hit Points then change to 10 times your Charisma modifier (minimum of 10 Hit Points), and you gain 1 Exhaustion level. Once you use this benefit you can't use it again until you finish a Short or Long Rest."),
                 f(14, "Superior Dread", "Your Form of Dread improves, granting you the following benefits while you are using it. Dread Resistance. You have Resistance to Bludgeoning, Piercing, and Slashing damage. Ghostly Flight. You have a Fly Speed equal to your Speed and can hover. You can move through creatures and objects as if they were Difficult Terrain, but you take 1d10 Force damage if you end your turn inside a creature or an object. Profane Casting. Whenever you cast a Warlock spell from the Conjuration or Necromancy school, you cast it without any Verbal, Somatic, or Material components, except Material components that are costly or consumed."),
             ),
-            book = HORROR),
+            book = RAVEN),
     )
 
     fun forClass(classId: String): List<Subclass> = ALL.filter { it.classId == classId }

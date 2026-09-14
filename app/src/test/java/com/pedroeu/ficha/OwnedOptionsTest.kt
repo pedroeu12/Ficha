@@ -11,6 +11,7 @@ import com.pedroeu.ficha.data.model.OptionSource
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.KnownSpell
+import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -131,6 +132,28 @@ class OwnedOptionsTest {
 
         val level2 = ask(wizard, "wizard:spell_mastery_2").options.map { it.id }.toSet()
         assertEquals(setOf("misty_step"), level2)
+    }
+
+    @Test
+    fun `when selecting a cantrip to enhance, owned cantrips are not disabled`() {
+        val pc = warlock("eldritch_blast", "chill_touch", "prestidigitation")
+        val choice = ask(pc, "invocation:agonizing_blast:cantrip")
+
+        // The choice should be resolved to only known damage cantrips
+        val offered = choice.options.map { it.id }
+        assertTrue("eldritch_blast" in offered)
+        assertTrue("chill_touch" in offered)
+
+        // But when checking what should be disabled, known spells should NOT be disabled
+        val disabled = OwnedOptions.disabledFor(choice, OwnedOptions.of(pc))
+        assertTrue(
+            "eldritch_blast should be enabled even though you own it (to enhance it)",
+            "eldritch_blast" !in disabled,
+        )
+        assertTrue(
+            "chill_touch should be enabled even though you own it (to enhance it)",
+            "chill_touch" !in disabled,
+        )
     }
 
     // ================================================================ The whole category

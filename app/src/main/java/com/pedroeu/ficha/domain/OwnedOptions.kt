@@ -2,6 +2,7 @@ package com.pedroeu.ficha.domain
 
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
+import com.pedroeu.ficha.data.model.OptionSource
 
 /**
  * What the character already has, so no picker ever offers it twice.
@@ -70,9 +71,19 @@ object OwnedOptions {
                 .filter { it.name.normalized() in owned.tools || it.id.normalized() in owned.tools }
                 .map { it.id }
 
-            ChoiceKind.SPELL -> choice.options
-                .filter { it.id in owned.spells || it.name.normalized() in owned.spellNames }
-                .map { it.id }
+            ChoiceKind.SPELL -> {
+                // When a choice asks "choose one of your known spells" (OptionSource.KnownSpells),
+                // the options have already been filtered to only those the character knows.
+                // Do not disable them again—the whole point is to enhance or modify what you have,
+                // not to learn something new.
+                if (choice.optionsFrom is OptionSource.KnownSpells) {
+                    emptyList()
+                } else {
+                    choice.options
+                        .filter { it.id in owned.spells || it.name.normalized() in owned.spellNames }
+                        .map { it.id }
+                }
+            }
 
             ChoiceKind.LANGUAGE -> choice.options
                 .filter { it.name.normalized() in owned.languages }

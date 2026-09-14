@@ -1595,7 +1595,16 @@ object ResourceData {
                             name = "Jolt to Life",
                             max = c.modAtLeastOne(Ability.INT),
                             recharge = Recharge.LONG_REST,
-                            source = "Reanimator",
+                            source = "Reanimator's Skill Set",
+                            // Its own text, because the printed version folds Jolt to Life
+                            // into Reanimator's Skill Set and the tracker keeps the name a
+                            // player would look for.
+                            description = "When you cast Spare the Dying, the target instead " +
+                                "regains Hit Points equal to your Artificer level, and each " +
+                                "creature of your choice in a 10-foot Emanation around it " +
+                                "takes 2d4 Lightning damage on a failed Dexterity save, or " +
+                                "half as much on a success. The damage rises to 3d4 at " +
+                                "Artificer level 11 and 4d4 at 17.",
                         )
                     )
                     add(

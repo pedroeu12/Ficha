@@ -316,7 +316,12 @@ object SpellGrantData {
         // ---- Other subclasses that hand over a specific spell
         "college_of_the_moon" to at(6, "moonbeam"),
         "land" to emptyList(),
-        "moon" to emptyList(),
+        // The Circle of the Moon's own table, which granted nothing: the subclass had its
+        // Wild Shape features and none of the five spells that come with them.
+        "moon" to at(3, "cure_wounds", "moonbeam", "starry_wisp") +
+            at(5, "conjure_animals") +
+            at(7, "fount_of_moonlight") +
+            at(9, "mass_cure_wounds"),
         "abjurer" to at(10, "counterspell", "dispel_magic"),
 
         // The Eldritch Knight is granted nothing; the Arcane Trickster's Mage Hand is

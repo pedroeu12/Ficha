@@ -431,7 +431,7 @@ object PerUseChoiceData {
             label = "Improved Reanimation",
             prompt = "Which further modification does this companion have? You choose " +
                 "again whenever you create a new one.",
-            source = "Improved Reanimation",
+            source = "Macabre Modifications",
             resourceId = "reanimator:companion",
             subclassId = "reanimator",
             minLevel = 9,

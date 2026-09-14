@@ -1,0 +1,400 @@
+artificer	alchemist	3	Tools of the Trade
+artificer	alchemist	3	Alchemist Spells.
+artificer	alchemist	3	Experimental Elixir
+artificer	alchemist	5	Alchemical Savant
+artificer	alchemist	9	Restorative Reagents
+artificer	alchemist	15	Chemical Mastery
+artificer	armorer	3	Tools of the Trade
+artificer	armorer	3	Armorer Spells
+artificer	armorer	3	Arcane Armor
+artificer	armorer	3	Armor Model
+artificer	armorer	5	Extra Attack
+artificer	armorer	9	Improved Armorer
+artificer	armorer	15	Perfected Armor
+artificer	artillerist	3	Tools of the Trade
+artificer	artillerist	3	Artillerist Spells
+artificer	artillerist	3	Eldritch Cannon
+artificer	artillerist	5	Arcane Firearm
+artificer	artillerist	9	Explosive Cannon
+artificer	artillerist	15	Fortified Position
+artificer	battle-smith	3	Tools of the Trade
+artificer	battle-smith	3	Battle Smith spells
+artificer	battle-smith	3	Battle Ready
+artificer	battle-smith	3	Steel Defender
+artificer	battle-smith	5	Extra Attack
+artificer	battle-smith	9	Arcane Jolt
+artificer	battle-smith	15	Improved Defender
+artificer	cartographer	3	Tools of the Trade
+artificer	cartographer	3	Cartographer Spells
+artificer	cartographer	3	Adventurer's Atlas
+artificer	cartographer	3	Mapping Magic
+artificer	cartographer	5	Guided Precision
+artificer	cartographer	9	Ingenious Movement
+artificer	cartographer	15	Superior Atlas
+artificer	reanimator	3	Reanimator Spells
+artificer	reanimator	3	Reanimator's Skill Set
+artificer	reanimator	3	Reanimated Companion
+artificer	reanimator	5	Strange Modifications
+artificer	reanimator	9	Improved Reanimation
+artificer	reanimator	9	Macabre Modifications
+artificer	reanimator	15	Refined Reanimation
+barbarian	path-of-the-berserker	3	Frenzy
+barbarian	path-of-the-berserker	6	Mindless Rage
+barbarian	path-of-the-berserker	10	Retaliation
+barbarian	path-of-the-berserker	14	Intimidating Presence
+barbarian	path-of-the-wild-heart	3	Animal Speaker
+barbarian	path-of-the-wild-heart	3	Rage of the Wilds
+barbarian	path-of-the-wild-heart	6	Aspect of the Wilds
+barbarian	path-of-the-wild-heart	10	Nature Speaker
+barbarian	path-of-the-wild-heart	14	Power of the Wilds
+barbarian	path-of-the-world-tree	3	Vitality of the Tree
+barbarian	path-of-the-world-tree	6	Branches of the Tree
+barbarian	path-of-the-world-tree	10	Battering Roots
+barbarian	path-of-the-world-tree	14	Travel along the Tree
+barbarian	path-of-the-zealot	3	Divine Fury
+barbarian	path-of-the-zealot	3	Warrior of the Gods
+barbarian	path-of-the-zealot	6	Fanatical Focus
+barbarian	path-of-the-zealot	10	Zealous Presence
+barbarian	path-of-the-zealot	14	Rage of the Gods
+bard	college-of-dance	3	Dazzling Footwork
+bard	college-of-dance	6	Inspiring Movement
+bard	college-of-dance	6	Tandem Footwork
+bard	college-of-dance	14	Leading Evasion
+bard	college-of-glamour	3	Beguiling Magic
+bard	college-of-glamour	3	Mantle of Inspiration
+bard	college-of-glamour	6	Mantle of Majesty
+bard	college-of-glamour	14	Unbreakable Majesty
+bard	college-of-lore	3	Bonus Proficiencies
+bard	college-of-lore	3	Cutting Words
+bard	college-of-lore	6	Magical Discoveries
+bard	college-of-lore	14	Peerless Skill
+bard	college-of-spirits	3	Channeler
+bard	college-of-spirits	3	Spirits from Beyond
+bard	college-of-spirits	6	Empowered Channeling
+bard	college-of-spirits	14	Mystical Connection
+bard	college-of-the-moon	3	Moon's Inspiration
+bard	college-of-the-moon	3	Primal Lore
+bard	college-of-the-moon	6	Blessing of Moonlight
+bard	college-of-the-moon	14	Eventide's Splendor
+bard	college-of-valor	3	Combat Inspiration
+bard	college-of-valor	3	Martial Training
+bard	college-of-valor	6	Extra Attack
+bard	college-of-valor	14	Battle Magic
+cleric	arcana-domain	3	Arcana Domain Spells
+cleric	arcana-domain	3	Modify Magic
+cleric	arcana-domain	3	Student of Arcana
+cleric	arcana-domain	6	Dispelling Recovery
+cleric	arcana-domain	17	Magical Mastery
+cleric	grave-domain	3	Grave Domain Spells
+cleric	grave-domain	3	Circle of Mortality
+cleric	grave-domain	3	Path to the Grave
+cleric	grave-domain	6	Sentinel at Death's Door
+cleric	grave-domain	17	Divine Reaper
+cleric	knowledge-domain	3	Blessings of Knowledge
+cleric	knowledge-domain	3	Knowledge Domain Spells
+cleric	knowledge-domain	3	Mind Magic
+cleric	knowledge-domain	6	Unfettered Mind
+cleric	knowledge-domain	17	Divine Foreknowledge
+cleric	life-domain	3	Disciple of Life
+cleric	life-domain	3	Life Domain Spells
+cleric	life-domain	3	Preserve Life
+cleric	life-domain	6	Blessed Healer
+cleric	life-domain	17	Supreme Healing
+cleric	light-domain	3	Light Domain Spells
+cleric	light-domain	3	Radiance of the Dawn
+cleric	light-domain	3	Warding Flare
+cleric	light-domain	6	Improved Warding Flare
+cleric	light-domain	17	Corona of Light
+cleric	trickery-domain	3	Blessing of the Trickster
+cleric	trickery-domain	3	Trickery Domain Spells
+cleric	trickery-domain	3	Invoke Duplicity
+cleric	trickery-domain	6	Trickster's Transposition
+cleric	trickery-domain	17	Improved Duplicity
+cleric	war-domain	3	Guided Strike
+cleric	war-domain	3	War Domain Spells
+cleric	war-domain	3	War Priest
+cleric	war-domain	6	War God's Blessing
+cleric	war-domain	17	Avatar of Battle
+druid	circle-of-the-land	3	Circle of the Land Spells
+druid	circle-of-the-land	3	Land's Aid
+druid	circle-of-the-land	6	Natural Recovery
+druid	circle-of-the-land	10	Nature's Ward
+druid	circle-of-the-land	14	Nature's Sanctuary
+druid	circle-of-the-moon	3	Circle Forms
+druid	circle-of-the-moon	3	Circle of the Moon Spells
+druid	circle-of-the-moon	6	Improved Circle Forms
+druid	circle-of-the-moon	10	Moonlight Step
+druid	circle-of-the-moon	14	Lunar Form
+druid	circle-of-the-sea	3	Circle of the Sea Spells
+druid	circle-of-the-sea	3	Wrath of the Sea
+druid	circle-of-the-sea	6	Aquatic Affinity
+druid	circle-of-the-sea	10	Stormborn
+druid	circle-of-the-sea	14	Oceanic Gift
+druid	circle-of-the-stars	3	Star Map
+druid	circle-of-the-stars	3	Starry Form
+druid	circle-of-the-stars	6	Cosmic Omen
+druid	circle-of-the-stars	10	Twinkling Constellations
+druid	circle-of-the-stars	14	Full of Stars
+fighter	arcane-archer	3	Arcane Archer Lore
+fighter	arcane-archer	3	Arcane Shot
+fighter	arcane-archer	7	Curving Shot
+fighter	arcane-archer	7	Magical Ammunition
+fighter	arcane-archer	10	Ever-Ready Shot
+fighter	arcane-archer	15	Indomitable Teleport
+fighter	arcane-archer	18	Masterful Shots
+fighter	banneret	3	Knightly Envoy
+fighter	banneret	3	Group Recovery
+fighter	banneret	7	Team Tactics
+fighter	banneret	10	Rallying Surge
+fighter	banneret	15	Shared Resilience
+fighter	banneret	18	Inspiring Commander
+fighter	battle-master	3	Combat Superiority
+fighter	battle-master	3	Student of War
+fighter	battle-master	7	Know Your Enemy
+fighter	battle-master	10	Improved Combat Superiority
+fighter	battle-master	15	Relentless
+fighter	battle-master	18	Ultimate Combat Superiority
+fighter	champion	3	Improved Critical
+fighter	champion	3	Remarkable Athlete
+fighter	champion	7	Additional Fighting Style
+fighter	champion	10	Heroic Warrior
+fighter	champion	15	Superior Critical
+fighter	champion	18	Survivor
+fighter	eldritch-knight	3	Spellcasting
+fighter	eldritch-knight	3	War Bond
+fighter	eldritch-knight	7	War Magic
+fighter	eldritch-knight	10	Eldritch Strike
+fighter	eldritch-knight	15	Arcane Charge
+fighter	eldritch-knight	18	Improved War Magic
+fighter	psi-warrior	3	Psionic Power
+fighter	psi-warrior	7	Telekinetic Adept
+fighter	psi-warrior	10	Guarded Mind
+fighter	psi-warrior	15	Bulwark of Force
+fighter	psi-warrior	18	Telekinetic Master
+monk	warrior-of-mercy	3	Hand of Harm
+monk	warrior-of-mercy	3	Hand of Healing
+monk	warrior-of-mercy	3	Implements of Mercy
+monk	warrior-of-mercy	6	Physician's Touch
+monk	warrior-of-mercy	11	Flurry of Healing and Harm
+monk	warrior-of-mercy	17	Hand of Ultimate Mercy
+monk	warrior-of-shadow	3	Shadow Arts
+monk	warrior-of-shadow	6	Shadow Step
+monk	warrior-of-shadow	11	Improved Shadow Step
+monk	warrior-of-shadow	17	Cloak of Shadows
+monk	warrior-of-the-elements	3	Elemental Attunement
+monk	warrior-of-the-elements	3	Manipulate Elements
+monk	warrior-of-the-elements	6	Elemental Burst
+monk	warrior-of-the-elements	11	Stride of the Elements
+monk	warrior-of-the-elements	17	Elemental Epitome
+monk	warrior-of-the-mystic-arts	3	Spellcasting
+monk	warrior-of-the-mystic-arts	6	Mystic Fighting Style
+monk	warrior-of-the-mystic-arts	6	Mystic Focus
+monk	warrior-of-the-mystic-arts	11	Focused Strike
+monk	warrior-of-the-mystic-arts	17	Improved Mystic Fighting Style
+monk	warrior-of-the-open-hand	3	Open Hand Technique
+monk	warrior-of-the-open-hand	6	Wholeness of Body
+monk	warrior-of-the-open-hand	11	Fleet Step
+monk	warrior-of-the-open-hand	17	Quivering Palm
+paladin	oath-of-devotion	3	Oath of Devotion Spells
+paladin	oath-of-devotion	3	Sacred Weapon
+paladin	oath-of-devotion	7	Aura of Devotion
+paladin	oath-of-devotion	15	Smite of Protection
+paladin	oath-of-devotion	20	Holy Nimbus
+paladin	oath-of-glory	3	Inspiring Smite
+paladin	oath-of-glory	3	Oath of Glory Spells.
+paladin	oath-of-glory	3	Peerless Athlete
+paladin	oath-of-glory	7	Aura of Alacrity
+paladin	oath-of-glory	15	Glorious Defense
+paladin	oath-of-glory	20	Living Legend
+paladin	oath-of-the-ancients	3	Nature's Wrath
+paladin	oath-of-the-ancients	3	Oath of the Ancients Spells
+paladin	oath-of-the-ancients	7	Aura of Warding
+paladin	oath-of-the-ancients	15	Undying Sentinel
+paladin	oath-of-the-ancients	20	Elder Champion
+paladin	oath-of-the-noble-genies	3	Elemental Smite
+paladin	oath-of-the-noble-genies	3	Genie Spells
+paladin	oath-of-the-noble-genies	3	Genie's Splendor
+paladin	oath-of-the-noble-genies	7	Aura of Elemental Shielding
+paladin	oath-of-the-noble-genies	15	Elemental Rebuke
+paladin	oath-of-the-noble-genies	20	Noble Scion
+paladin	oath-of-vengeance	3	Oath of Vengeance Spells
+paladin	oath-of-vengeance	3	Vow of Enmity
+paladin	oath-of-vengeance	7	Relentless Avenger
+paladin	oath-of-vengeance	15	Soul of Vengeance
+paladin	oath-of-vengeance	20	Avenging Angel
+ranger	beast-master	3	Primal Companion
+ranger	beast-master	7	Exceptional Training
+ranger	beast-master	11	Bestial Fury
+ranger	beast-master	15	Share Spells
+ranger	fey-wanderer	3	Dreadful Strikes
+ranger	fey-wanderer	3	Fey Wanderer Spells
+ranger	fey-wanderer	3	Otherworldly Glamour.
+ranger	fey-wanderer	7	Beguiling Twist
+ranger	fey-wanderer	11	Fey Reinforcements
+ranger	fey-wanderer	15	Misty Wanderer
+ranger	gloom-stalker	3	Dread Ambusher
+ranger	gloom-stalker	3	Gloom Stalker Spells
+ranger	gloom-stalker	3	Umbral Sight
+ranger	gloom-stalker	7	Iron Mind
+ranger	gloom-stalker	11	Stalker's Flurry
+ranger	gloom-stalker	15	Shadowy Dodge
+ranger	hollow-warden	3	Hollow Warden Spells
+ranger	hollow-warden	3	Wrath of the Wild
+ranger	hollow-warden	7	Hungering Might
+ranger	hollow-warden	11	Rot and Violence
+ranger	hollow-warden	15	Ancient Might
+ranger	hunter	3	Hunter's Lore
+ranger	hunter	3	Hunter's Prey
+ranger	hunter	7	Defensive Tactics
+ranger	hunter	11	Superior Hunter's Prey
+ranger	hunter	15	Superior Hunter's Defense
+ranger	winter-walker	3	Frigid Explorer
+ranger	winter-walker	3	Hunter's Rime
+ranger	winter-walker	3	Winter Walker Spells
+ranger	winter-walker	7	Fortifying Soul
+ranger	winter-walker	11	Chilling Retribution
+ranger	winter-walker	15	Frozen Haunt
+rogue	arcane-trickster	3	Spellcasting
+rogue	arcane-trickster	3	Mage Hand Legerdemain
+rogue	arcane-trickster	9	Magical Ambush
+rogue	arcane-trickster	13	Versatile Trickster
+rogue	arcane-trickster	17	Spell Thief
+rogue	assassin	3	Assassinate
+rogue	assassin	3	Assassin's Tools
+rogue	assassin	9	Infiltration Expertise
+rogue	assassin	13	Envenom Weapons
+rogue	assassin	17	Death Strike
+rogue	phantom	3	Wails from the Grave
+rogue	phantom	3	Whispers of the Dead
+rogue	phantom	9	Tokens of the Departed
+rogue	phantom	9	Voice of Death
+rogue	phantom	13	Ghost Walk
+rogue	phantom	17	Death's Friend
+rogue	scion-of-the-three	3	Bloodthirst
+rogue	scion-of-the-three	3	Dread Allegiance
+rogue	scion-of-the-three	9	Strike Fear
+rogue	scion-of-the-three	13	Aura of Malevolence
+rogue	scion-of-the-three	17	Dread Incarnate
+rogue	soulknife	3	Psionic Power
+rogue	soulknife	3	Psychic Blades
+rogue	soulknife	9	Soul Blades
+rogue	soulknife	13	Psychic Veil
+rogue	soulknife	17	Rend Mind
+rogue	thief	3	Fast Hands
+rogue	thief	3	Second Story Work
+rogue	thief	9	Supreme Sneak
+rogue	thief	13	Use Magic Device
+rogue	thief	17	Thief's Reflexes
+sorcerer	aberrant-sorcery	3	Psionic Spells
+sorcerer	aberrant-sorcery	3	Telepathic Speech
+sorcerer	aberrant-sorcery	6	Psionic Sorcery
+sorcerer	aberrant-sorcery	6	Psychic Defenses
+sorcerer	aberrant-sorcery	14	Revelation in Flesh
+sorcerer	aberrant-sorcery	18	Warping Implosion
+sorcerer	clockwork-sorcery	3	Clockwork Spells
+sorcerer	clockwork-sorcery	3	Restore Balance
+sorcerer	clockwork-sorcery	6	Bastion of Law
+sorcerer	clockwork-sorcery	14	Trance of Order
+sorcerer	clockwork-sorcery	18	Clockwork Cavalcade
+sorcerer	draconic-sorcery	3	Draconic Resilience
+sorcerer	draconic-sorcery	3	Draconic Spells
+sorcerer	draconic-sorcery	6	Elemental Affinity
+sorcerer	draconic-sorcery	14	Dragon Wings
+sorcerer	draconic-sorcery	18	Dragon Companion
+sorcerer	shadow-sorcery	3	Shadow Spells
+sorcerer	shadow-sorcery	3	Power of Shadow
+sorcerer	shadow-sorcery	6	Beasts of Ill Omen
+sorcerer	shadow-sorcery	14	Shadow Walk
+sorcerer	shadow-sorcery	18	Umbral Form
+sorcerer	spellfire-sorcery	3	Spellfire Burst
+sorcerer	spellfire-sorcery	3	Spellfire Spells
+sorcerer	spellfire-sorcery	6	Absorb Spells
+sorcerer	spellfire-sorcery	14	Honed Spellfire
+sorcerer	spellfire-sorcery	18	Crown of Spellfire
+sorcerer	wild-magic-sorcery	3	Wild Magic Surge
+sorcerer	wild-magic-sorcery	3	Tides of Chaos
+sorcerer	wild-magic-sorcery	6	Bend Luck
+sorcerer	wild-magic-sorcery	14	Controlled Chaos
+sorcerer	wild-magic-sorcery	18	Tamed Surge
+warlock	archfey-patron	3	Archfey Spells
+warlock	archfey-patron	3	Steps of the Fey
+warlock	archfey-patron	6	Misty Escape
+warlock	archfey-patron	10	Beguiling Defenses
+warlock	archfey-patron	14	Bewitching Magic
+warlock	celestial-patron	3	Celestial Spells
+warlock	celestial-patron	3	Healing Light
+warlock	celestial-patron	6	Radiant Soul
+warlock	celestial-patron	10	Celestial Resilience
+warlock	celestial-patron	14	Searing Vengeance
+warlock	fiend-patron	3	Dark One's Blessing
+warlock	fiend-patron	3	Fiend Spells
+warlock	fiend-patron	6	Dark One's Own Luck
+warlock	fiend-patron	10	Fiendish Resilience
+warlock	fiend-patron	14	Hurl Through Hell
+warlock	great-old-one-patron	3	Awakened Mind
+warlock	great-old-one-patron	3	Great Old One Spells
+warlock	great-old-one-patron	3	Psychic Spells
+warlock	great-old-one-patron	6	Clairvoyant Combatant
+warlock	great-old-one-patron	10	Eldritch Hex
+warlock	great-old-one-patron	10	Thought Shield
+warlock	great-old-one-patron	14	Create Thrall
+warlock	undead-patron	3	Form of Dread
+warlock	undead-patron	3	Undead Spells
+warlock	undead-patron	6	Grave Touched
+warlock	undead-patron	10	Necrotic Husk
+warlock	undead-patron	14	Superior Dread
+warlock	vestige-patron	3	Vestige Companion
+warlock	vestige-patron	3	Vestige Spells
+warlock	vestige-patron	6	Vestige Power
+warlock	vestige-patron	10	Vestige Recovery
+warlock	vestige-patron	14	Semblance of Life
+wizard	abjurer	3	Abjuration Savant
+wizard	abjurer	3	Arcane ward
+wizard	abjurer	6	Projected Ward
+wizard	abjurer	10	Spell Breaker
+wizard	abjurer	14	Spell Resistance
+wizard	bladesinger	3	Bladesong
+wizard	bladesinger	3	Training in War and Song
+wizard	bladesinger	6	Extra Attack
+wizard	bladesinger	10	Song of Defense
+wizard	bladesinger	14	Song of Victory
+wizard	conjurer	3	Benign Transposition
+wizard	conjurer	3	Conjuration Savant
+wizard	conjurer	6	Distant Transposition
+wizard	conjurer	6	Durable Summons
+wizard	conjurer	10	Focused Conjuration
+wizard	conjurer	14	Splintered Summons
+wizard	diviner	3	Divination Savant
+wizard	diviner	3	Portent
+wizard	diviner	6	Expert Divination
+wizard	diviner	10	The Third Eye
+wizard	diviner	14	Greater Portent
+wizard	enchanter	3	Enchanting Conversationalist
+wizard	enchanter	3	Enchantment Savant
+wizard	enchanter	3	Hypnotic Presence
+wizard	enchanter	6	Split Enchantment
+wizard	enchanter	10	Instinctive Charm
+wizard	enchanter	14	Alter Memories
+wizard	evoker	3	Evocation Savant
+wizard	evoker	3	Potent Cantrip
+wizard	evoker	6	Sculpt Spells
+wizard	evoker	10	Empowered Evocation
+wizard	evoker	14	Overchannel
+wizard	illusionist	3	Illusion Savant
+wizard	illusionist	3	Improved Illusions
+wizard	illusionist	6	Phantasmal Creatures
+wizard	illusionist	10	Illusory Self
+wizard	illusionist	14	Illusory Reality
+wizard	necromancer	3	Necromancy Savant
+wizard	necromancer	3	Necromancy Spellbook
+wizard	necromancer	6	Grave Power
+wizard	necromancer	6	Undead Thralls
+wizard	necromancer	10	Harvest Undead
+wizard	necromancer	14	Death's Master
+wizard	transmuter	3	Transmutation Savant
+wizard	transmuter	3	Transmuter's Stone
+wizard	transmuter	3	Wondrous Alteration
+wizard	transmuter	6	Empowered Transmutation
+wizard	transmuter	10	Potent Stone
+wizard	transmuter	10	Shape-Shifter
+wizard	transmuter	14	Master Transmuter

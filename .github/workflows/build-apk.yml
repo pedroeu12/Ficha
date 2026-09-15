@@ -35,8 +35,15 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # The debug variant, not every variant. `test` runs the suite twice — once per build
+      # type — which doubled an eleven-minute job to no purpose, since a unit test does not go
+      # through R8 and both runs execute identical code. Worse, it failed: the screen tests
+      # need an Activity to draw into, which comes from androidx's ui-test-manifest, and that
+      # is a debug dependency by design — nobody ships a test activity in a release build. So
+      # the release run had nothing to host a composition and every rendering test failed in a
+      # variant that will never be tested on a device anyway.
       - name: Run the unit tests
-        run: ./gradlew test --stacktrace
+        run: ./gradlew testDebugUnitTest --stacktrace
 
       - name: Build the debug APK
         run: ./gradlew assembleDebug --stacktrace

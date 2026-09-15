@@ -15,6 +15,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.pedroeu.ficha.domain.CharacterSummons
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.rules.CustomStatblock
 import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.design.Space
 import com.pedroeu.ficha.ui.i18n.tr
@@ -51,7 +53,11 @@ fun SummonPickerSheet(
         owningClassId: String?,
         concentration: Boolean,
     ) -> Unit,
+    /** Given, the player can write a creature of their own and call that up instead. */
+    onWriteCreature: ((CustomStatblock) -> Unit)? = null,
+    onEraseCreature: ((String) -> Unit)? = null,
 ) {
+    var writing by remember { mutableStateOf<String?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val available = remember(character) { CharacterSummons.available(character) }
     var chosen by remember { mutableStateOf(available.firstOrNull()) }
@@ -87,6 +93,19 @@ fun SummonPickerSheet(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                // Deliberately not a return. A creature the player wrote is not attached to a
+                // spell, so a character with no summoning spell at all can still have one —
+                // the DM's construct, a familiar from another book — and bailing out here is
+                // what would hide it from exactly the character most likely to have it.
+                OwnCreatures(
+                    character = character,
+                    onWrite = onWriteCreature,
+                    onEdit = { writing = it },
+                    onSummon = { onSummon(it.id, OWN_CREATURE, it.name, 0, null, false) },
+                )
+                CreatureEditor(character, writing, onWriteCreature, onEraseCreature) {
+                    writing = null
+                }
                 return@Column
             }
 
@@ -187,8 +206,93 @@ fun SummonPickerSheet(
                 shape = Corner.row,
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(tr("Summon")) }
+
+            OwnCreatures(
+                character = character,
+                onWrite = onWriteCreature,
+                onEdit = { writing = it },
+                onSummon = { onSummon(it.id, OWN_CREATURE, it.name, 0, null, false) },
+            )
         }
     }
+
+    CreatureEditor(character, writing, onWriteCreature, onEraseCreature) { writing = null }
+}
+
+/** The source id a creature of the player's own is summoned under. */
+const val OWN_CREATURE = "custom:creature"
+
+/** The id the editor is opened with for a creature that does not exist yet. */
+private const val NEW_CREATURE = ""
+
+/**
+ * The creatures the player wrote, and the way to write another.
+ *
+ * Below the book's list rather than mixed into it, because they answer a different question:
+ * the entries above are "which of my spells am I casting", and these are "put this thing on
+ * the table". Tapping one summons it directly — there is no form to choose and no slot to
+ * spend, since nothing about it was ever derived from a spell.
+ */
+@Composable
+private fun OwnCreatures(
+    character: PlayerCharacter,
+    onWrite: ((CustomStatblock) -> Unit)?,
+    onEdit: (String) -> Unit,
+    onSummon: (CustomStatblock) -> Unit,
+) {
+    if (onWrite == null) return
+
+    Text(
+        text = tr("Your own creatures"),
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.SemiBold,
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(Space.tight)) {
+        character.customStatblocks.forEach { creature ->
+            Row(Modifier.fillMaxWidth()) {
+                Column(Modifier.weight(1f)) {
+                    DetailRow(
+                        title = creature.name,
+                        supporting = listOfNotNull(
+                            "${creature.size} ${creature.creatureType}".trim()
+                                .takeIf { it.isNotBlank() },
+                            trf("{0} HP", creature.hitPoints),
+                            trf("AC {0}", creature.armorClass),
+                        ).joinToString(" · "),
+                        onClick = { onSummon(creature) },
+                    )
+                }
+                TextButton(onClick = { onEdit(creature.id) }) { Text(tr("Edit")) }
+            }
+        }
+        TextButton(onClick = { onEdit(NEW_CREATURE) }) { Text(tr("+ Write a creature")) }
+    }
+}
+
+/** The form, opened on a creature's id — blank for one that does not exist yet. */
+@Composable
+private fun CreatureEditor(
+    character: PlayerCharacter,
+    openOn: String?,
+    onWrite: ((CustomStatblock) -> Unit)?,
+    onErase: ((String) -> Unit)?,
+    onClose: () -> Unit,
+) {
+    if (openOn == null || onWrite == null) return
+    CreatureDialog(
+        existing = character.customStatblocks.find { it.id == openOn },
+        onDismiss = onClose,
+        onSave = {
+            onWrite(it)
+            onClose()
+        },
+        onErase = onErase?.let { erase ->
+            { creature: CustomStatblock ->
+                erase(creature.id)
+                onClose()
+            }
+        },
+    )
 }
 
 /**

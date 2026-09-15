@@ -117,7 +117,10 @@ object CharacterSummons {
         concentration: Boolean = false,
         howMany: Int = 1,
     ): PlayerCharacter {
-        val statblock = StatblockData.byId(statblockId) ?: return character
+        // The player's own creatures answer here too, which is the whole of what it takes to
+        // make one summonable: everything downstream reads a Statblock and does not care who
+        // wrote it.
+        val statblock = SummonEdits.baseOf(character, statblockId) ?: return character
         val maxHp = statblock.hitPointsFor(character, spellLevel, owningClassId)
         val existing = character.activeSummons.count { it.statblockId == statblockId }
 
@@ -256,7 +259,16 @@ object CharacterSummons {
         )
 
     /** The stat block behind a creature on the table. */
+    @Deprecated(
+        "A creature on the table is the book's plus what has been changed about it; " +
+            "use SummonEdits.resolve, which also knows the player's own creatures.",
+        ReplaceWith("SummonEdits.resolve(character, summon)"),
+    )
     fun statblockOf(summon: ActiveSummon): Statblock? = StatblockData.byId(summon.statblockId)
+
+    /** The creature as it stands on the table: the book's, or the player's, plus its edits. */
+    fun statblockFor(character: PlayerCharacter, summon: ActiveSummon): Statblock? =
+        SummonEdits.resolve(character, summon)
 
     /**
      * A summoned creature's attack bonus, which is almost always the summoner's.

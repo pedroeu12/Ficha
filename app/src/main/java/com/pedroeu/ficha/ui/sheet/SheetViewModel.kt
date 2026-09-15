@@ -21,6 +21,10 @@ import com.pedroeu.ficha.domain.CustomFeature
 import com.pedroeu.ficha.domain.CustomOption
 import com.pedroeu.ficha.domain.CustomOptions
 import com.pedroeu.ficha.domain.CustomResource
+import com.pedroeu.ficha.domain.SummonEdits
+import com.pedroeu.ficha.rules.CustomAction
+import com.pedroeu.ficha.rules.CustomStatblock
+import com.pedroeu.ficha.ui.components.RESET as RESET_SUMMON
 import com.pedroeu.ficha.domain.DeathSaves
 import com.pedroeu.ficha.domain.FeatEdits
 import com.pedroeu.ficha.data.model.SpellDef
@@ -135,6 +139,30 @@ class SheetViewModel(
 
     fun spendSummonUse(instanceId: String, trait: String, delta: Int) =
         update { CharacterSummons.spend(it, instanceId, trait, delta) }
+
+    /**
+     * Edit Mode on a creature: one field of one creature on the table.
+     *
+     * A single entry point keyed by field rather than a method per row, so a stat block that
+     * gains a line does not need a new method, a new parameter and a new call site — which is
+     * the shape that let the sheet and the tablet drift apart every previous time.
+     */
+    fun setSummonField(instanceId: String, key: String, value: String?) = update { character ->
+        if (key == RESET_SUMMON) SummonEdits.resetEdits(character, instanceId)
+        else SummonEdits.setField(character, instanceId, key, value)
+    }
+
+    fun addSummonAction(instanceId: String, action: CustomAction) =
+        update { SummonEdits.addAction(it, instanceId, action) }
+
+    fun removeSummonAction(instanceId: String, name: String) =
+        update { SummonEdits.removeAction(it, instanceId, name) }
+
+    /** A creature the player wrote, kept with the character who can call it up. */
+    fun writeCreature(creature: CustomStatblock) =
+        update { SummonEdits.writeCreature(it, creature) }
+
+    fun eraseCreature(creatureId: String) = update { SummonEdits.eraseCreature(it, creatureId) }
 
     // ------------------------------------------------------------------ Play tracking
 

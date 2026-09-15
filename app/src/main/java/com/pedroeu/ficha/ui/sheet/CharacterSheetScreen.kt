@@ -183,8 +183,13 @@ fun CharacterSheetScreen(
             onSelectCharacter = { viewing = null },
             onSelectSummon = { viewing = it },
             // Null hides the button entirely: a character with nothing to summon should not
-            // be offered the gesture at all.
-            onSummonSomething = if (CharacterSummons.available(loaded).isNotEmpty()) {
+            // be offered the gesture at all — but a creature the player wrote counts, and is
+            // exactly the case of a character with no summoning spell who nonetheless has
+            // something to put on the table.
+            onSummonSomething = if (
+                CharacterSummons.available(loaded).isNotEmpty() ||
+                loaded.customStatblocks.isNotEmpty()
+            ) {
                 { summoning = true }
             } else {
                 null
@@ -218,6 +223,11 @@ fun CharacterSheetScreen(
                     viewModel.spendSummonUse(openSummon.instanceId, trait, delta)
                 },
                 onNotes = { viewModel.setSummonNotes(openSummon.instanceId, it) },
+                onSetField = { key, value ->
+                    viewModel.setSummonField(openSummon.instanceId, key, value)
+                },
+                onAddAction = { viewModel.addSummonAction(openSummon.instanceId, it) },
+                onRemoveAction = { viewModel.removeSummonAction(openSummon.instanceId, it) },
                 modifier = Modifier.weight(1f),
             )
             return@Column
@@ -264,6 +274,8 @@ fun CharacterSheetScreen(
                 // above, which is where the player goes to look at it.
                 viewing = null
             },
+            onWriteCreature = viewModel::writeCreature,
+            onEraseCreature = viewModel::eraseCreature,
         )
     }
 }

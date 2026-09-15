@@ -109,3 +109,11 @@ Three things are not `Choice`s and are handled in their own way:
   table of features at twenty levels, a Hit Die and a spell list; a sheet that let you invent
   one from nothing would be a sheet that could not add anything up.
 - **Attacks, items, resources and features** were already free text and stay that way.
+- **Creatures** have two halves. A creature on the table can be changed field by field
+  (`ActiveSummon.overrides`, keyed `armorClass`, `speed`, `ability:STR`,
+  `action:Bite:description`), which is scoped to that one instance — one of five wolves can be
+  the one that drank the potion. A creature written from nothing is a `CustomStatblock` on the
+  character, offered by the summon picker beside the book's, and summonable even by a character
+  with no summoning spell at all. `SummonEdits.resolve` folds book, written creature and edits
+  into the one `Statblock` the sheet already knows how to draw, so there is one renderer and
+  no way for the two paths to drift.

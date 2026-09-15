@@ -1,5 +1,6 @@
 package com.pedroeu.ficha.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -33,8 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterSummons
 import com.pedroeu.ficha.domain.PlayerCharacter
+import com.pedroeu.ficha.domain.SummonEdits
 import com.pedroeu.ficha.rules.ActionKind
 import com.pedroeu.ficha.rules.ActiveSummon
+import com.pedroeu.ficha.rules.CustomAction
 import com.pedroeu.ficha.rules.FormulaEval
 import com.pedroeu.ficha.ui.design.Corner
 import com.pedroeu.ficha.ui.design.Space
@@ -68,9 +71,25 @@ fun SummonSheet(
     onNotes: (String) -> Unit,
     /** Edit Mode's way to correct a creature's maximum, for a rolled or house-ruled one. */
     onSetMaxHitPoints: (Int) -> Unit = {},
+    /**
+     * Edit Mode's way to change anything else about this creature: its Armor Class, its
+     * speed, its size, an ability score, what one of its actions says.
+     *
+     * Keyed by field rather than a callback per line, because the alternative is twenty
+     * parameters and a screen that has to be edited every time a stat block gains a row.
+     */
+    onSetField: (key: String, value: String?) -> Unit = { _, _ -> },
+    /** Edit Mode's way to give this creature something new to do, or take one away. */
+    onAddAction: (CustomAction) -> Unit = {},
+    onRemoveAction: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val statblock = CharacterSummons.statblockOf(summon)
+    // Which kind of action is being written, if any.
+    var adding by rememberSaveable { mutableStateOf<ActionKind?>(null) }
+
+    // The creature as it stands, not as the book printed it: whatever has been changed about
+    // this one is already folded in, so nothing below has to know an edit happened.
+    val statblock = CharacterSummons.statblockFor(character, summon)
     if (statblock == null) {
         Column(modifier.fillMaxSize().padding(Space.screenEdge)) {
             Text(
@@ -111,13 +130,17 @@ fun SummonSheet(
                                 label = tr("Name"),
                                 style = MaterialTheme.typography.titleMedium,
                             )
-                            Text(
-                                text = "${statblock.size} ${statblock.creatureType}" +
+                            EditableText(
+                                value = "${statblock.size} ${statblock.creatureType}".trim() +
                                     if (summon.sourceLabel.isNotBlank()) {
                                         " · ${summon.sourceLabel}"
                                     } else "",
+                                editMode = editMode,
+                                onChange = { onSetField("creatureType", it) },
+                                label = tr("Size and type"),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                isOverridden = SummonEdits.isEdited(summon, "creatureType"),
                             )
                         }
                         IconButton(onClick = onDismiss) {
@@ -145,12 +168,22 @@ fun SummonSheet(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalArrangement = Arrangement.spacedBy(Space.inline),
                     ) {
-                        StatStone(
-                            tr("AC"),
-                            statblock.armorClassFor(character, summon.spellLevel, owningClassId)
+                        EditableStone(
+                            label = tr("AC"),
+                            value = statblock
+                                .armorClassFor(character, summon.spellLevel, owningClassId)
                                 .toString(),
+                            editMode = editMode,
+                            edited = SummonEdits.isEdited(summon, "armorClass"),
+                            onChange = { onSetField("armorClass", it) },
                         )
-                        StatStone(tr("Speed"), statblock.speed)
+                        EditableStone(
+                            label = tr("Speed"),
+                            value = statblock.speed,
+                            editMode = editMode,
+                            edited = SummonEdits.isEdited(summon, "speed"),
+                            onChange = { onSetField("speed", it) },
+                        )
                         CharacterSummons.attackBonus(character, summon)?.let {
                             StatStone(tr("Attack"), if (it >= 0) "+$it" else "$it")
                         }
@@ -178,9 +211,14 @@ fun SummonSheet(
                         Ability.ALL.forEach { ability ->
                             val score = statblock.abilityScores[ability] ?: 10
                             val mod = statblock.modifier(ability)
-                            StatStone(
-                                ability.abbreviation,
-                                "$score (${if (mod >= 0) "+$mod" else "$mod"})",
+                            EditableStone(
+                                label = ability.abbreviation,
+                                value = "$score (${if (mod >= 0) "+$mod" else "$mod"})",
+                                editMode = editMode,
+                                edited = SummonEdits.isEdited(summon, "ability:${ability.name}"),
+                                // Typed as a score; the modifier beside it is the app's job.
+                                editValue = score.toString(),
+                                onChange = { onSetField("ability:${ability.name}", it) },
                             )
                         }
                     }
@@ -188,18 +226,24 @@ fun SummonSheet(
             }
         }
 
-        val defences = listOfNotNull(
-            statblock.resistances.takeIf { it.isNotEmpty() }
-                ?.let { tr("Resistances") to it.joinToString(", ") },
-            statblock.vulnerabilities.takeIf { it.isNotEmpty() }
-                ?.let { tr("Vulnerabilities") to it.joinToString(", ") },
-            statblock.immunities.takeIf { it.isNotEmpty() }
-                ?.let { tr("Immunities") to it.joinToString(", ") },
-            statblock.conditionImmunities.takeIf { it.isNotEmpty() }
-                ?.let { tr("Condition Immunities") to it.joinToString(", ") },
-            statblock.senses.takeIf { it.isNotBlank() }?.let { tr("Senses") to it },
-            statblock.languages.takeIf { it.isNotBlank() }?.let { tr("Languages") to it },
-        )
+        // Every line a stat block can carry, whether or not this creature has one — in Edit
+        // Mode an empty row is the only way to add what the book left out, and a creature that
+        // gained resistance to fire at the table has nowhere else to say so.
+        val defences = listOf(
+            Triple(tr("Resistances"), "resistances", statblock.resistances.joinToString(", ")),
+            Triple(
+                tr("Vulnerabilities"), "vulnerabilities",
+                statblock.vulnerabilities.joinToString(", "),
+            ),
+            Triple(tr("Immunities"), "immunities", statblock.immunities.joinToString(", ")),
+            Triple(
+                tr("Condition Immunities"), "conditionImmunities",
+                statblock.conditionImmunities.joinToString(", "),
+            ),
+            Triple(tr("Senses"), "senses", statblock.senses),
+            Triple(tr("Languages"), "languages", statblock.languages),
+        ).filter { editMode || it.third.isNotBlank() }
+
         if (defences.isNotEmpty()) {
             item {
                 Card(shape = Corner.card) {
@@ -207,7 +251,7 @@ fun SummonSheet(
                         Modifier.padding(Space.cardPadding),
                         verticalArrangement = Arrangement.spacedBy(Space.tight),
                     ) {
-                        defences.forEach { (label, value) ->
+                        defences.forEach { (label, key, value) ->
                             Row(Modifier.fillMaxWidth()) {
                                 Text(
                                     text = "$label: ",
@@ -215,7 +259,15 @@ fun SummonSheet(
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.secondary,
                                 )
-                                Text(value, style = MaterialTheme.typography.bodySmall)
+                                EditableText(
+                                    value = value,
+                                    editMode = editMode,
+                                    onChange = { onSetField(key, it) },
+                                    label = label,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    isOverridden = SummonEdits.isEdited(summon, key),
+                                    placeholder = tr("None"),
+                                )
                             }
                         }
                     }
@@ -231,7 +283,7 @@ fun SummonSheet(
             ActionKind.REACTION to tr("Reactions"),
         ).forEach { (kind, heading) ->
             val actions = grouped[kind].orEmpty()
-            if (actions.isEmpty()) return@forEach
+            if (actions.isEmpty() && !editMode) return@forEach
             item {
                 Card(shape = Corner.card) {
                     Column(Modifier.padding(Space.cardPadding)) {
@@ -268,11 +320,29 @@ fun SummonSheet(
                                     )
                                 }
                             }
-                            DetailRow(
-                                title = action.name,
-                                supporting = numbers.joinToString(" · "),
-                                onClick = null,
-                            )
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    DetailRow(
+                                        title = action.name,
+                                        supporting = numbers.joinToString(" · "),
+                                        onClick = null,
+                                    )
+                                }
+                                if (editMode) {
+                                    IconButton(onClick = { onRemoveAction(action.name) }) {
+                                        Icon(
+                                            Icons.Default.Delete,
+                                            contentDescription = trf(
+                                                "Remove {0}", action.name,
+                                            ),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
+                                }
+                            }
                             // A trait the rules ration — "Repair (3/Day)", "Healing Touch
                             // (1/Day)" — gets its own counter on the creature, because a
                             // summon's uses are its own and not the summoner's.
@@ -284,12 +354,26 @@ fun SummonSheet(
                                     onRestore = { onSpend(action.name, -1) },
                                 )
                             }
-                            Text(
-                                text = action.description,
+                            EditableText(
+                                value = action.description,
+                                editMode = editMode,
+                                onChange = {
+                                    onSetField("action:${action.name}:description", it)
+                                },
+                                label = action.name,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                isOverridden = SummonEdits.isEdited(
+                                    summon, "action:${action.name}:description",
+                                ),
                                 modifier = Modifier.padding(bottom = Space.inline),
                             )
+                        }
+                        if (editMode) {
+                            OutlinedButton(
+                                onClick = { adding = kind },
+                                shape = Corner.row,
+                            ) { Text(trf("Add a {0}", heading.trimEnd('s').lowercase())) }
                         }
                     }
                 }
@@ -315,6 +399,84 @@ fun SummonSheet(
                 }
             }
         }
+
+        if (editMode && summon.overrides.isNotEmpty()) {
+            item {
+                OutlinedButton(
+                    onClick = { onSetField(RESET, null) },
+                    shape = Corner.row,
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(tr("Put this creature back the way the book has it")) }
+            }
+        }
+    }
+
+    adding?.let { kind ->
+        CreatureActionDialog(
+            kind = kind,
+            existing = null,
+            onDismiss = { adding = null },
+            onSave = {
+                onAddAction(it)
+                adding = null
+            },
+        )
+    }
+}
+
+/** The key that means "undo everything", rather than any field of the creature. */
+const val RESET = "__reset__"
+
+/**
+ * A stat the player can correct, drawn the same way as one they cannot.
+ *
+ * The value shown and the value typed are not always the same string — an ability score reads
+ * "14 (+2)" and is edited as "14" — so the editor takes the raw one and the stone keeps the
+ * readable one. Putting that distinction here rather than at each call site is what stops a
+ * dialog from offering to change a modifier the app works out for itself.
+ */
+@Composable
+private fun EditableStone(
+    label: String,
+    value: String,
+    editMode: Boolean,
+    edited: Boolean,
+    onChange: (String?) -> Unit,
+    editValue: String = value,
+) {
+    if (!editMode) {
+        StatStone(label, value)
+        return
+    }
+    var editing by rememberSaveable { mutableStateOf(false) }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { editing = true },
+    ) {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = if (edited) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurface,
+        )
+    }
+    if (editing) {
+        TextEditDialog(
+            title = label,
+            initial = editValue,
+            canReset = edited,
+            onDismiss = { editing = false },
+            onConfirm = {
+                onChange(it)
+                editing = false
+            },
+        )
     }
 }
 

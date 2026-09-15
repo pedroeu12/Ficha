@@ -280,6 +280,14 @@ data class PlayerCharacter(
     val customOptions: List<CustomOption> = emptyList(),
     /** Limited-use resources written by the player. */
     val customResources: List<CustomResource> = emptyList(),
+    /**
+     * Creatures the player wrote themselves, ready to be called up like any other.
+     *
+     * Kept with the character rather than in a table of content: the DM's construct belongs to
+     * the character who has it, travels with them through a backup, and has no business
+     * appearing in the next character's summon list.
+     */
+    val customStatblocks: List<com.pedroeu.ficha.rules.CustomStatblock> = emptyList(),
     /** Resource id -> uses spent so far. */
     val resourceUses: Map<String, Int> = emptyMap(),
     /** Resource id -> maximum that replaces the derived one. */

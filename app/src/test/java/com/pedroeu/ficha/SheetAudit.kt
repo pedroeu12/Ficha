@@ -9,6 +9,7 @@ import com.pedroeu.ficha.domain.CharacterCalculations
 import com.pedroeu.ficha.domain.CharacterResources
 import com.pedroeu.ficha.domain.CharacterSpells
 import com.pedroeu.ficha.domain.CharacterSummons
+import com.pedroeu.ficha.domain.SummonEdits
 import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.ChoiceResolver
 import com.pedroeu.ficha.domain.ClassLevels
@@ -161,6 +162,26 @@ object SheetAudit {
         CharacterSummons.available(character).forEach { summonable ->
             if (summonable.options.isEmpty()) {
                 say("${summonable.summons.summonId} can be summoned and has no stat block")
+            }
+        }
+
+        // Anything already on the table has to be describable. A creature whose rules cannot
+        // be stated draws as an apology where a stat block should be, and the way to get one
+        // is to delete a written creature that something was still an instance of.
+        character.activeSummons.forEach { summon ->
+            if (SummonEdits.resolve(character, summon) == null) {
+                say("${summon.name.ifBlank { summon.statblockId }} is on the table with no rules behind it")
+            }
+            if (summon.maxHp <= 0) {
+                say("${summon.name.ifBlank { summon.statblockId }} has no hit points")
+            }
+        }
+
+        character.customStatblocks.forEach { creature ->
+            if (creature.name.isBlank()) say("a written creature has no name")
+            if (creature.hitPoints <= 0) say("${creature.name} was written with no hit points")
+            creature.actions.filter { it.name.isBlank() }.forEach {
+                say("${creature.name} has an action with no name")
             }
         }
 

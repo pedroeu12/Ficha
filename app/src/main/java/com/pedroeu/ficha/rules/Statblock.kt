@@ -70,6 +70,57 @@ data class Statblock(
 }
 
 /**
+ * One line of a creature the player wrote: an action, a bonus action, a reaction, a trait.
+ *
+ * Free text rather than a [Formula], because a creature invented at the table is not derived
+ * from anything — "+7" is the answer, not "your spell attack bonus". Reading it back needs no
+ * evaluation and no character.
+ */
+@Serializable
+data class CustomAction(
+    val name: String,
+    /** Matches [ActionKind] by name. */
+    val kind: String = "ACTION",
+    val description: String = "",
+    val toHit: String = "",
+    val damageDice: String = "",
+    val damageType: String = "",
+    val reach: String = "",
+)
+
+/**
+ * A creature the player wrote themselves, kept with the character who can call it up.
+ *
+ * The books cover the summoning spells; they do not cover the DM's own construct, the familiar
+ * from a third-party book, or the wolf a Druid's player and their DM agreed on. Until this
+ * existed, any of those meant summoning the closest printed thing and remembering every
+ * difference — which is exactly the bookkeeping a sheet is for.
+ *
+ * Plain numbers, not formulas. A printed summon's Armor Class is "12 plus your Intelligence
+ * modifier" because the book says so; one written at the table is whatever the table said, and
+ * asking a player to express that as a formula would be asking them to learn the engine.
+ */
+@Serializable
+data class CustomStatblock(
+    val id: String,
+    val name: String,
+    val size: String = "Medium",
+    val creatureType: String = "",
+    val armorClass: Int = 12,
+    val hitPoints: Int = 10,
+    val speed: String = "30 ft.",
+    /** [Ability] name to score; anything missing reads as 10. */
+    val abilityScores: Map<String, Int> = emptyMap(),
+    val actions: List<CustomAction> = emptyList(),
+    val senses: String = "",
+    val languages: String = "",
+    val resistances: String = "",
+    val immunities: String = "",
+    val conditionImmunities: String = "",
+    val notes: String = "",
+)
+
+/**
  * A creature currently on the table, with its own hit points and its own expended uses.
  *
  * Stored on the character rather than derived, because the whole point is that it changes: a
@@ -96,6 +147,23 @@ data class ActiveSummon(
     val notes: String = "",
     /** Set when the summoner is concentrating on it, so ending concentration ends it. */
     val concentration: Boolean = false,
+    /**
+     * Edits to this creature, as it stands on the table.
+     *
+     * The same shape the character sheet uses for its own pinned values, and for the same
+     * reason: a summon is a thing being played, and a thing being played gets house-ruled,
+     * buffed, and corrected. A Steel Defender with a shield has a different Armor Class than
+     * the book's, and a sheet that cannot say so sends the player back to paper.
+     *
+     * Keyed by field — "armorClass", "speed", "senses", "ability:STR",
+     * "action:Bite:description" — and scoped to this creature, so one of five wolves can be
+     * the one that swallowed a potion.
+     */
+    val overrides: Map<String, String> = emptyMap(),
+    /** Actions added to this creature by hand. */
+    val extraActions: List<CustomAction> = emptyList(),
+    /** Actions taken off it by hand, by name. */
+    val removedActions: Set<String> = emptySet(),
 ) {
     val isBloodied: Boolean get() = maxHp > 0 && currentHp * 2 <= maxHp
     val isDown: Boolean get() = currentHp <= 0

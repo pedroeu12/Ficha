@@ -177,6 +177,35 @@ class UiInvariantTest {
         )
     }
 
+    /**
+     * A screen that edits an answer starts from the answer, not from nothing.
+     *
+     * The same mistake as remembering a copy, one level up: the level-up flow kept its picks
+     * in a map of its own and seeded the character's existing answers into it once, at the
+     * start. Choosing a subclass clears that map — and from that moment every invocation the
+     * Warlock already had was greyed out as a duplicate of itself, unpickable and
+     * unremovable. "I can't tick or untick Agonizing Blast" is what that looks like.
+     *
+     * Reading the map directly is the shape of the bug. Read through the accessor that falls
+     * back to the character, so an empty map means "nothing touched yet" rather than "nothing
+     * chosen ever".
+     */
+    @Test
+    fun `a screen that edits an answer reads it from the character, not from its own map`() {
+        val offenders = sources.flatMap { source ->
+            Regex("""(?:state|current)\.selections\[""").findAll(source.text)
+                .map { "${source.name} reads the level-up selections map directly" }
+                .toList()
+        }.distinct()
+
+        fail(
+            "An editor that starts from its own empty map treats what the character already " +
+                "holds as duplicates and greys them out. Use selectionFor, which falls back " +
+                "to the answer on the character.",
+            offenders,
+        )
+    }
+
     // ================================================================ What a number claims
 
     /**

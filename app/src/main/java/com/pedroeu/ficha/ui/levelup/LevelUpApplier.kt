@@ -26,9 +26,13 @@ internal object LevelUpApplier {
 
         // Keyed by the level in the class that granted it, so a multiclass character's picks
         // stay attached to the right feature.
+        // Through selectionFor, so a question the player left alone keeps the answer they
+        // already had — re-recorded at the level being gained, which is where every reader
+        // looks for it. Reading the map directly wrote nothing for an untouched question,
+        // and the answer stayed filed under the old level with the old count.
         val choiceSelections = allChoices.mapNotNull { choice ->
-            state.selections[choice.id]
-                ?.takeIf { it.isNotEmpty() }
+            state.selectionFor(choice.id)
+                .takeIf { it.isNotEmpty() }
                 ?.let { "${state.targetClassLevel}:${choice.id}" to it }
         }.toMap()
 
@@ -36,7 +40,7 @@ internal object LevelUpApplier {
         // by the level, because a feat is taken once and its answers belong to it — that also
         // lets the sheet resolve them the same way as a feat gained at character creation.
         val featSelections = state.featChoices.mapNotNull { choice ->
-            state.selections[choice.id]?.takeIf { it.isNotEmpty() }?.let { choice.id to it }
+            state.selectionFor(choice.id).takeIf { it.isNotEmpty() }?.let { choice.id to it }
         }.toMap()
 
         val learnedSpells = buildList {

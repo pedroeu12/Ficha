@@ -108,7 +108,10 @@ class LevelUpViewModel(
     fun selectSubclass(id: String) = edit { it.copy(subclassId = id, selections = emptyMap()) }
 
     fun toggleSelection(choiceId: String, optionId: String, max: Int) = edit { current ->
-        val selected = current.selections[choiceId].orEmpty()
+        // From what is on screen, which for a question the character already answered is that
+        // answer rather than an empty list — otherwise the first tap starts from nothing and
+        // silently drops everything they had.
+        val selected = current.selectionFor(choiceId)
         val next = ChoiceGrants.nextSelection(selected, optionId, max)
         current.copy(selections = current.selections + (choiceId to next))
     }

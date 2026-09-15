@@ -1,6 +1,7 @@
 package com.pedroeu.ficha.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
@@ -30,6 +33,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.CharacterSummons
@@ -520,6 +525,7 @@ private fun HitPointBar(
     onSetMax: (Int) -> Unit,
 ) {
     var typed by rememberSaveable { mutableStateOf("") }
+    var editingNumbers by rememberSaveable { mutableStateOf(false) }
     val amount = typed.toIntOrNull() ?: 1
 
     Column(verticalArrangement = Arrangement.spacedBy(Space.tight)) {
@@ -530,6 +536,10 @@ private fun HitPointBar(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
+            // Tap the number to change it, which is the gesture the character's own sheet
+            // uses. The buttons below were the only way in, and a player who had learned to
+            // tap a number on every other card reasonably read "cannot be edited" from a
+            // number that did not respond — reported as exactly that.
             Text(
                 text = buildString {
                     append("$current / $max")
@@ -537,8 +547,16 @@ private fun HitPointBar(
                 },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = if (current <= 0) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.onSurface,
+                color = when {
+                    current <= 0 -> MaterialTheme.colorScheme.error
+                    editMode -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.onSurface
+                },
+                modifier = if (editMode) {
+                    Modifier.clickable { editingNumbers = true }.padding(horizontal = 4.dp)
+                } else {
+                    Modifier
+                },
             )
         }
         LinearProgressIndicator(
@@ -591,6 +609,72 @@ private fun HitPointBar(
             }
         }
     }
+
+    if (editingNumbers) {
+        CreatureHitPointsDialog(
+            current = current,
+            max = max,
+            temp = temp,
+            onDismiss = { editingNumbers = false },
+            onSave = { newCurrent, newMax, newTemp ->
+                // The maximum first: setting it clamps the current total, so writing the
+                // current one afterwards is what makes "40 out of 60" reachable in one go.
+                if (newMax != max) onSetMax(newMax)
+                onSet(newCurrent, newTemp)
+                editingNumbers = false
+            },
+        )
+    }
+}
+
+/** All three of a creature's hit point numbers, changed together. */
+@Composable
+private fun CreatureHitPointsDialog(
+    current: Int,
+    max: Int,
+    temp: Int,
+    onDismiss: () -> Unit,
+    onSave: (current: Int, max: Int, temp: Int) -> Unit,
+) {
+    var currentText by rememberSaveable { mutableStateOf(current.toString()) }
+    var maxText by rememberSaveable { mutableStateOf(max.toString()) }
+    var tempText by rememberSaveable { mutableStateOf(temp.toString()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(tr("Hit Points")) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(Space.inline)) {
+                listOf(
+                    Triple(tr("Current"), currentText) { v: String -> currentText = v },
+                    Triple(tr("Maximum"), maxText) { v: String -> maxText = v },
+                    Triple(tr("Temporary"), tempText) { v: String -> tempText = v },
+                ).forEach { (label, value, onChange) ->
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = { entry -> onChange(entry.filter { it.isDigit() }.take(4)) },
+                        label = { Text(label) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = Corner.row,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onSave(
+                        currentText.toIntOrNull() ?: current,
+                        (maxText.toIntOrNull() ?: max).coerceAtLeast(1),
+                        tempText.toIntOrNull() ?: temp,
+                    )
+                },
+            ) { Text(tr("Save")) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Cancel")) } },
+    )
 }
 
 

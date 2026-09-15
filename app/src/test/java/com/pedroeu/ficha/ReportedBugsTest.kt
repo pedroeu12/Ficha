@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.pedroeu.ficha.data.content.ProgressionData
@@ -54,6 +55,7 @@ class ReportedBugsTest {
             druid, "bestial_spirit_land", "summon_beast", "Summon Beast", spellLevel = 2,
         )
         val summon = character.activeSummons.single()
+        val startingHp = summon.maxHp
         var newMax = 0
 
         compose.setContent {
@@ -65,10 +67,24 @@ class ReportedBugsTest {
                     onRename = {}, onDamage = {}, onHeal = {}, onSetHitPoints = { _, _ -> },
                     onDismiss = {}, onSpend = { _, _ -> }, onNotes = {},
                     onSetMaxHitPoints = { newMax = it },
+                    onSetField = { _, _ -> },
                 )
             }
         }
 
+        // The number itself is the way in, the same as on the character's own sheet.
+        compose.onAllNodesWithText("$startingHp / $startingHp").onFirst()
+            .performSemanticsAction(SemanticsActions.OnClick)
+        // The field arrives holding the creature's current maximum, which is what a player
+        // wants to see; the test has to clear it the way they would.
+        compose.onAllNodesWithText(tr("Maximum")).onFirst().performTextClearance()
+        compose.onAllNodesWithText(tr("Maximum")).onFirst().performTextInput("42")
+        compose.onAllNodesWithText(tr("Save")).onFirst()
+            .performSemanticsAction(SemanticsActions.OnClick)
+        assertEquals("tapping the number never reached the character", 42, newMax)
+
+        // And the buttons below still work, for a player who learned them first.
+        newMax = 0
         compose.onAllNodesWithText(tr("Amount")).onFirst().performTextInput("42")
         compose.onAllNodes(hasScrollAction()).onFirst()
             .performScrollToNode(hasText(tr("Set max")))

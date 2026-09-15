@@ -281,7 +281,7 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             val disabled = OwnedOptions.disabledFor(
                 choice = choice,
                 owned = OwnedOptions.of(state.character),
-                currentSelection = state.selections[choice.id].orEmpty().toSet(),
+                currentSelection = state.selectionFor(choice.id).toSet(),
                 // The level being gained, not the one being left: an invocation that asks
                 // for Warlock 5 is available on the level up that reaches 5.
                 classLevels = ClassLevels.levelMap(state.leveledCharacter),
@@ -289,7 +289,7 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
 
             ChoiceSection(
                 choice = choice,
-                selected = state.selections[choice.id].orEmpty(),
+                selected = state.selectionFor(choice.id),
                 onToggle = { viewModel.toggleSelection(choice.id, it, choice.count) },
                 disabledOptionIds = disabled,
                 written = state.character.customOptions,
@@ -329,7 +329,7 @@ fun FeatChoicesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
             val disabled = OwnedOptions.disabledFor(
                 choice = choice,
                 owned = OwnedOptions.of(state.character),
-                currentSelection = state.selections[choice.id].orEmpty().toSet(),
+                currentSelection = state.selectionFor(choice.id).toSet(),
                 // The level being gained, not the one being left: an invocation that asks
                 // for Warlock 5 is available on the level up that reaches 5.
                 classLevels = ClassLevels.levelMap(state.leveledCharacter),
@@ -337,7 +337,7 @@ fun FeatChoicesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
 
             ChoiceSection(
                 choice = choice,
-                selected = state.selections[choice.id].orEmpty(),
+                selected = state.selectionFor(choice.id),
                 onToggle = { viewModel.toggleSelection(choice.id, it, choice.count) },
                 disabledOptionIds = disabled,
                 written = state.character.customOptions,

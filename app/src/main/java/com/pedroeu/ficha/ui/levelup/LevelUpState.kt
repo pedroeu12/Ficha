@@ -77,7 +77,14 @@ data class LevelUpState(
 
     val subclassId: String? = null,
 
-    /** Choice.id -> selected option ids, across class and subclass features gained now. */
+    /**
+     * Choice.id -> selected option ids, across class and subclass features gained now.
+     *
+     * Only what has been touched *during this level up*. What the character already answered
+     * is not copied in here — read it through [selectionFor], which falls back to the
+     * character. The difference matters: a copy taken once goes stale the moment anything
+     * clears this map, and everything the character already held then greys out.
+     */
     val selections: Map<String, List<String>> = emptyMap(),
 
     val asiMode: AsiMode = AsiMode.PLUS_TWO,
@@ -124,6 +131,21 @@ data class LevelUpState(
     val multiclassOptions get() = Multiclassing.options(character)
 
     /** The character with its new level applied, used to preview the resulting numbers. */
+    /**
+     * The live answer to one question: what has been picked here, or failing that what the
+     * character already holds.
+     *
+     * A Warlock's invocations are asked again at every level and each asking restates the
+     * whole list, so arriving at level 5 the five already held *are* the answer — they are
+     * not five duplicates to be greyed out. Seeding a copy of them into [selections] at the
+     * start almost worked: choosing a subclass clears the map, and from that moment every
+     * invocation the character owned was unpickable and unremovable. Deriving it instead is
+     * the same lesson the editor dialogs learned — remember where the answer lives, never a
+     * copy of it.
+     */
+    fun selectionFor(choiceId: String): List<String> =
+        selections[choiceId] ?: ChoiceResolver.latestSelectionFor(character, choiceId)
+
     val leveledCharacter: PlayerCharacter
         get() = Multiclassing.withLevelIn(character, classId)
 

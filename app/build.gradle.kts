@@ -14,8 +14,8 @@ android {
         applicationId = "com.pedroeu.ficha"
         minSdk = 26
         targetSdk = 35
-        versionCode = 59
-        versionName = "3.19.0"
+        versionCode = 60
+        versionName = "3.20.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -75,6 +75,23 @@ android {
         buildConfig = true
     }
 
+    /**
+     * Unit tests get the app's resources, so the interface can be drawn inside them.
+     *
+     * Without this a Compose test on the JVM cannot inflate a theme and every screen test
+     * fails at the first colour lookup. With it, Robolectric can render a real screen, and a
+     * test can ask the questions no amount of reading the source answers: is this list
+     * scrollable, is the option at the bottom reachable, did tapping it actually change
+     * anything. That is the class of bug that kept shipping — twenty-eight invocations drawn
+     * into a dialog that clips at the fold reads perfectly well as source.
+     */
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all { it.systemProperty("robolectric.logging", "stdout") }
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -111,6 +128,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
     testImplementation("junit:junit:4.13.2")
+    // Drawing the interface on the JVM, so a test can see what the player sees.
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

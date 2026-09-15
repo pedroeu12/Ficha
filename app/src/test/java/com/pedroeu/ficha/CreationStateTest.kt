@@ -106,7 +106,10 @@ class CreationStateTest {
             rogue.copy(
                 expertiseChoices = setOf(Skill.STEALTH, Skill.PERCEPTION),
                 classFeatureSelections = mapOf(
-                    "class:rogue:weapon_mastery" to listOf("dagger", "shortsword")
+                    "class:rogue:weapon_mastery" to listOf("dagger", "shortsword"),
+                    // Thieves' Cant grants a second language and now asks which; the Rogue
+                    // cannot leave creation with it unanswered, the same as any other grant.
+                    "rogue:cant_language" to listOf("Elvish"),
                 ),
             ).canAdvance
         )

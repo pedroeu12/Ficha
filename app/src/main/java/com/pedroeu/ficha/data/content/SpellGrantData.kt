@@ -49,7 +49,11 @@ object SpellGrantData {
         // Tinker's Magic hands the Artificer the Mending cantrip outright.
         "artificer" to at(1, "mending"),
         // Druidic teaches Druidcraft alongside the secret language.
-        "druid" to at(1, "druidcraft"),
+        // Druidic at level 1: "you also unlocked the magic of communicating with animals; you
+        // always have the Speak with Animals spell prepared." The app granted the cantrip and
+        // not the spell — the feature's text had been a one-line summary that never mentioned
+        // it, so nothing in the sheet or the tests could see the promise.
+        "druid" to at(1, "druidcraft") + at(1, "speak_with_animals"),
         // Contact Patron at 9: "You always have Contact Other Plane prepared."
         "warlock" to at(1, "eldritch_blast") + at(9, "contact_other_plane"),
         // Favored Enemy at level 1, then Paladin's Smite at 2 and Faithful Steed at 5. All

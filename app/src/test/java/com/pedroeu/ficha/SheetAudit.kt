@@ -135,6 +135,10 @@ object SheetAudit {
             val held = when {
                 source.subclassId.isNotBlank() -> ClassLevels.hasSubclass(character, source.subclassId)
                 source.speciesId.isNotBlank() -> character.speciesId == source.speciesId
+                // A class can grant a decision of its own — the Rogue's Cunning Strike is the
+                // first, chosen every time Sneak Attack lands.
+                source.classId.isNotBlank() ->
+                    ClassLevels.of(character).any { it.classId == source.classId }
                 else -> false
             }
             if (!held) say("${source.id} is offered and its source is not held")

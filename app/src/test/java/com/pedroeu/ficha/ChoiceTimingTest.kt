@@ -63,6 +63,9 @@ class ChoiceTimingTest {
             "the familiar's form is chosen when Find Familiar is cast, by the summon picker",
         "Alter Memories" to
             "the creature is one the spell is already targeting, chosen as it is cast",
+        "Rage" to "the benefits are all of them at once; nothing is chosen between",
+        "Abjure Foes" to "the creatures affected are targets, chosen as the ability is used",
+        "Cunning Action" to "Dash, Disengage or Hide is an action taken, not a pick kept",
     )
 
     private data class Feature(val owner: String, val name: String, val text: String,

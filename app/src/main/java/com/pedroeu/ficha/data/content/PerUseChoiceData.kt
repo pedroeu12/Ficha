@@ -26,6 +26,14 @@ data class PerUseChoice(
     val source: String,
     /** The pool the feature draws on, when it has one, so its tracker can ask. */
     val resourceId: String = "",
+    /**
+     * Gating: the class that grants it, if any.
+     *
+     * A decision can belong to the class rather than to a subclass — the Rogue's Cunning
+     * Strike is one, chosen every time Sneak Attack lands. Until this existed the shape could
+     * not be expressed, so a feature the whole class has had nowhere to ask its question.
+     */
+    val classId: String = "",
     /** Gating: the subclass that grants it, if any. */
     val subclassId: String = "",
     /** Gating: the species that grants it, if any. */
@@ -42,6 +50,39 @@ object PerUseChoiceData {
 
 
     val ALL: List<PerUseChoice> = listOf(
+
+        // ---------------------------------------------------------------- Rogue
+        PerUseChoice(
+            id = "rogue:cunning_strike",
+            label = "Cunning Strike",
+            prompt = "Which effect do you add to this Sneak Attack? You choose again each time.",
+            source = "Cunning Strike",
+            classId = "rogue",
+            minLevel = 5,
+            options = listOf(
+                ChoiceOption(
+                    "poison", "Poison",
+                    "You add a toxin to your strike, forcing the target to make a Constitution " +
+                        "saving throw. On a failed save, the target has the Poisoned condition " +
+                        "for 1 minute. At the end of each of its turns, the poisoned target " +
+                        "repeats the save, ending the effect on a success. To use this effect, " +
+                        "you must have a Poisoner's Kit on your person.",
+                    "Cost: 1d6",
+                ),
+                ChoiceOption(
+                    "trip", "Trip",
+                    "If the target is Large or smaller, it must succeed on a Dexterity saving " +
+                        "throw or have the Prone condition.",
+                    "Cost: 1d6",
+                ),
+                ChoiceOption(
+                    "withdraw", "Withdraw",
+                    "Immediately after the attack, you move up to half your Speed without " +
+                        "provoking Opportunity Attacks.",
+                    "Cost: 1d6",
+                ),
+            ),
+        ),
 
         // ---------------------------------------------------------------- Fighter
         PerUseChoice(

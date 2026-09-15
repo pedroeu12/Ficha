@@ -480,6 +480,8 @@ internal object Adapters {
             when {
                 perUse.subclassId.isNotBlank() -> ClassLevels.hasSubclass(character, perUse.subclassId)
                 perUse.speciesId.isNotBlank() -> character.speciesId == perUse.speciesId
+                perUse.classId.isNotBlank() ->
+                    ClassLevels.of(character).any { it.classId == perUse.classId }
                 else -> false
             }
         }.map { perUse ->
@@ -491,6 +493,7 @@ internal object Adapters {
                     perUse.subclassId.isNotBlank() ->
                         Source.Subclass(perUse.subclassId, classOf(perUse.subclassId))
                     perUse.speciesId.isNotBlank() -> Source.Species(perUse.speciesId)
+                    perUse.classId.isNotBlank() -> Source.Class(perUse.classId)
                     else -> Source.Custom(perUse.id)
                 },
                 gate = Gate(

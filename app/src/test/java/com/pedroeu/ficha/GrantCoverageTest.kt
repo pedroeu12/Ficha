@@ -56,11 +56,45 @@ class GrantCoverageTest {
         .sortedByDescending { it.name.length }
         .map { it.name to it.id }
 
-    private fun spellsNamedIn(text: String): Set<String> {
-        var rest = text
+    /**
+     * Sentences that name a spell without handing it over.
+     *
+     * The books recommend starting cantrips — "Burning Hands and Detect Magic are
+     * recommended" — in the same feature that says you can cast spells, so a reader that takes
+     * the whole feature at once reads a suggestion as a grant. Dropping those sentences is
+     * more honest than listing each spell as an exception, which is what would otherwise grow
+     * here every time a class's Spellcasting text is quoted in full.
+     */
+    private val SUGGESTION = Regex("""[^.]*\b(?:are|is) recommended[^.]*\.""", RegexOption.IGNORE_CASE)
+
+    /**
+     * Worked examples, which name a spell to show how the arithmetic goes.
+     *
+     * "For example, when you're a level 5 Warlock… To cast the level 1 spell Witch Bolt, you
+     * must spend one of those slots" explains the slot table; it does not hand over Witch
+     * Bolt. An example runs to the end of the paragraph, so both its sentences go.
+     */
+    private val WORKED_EXAMPLE =
+        Regex("""For example,[^.]*\.(?:[^.]*\.)?""", RegexOption.IGNORE_CASE)
+
+    private fun spellsNamedIn(text: String, featureName: String = ""): Set<String> {
+        // A feature called Words of Creation is not a promise of Creation.
+        var rest = WORKED_EXAMPLE.replace(SUGGESTION.replace(text, " "), " ")
+        if (featureName.isNotBlank()) {
+            rest = rest.replace(featureName, " ")
+        }
         val found = mutableSetOf<String>()
         NAMES.forEach { (name, id) ->
-            val re = Regex("""\b${Regex.escape(name)}\b""", RegexOption.IGNORE_CASE)
+            // Matched as the books write it, capitals and all, and with the colon some of
+            // them use: "the aid of an otherworldly steed" is not the Aid spell, and
+            // "Power Word: Heal" is Power Word Heal rather than a promise of Heal.
+            //
+            // Escaped word by word, because Kotlin's Regex.escape wraps the whole string in
+            // \Q…\E — so a separator spliced into the escaped form is quoted along with it
+            // and every multi-word spell stops matching, which lets "Invisibility" match
+            // inside "Greater Invisibility" and reports fourteen grants nobody promised.
+            val pattern = name.split(" ").joinToString("""(?::)?\s+""") { Regex.escape(it) }
+            val re = Regex("""\b$pattern\b""")
             if (re.containsMatchIn(rest)) {
                 found += id
                 rest = re.replace(rest) { m -> " ".repeat(m.value.length) }
@@ -74,7 +108,7 @@ class GrantCoverageTest {
     private fun gaps(): List<Gap> = buildList {
         fun check(sourceId: String, feature: String, text: String, covered: Set<String>) {
             if (!PROMISE.containsMatchIn(text)) return
-            val missing = (spellsNamedIn(text) - covered)
+            val missing = (spellsNamedIn(text, feature) - covered)
                 .filterNot { "$sourceId:$it" in NAMED_BUT_NOT_A_SPELL }
                 .sorted()
             if (missing.isNotEmpty()) add(Gap(sourceId, feature, missing))

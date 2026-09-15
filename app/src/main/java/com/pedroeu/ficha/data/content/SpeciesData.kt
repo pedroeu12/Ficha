@@ -24,7 +24,7 @@ object SpeciesData {
             traits = listOf(
                 Trait("Resourceful", "You gain Heroic Inspiration whenever you finish a Long Rest."),
                 Trait("Skillful", "You gain proficiency in one skill of your choice."),
-                Trait("Versatile", "You gain an Origin feat of your choice."),
+                Trait("Versatile", "You gain an Origin feat of your choice. Skilled is recommended."),
             ),
             bonusSkillChoiceCount = 1,
             grantsOriginFeat = true,
@@ -39,7 +39,8 @@ object SpeciesData {
             traits = listOf(
                 Trait("Fey Ancestry", "You have advantage on saving throws against being charmed, and magic can't put you to sleep."),
                 Trait("Keen Senses", "You gain proficiency in the Insight, Perception, or Survival skill of your choice."),
-                Trait("Trance", "You don't need to sleep. Instead you meditate for 4 hours a day to gain the benefit of a long rest."),
+                Trait("Trance", "You don't need to sleep, and magic can't put you to sleep. You can finish a Long Rest in 4 hours " +
+                          "if you spend those hours in a trancelike meditation, during which you retain consciousness."),
             ),
             lineageChoiceLabel = "Elven Lineage",
             lineageOptions = listOf(
@@ -107,7 +108,16 @@ object SpeciesData {
             lineageChoiceLabel = "Gnomish Lineage",
             lineageOptions = listOf(
                 LineageOption("forest_gnome", "Forest Gnome", "You know the Minor Illusion cantrip (Intelligence) and can communicate simple ideas with Small or smaller beasts."),
-                LineageOption("rock_gnome", "Rock Gnome", "You gain proficiency with Tinker's Tools and can spend 1 hour crafting a tiny clockwork device with a minor effect."),
+                LineageOption("rock_gnome", "Rock Gnome", "You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes " +
+                                                "casting Prestidigitation to create a Tiny clockwork device (AC 5,1 HP), such as a toy, fire " +
+                                                "starter, or music box. When you create the device, you determine its function by choosing one " +
+                                                "effect from Prestidigitation; the device produces that effect whenever you or another creature " +
+                                                "takes a Bonus Action to activate it with a touch. If the chosen effect has options within it, " +
+                                                "you choose one of those options for the device when you create it. For example, if you choose " +
+                                                "the spell's ignite-extinguish effect, you determine whether the device ignites or extinguishes " +
+                                                "fire; the device doesn't do both. You can have three such devices in existence at a time, and " +
+                                                "each falls apart 8 hours after its creation or when you dismantle it with a touch as a Utilize " +
+                                                "action."),
             ),
         ),
         Species(
@@ -151,7 +161,8 @@ object SpeciesData {
             darkvisionRange = 60,
             summary = "Marked by a fiendish bloodline, tieflings carry an infernal legacy that shapes their innate magic.",
             traits = listOf(
-                Trait("Otherworldly Presence", "You know the Thaumaturgy cantrip (Charisma)."),
+                Trait("Otherworldly Presence", "You know the Thaumaturgy cantrip. When you cast it with this trait, the spell uses the same " +
+                          "spellcasting ability you use for your Fiendish Legacy trait."),
             ),
             lineageChoiceLabel = "Fiendish Legacy",
             lineageOptions = listOf(
@@ -169,8 +180,10 @@ object SpeciesData {
             summary = "Touched by the Upper Planes, aasimar carry a spark of celestial radiance within their mortal form.",
             traits = listOf(
                 Trait("Celestial Resistance", "You have resistance to necrotic damage and radiant damage."),
-                Trait("Healing Hands", "As an action, you touch a creature and it regains hit points equal to your proficiency bonus times a d4. Usable once per long rest."),
-                Trait("Light Bearer", "You know the Light cantrip (Charisma)."),
+                Trait("Healing Hands", "As a Magic action, you touch a creature and roll a number of d4s equal to your Proficiency " +
+                          "Bonus. The creature regains a number of Hit Points equal to the total rolled. Once you use this " +
+                          "trait, you can't use it again until you finish a Long Rest."),
+                Trait("Light Bearer", "You know the Light cantrip. Charisma is your spellcasting ability for it."),
                 // Not a lineage. The three revelations are chosen at the moment you transform,
                 // once per Long Rest, which is why they live in PerUseChoiceData and not here:
                 // asking for one at character creation locked an Aasimar into a third of the

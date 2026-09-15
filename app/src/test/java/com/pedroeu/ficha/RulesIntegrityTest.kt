@@ -278,6 +278,8 @@ class RulesIntegrityTest {
             val owner = when {
                 choice.subclassId.isNotBlank() -> choice.subclassId in subclassIds
                 choice.speciesId.isNotBlank() -> choice.speciesId in speciesIds
+                // A class can grant one too: Cunning Strike is the Rogue's, not a subclass's.
+                choice.classId.isNotBlank() -> ClassData.byId(choice.classId) != null
                 else -> false
             }
             !owner || choice.options.isEmpty()

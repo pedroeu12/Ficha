@@ -165,6 +165,11 @@ class RulesEngineTest {
                     }
                     choice.speciesId.isNotBlank() ->
                         pc.speciesId == choice.speciesId && pc.level >= choice.minLevel
+                    // And a class can own one: Cunning Strike is the Rogue's own, gated on
+                    // the level in that class rather than on a subclass.
+                    choice.classId.isNotBlank() -> classes.any {
+                        it.classId == choice.classId && it.level >= choice.minLevel
+                    }
                     else -> false
                 }
             }.map { it.id }.toSet()

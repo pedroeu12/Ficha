@@ -82,7 +82,7 @@ object MagicItemData {
         "holy_avenger" to 3,
         "luck_blade" to 1,
         "mace_of_smiting" to 1,
-        "nine_lives_stealer" to 1,
+        "nine_lives_stealer" to 2,   // The 2024 book gives +2; the app had carried +1.
         "scimitar_of_speed" to 2,
         "vorpal_sword" to 3,
         "rod_of_lordly_might" to 3,
@@ -136,8 +136,10 @@ object MagicItemData {
             attunement = true, plan = 10),
         item("armor_invulnerability", "Armor of Invulnerability", ItemRarity.LEGENDARY,
             "Armor (Plate)",
-            "You have Resistance to Bludgeoning, Piercing, and Slashing damage. As a Magic " +
-                "action you can gain Immunity to that damage for 10 minutes, once per day.",
+            "You have Resistance to Bludgeoning, Piercing, and Slashing damage while you wear this armor. " +
+            "Metal Shell. You can take a Magic action to give yourself Immunity to Bludgeoning, Piercing, and " +
+            "Slashing damage for 10 minutes or until you are no longer wearing the armor. Once this property " +
+            "is used, it can't be used again until the next dawn.",
             attunement = true, weightLb = 65.0),
         item("arrow_catching_shield", "Arrow-Catching Shield", ItemRarity.RARE, "Armor (Shield)",
             "(Requires Attunement) You gain a +2 bonus to Armor Class against ranged attack rolls while you " +
@@ -191,7 +193,9 @@ object MagicItemData {
             "You have a +3 bonus to attack rolls and damage rolls made with this magic weapon."),
         item("adamantine_weapon", "Adamantine Weapon", ItemRarity.UNCOMMON,
             "Weapon (any) or Ammunition",
-            "Whenever this weapon or piece of ammunition hits an object, the hit is a Critical Hit."),
+            "This weapon or piece of ammunition is made of adamantine, one of the hardest substances in " +
+            "existence. Whenever this weapon or piece of ammunition hits an object, the hit is a Critical " +
+            "Hit."),
         item("berserker_axe", "Berserker Axe", ItemRarity.RARE, "Weapon (Axe)",
             "(Requires Attunement) You gain a +1 bonus to attack rolls and damage rolls made with this magic " +
                 "weapon. In addition, while you are attuned to this weapon, your Hit Point maximum increases by 1 " +
@@ -253,8 +257,11 @@ object MagicItemData {
             attunement = true, weightLb = 3.0),
         item("repeating_shot", "Repeating Shot", ItemRarity.UNCOMMON,
             "Weapon (any Ammunition weapon)",
-            "You gain a +1 bonus to attack and damage rolls with this weapon, which produces " +
-                "its own magic ammunition when you fire it. It also ignores the Loading property.",
+            "This magic weapon grants a +1 bonus to attack and damage rolls made with it when it's used to " +
+            "make a ranged attack, and it ignores the Loading property if it has that property. If the weapon " +
+            "lacks ammunition, it produces its own, automatically creating one piece of magic ammunition when " +
+            "the wielder makes a ranged attack roll with it. The ammunition created by the weapon vanishes " +
+            "the instant after it hits or misses a target.",
             attunement = true, plan = 2, book = Sourcebook.EBERRON),
         item("returning_weapon", "Returning Weapon", ItemRarity.UNCOMMON,
             "Weapon (any weapon with the Thrown property)",
@@ -511,8 +518,10 @@ object MagicItemData {
             attunement = true, weightLb = 1.0),
         item("boots_striding_springing", "Boots of Striding and Springing", ItemRarity.UNCOMMON,
             WONDROUS,
-            "Your Speed becomes 30 feet unless it was already higher, and it can't be reduced. " +
-                "Your Long and High Jump distances are tripled.",
+            "While you wear these boots, your Speed becomes 30 feet unless your Speed is higher, and your " +
+            "Speed isn't reduced by you carrying weight in excess of your carrying capacity or wearing Heavy " +
+            "Armor. Once on each of your turns, you can jump up to 30 feet by spending only 10 feet of " +
+            "movement.",
             attunement = true, weightLb = 1.0),
         item("boots_winding_path", "Boots of the Winding Path", ItemRarity.RARE, WONDROUS,
             "(Requires Attunement) While wearing these boots, you can take a Bonus Action to teleport up to " +
@@ -691,8 +700,10 @@ object MagicItemData {
             weightLb = 1.0, plan = 2),
         item("slippers_spider_climbing", "Slippers of Spider Climbing", ItemRarity.UNCOMMON,
             WONDROUS,
-            "You can move up, down, and across vertical surfaces and along ceilings while " +
-                "leaving your hands free, with a Climb Speed equal to your Speed.",
+            "While you wear these light shoes, you can move up, down, and across vertical surfaces and along " +
+            "ceilings, while leaving your hands free. You have a Climb Speed equal to your Speed. However, " +
+            "the slippers don't allow you to move this way on a slippery surface, such as one covered by ice " +
+            "or oil.",
             attunement = true, weightLb = 0.5),
         item("weapon_of_warning", "Weapon of Warning", ItemRarity.UNCOMMON, "Weapon (any)",
             "(Requires Attunement) As long as this weapon is within your reach and you are attuned to it, you " +
@@ -839,20 +850,26 @@ object MagicItemData {
             attunement = true, weightLb = 55.0),
         item("elven_studded_leather", "Glamoured Studded Leather", ItemRarity.RARE,
             "Armor (Studded Leather)",
-            "You gain a +1 bonus to Armor Class. As a Bonus Action you can make the armor " +
-                "assume the appearance of any normal clothing or other armor you have seen.",
+            "While wearing this armor, you gain a +1 bonus to Armor Class. You can also take a Bonus Action " +
+            "to cause the armor to assume the appearance of a normal set of clothing or some other kind of " +
+            "armor. You decide what it looks like—including color, style, and accessories—but the armor " +
+            "retains its normal bulk and weight. The illusory appearance lasts until you use this property " +
+            "again or doff the armor.",
             weightLb = 13.0),
         item("plate_of_etherealness", "Plate Armor of Etherealness", ItemRarity.LEGENDARY,
             "Armor (Plate)",
-            "While wearing this armor you can speak its command word as a Magic action to gain " +
-                "the effect of the Etherealness spell for 10 minutes. It can't be used again " +
-                "until the next dawn.",
+            "While you're wearing this armor, you can take a Magic action and use a command word to gain the " +
+            "effect of the Etherealness spell. The spell ends immediately if you remove the armor or take a " +
+            "Magic action to repeat the command word. This property of the armor can't be used again until " +
+            "the next dawn.",
             attunement = true, weightLb = 65.0),
         item("shield_missile_attraction", "Shield of Missile Attraction", ItemRarity.RARE,
             "Armor (Shield)",
-            "You have Resistance to damage from ranged weapon attacks while wielding this " +
-                "Shield. It is cursed: ranged attacks aimed at a target within 10 feet of you " +
-                "are redirected to hit you instead.",
+            "While holding this Shield, you have Resistance to damage from attacks made with Ranged weapons. " +
+            "Curse. This Shield is cursed. Attuning to it curses you until you are targeted by a Remove Curse " +
+            "spell or similar magic. Removing the Shield fails to end the curse on you. Whenever an attack " +
+            "with a Ranged weapon targets a creature within 10 feet of you, the curse causes you to become " +
+            "the target instead.",
             attunement = true, weightLb = 6.0),
     )
 
@@ -898,11 +915,14 @@ object MagicItemData {
             attunement = true, attunementNote = "by a Paladin"),
         item("javelin_of_lightning", "Javelin of Lightning", ItemRarity.UNCOMMON,
             "Weapon (Javelin)",
-            "As a Bonus Action you can turn the javelin into a bolt of lightning. Hurled at a " +
-                "target within 120 feet, it forms a 5-foot-wide, 120-foot-long Line; each " +
-                "creature in it makes a DC 13 Dexterity saving throw, taking 4d6 Lightning " +
-                "damage on a failure or half as much on a success. It can't be used again until " +
-                "the next dawn.",
+            "Each time you make an attack roll with this magic weapon and hit, you can have it deal Lightning " +
+            "damage instead of Piercing damage. Lightning Bolt. When you throw this weapon at a target no " +
+            "farther than 120 feet from you, you can forgo making a ranged attack roll and instead turn the " +
+            "weapon into a bolt of lightning. This bolt forms a 5-foot-wide Line between you and the target. " +
+            "The target and each other creature in the Line (excluding you) makes a DC 13 Dexterity saving " +
+            "throw, taking 4d6 Lightning damage on a failed save or half as much damage on a successful one. " +
+            "Immediately after dealing this damage, the weapon reappears in your hand. This property can't be " +
+            "used again until the next dawn.",
             weightLb = 2.0),
         item("luck_blade", "Luck Blade", ItemRarity.LEGENDARY, "Weapon (any Sword)",
             "(Requires Attunement) You gain a +1 bonus to attack rolls and damage rolls made with this magic " +
@@ -943,10 +963,12 @@ object MagicItemData {
                 "15-foot radius and Dim Light for an additional 15 feet."),
         item("nine_lives_stealer", "Nine Lives Stealer", ItemRarity.VERY_RARE,
             "Weapon (any Sword)",
-            "You gain a +1 bonus to attack and damage rolls. The sword has 1d8 + 1 charges; " +
-                "when you score a Critical Hit against a creature with fewer than 100 Hit " +
-                "Points, it must succeed on a DC 15 Constitution saving throw or die, expending " +
-                "a charge.",
+            "You gain a +2 bonus to attack rolls and damage rolls made with this magic weapon. Life Stealing. " +
+            "The weapon has 1d8 + 1 charges. When you attack a creature that has fewer than 100 Hit Points " +
+            "with this weapon and roll a 20 on the d20 for the attack roll, the creature must succeed on a DC " +
+            "15 Constitution saving throw or be slain instantly as the sword tears its life force from its " +
+            "body. Constructs and Undead succeed on the save automatically. The weapon loses 1 charge if the " +
+            "creature is slain. When the weapon has no charges remaining, it loses this property.",
             attunement = true),
         item("oathbow", "Oathbow", ItemRarity.VERY_RARE, "Weapon (Longbow)",
             "(Requires Attunement) When you nock an arrow on this bow, it whispers in Elvish, \"Swift defeat " +
@@ -1407,9 +1429,24 @@ object MagicItemData {
             attunement = true, attunementNote = "by a Druid", weightLb = 4.0),
         item("staff_thunder_lightning", "Staff of Thunder and Lightning", ItemRarity.VERY_RARE,
             "Staff",
-            "This quarterstaff grants a +2 bonus to attack and damage rolls and holds five " +
-                "daily powers: Lightning on a hit, Thunder on a hit, a Lightning Strike Line, a " +
-                "Thunderclap, and both at once.",
+            "This staff can be wielded as a magic Quarterstaff that grants a +2 bonus to attack rolls and " +
+            "damage rolls made with it. It also has the following additional properties. Once one of these " +
+            "properties is used, it can't be used again until the next dawn. Lightning. When you hit with a " +
+            "melee attack using the staff, you can cause the target to take an extra 2d6 Lightning damage (no " +
+            "action required). Thunder. When you hit with a melee attack using the staff, you can cause the " +
+            "staff to emit a crack of thunder audible out to 300 feet (no action required). The target you " +
+            "hit must succeed on a DC 17 Constitution saving throw or have the Stunned condition until the " +
+            "end of your next turn. Thunder and Lightning. Immediately after you hit with a melee attack " +
+            "using the staff, you can take a Bonus Action to use the Lightning and Thunder properties (see " +
+            "above) at the same time. Doing so doesn't expend the daily use of those properties, only the use " +
+            "of this one. Lightning Strike. You can take a Magic action to cause a bolt of lightning to leap " +
+            "from the staff's tip in a Line that is 5 feet wide and 120 feet long. Each creature in that Line " +
+            "makes a DC 17 Dexterity saving throw, taking 9d6 Lightning damage on a failed save or half as " +
+            "much damage on a successful one. Thunderclap. You can take a Magic action to cause the staff to " +
+            "produce a thunderclap audible out to 600 feet. Every creature within a 60-foot Emanation " +
+            "originating from you makes a DC 17 Constitution saving throw. On a failed save, a creature takes " +
+            "2d6 Thunder damage and has the Deafened condition for 1 minute. On a successful save, a creature " +
+            "takes half as much damage only.",
             attunement = true, weightLb = 4.0),
         item("staff_of_withering", "Staff of Withering", ItemRarity.RARE, "Staff",
             "(Requires Attunement) This staff has 3 charges and regains 1d3 expended charges daily at dawn. " +
@@ -1564,8 +1601,12 @@ object MagicItemData {
             attunement = true, weightLb = 1.0),
         item("bowl_water_elementals", "Bowl of Commanding Water Elementals", ItemRarity.RARE,
             WONDROUS,
-            "Filling this bowl with water and taking a Magic action summons a Water Elemental " +
-                "that acts as your ally, once per day.",
+            "While this bowl is filled with water and you are within 5 feet of it, you can take a Magic " +
+            "action to summon a Water Elemental. The elemental appears in an unoccupied space as close to the " +
+            "bowl as possible, understands your languages, obeys your commands, and takes its turn " +
+            "immediately after you on your Initiative count. The elemental disappears after 1 hour, when it " +
+            "dies, or when you dismiss it as a Bonus Action. The bowl can't be used this way again until the " +
+            "next dawn. The bowl is about 1 foot in diameter and half as deep. It holds about 3 gallons.",
             weightLb = 3.0),
         item("bracers_of_archery", "Bracers of Archery", ItemRarity.UNCOMMON, WONDROUS,
             "(Requires Attunement) While wearing these bracers, you have proficiency with the Longbow and " +
@@ -1573,8 +1614,11 @@ object MagicItemData {
             attunement = true, weightLb = 1.0),
         item("brazier_fire_elementals", "Brazier of Commanding Fire Elementals", ItemRarity.RARE,
             WONDROUS,
-            "Lighting a fire in this brazier and taking a Magic action summons a Fire Elemental " +
-                "that acts as your ally, once per day.",
+            "While you are within 5 feet of this brazier, you can take a Magic action to summon a Fire " +
+            "Elemental. The elemental appears in an unoccupied space as close to the brazier as possible, " +
+            "understands your languages, obeys your commands, and takes its turn immediately after you on " +
+            "your Initiative count. The elemental disappears after 1 hour, when it dies, or when you dismiss " +
+            "it as a Bonus Action. The brazier can't be used this way again until the next dawn.",
             weightLb = 5.0),
         item("broom_of_flying", "Broom of Flying", ItemRarity.UNCOMMON, WONDROUS,
             "(Requires Attunement) This wooden broom functions like a mundane broom until you stand astride " +
@@ -1637,8 +1681,11 @@ object MagicItemData {
             weightLb = 25.0),
         item("censer_air_elementals", "Censer of Controlling Air Elementals", ItemRarity.RARE,
             WONDROUS,
-            "Burning incense in this censer and taking a Magic action summons an Air Elemental " +
-                "that acts as your ally, once per day.",
+            "While gently swinging this censer, you can take a Magic action to summon an Air Elemental. The " +
+            "elemental appears in an unoccupied space as close to the censer as possible, understands your " +
+            "languages, obeys your commands, and takes its turn immediately after you on your Initiative " +
+            "count. The elemental disappears after 1 hour, when it dies, or when you dismiss it as a Bonus " +
+            "Action. The censer can't be used this way again until the next dawn.",
             weightLb = 1.0),
         item("chime_of_opening", "Chime of Opening", ItemRarity.RARE, WONDROUS,
             "This hollow metal tube measures about 1 foot long and weighs 1 pound. As a Magic action, you can " +
@@ -2198,8 +2245,10 @@ object MagicItemData {
             weightLb = 5.0),
         item("manual_gainful_exercise", "Manual of Gainful Exercise", ItemRarity.VERY_RARE,
             WONDROUS,
-            "Reading this book over 48 hours across 6 days increases your Strength score and " +
-                "its maximum by 2. The book then becomes nonmagical for a century.",
+            "This book describes fitness exercises, and its words are charged with magic. If you spend 48 " +
+            "hours over a period of 6 days or fewer studying the book's contents and practicing its " +
+            "guidelines, your Strength increases by 2, to a maximum of 30. The manual then loses its magic " +
+            "but regains it in a century.",
             weightLb = 5.0),
         item("manual_of_golems", "Manual of Golems", ItemRarity.VERY_RARE, WONDROUS,
             "This tome contains information and incantations necessary to make a particular type of golem. " +
@@ -2216,8 +2265,10 @@ object MagicItemData {
             weightLb = 5.0),
         item("manual_quickness_action", "Manual of Quickness of Action", ItemRarity.VERY_RARE,
             WONDROUS,
-            "Reading this book over 48 hours across 6 days increases your Dexterity score and " +
-                "its maximum by 2. The book then becomes nonmagical for a century.",
+            "This book contains coordination and balance exercises, and its words are charged with magic. If " +
+            "you spend 48 hours over a period of 6 days or fewer studying the book's contents and practicing " +
+            "its guidelines, your Dexterity increases by 2, to a maximum of 30. The manual then loses its " +
+            "magic but regains it in a century.",
             weightLb = 5.0),
         item("mantle_spell_resistance", "Mantle of Spell Resistance", ItemRarity.RARE, WONDROUS,
             "(Requires Attunement) You have Advantage on saving throws against spells while you wear this " +
@@ -2357,8 +2408,9 @@ object MagicItemData {
             attunement = true, weightLb = 2.0),
         item("potion_animal_friendship", "Potion of Animal Friendship", ItemRarity.UNCOMMON,
             "Potion",
-            "For 1 hour after drinking this potion you can cast Animal Friendship at will " +
-                "(save DC 13).",
+            "When you drink this potion, you can cast the level 3 version of the Animal Friendship spell " +
+            "(save DC 13). Agitating this potion's muddy liquid brings little bits into view: a fish scale, a " +
+            "hummingbird feather, a cat claw, or a squirrel hair.",
             weightLb = 0.5),
         item("potion_clairvoyance", "Potion of Clairvoyance", ItemRarity.RARE, "Potion",
             "When you drink this potion, you gain the effect of the Clairvoyance spell (no Concentration " +
@@ -2440,9 +2492,13 @@ object MagicItemData {
             attunement = true, weightLb = 4.0),
         item("robe_scintillating_colors", "Robe of Scintillating Colors", ItemRarity.VERY_RARE,
             WONDROUS,
-            "The robe has 3 charges and regains 1d3 daily at dawn. Expend a charge to make the " +
-                "robe blaze with shifting colors, giving attackers Disadvantage and forcing " +
-                "creatures that see you to save against the Stunned condition.",
+            "This robe has 3 charges, and it regains 1d3 expended charges daily at dawn. While you wear it, " +
+            "you can take a Magic action and expend 1 charge to cause the garment to display a shifting " +
+            "pattern of dazzling hues until the end of your next turn. During this time, the robe sheds " +
+            "Bright Light in a 30-foot radius and Dim Light for an additional 30 feet, and creatures that can " +
+            "see you have Disadvantage on attack rolls against you. Any creature in the Bright Light that can " +
+            "see you when the robe's power is activated must succeed on a DC 15 Wisdom saving throw or have " +
+            "the Stunned condition until the effect ends.",
             attunement = true, weightLb = 4.0),
         item("robe_of_stars", "Robe of Stars", ItemRarity.VERY_RARE, WONDROUS,
             "(Requires Attunement) This black or dark-blue robe is embroidered with small white or silver " +
@@ -2537,8 +2593,11 @@ object MagicItemData {
                 "existence."),
         item("stone_earth_elementals", "Stone of Controlling Earth Elementals", ItemRarity.RARE,
             WONDROUS,
-            "Placing this stone on the ground and taking a Magic action summons an Earth " +
-                "Elemental that acts as your ally, once per day.",
+            "While touching this 5-pound stone to the ground, you can take a Magic action to summon an Earth " +
+            "Elemental. The elemental appears in an unoccupied space you choose within 30 feet of yourself, " +
+            "obeys your commands, and takes its turn immediately after you on your Initiative count. The " +
+            "elemental disappears after 1 hour, when it dies, or when you dismiss it as a Bonus Action. The " +
+            "stone can't be used this way again until the next dawn.",
             weightLb = 5.0),
         // The books title it "Stone of Good Luck (Luckstone)", and an import pass once added a
         // second entry under that name beside this one — the same item twice in the catalogue,
@@ -2590,8 +2649,10 @@ object MagicItemData {
             weightLb = 5.0),
         item("tome_leadership_influence", "Tome of Leadership and Influence", ItemRarity.VERY_RARE,
             WONDROUS,
-            "Reading this book over 48 hours across 6 days increases your Charisma score and its " +
-                "maximum by 2. The book then becomes nonmagical for a century.",
+            "This book contains guidelines for influencing and charming others, and its words are charged " +
+            "with magic. If you spend 48 hours over a period of 6 days or fewer studying the book's contents " +
+            "and practicing its guidelines, your Charisma increases by 2, to a maximum of 30. The manual then " +
+            "loses its magic but regains it in a century.",
             weightLb = 5.0),
         item("tome_of_understanding", "Tome of Understanding", ItemRarity.VERY_RARE, WONDROUS,
             "This book contains intuition and insight exercises, and its words are charged with magic. If you " +

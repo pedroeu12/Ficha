@@ -209,6 +209,20 @@ class ChoiceCoverageTest {
         "Tamed Surge",
         // Which creatures the spell spares, decided as it is cast.
         "Sculpt Spells",
+        // "choose any Cleric spell of level 5 or lower" and cast it now — the whole feature is
+        // a spell chosen at the moment of intervention, not a pick the sheet keeps.
+        "Divine Intervention",
+        "Greater Divine Intervention",
+        // "choose expended spell slots to recover" — which slots come back is arithmetic done
+        // at the table on the slots that happen to be spent.
+        "Arcane Recovery",
+        // "choose cantrips" and "prepare spells" — both are asked by the spell pickers in
+        // creation and at every level up, which is where a player expects to answer them.
+        "Spellcasting",
+        "Pact Magic",
+        // "you determine its function: a toy, a fire starter, or a music box" — a different
+        // device every time the Gnome spends ten minutes making one.
+        "rock_gnome",
         // "you can choose one creature targeted by the spell" — the creature is already a
         // target of the Enchantment being cast, so it is chosen in the same breath as the
         // spell and there is nothing left for the sheet to remember afterwards.

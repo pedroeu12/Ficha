@@ -209,6 +209,10 @@ class ChoiceCoverageTest {
         "Tamed Surge",
         // Which creatures the spell spares, decided as it is cast.
         "Sculpt Spells",
+        // "you can choose one creature targeted by the spell" — the creature is already a
+        // target of the Enchantment being cast, so it is chosen in the same breath as the
+        // spell and there is nothing left for the sheet to remember afterwards.
+        "Alter Memories",
         // "Choose one spell ... that you have prepared" and cast it now.
         "Mind Magic",
     )

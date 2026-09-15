@@ -1035,7 +1035,16 @@ object ResourceData {
                     recharge = if (level >= 6) Recharge.SHORT_REST else Recharge.LONG_REST,
                     source = "Conjurer",
                 )
-            )
+            ) + if (level >= 14) listOf(
+                ResourceDef(
+                    id = "conjurer:splintered_summons",
+                    name = "Splintered Summons",
+                    max = 1,
+                    recharge = Recharge.LONG_REST,
+                    source = "Conjurer",
+                    notes = "Also returns if you expend a level 4+ spell slot.",
+                )
+            ) else emptyList()
 
             "enchanter" -> buildList {
                 add(
@@ -1077,6 +1086,20 @@ object ResourceData {
                         max = 1,
                         recharge = Recharge.LONG_REST,
                         source = "Necromancer",
+                    )
+                )
+                if (level >= 14) add(
+                    ResourceDef(
+                        id = "necromancer:bolster_undead",
+                        name = "Bolster Undead",
+                        max = 1,
+                        recharge = Recharge.LONG_REST,
+                        source = "Necromancer",
+                        actionCost = "Bonus Action",
+                        description = "Choose any number of Undead you have created or " +
+                            "summoned with a Necromancy spell that are within 60 feet of you. " +
+                            "Those Undead each gain Temporary Hit Points equal to your Wizard " +
+                            "level.",
                     )
                 )
             }

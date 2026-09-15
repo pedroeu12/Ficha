@@ -2540,7 +2540,10 @@ object MagicItemData {
             "Placing this stone on the ground and taking a Magic action summons an Earth " +
                 "Elemental that acts as your ally, once per day.",
             weightLb = 5.0),
-        item("stone_of_good_luck", "Stone of Good Luck", ItemRarity.UNCOMMON, WONDROUS,
+        // The books title it "Stone of Good Luck (Luckstone)", and an import pass once added a
+        // second entry under that name beside this one — the same item twice in the catalogue,
+        // two searches away from each other. The alias belongs in the name, not in a duplicate.
+        item("stone_of_good_luck", "Stone of Good Luck (Luckstone)", ItemRarity.UNCOMMON, WONDROUS,
             "You gain a +1 bonus to ability checks and saving throws while this polished agate " +
                 "is on your person.",
             attunement = true),
@@ -3820,9 +3823,6 @@ object MagicItemData {
                 "while it is animate. It has AC 15, HP 20, and Immunity to Poison and Psychic damage. If the head " +
                 "drops to 0 Hit Points, the staff is destroyed. As long as it's not destroyed, the staff regains " +
                 "all lost Hit Points when it reverts to its inanimate form.", attunement = true),
-        item("stone_of_good_luck_luckstone", "Stone of Good Luck (Luckstone)", ItemRarity.UNCOMMON, "Wondrous Item",
-            "(Requires Attunement) While this polished agate is on your person, you gain a +1 bonus to " +
-                "ability checks and saving throws.", attunement = true),
         item("stormwalker_s_cloak", "Stormwalker's Cloak", ItemRarity.RARE, "Wondrous Item",
             "(requires Attunement) While wearing this cloak, you gain the following benefits. Shocking " +
                 "Feedback. The cloak has 3 charges and regains all expended charges daily at dawn. You can expend " +

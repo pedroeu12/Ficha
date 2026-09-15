@@ -43,6 +43,42 @@ object PerUseChoiceData {
 
     val ALL: List<PerUseChoice> = listOf(
 
+        // ---------------------------------------------------------------- Fighter
+        PerUseChoice(
+            id = "arcane_archer:magical_ammunition",
+            label = "Magical Ammunition",
+            prompt = "Which property do you imbue the ammunition with? You choose again each time.",
+            source = "Magical Ammunition",
+            resourceId = "arcane_archer:magical_ammunition",
+            subclassId = "arcane_archer",
+            minLevel = 7,
+            options = listOf(
+                ChoiceOption(
+                    "darkening", "Darkening Ammunition",
+                    "Magical shadows fill a 15-foot Emanation originating from the ammunition for " +
+                        "1 minute. Nonmagical flames in the Emanation are extinguished, and creatures " +
+                        "in the Emanation have a -5 penalty to Wisdom (Perception) checks and Passive " +
+                        "Perception.",
+                    "1 minute",
+                ),
+                ChoiceOption(
+                    "unlocking", "Unlocking Ammunition",
+                    "A burst of magic fills a 15-foot Emanation originating from the ammunition. The " +
+                        "ammunition also emits a loud knocking sound, audible up to 300 feet away. Any " +
+                        "object in the Emanation that is held shut by a nonmagical lock or that is stuck " +
+                        "or barred becomes unlocked, unstuck, or unbarred. If such an object has multiple " +
+                        "locks, only one of them is unlocked.",
+                    "Instant",
+                ),
+                ChoiceOption(
+                    "vine", "Vine Ammunition",
+                    "A 120-foot-long vine grows from the ammunition. You and other creatures can then " +
+                        "climb it. The vine withers away after 10 minutes.",
+                    "10 minutes",
+                ),
+            ),
+        ),
+
         // ---------------------------------------------------------------- Barbarian
         PerUseChoice(
             id = "wild_heart:rage_of_the_wilds",

@@ -44,7 +44,7 @@ object SpellData {
                 "next turn. Cantrip Upgrade. The damage increases by 1d10 when you reach levels 5 (2d10), 11 " +
                 "(3d10), and 17 (4d10).",
             setOf(SORCERER, WARLOCK, WIZARD), damage = "1d10", damageType = "Necrotic", needsAttackRoll = true, scalesWithLevel = true),
-        SpellDef("dancing_lights", "Dancing Lights", 0, "Illusion", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("dancing_lights", "Dancing Lights", 0, "Illusion", "Action", "120 feet", "V, S, M (a bit of phosphorus)", "1 minute",
             "You create up to four torch-size lights within range, making them appear as torches, lanterns, " +
                 "or glowing orbs that hover for the duration. Alternatively, you combine the four lights into one " +
                 "glowing Medium form that is vaguely humanlike. Whichever form you choose, each light sheds Dim " +
@@ -78,7 +78,7 @@ object SpellData {
             "You touch a willing creature and choose a skill. Until the spell ends, the creature adds 1d4 to " +
                 "any ability check using the chosen skill.",
             setOf(CLERIC, DRUID, ARTIFICER), concentration = true),
-        SpellDef("light", "Light", 0, "Evocation", "Action", "Touch", "V, M", "1 hour",
+        SpellDef("light", "Light", 0, "Evocation", "Action", "Touch", "V, M (a firefly or phosphorescent moss)", "1 hour",
             "You touch one Large or smaller object that isn't being worn or carried by someone else. Until " +
                 "the spell ends, the object sheds Bright Light in a 20-foot radius and Dim Light for an " +
                 "additional 20 feet. The light can be colored as you like. Covering the object with something " +
@@ -95,13 +95,13 @@ object SpellData {
             setOf(BARD, SORCERER, WARLOCK, WIZARD, ARTIFICER)),
         // Not on the Artificer list: an Artificer is handed Mending by Tinker's Magic rather
         // than choosing it, so tagging it here would let it be picked a second time.
-        SpellDef("mending", "Mending", 0, "Transmutation", "1 minute", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("mending", "Mending", 0, "Transmutation", "1 minute", "Touch", "V, S, M (two lodestones)", "Instantaneous",
             "This spell repairs a single break or tear in an object you touch, such as a broken chain link, " +
                 "two halves of a broken key, a torn cloak, or a leaking wineskin. As long as the break or tear is " +
                 "no larger than 1 foot in any dimension, you mend it, leaving no trace of the former damage. This " +
                 "spell can physically repair a magic item, but it can't restore magic to such an object.",
             setOf(BARD, CLERIC, DRUID, SORCERER, WIZARD)),
-        SpellDef("message", "Message", 0, "Transmutation", "Action", "120 feet", "S, M", "1 round",
+        SpellDef("message", "Message", 0, "Transmutation", "Action", "120 feet", "S, M (a copper wire)", "1 round",
             "You point toward a creature within range and whisper a message. The target (and only the target) " +
                 "hears the message and can reply in a whisper that only you can hear. You can cast this spell " +
                 "through solid objects if you are familiar with the target and know it is beyond the barrier. " +
@@ -113,7 +113,7 @@ object SpellData {
                 "next saving throw it makes before the end of your next turn. Cantrip Upgrade. The damage " +
                 "increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).",
             setOf(SORCERER, WARLOCK, WIZARD), damage = "1d6", damageType = "Psychic", saveAbility = Ability.INT, scalesWithLevel = true),
-        SpellDef("minor_illusion", "Minor Illusion", 0, "Illusion", "Action", "30 feet", "S, M", "1 minute",
+        SpellDef("minor_illusion", "Minor Illusion", 0, "Illusion", "Action", "30 feet", "S, M (a bit of fleece)", "1 minute",
             "You create a sound or an image of an object within range that lasts for the duration. See the " +
                 "descriptions below for the effects of each. The illusion ends if you cast this spell again. If a " +
                 "creature takes a Study action to examine the sound or image, the creature can determine that it " +
@@ -144,7 +144,7 @@ object SpellData {
                 "trinket or an illusory image that can fit in your hand. It lasts until the end of your next " +
                 "turn. A trinket can deal no damage and has no monetary worth.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD, ARTIFICER)),
-        SpellDef("produce_flame", "Produce Flame", 0, "Conjuration", "Action", "Self", "V, S", "10 minutes",
+        SpellDef("produce_flame", "Produce Flame", 0, "Conjuration", "Bonus Action", "Self", "V, S", "10 minutes",
             "A flickering flame appears in your hand and remains there for the duration. While there, the " +
                 "flame emits no heat and ignites nothing, and it sheds Bright Light in a 20-foot radius and Dim " +
                 "Light for an additional 20 feet. The spell ends if you cast it again. Until the spell ends, you " +
@@ -170,7 +170,7 @@ object SpellData {
                 "Half Cover or Three-Quarters Cover for this save. Cantrip Upgrade. The damage increases by 1d8 " +
                 "when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).",
             setOf(CLERIC), damage = "1d8", damageType = "Radiant", saveAbility = Ability.DEX, scalesWithLevel = true),
-        SpellDef("shillelagh", "Shillelagh", 0, "Transmutation", "Bonus Action", "Self", "V, S, M", "1 minute",
+        SpellDef("shillelagh", "Shillelagh", 0, "Transmutation", "Bonus Action", "Self", "V, S, M (mistletoe)", "1 minute",
             "A Club or Quarterstaff you are holding is imbued with nature's power. For the duration, you can " +
                 "use your spellcasting ability instead of Strength for the attack and damage rolls of melee " +
                 "attacks using that weapon, and the weapon's damage die becomes a d8. If the attack deals damage, " +
@@ -215,7 +215,7 @@ object SpellData {
                 "originates from a point of your choice within range, such as a rumble of thunder, the cry of a " +
                 "raven, or ominous whispers. Tremors. You cause harmless tremors in the ground for 1 minute.",
             setOf(CLERIC)),
-        SpellDef("thorn_whip", "Thorn Whip", 0, "Transmutation", "Action", "30 feet", "V, S, M", "Instantaneous",
+        SpellDef("thorn_whip", "Thorn Whip", 0, "Transmutation", "Action", "30 feet", "V, S, M (the stem of a thorny plant)", "Instantaneous",
             "You create a vine-like whip covered in thorns that lashes out at your command toward a creature " +
                 "in range. Make a melee spell attack against the target. On a hit, the target takes 1d6 Piercing " +
                 "damage, and if it is Large or smaller, you can pull it up to 10 feet closer to you. Cantrip " +
@@ -228,7 +228,7 @@ object SpellData {
                 "Necrotic damage. Cantrip Upgrade. The damage increases by one die when you reach levels 5 (2d8 " +
                 "or 2d12), 11 (3d8 or 3d12), and 17 (4d8 or 4d12).",
             setOf(CLERIC, WARLOCK, WIZARD), damage = "1d8", damageType = "Necrotic", saveAbility = Ability.WIS, scalesWithLevel = true),
-        SpellDef("true_strike", "True Strike", 0, "Divination", "Action", "Self", "S, M", "Instantaneous",
+        SpellDef("true_strike", "True Strike", 0, "Divination", "Action", "Self", "S, M (a weapon with which you have proficiency and that is worth 1+ CP)", "Instantaneous",
             "Guided by a flash of magical insight, you make one attack with the weapon used in the spell's " +
                 "casting. The attack uses your spellcasting ability for the attack and damage rolls instead of " +
                 "using Strength or Dexterity. If the attack deals damage, it can be Radiant damage or the " +
@@ -242,14 +242,14 @@ object SpellData {
                 "and have Disadvantage on the next attack roll it makes before the end of its next turn. Cantrip " +
                 "Upgrade. The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).",
             setOf(BARD), damage = "1d6", damageType = "Psychic", saveAbility = Ability.WIS, scalesWithLevel = true),
-        SpellDef("word_of_radiance", "Word of Radiance", 0, "Evocation", "Action", "Self (5-foot radius)", "V, M", "Instantaneous",
+        SpellDef("word_of_radiance", "Word of Radiance", 0, "Evocation", "Action", "Self (5-foot radius)", "V, M (a sunburst token)", "Instantaneous",
             "Burning radiance erupts from you in a 5-foot Emanation. Each creature of your choice that you " +
                 "can see in it must succeed on a Constitution saving throw or take 1d6 Radiant damage. Cantrip " +
                 "Upgrade. The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).",
             setOf(CLERIC), damage = "1d6", damageType = "Radiant", saveAbility = Ability.CON, scalesWithLevel = true),
 
         // ---------------------------------------------------------------- Level 1
-        SpellDef("alarm", "Alarm", 1, "Abjuration", "1 minute", "30 feet", "V, S, M", "8 hours",
+        SpellDef("alarm", "Alarm", 1, "Abjuration", "1 minute", "30 feet", "V, S, M (a bell and silver wire)", "8 hours",
             "You set an alarm against intrusion. Choose a door, a window, or an area within range that is no " +
                 "larger than a 20-foot Cube. Until the spell ends, an alarm alerts you whenever a creature " +
                 "touches or enters the warded area. When you cast the spell, you can designate creatures that " +
@@ -258,13 +258,13 @@ object SpellData {
                 "Mental Alarm. You are alerted by a mental ping if you are within 1 mile of the warded area. This " +
                 "ping awakens you if you're asleep.",
             setOf(RANGER, WIZARD, ARTIFICER), ritual = true),
-        SpellDef("animal_friendship", "Animal Friendship", 1, "Enchantment", "Action", "30 feet", "V, S, M", "24 hours",
+        SpellDef("animal_friendship", "Animal Friendship", 1, "Enchantment", "Action", "30 feet", "V, S, M (a morsel of food)", "24 hours",
             "Target a Beast that you can see within range. The target must succeed on a Wisdom saving throw " +
                 "or have the Charmed condition for the duration. If you or one of your allies deals damage to the " +
                 "target, the spells ends. Using a Higher-Level Spell Slot. You can target one additional Beast " +
                 "for each spell slot level above 1.",
             setOf(BARD, DRUID, RANGER), saveAbility = Ability.WIS),
-        SpellDef("armor_of_agathys", "Armor of Agathys", 1, "Abjuration", "Bonus Action", "Self", "V, S, M", "1 hour",
+        SpellDef("armor_of_agathys", "Armor of Agathys", 1, "Abjuration", "Bonus Action", "Self", "V, S, M (a shard of blue glass)", "1 hour",
             "Protective magical frost surrounds you. You gain 5 Temporary Hit Points. If a creature hits you " +
                 "with a melee attack roll before the spell ends, the creature takes 5 Cold damage. The spell ends " +
                 "early if you have no Temporary Hit Points. Using a Higher-Level Spell Slot. The Temporary Hit " +
@@ -277,14 +277,14 @@ object SpellData {
                 "a target takes half as much damage only. Using a Higher-Level Spell Slot. The damage increases " +
                 "by 1d6 for each spell slot level above 1.",
             setOf(WARLOCK), damage = "2d6", damageType = "Necrotic", saveAbility = Ability.STR),
-        SpellDef("bane", "Bane", 1, "Enchantment", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("bane", "Bane", 1, "Enchantment", "Action", "30 feet", "V, S, M (a drop of blood)", "1 minute",
             "Up to three creatures of your choice that you can see within range must each make a Charisma " +
                 "saving throw. Whenever a target that fails this save makes an attack roll or a saving throw " +
                 "before the spell ends, the target must subtract 1d4 from the attack roll or save. Using a " +
                 "Higher-Level Spell Slot. You can target one additional creature for each spell slot level above " +
                 "1.",
             setOf(BARD, CLERIC, WARLOCK), concentration = true, saveAbility = Ability.CHA),
-        SpellDef("bless", "Bless", 1, "Enchantment", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("bless", "Bless", 1, "Enchantment", "Action", "30 feet", "V, S, M (a Holy Symbol worth 5+ GP)", "1 minute",
             "You bless up to three creatures within range. Whenever a target makes an attack roll or a saving " +
                 "throw before the spell ends, the target adds 1d4 to the attack roll or save. Using a " +
                 "Higher-Level Spell Slot. You can target one additional creature for each spell slot level above " +
@@ -303,7 +303,7 @@ object SpellData {
                 "When the spell ends, the target knows it was Charmed by you. Using a Higher-Level Spell Slot. " +
                 "You can target one additional creature for each spell slot level above 1.",
             setOf(BARD, DRUID, SORCERER, WARLOCK, WIZARD), saveAbility = Ability.WIS),
-        SpellDef("chromatic_orb", "Chromatic Orb", 1, "Evocation", "Action", "90 feet", "V, S, M", "Instantaneous",
+        SpellDef("chromatic_orb", "Chromatic Orb", 1, "Evocation", "Action", "90 feet", "V, S, M (a diamond worth 50+ GP)", "Instantaneous",
             "You hurl an orb of energy at a target within range. Choose Acid, Cold, Fire, Lightning, Poison, " +
                 "or Thunder for the type of orb you create, and then make a ranged spell attack against the " +
                 "target. On a hit, the target takes 3d8 damage of the chosen type. If you roll the same number on " +
@@ -324,7 +324,7 @@ object SpellData {
                 "target doesn't move and takes no action or Bonus Action. Using a Higher-Level Spell Slot. You " +
                 "can affect one additional creature for each spell slot level above 1.",
             setOf(BARD, CLERIC, PALADIN), saveAbility = Ability.WIS),
-        SpellDef("comprehend_languages", "Comprehend Languages", 1, "Divination", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("comprehend_languages", "Comprehend Languages", 1, "Divination", "Action", "Self", "V, S, M (a pinch of soot and salt)", "1 hour",
             "For the duration, you understand the literal meaning of any language that you hear or see " +
                 "signed. You also understand any written language that you see, but you must be touching the " +
                 "surface on which the words are written. It takes about 1 minute to read one page of text. This " +
@@ -377,16 +377,16 @@ object SpellData {
                 "benefit from the Invisible condition. Attack rolls against an affected creature or object have " +
                 "Advantage if the attacker can see it.",
             setOf(BARD, DRUID, ARTIFICER), concentration = true, saveAbility = Ability.DEX),
-        SpellDef("false_life", "False Life", 1, "Necromancy", "Action", "Self", "V, S, M", "Instantaneous",
+        SpellDef("false_life", "False Life", 1, "Necromancy", "Action", "Self", "V, S, M (a drop of alcohol)", "Instantaneous",
             "You gain 2d4 + 4 Temporary Hit Points. Using a Higher-Level Spell Slot. You gain 5 additional " +
                 "Temporary Hit Points for each spell slot level above 1.",
             setOf(SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("feather_fall", "Feather Fall", 1, "Transmutation", "Reaction", "60 feet", "V, M", "1 minute",
+        SpellDef("feather_fall", "Feather Fall", 1, "Transmutation", "Reaction", "60 feet", "V, M (a small feather or piece of down)", "1 minute",
             "Choose up to five falling creatures within range. A falling creature's rate of descent slows to " +
                 "60 feet per round until the spell ends. If a creature lands before the spell ends, the creature " +
                 "takes no damage from the fall, and the spell ends for that creature.",
             setOf(BARD, SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("find_familiar", "Find Familiar", 1, "Conjuration", "1 hour", "10 feet", "V, S, M", "Instantaneous",
+        SpellDef("find_familiar", "Find Familiar", 1, "Conjuration", "1 hour", "10 feet", "V, S, M (burning incense worth 10+ GP, which the spell consumes)", "Instantaneous",
             "You gain the service of a familiar, a spirit that takes an animal form you choose: Bat, Cat, " +
                 "Frog, Hawk, Lizard, Octopus, Owl, Rat, Raven, Spider, Weasel, or another Beast that has a " +
                 "Challenge Rating of 0. Appearing in an unoccupied space within range, the familiar has the " +
@@ -414,7 +414,7 @@ object SpellData {
                 "of Wind) disperses it. Using a Higher-Level Spell Slot. The fog's radius increases by 20 feet " +
                 "for each spell slot level above 1.",
             setOf(DRUID, RANGER, SORCERER, WIZARD), concentration = true),
-        SpellDef("goodberry", "Goodberry", 1, "Conjuration", "Action", "Self", "V, S, M", "24 hours",
+        SpellDef("goodberry", "Goodberry", 1, "Conjuration", "Action", "Self", "V, S, M (a sprig of mistletoe)", "24 hours",
             "Ten berries appear in your hand and are infused with magic for the duration. A creature can take " +
                 "a Bonus Action to eat one berry. Eating a berry restores 1 Hit Point, and the berry provides " +
                 "enough nourishment to sustain a creature for one day. Uneaten berries disappear when the spell " +
@@ -443,7 +443,7 @@ object SpellData {
                 "ability modifier at the start of each of its turns. Using a Higher-Level Spell Slot. You can " +
                 "target one additional creature for each spell slot level above 1.",
             setOf(BARD, PALADIN), concentration = true),
-        SpellDef("hex", "Hex", 1, "Enchantment", "Bonus Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("hex", "Hex", 1, "Enchantment", "Bonus Action", "90 feet", "V, S, M (the petrified eye of a newt)", "1 hour",
             "You place a curse on a creature that you can see within range. Until the spell ends, you deal an " +
                 "extra 1d6 Necrotic damage to the target whenever you hit it with an attack roll. Also, choose " +
                 "one ability when you cast the spell. The target has Disadvantage on ability checks made with the " +
@@ -461,7 +461,7 @@ object SpellData {
                 "Concentration can last longer with a spell slot of level 3-4 (up to 8 hours) or 5+ (up to 24 " +
                 "hours).",
             setOf(RANGER), concentration = true, damage = "1d6", damageType = "Force"),
-        SpellDef("identify", "Identify", 1, "Divination", "1 minute", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("identify", "Identify", 1, "Divination", "1 minute", "Touch", "V, S, M (a pearl worth 100+ GP)", "Instantaneous",
             "You touch an object throughout the spell's casting. If the object is a magic item or some other " +
                 "magical object, you learn its properties and how to use them, whether it requires Attunement, " +
                 "and how many charges it has, if any. You learn whether any ongoing spells are affecting the item " +
@@ -474,17 +474,17 @@ object SpellData {
                 "save or half as much damage on a successful one. Using a Higher-Level Spell Slot. The damage " +
                 "increases by 1d10 for each spell slot level above 1.",
             setOf(CLERIC), damage = "2d10", damageType = "Necrotic", saveAbility = Ability.CON),
-        SpellDef("jump", "Jump", 1, "Transmutation", "Bonus Action", "Touch", "V, S, M", "1 minute",
+        SpellDef("jump", "Jump", 1, "Transmutation", "Bonus Action", "Touch", "V, S, M (a grasshopper's hind leg)", "1 minute",
             "You touch a willing creature. Once on each of its turns until the spell ends, that creature can " +
                 "jump up to 30 feet by spending 10 feet of movement. Using a Higher-Level Spell Slot. You can " +
                 "target one additional creature for each spell slot level above 1.",
             setOf(DRUID, RANGER, SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("longstrider", "Longstrider", 1, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("longstrider", "Longstrider", 1, "Transmutation", "Action", "Touch", "V, S, M (a pinch of dirt)", "1 hour",
             "You touch a creature. The target's Speed increases by 10 feet until the spell ends. Using a " +
                 "Higher-Level Spell Slot. You can target one additional creature for each spell slot level above " +
                 "1.",
             setOf(BARD, DRUID, RANGER, WIZARD, ARTIFICER)),
-        SpellDef("mage_armor", "Mage Armor", 1, "Abjuration", "Action", "Touch", "V, S, M", "8 hours",
+        SpellDef("mage_armor", "Mage Armor", 1, "Abjuration", "Action", "Touch", "V, S, M (a piece of cured leather)", "8 hours",
             "You touch a willing creature who isn't wearing armor. Until the spell ends, the target's base AC " +
                 "becomes 13 plus its Dexterity modifier. The spell ends early if the target dons armor.",
             setOf(SORCERER, WIZARD)),
@@ -494,7 +494,7 @@ object SpellData {
                 "strike simultaneously, and you can direct them to hit one creature or several. Using a " +
                 "Higher-Level Spell Slot. The spell creates one more dart for each spell slot level above 1.",
             setOf(SORCERER, WIZARD)),
-        SpellDef("protection_evil_good", "Protection from Evil and Good", 1, "Abjuration", "Action", "Touch", "V, S, M", "10 minutes",
+        SpellDef("protection_evil_good", "Protection from Evil and Good", 1, "Abjuration", "Action", "Touch", "V, S, M (a flask of Holy Water worth 25+ GP, which the spell consumes)", "10 minutes",
             "Until the spell ends, one willing creature you touch is protected against creatures that are " +
                 "Aberrations, Celestials, Elementals, Fey, Fiends, or Undead. The protection grants several " +
                 "benefits. Creatures of those types have Disadvantage on attack rolls against the target. The " +
@@ -506,7 +506,7 @@ object SpellData {
             "You remove poison and rot from nonmagical food and drink in a 5-foot-radius Sphere centered on a " +
                 "point within range.",
             setOf(CLERIC, DRUID, PALADIN, ARTIFICER), ritual = true),
-        SpellDef("sanctuary", "Sanctuary", 1, "Abjuration", "Bonus Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("sanctuary", "Sanctuary", 1, "Abjuration", "Bonus Action", "30 feet", "V, S, M (a shard of glass from a mirror)", "1 minute",
             "You ward a creature within range. Until the spell ends, any creature who targets the warded " +
                 "creature with an attack roll or a damaging spell must succeed on a Wisdom saving throw or either " +
                 "choose a new target or lose the attack or spell. This spell doesn't protect the warded creature " +
@@ -518,11 +518,11 @@ object SpellData {
                 "have a +5 bonus to AC, including against the triggering attack, and you take no damage from " +
                 "Magic Missile .",
             setOf(SORCERER, WIZARD)),
-        SpellDef("shield_of_faith", "Shield of Faith", 1, "Abjuration", "Bonus Action", "60 feet", "V, S, M", "10 minutes",
+        SpellDef("shield_of_faith", "Shield of Faith", 1, "Abjuration", "Bonus Action", "60 feet", "V, S, M (a prayer scroll)", "10 minutes",
             "A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to " +
                 "AC for the duration.",
             setOf(CLERIC, PALADIN), concentration = true),
-        SpellDef("silent_image", "Silent Image", 1, "Illusion", "Action", "60 feet", "V, S, M", "10 minutes",
+        SpellDef("silent_image", "Silent Image", 1, "Illusion", "Action", "60 feet", "V, S, M (a bit of fleece)", "10 minutes",
             "You create the image of an object, a creature, or some other visible phenomenon that is no " +
                 "larger than a 15-foot Cube. The image appears at a spot within range and lasts for the duration. " +
                 "The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects. As a " +
@@ -535,7 +535,7 @@ object SpellData {
                 "your spell save DC. If a creature discerns the illusion for what it is, the creature can see " +
                 "through the image.",
             setOf(BARD, SORCERER, WIZARD), concentration = true),
-        SpellDef("sleep", "Sleep", 1, "Enchantment", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("sleep", "Sleep", 1, "Enchantment", "Action", "60 feet", "V, S, M (a pinch of sand or rose petals)", "1 minute",
             "Each creature of your choice in a 5-foot-radius Sphere centered on a point within range must " +
                 "succeed on a Wisdom saving throw or have the Incapacitated condition until the end of its next " +
                 "turn, at which point it must repeat the save. If the target fails the second save, the target " +
@@ -551,7 +551,7 @@ object SpellData {
                 "information about nearby locations and monsters, including whatever it has perceived within the " +
                 "past day.",
             setOf(BARD, DRUID, RANGER, WARLOCK), ritual = true),
-        SpellDef("tashas_hideous_laughter", "Tasha's Hideous Laughter", 1, "Enchantment", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("tashas_hideous_laughter", "Tasha's Hideous Laughter", 1, "Enchantment", "Action", "30 feet", "V, S, M (a tart and a feather)", "1 minute",
             "One creature of your choice that you can see within range makes a Wisdom saving throw. On a " +
                 "failed save, it has the Prone and Incapacitated conditions for the duration. During that time, " +
                 "it laughs uncontrollably if it's capable of laughter, and it can't end the Prone condition on " +
@@ -572,14 +572,14 @@ object SpellData {
             "You take the Dash action, and until the spell ends, you can take that action again as a Bonus " +
                 "Action.",
             setOf(SORCERER, WARLOCK, WIZARD, ARTIFICER), concentration = true),
-        SpellDef("grease", "Grease", 1, "Conjuration", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("grease", "Grease", 1, "Conjuration", "Action", "60 feet", "V, S, M (a bit of pork rind or butter)", "1 minute",
             "Nonflammable grease covers the ground in a 10-foot square centered on a point within range and " +
                 "turns it into Difficult Terrain for the duration. When the grease appears, each creature " +
                 "standing in its area must succeed on a Dexterity saving throw or have the Prone condition. A " +
                 "creature that enters the area or ends its turn there must also succeed on that save or fall " +
                 "Prone.",
             setOf(ARTIFICER, SORCERER, WIZARD), saveAbility = Ability.DEX),
-        SpellDef("witch_bolt", "Witch Bolt", 1, "Evocation", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("witch_bolt", "Witch Bolt", 1, "Evocation", "Action", "60 feet", "V, S, M (a twig struck by lightning)", "1 minute",
             "A beam of crackling energy lances toward a creature within range, forming a sustained arc of " +
                 "lightning between you and the target. Make a ranged spell attack against it. On a hit, the " +
                 "target takes 2d12 Lightning damage. On each of your subsequent turns, you can take a Bonus " +
@@ -590,7 +590,7 @@ object SpellData {
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true, damage = "2d12", damageType = "Lightning", needsAttackRoll = true),
 
         // ---------------------------------------------------------------- Level 2
-        SpellDef("aid", "Aid", 2, "Abjuration", "Action", "30 feet", "V, S, M", "8 hours",
+        SpellDef("aid", "Aid", 2, "Abjuration", "Action", "30 feet", "V, S, M (a strip of white cloth)", "8 hours",
             "Choose up to three creatures within range. Each target's Hit Point maximum and current Hit " +
                 "Points increase by 5 for the duration. Using a Higher-Level Spell Slot. Each target's Hit Points " +
                 "increase by 5 for each spell slot level above 2.",
@@ -611,7 +611,7 @@ object SpellData {
                 "parentheses instead of dealing the normal damage for your Unarmed Strike, and you use your " +
                 "spellcasting ability modifier for the attack and damage rolls rather than using Strength.",
             setOf(SORCERER, WIZARD, ARTIFICER), concentration = true),
-        SpellDef("animal_messenger", "Animal Messenger", 2, "Enchantment", "Action", "30 feet", "V, S, M", "24 hours",
+        SpellDef("animal_messenger", "Animal Messenger", 2, "Enchantment", "Action", "30 feet", "V, S, M (a morsel of food)", "24 hours",
             "A Tiny Beast of your choice that you can see within range must succeed on a Charisma saving " +
                 "throw, or it attempts to deliver a message for you (if the target's Challenge Rating isn't 0, it " +
                 "automatically succeeds). You specify a location you have visited and a recipient who matches a " +
@@ -638,7 +638,7 @@ object SpellData {
                 "Hostile toward. This indifference ends if the target takes damage or witnesses its allies taking " +
                 "damage. When the spell ends, the creature's attitude returns to normal.",
             setOf(BARD, CLERIC), concentration = true, saveAbility = Ability.CHA),
-        SpellDef("darkness", "Darkness", 2, "Evocation", "Action", "60 feet", "V, M", "10 minutes",
+        SpellDef("darkness", "Darkness", 2, "Evocation", "Action", "60 feet", "V, M (bat fur and a piece of coal)", "10 minutes",
             "For the duration, magical Darkness spreads from a point within range and fills a 15-foot-radius " +
                 "Sphere. Darkvision can't see through it, and nonmagical light can't illuminate it. " +
                 "Alternatively, you cast the spell on an object that isn't being worn or carried, causing the " +
@@ -647,7 +647,7 @@ object SpellData {
                 "overlaps with an area of Bright Light or Dim Light created by a spell of level 2 or lower, that " +
                 "other spell is dispelled.",
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true),
-        SpellDef("detect_thoughts", "Detect Thoughts", 2, "Divination", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("detect_thoughts", "Detect Thoughts", 2, "Divination", "Action", "Self", "V, S, M (1 Copper Piece)", "1 minute",
             "You activate one of the effects below. Until the spell ends, you can activate either effect as a " +
                 "Magic action on your later turns. Sense Thoughts. You sense the presence of thoughts within 30 " +
                 "feet of yourself that belong to creatures that know languages or are telepathic. You don't read " +
@@ -664,13 +664,13 @@ object SpellData {
                 "take an action on its turn to make an Intelligence (Arcana) check against your spell save DC, " +
                 "ending the spell on a success.",
             setOf(BARD, SORCERER, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("enhance_ability", "Enhance Ability", 2, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("enhance_ability", "Enhance Ability", 2, "Transmutation", "Action", "Touch", "V, S, M (fur or a feather)", "1 hour",
             "You touch a creature and choose Strength, Dexterity, Intelligence, Wisdom, or Charisma. For the " +
                 "duration, the target has Advantage on ability checks using the chosen ability. Using a " +
                 "Higher-Level Spell Slot. You can target one additional creature for each spell slot level above " +
                 "2. You can choose a different ability for each target.",
             setOf(ARTIFICER, BARD, CLERIC, DRUID, RANGER, SORCERER, WIZARD), concentration = true),
-        SpellDef("enlarge_reduce", "Enlarge/Reduce", 2, "Transmutation", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("enlarge_reduce", "Enlarge/Reduce", 2, "Transmutation", "Action", "30 feet", "V, S, M (a pinch of powdered iron)", "1 minute",
             "For the duration, the spell enlarges or reduces a creature or an object you can see within range " +
                 "(see the chosen effect below). A targeted object must be neither worn nor carried. If the target " +
                 "is an unwilling creature, it can make a Constitution saving throw. On a successful save, the " +
@@ -684,7 +684,7 @@ object SpellData {
                 "Strength checks and Strength saving throws. The target's attacks with its reduced weapons or " +
                 "Unarmed Strikes deal 1d4 less damage on a hit (this can't reduce the damage below 1).",
             setOf(BARD, DRUID, SORCERER, WIZARD, ARTIFICER), concentration = true, saveAbility = Ability.CON),
-        SpellDef("flaming_sphere", "Flaming Sphere", 2, "Conjuration", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("flaming_sphere", "Flaming Sphere", 2, "Conjuration", "Action", "60 feet", "V, S, M (a ball of wax)", "1 minute",
             "You create a 5-foot-diameter sphere of fire in an unoccupied space on the ground within range. " +
                 "It lasts for the duration. Any creature that ends its turn within 5 feet of the sphere makes a " +
                 "Dexterity saving throw, taking 2d6 Fire damage on a failed save or half as much damage on a " +
@@ -696,7 +696,7 @@ object SpellData {
                 "Light in a 20-foot radius and Dim Light for an additional 20 feet. Using a Higher-Level Spell " +
                 "Slot. The damage increases by 1d6 for each spell slot level above 2.",
             setOf(DRUID, SORCERER, WIZARD), concentration = true, damage = "2d6", damageType = "Fire", saveAbility = Ability.DEX),
-        SpellDef("gust_of_wind", "Gust of Wind", 2, "Evocation", "Action", "Self (60-foot line)", "V, S, M", "1 minute",
+        SpellDef("gust_of_wind", "Gust of Wind", 2, "Evocation", "Action", "Self (60-foot line)", "V, S, M (a legume seed)", "1 minute",
             "A Line of strong wind 60 feet long and 10 feet wide blasts from you in a direction you choose " +
                 "for the duration. Each creature in the Line must succeed on a Strength saving throw or be pushed " +
                 "15 feet away from you in a direction following the Line. A creature that ends its turn in the " +
@@ -706,13 +706,13 @@ object SpellData {
                 "lanterns, to dance wildly and has a 50 percent chance to extinguish them. As a Bonus Action on " +
                 "your later turns, you can change the direction in which the Line blasts from you.",
             setOf(DRUID, RANGER, SORCERER, WIZARD), concentration = true, saveAbility = Ability.STR),
-        SpellDef("hold_person", "Hold Person", 2, "Enchantment", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("hold_person", "Hold Person", 2, "Enchantment", "Action", "60 feet", "V, S, M (a straight piece of iron)", "1 minute",
             "Choose a Humanoid that you can see within range. The target must succeed on a Wisdom saving " +
                 "throw or have the Paralyzed condition for the duration. At the end of each of its turns, the " +
                 "target repeats the save, ending the spell on itself on a success. Using a Higher-Level Spell " +
                 "Slot. You can target one additional Humanoid for each spell slot level above 2.",
             setOf(BARD, CLERIC, DRUID, SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("invisibility", "Invisibility", 2, "Illusion", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("invisibility", "Invisibility", 2, "Illusion", "Action", "Touch", "V, S, M (an eyelash in gum arabic)", "1 hour",
             "A creature you touch has the Invisible condition until the spell ends. The spell ends early " +
                 "immediately after the target makes an attack roll, deals damage, or casts a spell. Using a " +
                 "Higher-Level Spell Slot. You can target one additional creature for each spell slot level above " +
@@ -727,10 +727,10 @@ object SpellData {
                 "which time the target can be opened and closed. When you cast the spell, a loud knock, audible " +
                 "up to 300 feet away, emanates from the target.",
             setOf(BARD, SORCERER, WIZARD)),
-        SpellDef("lesser_restoration", "Lesser Restoration", 2, "Abjuration", "Action", "Touch", "V, S", "Instantaneous",
+        SpellDef("lesser_restoration", "Lesser Restoration", 2, "Abjuration", "Bonus Action", "Touch", "V, S", "Instantaneous",
             "You touch a creature and end one condition on it: Blinded, Deafened, Paralyzed, or Poisoned.",
             setOf(BARD, CLERIC, DRUID, PALADIN, RANGER, ARTIFICER)),
-        SpellDef("levitate", "Levitate", 2, "Transmutation", "Action", "60 feet", "V, S, M", "10 minutes",
+        SpellDef("levitate", "Levitate", 2, "Transmutation", "Action", "60 feet", "V, S, M (a metal spring)", "10 minutes",
             "One creature or loose object of your choice that you can see within range rises vertically up to " +
                 "20 feet and remains suspended there for the duration. The spell can levitate an object that " +
                 "weighs up to 500 pounds. An unwilling creature that succeeds on a Constitution saving throw is " +
@@ -760,7 +760,7 @@ object SpellData {
             "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space you can " +
                 "see.",
             setOf(SORCERER, WARLOCK, WIZARD)),
-        SpellDef("moonbeam", "Moonbeam", 2, "Evocation", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("moonbeam", "Moonbeam", 2, "Evocation", "Action", "120 feet", "V, S, M (a moonseed leaf)", "1 minute",
             "A silvery beam of pale light shines down in a 5-foot-radius, 40-foot-high Cylinder centered on a " +
                 "point within range. Until the spell ends, Dim Light fills the Cylinder, and you can take a Magic " +
                 "action on later turns to move the Cylinder up to 60 feet. When the Cylinder appears, each " +
@@ -772,7 +772,7 @@ object SpellData {
                 "there. A creature makes this save only once per turn. Using a Higher-Level Spell Slot. The " +
                 "damage increases by 1d10 for each spell slot level above 2.",
             setOf(DRUID), concentration = true, damage = "2d10", damageType = "Radiant", saveAbility = Ability.CON),
-        SpellDef("pass_without_trace", "Pass without Trace", 2, "Abjuration", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("pass_without_trace", "Pass without Trace", 2, "Abjuration", "Action", "Self", "V, S, M (ashes from burned mistletoe)", "1 hour",
             "You radiate a concealing aura in a 30-foot Emanation for the duration. While in the aura, you " +
                 "and each creature you choose have a +10 bonus to Dexterity (Stealth) checks and leave no tracks.",
             setOf(DRUID, RANGER), concentration = true),
@@ -781,12 +781,12 @@ object SpellData {
                 "ranged spell attack for each ray. On a hit, the target takes 2d6 Fire damage. Using a " +
                 "Higher-Level Spell Slot. You create one additional ray for each spell slot level above 2.",
             setOf(SORCERER, WIZARD), damage = "2d6", damageType = "Fire", needsAttackRoll = true),
-        SpellDef("see_invisibility", "See Invisibility", 2, "Divination", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("see_invisibility", "See Invisibility", 2, "Divination", "Action", "Self", "V, S, M (a pinch of talc)", "1 hour",
             "For the duration, you see creatures and objects that have the Invisible condition as if they " +
                 "were visible, and you can see into the Ethereal Plane. Creatures and objects there appear " +
                 "ghostly.",
             setOf(BARD, SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("shatter", "Shatter", 2, "Evocation", "Action", "60 feet", "V, S, M", "Instantaneous",
+        SpellDef("shatter", "Shatter", 2, "Evocation", "Action", "60 feet", "V, S, M (a chip of mica)", "Instantaneous",
             "A loud noise erupts from a point of your choice within range. Each creature in a 10-foot-radius " +
                 "Sphere centered there makes a Constitution saving throw, taking 3d8 Thunder damage on a failed " +
                 "save or half as much damage on a successful one. A Construct has Disadvantage on the save. A " +
@@ -800,7 +800,7 @@ object SpellData {
                 "has Immunity to Thunder damage, and creatures have the Deafened condition while entirely inside " +
                 "it. Casting a spell that includes a Verbal component is impossible there.",
             setOf(BARD, CLERIC, RANGER), ritual = true, concentration = true),
-        SpellDef("spider_climb", "Spider Climb", 2, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("spider_climb", "Spider Climb", 2, "Transmutation", "Action", "Touch", "V, S, M (a drop of bitumen and a spider)", "1 hour",
             "Until the spell ends, one willing creature you touch gains the ability to move up, down, and " +
                 "across vertical surfaces and along ceilings, while leaving its hands free. The target also gains " +
                 "a Climb Speed equal to its Speed. Using a Higher-Level Spell Slot. You can target one additional " +
@@ -815,7 +815,7 @@ object SpellData {
                 "within 5 feet of it. Using a Higher-Level Spell Slot. The damage increases by 1d8 for every slot " +
                 "level above 2.",
             setOf(CLERIC), concentration = true, needsAttackRoll = true),
-        SpellDef("suggestion", "Suggestion", 2, "Enchantment", "Action", "30 feet", "V, M", "8 hours",
+        SpellDef("suggestion", "Suggestion", 2, "Enchantment", "Action", "30 feet", "V, M (a drop of honey)", "8 hours",
             "You suggest a course of activity-described in no more than 25 words-to one creature you can see " +
                 "within range that can hear and understand you. The suggestion must sound achievable and not " +
                 "involve anything that would obviously deal damage to the target or its allies. For example, you " +
@@ -826,15 +826,15 @@ object SpellData {
                 "ability. The suggested activity can continue for the entire duration, but if the suggested " +
                 "activity can be completed in a shorter time, the spell ends for the target upon completing it.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("continual_flame", "Continual Flame", 2, "Evocation", "Action", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("continual_flame", "Continual Flame", 2, "Evocation", "Action", "Touch", "V, S, M (ruby dust worth 50+ GP, which the spell consumes)", "Until dispelled",
             "A flame springs from an object that you touch. The effect casts Bright Light in a 20-foot radius " +
                 "and Dim Light for an additional 20 feet. It looks like a regular flame, but it creates no heat " +
                 "and consumes no fuel. The flame can be covered or hidden but not smothered or quenched.",
             setOf(ARTIFICER, CLERIC, DRUID, WIZARD)),
-        SpellDef("darkvision", "Darkvision", 2, "Transmutation", "Action", "Touch", "V, S, M", "8 hours",
+        SpellDef("darkvision", "Darkvision", 2, "Transmutation", "Action", "Touch", "V, S, M (a dried carrot)", "8 hours",
             "For the duration, a willing creature you touch has Darkvision with a range of 150 feet.",
             setOf(DRUID, RANGER, SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("heat_metal", "Heat Metal", 2, "Transmutation", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("heat_metal", "Heat Metal", 2, "Transmutation", "Action", "60 feet", "V, S, M (a piece of iron and a flame)", "1 minute",
             "Choose a manufactured metal object, such as a metal weapon or a suit of Heavy or Medium metal " +
                 "armor, that you can see within range. You cause the object to glow red-hot. Any creature in " +
                 "physical contact with the object takes 2d8 Fire damage when you cast the spell. Until the spell " +
@@ -845,7 +845,7 @@ object SpellData {
                 "of your next turn. Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell " +
                 "slot level above 2.",
             setOf(BARD, DRUID, ARTIFICER), damage = "2d8", damageType = "Fire", concentration = true, saveAbility = Ability.CON),
-        SpellDef("homunculus_servant", "Homunculus Servant", 2, "Conjuration", "1 hour", "10 feet", "V, S, M", "Instantaneous",
+        SpellDef("homunculus_servant", "Homunculus Servant", 2, "Conjuration", "1 hour", "10 feet", "V, S, M (a gem worth 100+ GP)", "Instantaneous",
             "You summon a special homunculus in an unoccupied space within range. This creature uses the " +
                 "Homunculus Servant stat block. If you already have a homunculus from this spell, the homunculus " +
                 "is replaced by the new one. You determine the homunculus's appearance, such as a " +
@@ -869,7 +869,7 @@ object SpellData {
                 "Channel Magic. Trigger: You cast a spell that has a range of touch while the homunculus is " +
                 "within 120 feet of you. Response: The homunculus delivers the spell through its touch.",
             setOf(ARTIFICER), ritual = true, book = Sourcebook.EBERRON, saveAbility = Ability.DEX),
-        SpellDef("web", "Web", 2, "Conjuration", "Action", "60 feet", "V, S, M", "1 hour",
+        SpellDef("web", "Web", 2, "Conjuration", "Action", "60 feet", "V, S, M (a bit of spiderweb)", "1 hour",
             "You conjure a mass of sticky webbing at a point within range. The webs fill a 20-foot Cube there " +
                 "for the duration. The webs are Difficult Terrain, and the area within them is Lightly Obscured. " +
                 "If the webs aren't anchored between two solid masses (such as walls or trees) or layered across " +
@@ -884,7 +884,7 @@ object SpellData {
             setOf(SORCERER, WIZARD, ARTIFICER), concentration = true, saveAbility = Ability.DEX),
 
         // ---------------------------------------------------------------- Level 3
-        SpellDef("animate_dead", "Animate Dead", 3, "Necromancy", "1 minute", "10 feet", "V, S, M", "Instantaneous",
+        SpellDef("animate_dead", "Animate Dead", 3, "Necromancy", "1 minute", "10 feet", "V, S, M (a drop of blood, a piece of flesh, and a pinch of bone dust)", "Instantaneous",
             "Choose a pile of bones or a corpse of a Medium or Small Humanoid within range. The target " +
                 "becomes an Undead creature: a Skeleton if you chose bones or a Zombie if you chose a corpse (see " +
                 "appendix B for the stat blocks). On each of your turns, you can take a Bonus Action to mentally " +
@@ -933,14 +933,14 @@ object SpellData {
                 "check, the spell ends. Using a Higher-Level Spell Slot. You automatically end a spell on the " +
                 "target if the spell's level is equal to or less than the level of the spell slot you use.",
             setOf(ARTIFICER, BARD, CLERIC, DRUID, PALADIN, RANGER, SORCERER, WARLOCK, WIZARD)),
-        SpellDef("fear", "Fear", 3, "Illusion", "Action", "Self (30-foot cone)", "V, S, M", "1 minute",
+        SpellDef("fear", "Fear", 3, "Illusion", "Action", "Self (30-foot cone)", "V, S, M (a white feather)", "1 minute",
             "Each creature in a 30-foot Cone must succeed on a Wisdom saving throw or drop whatever it is " +
                 "holding and have the Frightened condition for the duration. A Frightened creature takes the Dash " +
                 "action and moves away from you by the safest route on each of its turns unless there is nowhere " +
                 "to move. If the creature ends its turn in a space where it doesn't have line of sight to you, " +
                 "the creature makes a Wisdom saving throw. On a successful save, the spell ends on that creature.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("fireball", "Fireball", 3, "Evocation", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("fireball", "Fireball", 3, "Evocation", "Action", "150 feet", "V, S, M (a ball of bat guano and sulfur)", "Instantaneous",
             "A bright streak flashes from you to a point you choose within range and then blossoms with a low " +
                 "roar into a fiery explosion. Each creature in a 20-foot-radius Sphere centered on that point " +
                 "makes a Dexterity saving throw, taking 8d6 Fire damage on a failed save or half as much damage " +
@@ -948,13 +948,13 @@ object SpellData {
                 "burning. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot level " +
                 "above 3.",
             setOf(SORCERER, WIZARD), damage = "8d6", damageType = "Fire", saveAbility = Ability.DEX),
-        SpellDef("fly", "Fly", 3, "Transmutation", "Action", "Touch", "V, S, M", "10 minutes",
+        SpellDef("fly", "Fly", 3, "Transmutation", "Action", "Touch", "V, S, M (a feather)", "10 minutes",
             "You touch a willing creature. For the duration, the target gains a Fly Speed of 60 feet and can " +
                 "hover. When the spell ends, the target falls if it is still aloft unless it can stop the fall. " +
                 "Using a Higher-Level Spell Slot. You can target one additional creature for each spell slot " +
                 "level above 3.",
             setOf(SORCERER, WARLOCK, WIZARD, ARTIFICER), concentration = true),
-        SpellDef("haste", "Haste", 3, "Transmutation", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("haste", "Haste", 3, "Transmutation", "Action", "30 feet", "V, S, M (a shaving of licorice root)", "1 minute",
             "Choose a willing creature that you can see within range. Until the spell ends, the target's " +
                 "Speed is doubled, it gains a +2 bonus to Armor Class, it has Advantage on Dexterity saving " +
                 "throws, and it gains an additional action on each of its turns. That action can be used to take " +
@@ -962,14 +962,14 @@ object SpellData {
                 "ends, the target is Incapacitated and has a Speed of 0 until the end of its next turn, as a wave " +
                 "of lethargy washes over it.",
             setOf(SORCERER, WIZARD, ARTIFICER), concentration = true),
-        SpellDef("hypnotic_pattern", "Hypnotic Pattern", 3, "Illusion", "Action", "120 feet", "S, M", "1 minute",
+        SpellDef("hypnotic_pattern", "Hypnotic Pattern", 3, "Illusion", "Action", "120 feet", "S, M (a pinch of confetti)", "1 minute",
             "You create a twisting pattern of colors in a 30-foot Cube within range. The pattern appears for " +
                 "a moment and vanishes. Each creature in the area who can see the pattern must succeed on a " +
                 "Wisdom saving throw or have the Charmed condition for the duration. While Charmed, the creature " +
                 "has the Incapacitated condition and a Speed of 0. The spell ends for an affected creature if it " +
                 "takes any damage or if someone else uses an action to shake the creature out of its stupor.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("lightning_bolt", "Lightning Bolt", 3, "Evocation", "Action", "Self (100-foot line)", "V, S, M", "Instantaneous",
+        SpellDef("lightning_bolt", "Lightning Bolt", 3, "Evocation", "Action", "Self (100-foot line)", "V, S, M (a bit of fur and a crystal rod)", "Instantaneous",
             "A stroke of lightning forming a 100-foot-long, 5-foot-wide Line blasts out from you in a " +
                 "direction you choose. Each creature in the Line makes a Dexterity saving throw, taking 8d6 " +
                 "Lightning damage on a failed save or half as much damage on a successful one. Using a " +
@@ -980,7 +980,7 @@ object SpellData {
                 "plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The healing increases " +
                 "by 1d4 for each spell slot level above 3.",
             setOf(BARD, CLERIC)),
-        SpellDef("plant_growth", "Plant Growth", 3, "Transmutation", "Action", "150 feet", "V, S", "Instantaneous",
+        SpellDef("plant_growth", "Plant Growth", 3, "Transmutation", "Action (Overgrowth) or 8 hours (Enrichment)", "150 feet", "V, S", "Instantaneous",
             "This spell channels vitality into plants. The casting time you use determines whether the spell " +
                 "has the Overgrowth or the Enrichment effect below. Overgrowth. Choose a point within range. All " +
                 "normal plants in a 100-foot-radius Sphere centered on that point become thick and overgrown. A " +
@@ -994,12 +994,12 @@ object SpellData {
             "For the duration, the willing creature you touch has Resistance to one damage type of your " +
                 "choice: Acid, Cold, Fire, Lightning, or Thunder.",
             setOf(CLERIC, DRUID, RANGER, SORCERER, WIZARD, ARTIFICER), concentration = true),
-        SpellDef("revivify", "Revivify", 3, "Necromancy", "Action", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("revivify", "Revivify", 3, "Necromancy", "Action", "Touch", "V, S, M (a diamond worth 300+ GP, which the spell consumes)", "Instantaneous",
             "You touch a creature that has died within the last minute. That creature revives with 1 Hit " +
                 "Point. This spell can't revive a creature that has died of old age, nor does it restore any " +
                 "missing body parts.",
             setOf(CLERIC, DRUID, PALADIN, RANGER, ARTIFICER)),
-        SpellDef("sending", "Sending", 3, "Divination", "Action", "Unlimited", "V, S, M", "Instantaneous",
+        SpellDef("sending", "Sending", 3, "Divination", "Action", "Unlimited", "V, S, M (a copper wire)", "Instantaneous",
             "You send a short message of 25 words or fewer to a creature you have met or a creature described " +
                 "to you by someone who has met it. The target hears the message in its mind, recognizes you as " +
                 "the sender if it knows you, and can answer in a like manner immediately. The spell enables " +
@@ -1010,14 +1010,14 @@ object SpellData {
                 "8 hours. If you try to send another message during that time, you learn that you are blocked, " +
                 "and the spell fails.",
             setOf(BARD, CLERIC, WIZARD)),
-        SpellDef("sleet_storm", "Sleet Storm", 3, "Conjuration", "Action", "150 feet", "V, S, M", "1 minute",
+        SpellDef("sleet_storm", "Sleet Storm", 3, "Conjuration", "Action", "150 feet", "V, S, M (a miniature umbrella)", "1 minute",
             "Until the spell ends, sleet falls in a 40-foot-tall, 20-foot-radius Cylinder centered on a point " +
                 "you choose within range. The area is Heavily Obscured, and exposed flames in the area are " +
                 "doused. Ground in the Cylinder is Difficult Terrain. When a creature enters the Cylinder for the " +
                 "first time on a turn or starts its turn there, it must succeed on a Dexterity saving throw or " +
                 "have the Prone condition and lose Concentration.",
             setOf(DRUID, SORCERER, WIZARD), concentration = true, saveAbility = Ability.DEX),
-        SpellDef("spirit_guardians", "Spirit Guardians", 3, "Conjuration", "Action", "Self (15-foot radius)", "V, S, M", "10 minutes",
+        SpellDef("spirit_guardians", "Spirit Guardians", 3, "Conjuration", "Action", "Self (15-foot radius)", "V, S, M (a prayer scroll)", "10 minutes",
             "Protective spirits flit around you in a 15-foot Emanation for the duration. If you are good or " +
                 "neutral, their spectral form appears angelic or fey (your choice). If you are evil, they appear " +
                 "fiendish. When you cast this spell, you can designate creatures to be unaffected by it. Any " +
@@ -1028,7 +1028,7 @@ object SpellData {
                 "save, the creature takes half as much damage. A creature makes this save only once per turn. " +
                 "Using a Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 3.",
             setOf(CLERIC), concentration = true, damage = "3d8", damageType = "Radiant", saveAbility = Ability.WIS),
-        SpellDef("tongues", "Tongues", 3, "Divination", "Action", "Touch", "V, M", "1 hour",
+        SpellDef("tongues", "Tongues", 3, "Divination", "Action", "Touch", "V, M (a miniature ziggurat)", "1 hour",
             "This spell grants the creature you touch the ability to understand any spoken or signed language " +
                 "that it hears or sees. Moreover, when the target communicates by speaking or signing, any " +
                 "creature that knows at least one language can understand it if that creature can hear the speech " +
@@ -1056,7 +1056,7 @@ object SpellData {
                 "extra damage increases to 2d4. If you use a level 7+ spell slot, the bonus increases to +3, and " +
                 "the extra damage increases to 3d4.",
             setOf(ARTIFICER, DRUID, PALADIN, RANGER), concentration = true),
-        SpellDef("glyph_of_warding", "Glyph of Warding", 3, "Abjuration", "1 hour", "Touch", "V, S, M", "Until dispelled or triggered",
+        SpellDef("glyph_of_warding", "Glyph of Warding", 3, "Abjuration", "1 hour", "Touch", "V, S, M (powdered diamond worth 200+ GP, which the spell consumes)", "Until dispelled or triggered",
             "You inscribe a glyph that later unleashes a magical effect. You inscribe it either on a surface " +
                 "(such as a table or a section of floor) or within an object that can be closed (such as a book " +
                 "or chest) to conceal the glyph. The glyph can cover an area no larger than 10 feet in diameter. " +
@@ -1086,12 +1086,12 @@ object SpellData {
                 "each spell slot level above 3. If you create a spell glyph, you can store any spell of up to the " +
                 "same level as the spell slot you use for the Glyph of Warding.",
             setOf(BARD, CLERIC, WIZARD, ARTIFICER), damage = "5d8", damageType = "Acid, Cold, Fire, Lightning, or Thunder (your choice)", saveAbility = Ability.DEX),
-        SpellDef("water_breathing", "Water Breathing", 3, "Transmutation", "Action", "30 feet", "V, S, M", "24 hours",
+        SpellDef("water_breathing", "Water Breathing", 3, "Transmutation", "Action", "30 feet", "V, S, M (a short reed)", "24 hours",
             "This spell grants up to ten willing creatures of your choice within range the ability to breathe " +
                 "underwater until the spell ends. Affected creatures also retain their normal mode of " +
                 "respiration.",
             setOf(DRUID, RANGER, SORCERER, WIZARD, ARTIFICER), ritual = true),
-        SpellDef("water_walk", "Water Walk", 3, "Transmutation", "Action", "30 feet", "V, S, M", "1 hour",
+        SpellDef("water_walk", "Water Walk", 3, "Transmutation", "Action", "30 feet", "V, S, M (a piece of cork)", "1 hour",
             "This spell grants the ability to move across any liquid surface - such as water, acid, mud, " +
                 "snow, quicksand, or lava - as if it were harmless solid ground (creatures crossing molten lava " +
                 "can still take damage from the heat). Up to ten willing creatures of your choice within range " +
@@ -1101,7 +1101,7 @@ object SpellData {
             setOf(CLERIC, DRUID, RANGER, SORCERER, ARTIFICER), ritual = true),
 
         // ---------------------------------------------------------------- Level 4
-        SpellDef("banishment", "Banishment", 4, "Abjuration", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("banishment", "Banishment", 4, "Abjuration", "Action", "30 feet", "V, S, M (a pentacle)", "1 minute",
             "One creature that you can see within range must succeed on a Charisma saving throw or be " +
                 "transported to a harmless demiplane for the duration. While there, the target has the " +
                 "Incapacitated condition. When the spell ends, the target reappears in the space it left or in " +
@@ -1118,7 +1118,7 @@ object SpellData {
                 "such as a tree or shrub. It doesn't make a save; it simply withers and dies. Using a " +
                 "Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 4.",
             setOf(DRUID, SORCERER, WARLOCK, WIZARD), damage = "8d8", damageType = "Necrotic", saveAbility = Ability.CON),
-        SpellDef("confusion", "Confusion", 4, "Enchantment", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("confusion", "Confusion", 4, "Enchantment", "Action", "90 feet", "V, S, M (three nut shells)", "1 minute",
             "Each creature in a 10-foot-radius Sphere centered on a point you choose within range must " +
                 "succeed on a Wisdom saving throw, or that target can't take Bonus Actions or Reactions and must " +
                 "roll 1d10 at the start of each of its turns to determine its behavior for that turn, consulting " +
@@ -1153,7 +1153,7 @@ object SpellData {
                 "of skill - such as weapons and armor - unless you have proficiency with the type of Artisan's " +
                 "Tools used to craft such objects.",
             setOf(WIZARD, ARTIFICER)),
-        SpellDef("freedom_of_movement", "Freedom of Movement", 4, "Abjuration", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("freedom_of_movement", "Freedom of Movement", 4, "Abjuration", "Action", "Touch", "V, S, M (a leather strap)", "1 hour",
             "You touch a willing creature. For the duration, the target's movement is unaffected by Difficult " +
                 "Terrain, and spells and other magical effects can neither reduce the target's Speed nor cause " +
                 "the target to have the Paralyzed or Restrained conditions. The target also has a Swim Speed " +
@@ -1165,7 +1165,7 @@ object SpellData {
         SpellDef("greater_invisibility", "Greater Invisibility", 4, "Illusion", "Action", "Touch", "V, S", "1 minute",
             "A creature you touch has the Invisible condition until the spell ends.",
             setOf(BARD, SORCERER, WIZARD), concentration = true),
-        SpellDef("ice_storm", "Ice Storm", 4, "Evocation", "Action", "300 feet", "V, S, M", "Instantaneous",
+        SpellDef("ice_storm", "Ice Storm", 4, "Evocation", "Action", "300 feet", "V, S, M (a mitten)", "Instantaneous",
             "Hail falls in a 20-foot-radius, 40-foot-high Cylinder centered on a point within range. Each " +
                 "creature in the Cylinder makes a Dexterity saving throw. A creature takes 2d10 Bludgeoning " +
                 "damage and 4d6 Cold damage on a failed save or half as much damage on a successful one. " +
@@ -1173,7 +1173,7 @@ object SpellData {
                 "Using a Higher-Level Spell Slot. The Bludgeoning damage increases by 1d10 for each spell slot " +
                 "level above 4.",
             setOf(DRUID, SORCERER, WIZARD), damage = "2d10", damageType = "Bludgeoning", saveAbility = Ability.DEX),
-        SpellDef("leomunds_secret_chest", "Leomund's Secret Chest", 4, "Conjuration", "Action", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("leomunds_secret_chest", "Leomund's Secret Chest", 4, "Conjuration", "Action", "Touch", "V, S, M (a chest, 3 feet by 2 feet by 2 feet, constructed from rare materials worth 5,000+ GP, and a Tiny replica of the chest made from the same materials worth 50+ GP)", "Until dispelled",
             "You hide a chest and all its contents on the Ethereal Plane. You must touch the chest and the " +
                 "miniature replica that serve as Material components for the spell. The chest can contain up to " +
                 "12 cubic feet of nonliving material (3 feet by 2 feet by 2 feet). While the chest remains on the " +
@@ -1185,7 +1185,7 @@ object SpellData {
                 "spell ends and the larger chest is on the Ethereal Plane, the chest remains there for you or " +
                 "someone else to find.",
             setOf(WIZARD, ARTIFICER)),
-        SpellDef("mordenkainens_faithful_hound", "Mordenkainen's Faithful Hound", 4, "Conjuration", "Action", "30 feet", "V, S, M", "8 hours",
+        SpellDef("mordenkainens_faithful_hound", "Mordenkainen's Faithful Hound", 4, "Conjuration", "Action", "30 feet", "V, S, M (a silver whistle)", "8 hours",
             "You conjure a phantom watchdog in an unoccupied space that you can see within range. The hound " +
                 "remains for the duration or until the two of you are more than 300 feet apart from each other. " +
                 "No one but you can see the hound, and it is intangible and invulnerable. When a Small or larger " +
@@ -1195,7 +1195,7 @@ object SpellData {
                 "it. That enemy must succeed on a Dexterity saving throw or take 4d8 Force damage. On your later " +
                 "turns, you can take a Magic action to move the hound up to 30 feet.",
             setOf(WIZARD, ARTIFICER), damage = "4d8", damageType = "Piercing", saveAbility = Ability.DEX),
-        SpellDef("mordenkainens_private_sanctum", "Mordenkainen's Private Sanctum", 4, "Abjuration", "10 minutes", "120 feet", "V, S, M", "24 hours",
+        SpellDef("mordenkainens_private_sanctum", "Mordenkainen's Private Sanctum", 4, "Abjuration", "10 minutes", "120 feet", "V, S, M (a thin sheet of lead)", "24 hours",
             "You make an area within range magically secure. The area is a Cube that can be as small as 5 " +
                 "feet to as large as 100 feet on each side. The spell lasts for the duration. When you cast the " +
                 "spell, you decide what sort of security the spell provides, choosing any of the following " +
@@ -1208,7 +1208,7 @@ object SpellData {
                 "Using a Higher-Level Spell Slot. You can increase the size of the Cube by 100 feet for each " +
                 "spell slot level above 4.",
             setOf(WIZARD, ARTIFICER)),
-        SpellDef("otilukes_resilient_sphere", "Otiluke's Resilient Sphere", 4, "Abjuration", "Action", "30 feet", "V, S, M", "1 minute",
+        SpellDef("otilukes_resilient_sphere", "Otiluke's Resilient Sphere", 4, "Abjuration", "Action", "30 feet", "V, S, M (a glass sphere)", "1 minute",
             "A shimmering sphere encloses a Large or smaller creature or object within range. An unwilling " +
                 "creature must succeed on a Dexterity saving throw or be enclosed for the duration. Nothing-not " +
                 "physical objects, energy, or other spell effects-can pass through the barrier, in or out, though " +
@@ -1220,7 +1220,7 @@ object SpellData {
                 "Similarly, the globe can be picked up and moved by other creatures. A Disintegrate spell " +
                 "targeting the globe destroys it without harming anything inside.",
             setOf(WIZARD, ARTIFICER), saveAbility = Ability.DEX, concentration = true),
-        SpellDef("polymorph", "Polymorph", 4, "Transmutation", "Action", "60 feet", "V, S, M", "1 hour",
+        SpellDef("polymorph", "Polymorph", 4, "Transmutation", "Action", "60 feet", "V, S, M (a caterpillar cocoon)", "1 hour",
             "You attempt to transform a creature that you can see within range into a Beast. The target must " +
                 "succeed on a Wisdom saving throw or shape-shift into a Beast form for the duration. That form " +
                 "can be any Beast you choose that has a Challenge Rating equal to or less than the target's (or " +
@@ -1234,18 +1234,18 @@ object SpellData {
                 "gear melds into the new form. The creature can't use or otherwise benefit from any of that " +
                 "equipment.",
             setOf(BARD, DRUID, SORCERER, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("stone_shape", "Stone Shape", 4, "Transmutation", "Action", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("stone_shape", "Stone Shape", 4, "Transmutation", "Action", "Touch", "V, S, M (soft clay)", "Instantaneous",
             "You touch a stone object of Medium size or smaller or a section of stone no more than 5 feet in " +
                 "any dimension and form it into any shape you like. For example, you could shape a large rock " +
                 "into a weapon, statue, or coffer, or you could make a small passage through a wall that is 5 " +
                 "feet thick. You could also shape a stone door or its frame to seal the door shut. The object you " +
                 "create can have up to two hinges and a latch, but finer mechanical detail isn't possible.",
             setOf(CLERIC, DRUID, WIZARD, ARTIFICER)),
-        SpellDef("stoneskin", "Stoneskin", 4, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("stoneskin", "Stoneskin", 4, "Transmutation", "Action", "Touch", "V, S, M (diamond dust worth 100+ GP, which the spell consumes)", "1 hour",
             "Until the spell ends, one willing creature you touch has Resistance to Bludgeoning, Piercing, " +
                 "and Slashing damage.",
             setOf(DRUID, RANGER, SORCERER, WIZARD, ARTIFICER), concentration = true),
-        SpellDef("wall_of_fire", "Wall of Fire", 4, "Evocation", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("wall_of_fire", "Wall of Fire", 4, "Evocation", "Action", "120 feet", "V, S, M (a piece of charcoal)", "1 minute",
             "You create a wall of fire on a solid surface within range. You can make the wall up to 60 feet " +
                 "long, 20 feet high, and 1 foot thick, or a ringed wall up to 20 feet in diameter, 20 feet high, " +
                 "and 1 foot thick. The wall is opaque and lasts for the duration. When the wall appears, each " +
@@ -1299,26 +1299,26 @@ object SpellData {
                 "The Sphere moves 10 feet away from you at the start of each of your turns. Using a Higher-Level " +
                 "Spell Slot. The damage increases by 1d8 for each spell slot level above 5.",
             setOf(SORCERER, WIZARD), concentration = true, damage = "5d8", damageType = "Poison", saveAbility = Ability.CON),
-        SpellDef("cone_of_cold", "Cone of Cold", 5, "Evocation", "Action", "Self (60-foot cone)", "V, S, M", "Instantaneous",
+        SpellDef("cone_of_cold", "Cone of Cold", 5, "Evocation", "Action", "Self (60-foot cone)", "V, S, M (a small crystal or glass cone)", "Instantaneous",
             "You unleash a blast of cold air. Each creature in a 60-foot Cone originating from you makes a " +
                 "Constitution saving throw, taking 8d8 Cold damage on a failed save or half as much damage on a " +
                 "successful one. A creature killed by this spell becomes a frozen statue until it thaws. Using a " +
                 "Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 5.",
             setOf(DRUID, SORCERER, WIZARD), damage = "8d8", damageType = "Cold", saveAbility = Ability.CON),
-        SpellDef("flame_strike", "Flame Strike", 5, "Evocation", "Action", "60 feet", "V, S, M", "Instantaneous",
+        SpellDef("flame_strike", "Flame Strike", 5, "Evocation", "Action", "60 feet", "V, S, M (a pinch of sulfur)", "Instantaneous",
             "A vertical column of brilliant fire roars down from above. Each creature in a 10-foot-radius, " +
                 "40-foot-high Cylinder centered on a point within range makes a Dexterity saving throw, taking " +
                 "5d6 Fire damage and 5d6 Radiant damage on a failed save or half as much damage on a successful " +
                 "one. Using a Higher-Level Spell Slot. The Fire damage and the Radiant damage increase by 1d6 for " +
                 "each spell slot level above 5.",
             setOf(CLERIC), damage = "5d6", damageType = "Fire", saveAbility = Ability.DEX),
-        SpellDef("greater_restoration", "Greater Restoration", 5, "Abjuration", "Action", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("greater_restoration", "Greater Restoration", 5, "Abjuration", "Action", "Touch", "V, S, M (diamond dust worth 100+ GP, which the spell consumes)", "Instantaneous",
             "You touch a creature and magically remove one of the following effects from it: 1 Exhaustion " +
                 "level The Charmed or Petrified condition A curse, including the target's Attunement to a cursed " +
                 "magic item Any reduction to one of the target's ability scores Any reduction to the target's Hit " +
                 "Point maximum",
             setOf(ARTIFICER, BARD, CLERIC, DRUID, PALADIN, RANGER)),
-        SpellDef("hold_monster", "Hold Monster", 5, "Enchantment", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("hold_monster", "Hold Monster", 5, "Enchantment", "Action", "90 feet", "V, S, M (a straight piece of iron)", "1 minute",
             "Choose a creature that you can see within range. The target must succeed on a Wisdom saving " +
                 "throw or have the Paralyzed condition for the duration. At the end of each of its turns, the " +
                 "target repeats the save, ending the spell on itself on a success. Using a Higher-Level Spell " +
@@ -1330,7 +1330,7 @@ object SpellData {
                 "equal to 5d8 plus your spellcasting ability modifier. Using a Higher-Level Spell Slot. The " +
                 "healing increases by 1d8 for each spell slot level above 5.",
             setOf(BARD, CLERIC, DRUID)),
-        SpellDef("raise_dead", "Raise Dead", 5, "Necromancy", "1 hour", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("raise_dead", "Raise Dead", 5, "Necromancy", "1 hour", "Touch", "V, S, M (a diamond worth 500+ GP, which the spell consumes)", "Instantaneous",
             "With a touch, you revive a dead creature if it has been dead no longer than 10 days and it " +
                 "wasn't Undead when it died. The creature returns to life with 1 Hit Point. This spell also " +
                 "neutralizes any poisons that affected the creature at the time of death. This spell closes all " +
@@ -1339,7 +1339,7 @@ object SpellData {
                 "Coming back from the dead is an ordeal. The target takes a -4 penalty to D20 Tests. Every time " +
                 "the target finishes a Long Rest, the penalty is reduced by 1 until it becomes 0.",
             setOf(BARD, CLERIC, PALADIN)),
-        SpellDef("scrying", "Scrying", 5, "Divination", "10 minutes", "Self", "V, S, M", "10 minutes",
+        SpellDef("scrying", "Scrying", 5, "Divination", "10 minutes", "Self", "V, S, M (a focus worth 1,000+ GP, such as a crystal ball, mirror, or water-filled font)", "10 minutes",
             "You can see and hear a creature you choose that is on the same plane of existence as you. The " +
                 "target makes a Wisdom saving throw, which is modified (see the tables below) by how well you " +
                 "know the target and the sort of physical connection you have to it. The target doesn't know what " +
@@ -1354,7 +1354,7 @@ object SpellData {
                 "the size of your fist. Instead of targeting a creature, you can target a location you have seen. " +
                 "When you do so, the sensor appears at that location and doesn't move.",
             setOf(BARD, CLERIC, DRUID, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("wall_of_stone", "Wall of Stone", 5, "Evocation", "Action", "120 feet", "V, S, M", "10 minutes",
+        SpellDef("wall_of_stone", "Wall of Stone", 5, "Evocation", "Action", "120 feet", "V, S, M (a cube of granite)", "10 minutes",
             "A nonmagical wall of solid stone springs into existence at a point you choose within range. The " +
                 "wall is 6 inches thick and is composed of ten 10-foot-by-10-foot panels. Each panel must be " +
                 "contiguous with another panel. Alternatively, you can create 10-foot-by-20-foot panels that are " +
@@ -1374,7 +1374,7 @@ object SpellData {
                 "Concentration on this spell for its full duration, the wall becomes permanent and can't be " +
                 "dispelled. Otherwise, the wall disappears when the spell ends.",
             setOf(DRUID, SORCERER, WIZARD, ARTIFICER), concentration = true, saveAbility = Ability.DEX),
-        SpellDef("wall_of_force", "Wall of Force", 5, "Evocation", "Action", "120 feet", "V, S, M", "10 minutes",
+        SpellDef("wall_of_force", "Wall of Force", 5, "Evocation", "Action", "120 feet", "V, S, M (a shard of glass)", "10 minutes",
             "An Invisible wall of force springs into existence at a point you choose within range. The wall " +
                 "appears in any orientation you choose, as a horizontal or vertical barrier or at an angle. It " +
                 "can be free floating or resting on a solid surface. You can form it into a hemispherical dome or " +
@@ -1407,7 +1407,7 @@ object SpellData {
                 "water that can fit in a 1-foot Cube to assume a crude shape (such as that of a creature) for 1 " +
                 "hour.",
             setOf(DRUID, SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("friends", "Friends", 0, "Enchantment", "Action", "10 feet", "S, M", "1 minute",
+        SpellDef("friends", "Friends", 0, "Enchantment", "Action", "10 feet", "S, M (some makeup)", "1 minute",
             "You magically emanate a sense of friendship toward one creature you can see within range. The " +
                 "target must succeed on a Wisdom saving throw or have the Charmed condition for the duration. The " +
                 "target succeeds automatically if it isn't a Humanoid, if you're fighting it, or if you have cast " +
@@ -1432,7 +1432,7 @@ object SpellData {
                 "(Athletics) check against your spell save DC. On a success, the spell ends. Using a Higher-Level " +
                 "Spell Slot. The damage increases by 1d6 for each spell slot level above 1.",
             setOf(RANGER), concentration = true, saveAbility = Ability.STR),
-        SpellDef("ice_knife", "Ice Knife", 1, "Conjuration", "Action", "60 feet", "S, M", "Instantaneous",
+        SpellDef("ice_knife", "Ice Knife", 1, "Conjuration", "Action", "60 feet", "S, M (a drop of water or a piece of ice)", "Instantaneous",
             "You create a shard of ice and fling it at one creature within range. Make a ranged spell attack " +
                 "against the target. On a hit, the target takes 1d10 Piercing damage. Hit or miss, the shard then " +
                 "explodes. The target and each creature within 5 feet of it must succeed on a Dexterity saving " +
@@ -1452,7 +1452,7 @@ object SpellData {
                 "condition. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell slot " +
                 "level above 1.",
             setOf(PALADIN), saveAbility = Ability.STR, damage = "2d6", damageType = "Thunder"),
-        SpellDef("unseen_servant", "Unseen Servant", 1, "Conjuration", "Action or Ritual", "60 feet", "V, S, M", "1 hour",
+        SpellDef("unseen_servant", "Unseen Servant", 1, "Conjuration", "Action or Ritual", "60 feet", "V, S, M (a bit of string and of wood)", "1 hour",
             "This spell creates an Invisible, mindless, shapeless, Medium force that performs simple tasks at " +
                 "your command until the spell ends. The servant springs into existence in an unoccupied space on " +
                 "the ground within range. It has AC 10, 1 Hit Point, and a Strength of 2, and it can't attack. If " +
@@ -1464,7 +1464,7 @@ object SpellData {
                 "your next command. If you command the servant to perform a task that would move it more than 60 " +
                 "feet away from you, the spell ends.",
             setOf(BARD, WARLOCK, WIZARD), ritual = true),
-        SpellDef("detect_poison_disease", "Detect Poison and Disease", 1, "Divination", "Action or Ritual", "Self", "V, S, M", "10 minutes",
+        SpellDef("detect_poison_disease", "Detect Poison and Disease", 1, "Divination", "Action or Ritual", "Self", "V, S, M (a yew leaf)", "10 minutes",
             "For the duration, you sense the location of poisons, poisonous or venomous creatures, and " +
                 "magical contagions within 30 feet of yourself. You sense the kind of poison, creature, or " +
                 "contagion in each case. The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; " +
@@ -1472,7 +1472,7 @@ object SpellData {
             setOf(CLERIC, DRUID, PALADIN, RANGER), ritual = true, concentration = true),
 
         // ---- Level 2
-        SpellDef("arcane_lock", "Arcane Lock", 2, "Abjuration", "Action", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("arcane_lock", "Arcane Lock", 2, "Abjuration", "Action", "Touch", "V, S, M (gold dust worth 25+ GP, which the spell consumes)", "Until dispelled",
             "You touch a closed door, window, gate, container, or hatch and magically lock it for the " +
                 "duration. This lock can't be unlocked by any nonmagical means. You and any creatures you " +
                 "designate when you cast the spell can open and close the object despite the lock. You can also " +
@@ -1483,14 +1483,14 @@ object SpellData {
                 "as your own. When perceiving through the Beast's senses, you benefit from any special senses it " +
                 "has.",
             setOf(DRUID, RANGER), ritual = true, concentration = true),
-        SpellDef("dragons_breath", "Dragon's Breath", 2, "Transmutation", "Bonus Action", "Touch", "V, S, M", "1 minute",
+        SpellDef("dragons_breath", "Dragon's Breath", 2, "Transmutation", "Bonus Action", "Touch", "V, S, M (a hot pepper)", "1 minute",
             "You touch one willing creature, and choose Acid, Cold, Fire, Lightning, or Poison. Until the " +
                 "spell ends, the target can take a Magic action to exhale a 15-foot Cone. Each creature in that " +
                 "area makes a Dexterity saving throw, taking 3d6 damage of the chosen type on a failed save or " +
                 "half as much damage on a successful one. Using a Higher-Level Spell Slot. The damage increases " +
                 "by 1d6 for each spell slot level above 2.",
             setOf(SORCERER, WIZARD, ARTIFICER), concentration = true, saveAbility = Ability.DEX),
-        SpellDef("locate_object", "Locate Object", 2, "Divination", "Action", "Self", "V, S, M", "10 minutes",
+        SpellDef("locate_object", "Locate Object", 2, "Divination", "Action", "Self", "V, S, M (a forked twig)", "10 minutes",
             "Describe or name an object that is familiar to you. You sense the direction to the object's " +
                 "location if that object is within 1,000 feet of you. If the object is in motion, you know the " +
                 "direction of its movement. The spell can locate a specific object known to you if you have seen " +
@@ -1499,7 +1499,7 @@ object SpellData {
                 "This spell can't locate an object if any thickness of lead blocks a direct path between you and " +
                 "the object.",
             setOf(BARD, CLERIC, DRUID, PALADIN, RANGER, WIZARD), concentration = true),
-        SpellDef("magic_mouth", "Magic Mouth", 2, "Illusion", "Action or Ritual", "30 feet", "V, S, M", "Until dispelled",
+        SpellDef("magic_mouth", "Magic Mouth", 2, "Illusion", "1 minute or Ritual", "30 feet", "V, S, M (jade dust worth 10+ GP, which the spell consumes)", "Until dispelled",
             "You implant a message within an object in range - a message that is uttered when a trigger " +
                 "condition is met. Choose an object that you can see and that isn't being worn or carried by " +
                 "another creature. Then speak the message, which must be 25 words or fewer, though it can be " +
@@ -1514,7 +1514,7 @@ object SpellData {
                 "the object. For example, you could instruct the mouth to speak when any creature moves within 30 " +
                 "feet of the object or when a silver bell rings within 30 feet of it.",
             setOf(BARD, WIZARD, ARTIFICER), ritual = true),
-        SpellDef("melfs_acid_arrow", "Melf's Acid Arrow", 2, "Evocation", "Action", "90 feet", "V, S, M", "Instantaneous",
+        SpellDef("melfs_acid_arrow", "Melf's Acid Arrow", 2, "Evocation", "Action", "90 feet", "V, S, M (powdered rhubarb leaf)", "Instantaneous",
             "A shimmering green arrow streaks toward a target within range and bursts in a spray of acid. " +
                 "Make a ranged spell attack against the target. On a hit, the target takes 4d4 Acid damage and " +
                 "2d4 Acid damage at the end of its next turn. On a miss, the arrow splashes the target with acid " +
@@ -1530,7 +1530,7 @@ object SpellData {
                 "it gains no benefit from that condition against you. Using a Higher-Level Spell Slot. The damage " +
                 "increases by 1d8 for each spell slot level above 2.",
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true, damage = "3d8", damageType = "Psychic", saveAbility = Ability.WIS),
-        SpellDef("phantasmal_force", "Phantasmal Force", 2, "Illusion", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("phantasmal_force", "Phantasmal Force", 2, "Illusion", "Action", "60 feet", "V, S, M (a bit of fleece)", "1 minute",
             "You attempt to craft an illusion in the mind of a creature you can see within range. The target " +
                 "makes an Intelligence saving throw. On a failed save, you create a phantasmal object, creature, " +
                 "or other phenomenon that is no larger than a 10-foot Cube and that is perceivable only to the " +
@@ -1553,7 +1553,7 @@ object SpellData {
                 "1d8 from all its damage rolls. The target repeats the save at the end of each of its turns, " +
                 "ending the spell on a success.",
             setOf(WARLOCK, WIZARD), concentration = true, saveAbility = Ability.CON),
-        SpellDef("rope_trick", "Rope Trick", 2, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("rope_trick", "Rope Trick", 2, "Transmutation", "Action", "Touch", "V, S, M (a segment of rope)", "1 hour",
             "You touch a rope. One end of it hovers upward until the rope hangs perpendicular to the ground " +
                 "or the rope reaches a ceiling. At the rope's upper end, an Invisible 3-foot-by-5-foot portal " +
                 "opens to an extradimensional space that lasts until the spell ends. That space can be reached by " +
@@ -1568,7 +1568,7 @@ object SpellData {
                 "and it can't benefit from the Invisible condition. Using a Higher-Level Spell Slot. The damage " +
                 "increases by 1d6 for each spell slot level above 2.",
             setOf(PALADIN), concentration = true, damage = "2d6", damageType = "Radiant"),
-        SpellDef("warding_bond", "Warding Bond", 2, "Abjuration", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("warding_bond", "Warding Bond", 2, "Abjuration", "Action", "Touch", "V, S, M (a pair of platinum rings worth 50+ GP each, which you and the target must wear for the duration)", "1 hour",
             "You touch another creature that is willing and create a mystic connection between you and the " +
                 "target until the spell ends. While the target is within 60 feet of you, it gains a +1 bonus to " +
                 "AC and saving throws, and it has Resistance to all damage. Also, each time it takes damage, you " +
@@ -1616,7 +1616,7 @@ object SpellData {
                 "increases by 1d10. Using a Higher-Level Spell Slot. The damage increases by 1d10 for each spell " +
                 "slot level above 3.",
             setOf(DRUID), concentration = true, damage = "3d10", damageType = "Lightning", saveAbility = Ability.DEX),
-        SpellDef("clairvoyance", "Clairvoyance", 3, "Divination", "10 minutes", "1 mile", "V, S, M", "10 minutes",
+        SpellDef("clairvoyance", "Clairvoyance", 3, "Divination", "10 minutes", "1 mile", "V, S, M (a focus worth 100+ GP, either a jeweled horn for hearing or a glass eye for seeing)", "10 minutes",
             "You create an Invisible sensor within range in a location familiar to you (a place you have " +
                 "visited or seen before) or in an obvious location that is unfamiliar to you (such as behind a " +
                 "door, around a corner, or in a grove of trees). The intangible, invulnerable sensor remains in " +
@@ -1625,7 +1625,7 @@ object SpellData {
                 "between seeing and hearing. A creature that sees the sensor (such as a creature benefiting from " +
                 "See Invisibility or Truesight) sees a luminous orb about the size of your fist.",
             setOf(BARD, CLERIC, SORCERER, WIZARD), concentration = true),
-        SpellDef("conjure_barrage", "Conjure Barrage", 3, "Conjuration", "Action", "Self (60-foot Cone)", "V, S, M", "Instantaneous",
+        SpellDef("conjure_barrage", "Conjure Barrage", 3, "Conjuration", "Action", "Self (60-foot Cone)", "V, S, M (a Melee or Ranged weapon worth at least 1 CP)", "Instantaneous",
             "You brandish the weapon used to cast the spell and conjure similar spectral weapons (or " +
                 "ammunition appropriate to the weapon) that launch forward and then disappear. Each creature of " +
                 "your choice that you can see in a 60-foot Cone makes a Dexterity saving throw, taking 5d8 Force " +
@@ -1641,7 +1641,7 @@ object SpellData {
                 "overlaps with an area of Darkness created by a spell of level 3 or lower, that other spell is " +
                 "dispelled.",
             setOf(CLERIC, DRUID, PALADIN, RANGER, SORCERER)),
-        SpellDef("hunger_of_hadar", "Hunger of Hadar", 3, "Conjuration", "Action", "150 feet", "V, S, M", "1 minute",
+        SpellDef("hunger_of_hadar", "Hunger of Hadar", 3, "Conjuration", "Action", "150 feet", "V, S, M (a pickled tentacle)", "1 minute",
             "You open a gateway to the Far Realm, a region infested with unspeakable horrors. A " +
                 "20-foot-radius Sphere of Darkness appears, centered on a point with range and lasting for the " +
                 "duration. The Sphere is Difficult Terrain, and it is filled with strange whispers and slurping " +
@@ -1652,7 +1652,7 @@ object SpellData {
                 "Spell Slot. The Cold or Acid damage (your choice) increases by 1d6 for each spell slot level " +
                 "above 3.",
             setOf(WARLOCK), concentration = true, damage = "2d6", damageType = "Acid", saveAbility = Ability.DEX),
-        SpellDef("nondetection", "Nondetection", 3, "Abjuration", "Action", "Touch", "V, S, M", "8 hours",
+        SpellDef("nondetection", "Nondetection", 3, "Abjuration", "Action", "Touch", "V, S, M (a pinch of diamond dust worth 25+ GP, which the spell consumes)", "8 hours",
             "For the duration, you hide a target that you touch from Divination spells. The target can be a " +
                 "willing creature, or it can be a place or an object no larger than 10 feet in any dimension. The " +
                 "target can't be targeted by any Divination spell or perceived through magical scrying sensors.",
@@ -1662,7 +1662,7 @@ object SpellData {
                 "item, its curse remains, but the spell breaks its owner's Attunement to the object so it can be " +
                 "removed or discarded.",
             setOf(CLERIC, PALADIN, WARLOCK, WIZARD)),
-        SpellDef("stinking_cloud", "Stinking Cloud", 3, "Conjuration", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("stinking_cloud", "Stinking Cloud", 3, "Conjuration", "Action", "90 feet", "V, S, M (a rotten egg)", "1 minute",
             "You create a 20-foot-radius Sphere of yellow, nauseating gas centered on a point within range. " +
                 "The cloud is Heavily Obscured. The cloud lingers in the air for the duration or until a strong " +
                 "wind (such as the one created by Gust of Wind ) disperses it. Each creature that starts its turn " +
@@ -1670,7 +1670,7 @@ object SpellData {
                 "the end of the current turn. While Poisoned in this way, the creature can't take an action or a " +
                 "Bonus Action.",
             setOf(BARD, SORCERER, WIZARD), concentration = true, saveAbility = Ability.CON),
-        SpellDef("summon_aberration", "Summon Aberration", 4, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_aberration", "Summon Aberration", 4, "Conjuration", "Action", "90 feet", "V, S, M (a pickled tentacle and an eyeball in a platinum-inlaid vial worth 400+ GP)", "1 hour",
             "You call forth an aberrant spirit. It manifests in an unoccupied space that you can see within " +
                 "range and uses the Aberrant Spirit stat block. When you cast the spell, choose Beholderkin, Mind " +
                 "Flayer, or Slaad. The creature resembles an Aberration of that kind, which determines certain " +
@@ -1698,7 +1698,7 @@ object SpellData {
                 "Attack Roll: Bonus equals your spell attack modifier, reach 5 ft. Hit:1d8 + 3 + the spell's " +
                 "level Psychic damage.",
             setOf(WARLOCK, WIZARD), concentration = true, damage = "2d6", damageType = "Psychic"),
-        SpellDef("summon_construct", "Summon Construct", 4, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_construct", "Summon Construct", 4, "Conjuration", "Action", "90 feet", "V, S, M (a lockbox worth 400+ GP)", "1 hour",
             "You call forth the spirit of a Construct. It manifests in an unoccupied space that you can see " +
                 "within range and uses the Construct Spirit stat block. When you cast the spell, choose a " +
                 "material: Clay, Metal, or Stone. The creature resembles an animate statue (you determine the " +
@@ -1726,7 +1726,7 @@ object SpellData {
                 "creature if possible, or the spirit moves up to half its Speed toward that creature without " +
                 "provoking Opportunity Attacks.",
             setOf(WIZARD, ARTIFICER), concentration = true),
-        SpellDef("summon_elemental", "Summon Elemental", 4, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_elemental", "Summon Elemental", 4, "Conjuration", "Action", "90 feet", "V, S, M (air, a pebble, ash, and water inside a gold-inlaid vial worth 400+ GP)", "1 hour",
             "You call forth an Elemental spirit. It manifests in an unoccupied space that you can see within " +
                 "range and uses the Elemental Spirit stat block. When you cast the spell, choose an element: Air, " +
                 "Earth, Fire, or Water. The creature resembles a bipedal form wreathed in the chosen element, " +
@@ -1750,7 +1750,7 @@ object SpellData {
                 "modifier, reach 5 ft. Hit: 1d10 + 4 + the spell's level Bludgeoning (Earth only), Cold (Water " +
                 "only), Lightning (Air only), or Fire (Fire only) damage.",
             setOf(DRUID, RANGER, WIZARD), concentration = true),
-        SpellDef("summon_celestial", "Summon Celestial", 5, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_celestial", "Summon Celestial", 5, "Conjuration", "Action", "90 feet", "V, S, M (a reliquary worth 500+ GP)", "1 hour",
             "You call forth a Celestial spirit. It manifests in an angelic form in an unoccupied space that " +
                 "you can see within range and uses the Celestial Spirit stat block. When you cast the spell, " +
                 "choose Avenger or Defender. Your choice determines certain details in its stat block. The " +
@@ -1773,7 +1773,7 @@ object SpellData {
                 "target. The chosen creature gains 1d10 Temporary Hit Points. Healing Touch (1/Day). The spirit " +
                 "touches another creature. The target regains Hit Points equal to 2d8 + the spell's level.",
             setOf(CLERIC, PALADIN), concentration = true),
-        SpellDef("summon_dragon", "Summon Dragon", 5, "Conjuration", "Action", "60 feet", "V, S, M", "1 hour",
+        SpellDef("summon_dragon", "Summon Dragon", 5, "Conjuration", "Action", "60 feet", "V, S, M (an object with the image of a dragon engraved on it worth 500+ GP)", "1 hour",
             "You call forth a Dragon spirit. It manifests in an unoccupied space that you can see within " +
                 "range and uses the Draconic Spirit stat block. The creature disappears when it drops to 0 Hit " +
                 "Points or when the spell ends. The creature is an ally to you and your allies. In combat, the " +
@@ -1795,7 +1795,7 @@ object SpellData {
                 "save DC, each creature in a 30-foot Cone. Failure: 2d6 damage of a type this spirit has " +
                 "Resistance to (your choice when you cast the spell). Success: Half damage",
             setOf(WIZARD), concentration = true),
-        SpellDef("wind_wall", "Wind Wall", 3, "Evocation", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("wind_wall", "Wind Wall", 3, "Evocation", "Action", "120 feet", "V, S, M (a fan and a feather)", "1 minute",
             "A wall of strong wind rises from the ground at a point you choose within range. You can make the " +
                 "wall up to 50 feet long, 15 feet high, and 1 foot thick. You can shape the wall in any way you " +
                 "choose so long as it makes one continuous path along the ground. The wall lasts for the " +
@@ -1809,7 +1809,7 @@ object SpellData {
             setOf(DRUID, RANGER), concentration = true, damage = "4d8", damageType = "Bludgeoning", saveAbility = Ability.STR),
 
         // ---- Level 4
-        SpellDef("arcane_eye", "Arcane Eye", 4, "Divination", "Action", "30 feet", "V, S, M", "1 hour",
+        SpellDef("arcane_eye", "Arcane Eye", 4, "Divination", "Action", "30 feet", "V, S, M (a bit of bat fur)", "1 hour",
             "You create an Invisible, invulnerable eye within range that hovers for the duration. You " +
                 "mentally receive visual information from the eye, which can see in every direction. It also has " +
                 "Darkvision with a range of 30 feet. As a Bonus Action, you can move the eye up to 30 feet in any " +
@@ -1869,7 +1869,7 @@ object SpellData {
                 "Higher-Level Spell Slot. Your Concentration can last longer with a spell slot of level 5 (up to " +
                 "10 minutes), 6 (up to 1 hour), or 7+ (up to 8 hours).",
             setOf(DRUID, RANGER, SORCERER), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("fire_shield", "Fire Shield", 4, "Evocation", "Action", "Self", "V, S, M", "10 minutes",
+        SpellDef("fire_shield", "Fire Shield", 4, "Evocation", "Action", "Self", "V, S, M (a bit of phosphorus or a firefly)", "10 minutes",
             "Wispy flames wreathe your body for the duration, shedding Bright Light in a 10-foot radius and " +
                 "Dim Light for an additional 10 feet. The flames provide you with a warm shield or a chill " +
                 "shield, as you choose. The warm shield grants you Resistance to Cold damage, and the chill " +
@@ -1877,7 +1877,7 @@ object SpellData {
                 "you hits you with a melee attack roll, the shield erupts with flame. The attacker takes 2d8 Fire " +
                 "damage from a warm shield or 2d8 Cold damage from a chill shield.",
             setOf(DRUID, SORCERER, WIZARD)),
-        SpellDef("gaseous_form", "Gaseous Form", 3, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("gaseous_form", "Gaseous Form", 3, "Transmutation", "Action", "Touch", "V, S, M (a bit of gauze)", "1 hour",
             "A willing creature you touch shape-shifts, along with everything it's wearing and carrying, into " +
                 "a misty cloud for the duration. The spell ends on the target if it drops to 0 Hit Points or if " +
                 "it takes a Magic action to end the spell on itself. While in this form, the target's only method " +
@@ -1898,7 +1898,7 @@ object SpellData {
                 "throw, taking 20 Radiant damage on a failed save or half as much damage on a successful one. The " +
                 "guardian vanishes when it has dealt a total of 60 damage.",
             setOf(CLERIC), saveAbility = Ability.DEX),
-        SpellDef("locate_creature", "Locate Creature", 4, "Divination", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("locate_creature", "Locate Creature", 4, "Divination", "Action", "Self", "V, S, M (fur from a bloodhound)", "1 hour",
             "Describe or name a creature that is familiar to you. You sense the direction to the creature's " +
                 "location if that creature is within 1,000 feet of you. If the creature is moving, you know the " +
                 "direction of its movement. The spell can locate a specific creature known to you or the nearest " +
@@ -1908,7 +1908,7 @@ object SpellData {
                 "locate the creature. This spell can't locate a creature if any thickness of lead blocks a direct " +
                 "path between you and the creature.",
             setOf(BARD, CLERIC, DRUID, PALADIN, RANGER, WIZARD), concentration = true),
-        SpellDef("vitriolic_sphere", "Vitriolic Sphere", 4, "Evocation", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("vitriolic_sphere", "Vitriolic Sphere", 4, "Evocation", "Action", "150 feet", "V, S, M (a drop of bile)", "Instantaneous",
             "You point at a location within range, and a glowing, 1-foot-diameter ball of acid streaks there " +
                 "and explodes in a 20-foot-radius Sphere. Each creature in that area makes a Dexterity saving " +
                 "throw. On a failed save, a creature takes 10d4 Acid damage and another 5d4 Acid damage at the " +
@@ -1925,7 +1925,7 @@ object SpellData {
             setOf(PALADIN), concentration = true, saveAbility = Ability.CHA, damage = "5d10", damageType = "Force"),
 
         // ---- Level 5
-        SpellDef("bigbys_hand", "Bigby's Hand", 5, "Evocation", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("bigbys_hand", "Bigby's Hand", 5, "Evocation", "Action", "120 feet", "V, S, M (an eggshell and a glove)", "1 minute",
             "You create a Large hand of shimmering magical energy in an unoccupied space that you can see " +
                 "within range. The hand lasts for the duration, and it moves at your command, mimicking the " +
                 "movements of your own hand. The hand is an object that has AC 20 and Hit Points equal to your " +
@@ -1947,7 +1947,7 @@ object SpellData {
                 "increases by 2d8 and the damage of the Grasping Hand increases by 2d6 for each spell slot level " +
                 "above 5.",
             setOf(SORCERER, WIZARD, ARTIFICER), concentration = true, damage = "5d8", damageType = "Force", saveAbility = Ability.STR, needsAttackRoll = true),
-        SpellDef("commune", "Commune", 5, "Divination", "1 minute or Ritual", "Self", "V, S, M", "1 minute",
+        SpellDef("commune", "Commune", 5, "Divination", "1 minute or Ritual", "Self", "V, S, M (incense)", "1 minute",
             "You contact a deity or a divine proxy and ask up to three questions that can be answered with " +
                 "yes or no. You must ask your questions before the spell ends. You receive a correct answer for " +
                 "each question. Divine beings aren't necessarily omniscient, so you might receive \"unclear\" as an " +
@@ -1993,7 +1993,7 @@ object SpellData {
                 "Higher-Level Spell Slot. Your Concentration can last longer with a spell slot of level 6 (up to " +
                 "10 minutes), 7 (up to 1 hour), or 8+ (up to 8 hours).",
             setOf(BARD, SORCERER, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("hallow", "Hallow", 5, "Abjuration", "24 hours", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("hallow", "Hallow", 5, "Abjuration", "24 hours", "Touch", "V, S, M (incense worth 1,000+ GP, which the spell consumes)", "Until dispelled",
             "You touch a point and infuse an area around it with holy or unholy power. The area can have a " +
                 "radius up to 60 feet, and the spell fails if the radius includes an area already under the " +
                 "effect of Hallow . The affected area has the following effects. Hallowed Ward. Choose any of " +
@@ -2015,7 +2015,7 @@ object SpellData {
                 "Vulnerability. Creatures of any types you choose have Vulnerability to one damage type of your " +
                 "choice while in the area.",
             setOf(CLERIC)),
-        SpellDef("legend_lore", "Legend Lore", 5, "Divination", "10 minutes", "Self", "V, S, M", "Instantaneous",
+        SpellDef("legend_lore", "Legend Lore", 5, "Divination", "10 minutes", "Self", "V, S, M (incense worth 250+ GP, which the spell consumes, and four ivory strips worth 50+ GP each)", "Instantaneous",
             "Name or describe a famous person, place, or object. The spell brings to your mind a brief " +
                 "summary of the significant lore about that famous thing, as described by the DM. The lore might " +
                 "consist of important details, amusing revelations, or even secret lore that has never been " +
@@ -2065,7 +2065,7 @@ object SpellData {
                 "have Advantage on attack rolls against it. On each of its turns, the target can take an action " +
                 "to collect itself and repeat the save, ending the spell on itself on a success.",
             setOf(BARD, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("passwall", "Passwall", 5, "Transmutation", "Action", "30 feet", "V, S, M", "1 hour",
+        SpellDef("passwall", "Passwall", 5, "Transmutation", "Action", "30 feet", "V, S, M (a pinch of sesame seeds)", "1 hour",
             "A passage appears at a point that you can see on a wooden, plaster, or stone surface (such as a " +
                 "wall, ceiling, or floor) within range and lasts for the duration. You choose the opening's " +
                 "dimensions: up to 5 feet wide, 8 feet tall, and 20 feet deep. The passage creates no instability " +
@@ -2113,7 +2113,7 @@ object SpellData {
                 "simple tool, opening a door or a container, stowing or retrieving an item from an open " +
                 "container, or pouring the contents from a vial.",
             setOf(SORCERER, WIZARD), concentration = true, saveAbility = Ability.STR),
-        SpellDef("teleportation_circle", "Teleportation Circle", 5, "Conjuration", "1 minute", "10 feet", "V, M", "1 round",
+        SpellDef("teleportation_circle", "Teleportation Circle", 5, "Conjuration", "1 minute", "10 feet", "V, M (rare inks worth 50+ GP, which the spell consumes)", "1 round",
             "As you cast the spell, you draw a 5-foot-radius circle on the ground inscribed with sigils that " +
                 "link your location to a permanent teleportation circle of your choice whose sigil sequence you " +
                 "know and that is on the same plane of existence as you. A shimmering portal opens within the " +
@@ -2141,7 +2141,7 @@ object SpellData {
             "You radiate a magical aura in a 30-foot Emanation. While in the aura, you and your allies each " +
                 "deal an extra 1d4 Radiant damage when hitting with a weapon or an Unarmed Strike.",
             setOf(PALADIN), concentration = true, damage = "1d4", damageType = "Radiant"),
-        SpellDef("steel_wind_strike", "Steel Wind Strike", 5, "Conjuration", "Action", "30 feet", "S, M", "Instantaneous",
+        SpellDef("steel_wind_strike", "Steel Wind Strike", 5, "Conjuration", "Action", "30 feet", "S, M (a Melee weapon worth 1+ SP)", "Instantaneous",
             "You flourish the weapon used in the casting and then vanish to strike like the wind. Choose up " +
                 "to five creatures you can see within range. Make a melee spell attack against each target. On a " +
                 "hit, a target takes 6d10 Force damage. You then teleport to an unoccupied space you can see " +
@@ -2152,7 +2152,7 @@ object SpellData {
                 "target is a Fiend or an Undead. Using a Higher-Level Spell Slot. The damage increases by 1d8 for " +
                 "each spell slot level above 1.",
             setOf(PALADIN), damage = "2d8", damageType = "Radiant"),
-        SpellDef("find_steed", "Find Steed", 2, "Conjuration", "10 minutes", "30 feet", "V, S", "Instantaneous",
+        SpellDef("find_steed", "Find Steed", 2, "Conjuration", "Action", "30 feet", "V, S", "Instantaneous",
             "You summon an otherworldly being that appears as a loyal steed in an unoccupied space of your " +
                 "choice within range. This creature uses the Otherworldly Steed stat block. If you already have a " +
                 "steed from this spell, the steed is replaced by the new one. The steed resembles a Large, " +
@@ -2195,7 +2195,7 @@ object SpellData {
                 "spirit's type. On a successful save, the target isn't Restrained by the spirit. Using a " +
                 "Higher-Level Spell Slot. The damage increases by 1d8 for each spell slot level above 5.",
             setOf(DRUID, WIZARD), concentration = true, saveAbility = Ability.DEX),
-        SpellDef("control_water", "Control Water", 4, "Transmutation", "Action", "300 feet", "V, S, M", "10 minutes",
+        SpellDef("control_water", "Control Water", 4, "Transmutation", "Action", "300 feet", "V, S, M (a mixture of water and dust)", "10 minutes",
             "Until the spell ends, you control any water inside an area you choose that is a Cube up to 100 " +
                 "feet on a side, using one of the following effects. As a Magic action on your later turns, you " +
                 "can repeat the same effect or choose a different one. Flood. You cause the water level of all " +
@@ -2223,7 +2223,7 @@ object SpellData {
                 "swim away from the whirlpool only if it first takes an action to pull away and succeeds on a " +
                 "Strength (Athletics) check against your spell save DC.",
             setOf(CLERIC, DRUID, WIZARD), concentration = true, damage = "2d8", damageType = "Bludgeoning", saveAbility = Ability.STR),
-        SpellDef("summon_beast", "Summon Beast", 2, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_beast", "Summon Beast", 2, "Conjuration", "Action", "90 feet", "V, S, M (a feather, tuft of fur, and fish tail inside a gilded acorn worth 200+ GP)", "1 hour",
             "You call forth a bestial spirit. It manifests in an unoccupied space that you can see within " +
                 "range and uses the Bestial Spirit stat block. When you cast the spell, choose an environment: " +
                 "Air, Land, or Water. The creature resembles an animal of your choice that is native to the " +
@@ -2247,7 +2247,7 @@ object SpellData {
                 "spell's level (round down). Rend. Melee Attack Roll: Bonus equals your spell attack modifier, " +
                 "reach 5 ft. Hit: 1d8 + 4 + the spell's level Piercing damage.",
             setOf(DRUID, RANGER), concentration = true),
-        SpellDef("summon_fey", "Summon Fey", 3, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_fey", "Summon Fey", 3, "Conjuration", "Action", "90 feet", "V, S, M (a gilded flower worth 300+ GP)", "1 hour",
             "You call forth a Fey spirit. It manifests in an unoccupied space that you can see within range " +
                 "and uses the Fey Spirit stat block. When you cast the spell, choose a mood: Fuming, Mirthful, or " +
                 "Tricksy. The creature resembles a Fey creature of your choice marked by the chosen mood, which " +
@@ -2292,7 +2292,7 @@ object SpellData {
                 "modifier. Those dice are then expended. Using a Higher-Level Spell Slot. The number of " +
                 "unexpended Hit Dice you can roll increases by one for each spell slot level above 2.",
             setOf(SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("spike_growth", "Spike Growth", 2, "Transmutation", "Action", "150 feet", "V, S, M", "10 minutes",
+        SpellDef("spike_growth", "Spike Growth", 2, "Transmutation", "Action", "150 feet", "V, S, M (seven thorns)", "10 minutes",
             "The ground in a 20-foot-radius Sphere centered on a point within range sprouts hard spikes and " +
                 "thorns. The area becomes Difficult Terrain for the duration. When a creature moves into or " +
                 "within the area, it takes 2d4 Piercing damage for every 5 feet it travels. The transformation of " +
@@ -2305,7 +2305,7 @@ object SpellData {
                 "Advantage on saving throws to avoid or end the Poisoned condition, and it has Resistance to " +
                 "Poison damage.",
             setOf(CLERIC, DRUID, PALADIN, RANGER, ARTIFICER)),
-        SpellDef("gentle_repose", "Gentle Repose", 2, "Necromancy", "Action", "Touch", "V, S, M", "10 days",
+        SpellDef("gentle_repose", "Gentle Repose", 2, "Necromancy", "Action", "Touch", "V, S, M (2 Copper Pieces, which the spell consumes)", "10 days",
             "You touch a corpse or other remains. For the duration, the target is protected from decay and " +
                 "can't become Undead. The spell also effectively extends the time limit on raising the target " +
                 "from the dead, since days spent under the influence of this spell don't count against the time " +
@@ -2324,7 +2324,7 @@ object SpellData {
                 "if so, where. The spell is blocked by 1 foot of stone, dirt, or wood; 1 inch of metal; or a thin " +
                 "sheet of lead.",
             setOf(CLERIC, PALADIN), concentration = true),
-        SpellDef("speak_with_dead", "Speak with Dead", 3, "Necromancy", "Action", "10 feet", "V, S, M", "10 minutes",
+        SpellDef("speak_with_dead", "Speak with Dead", 3, "Necromancy", "Action", "10 feet", "V, S, M (burning incense)", "10 minutes",
             "You grant the semblance of life to a corpse of your choice within range, allowing it to answer " +
                 "questions you pose. The corpse must have a mouth, and this spell fails if the deceased creature " +
                 "was Undead when it died. The spell also fails if the corpse was the target of this spell within " +
@@ -2366,7 +2366,7 @@ object SpellData {
                 "fades, giving the rider 1 minute to dismount. The spell ends early if the steed takes any " +
                 "damage.",
             setOf(WIZARD), ritual = true),
-        SpellDef("summon_undead", "Summon Undead", 3, "Necromancy", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_undead", "Summon Undead", 3, "Necromancy", "Action", "90 feet", "V, S, M (a gilded skull worth 300+ GP)", "1 hour",
             "You call forth an Undead spirit. It manifests in an unoccupied space that you can see within " +
                 "range and uses the Undead Spirit stat block. When you cast the spell, choose the creature's " +
                 "form: Ghostly, Putrid, or Skeletal. The spirit resembles an Undead creature with the chosen " +
@@ -2432,7 +2432,7 @@ object SpellData {
                 "ends. Using a Higher-Level Spell Slot. The damage increases by 1d10 for each spell slot level " +
                 "above 4.",
             setOf(BARD, WIZARD), concentration = true, damage = "4d10", damageType = "Psychic", saveAbility = Ability.WIS),
-        SpellDef("hallucinatory_terrain", "Hallucinatory Terrain", 4, "Illusion", "10 minutes", "300 feet", "V, S, M", "24 hours",
+        SpellDef("hallucinatory_terrain", "Hallucinatory Terrain", 4, "Illusion", "10 minutes", "300 feet", "V, S, M (a mushroom)", "24 hours",
             "You make natural terrain in a 150-foot Cube in range look, sound, and smell like another sort of " +
                 "natural terrain. Thus, open fields or a road can be made to resemble a swamp, hill, crevasse, or " +
                 "some other difficult or impassable terrain. A pond can be made to seem like a grassy meadow, a " +
@@ -2444,7 +2444,7 @@ object SpellData {
                 "it. If a creature discerns that the terrain is illusory, the creature sees a vague image " +
                 "superimposed on the real terrain.",
             setOf(BARD, DRUID, WARLOCK, WIZARD)),
-        SpellDef("dispel_evil_and_good", "Dispel Evil and Good", 5, "Abjuration", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("dispel_evil_and_good", "Dispel Evil and Good", 5, "Abjuration", "Action", "Self", "V, S, M (powdered silver and iron)", "1 minute",
             "For the duration, Celestials, Elementals, Fey, Fiends, and Undead have Disadvantage on attack " +
                 "rolls against you. You can end the spell early by using either of the following special " +
                 "functions. Break Enchantment. As a Magic action, you touch a creature that is possessed by or " +
@@ -2471,7 +2471,7 @@ object SpellData {
                 "Whenever the Poisoned target receives an effect that would end the Poisoned condition, the " +
                 "target must succeed on a Constitution saving throw, or the Poisoned condition doesn't end on it.",
             setOf(CLERIC, DRUID), damage = "11d8", damageType = "Necrotic", saveAbility = Ability.CON),
-        SpellDef("insect_plague", "Insect Plague", 5, "Conjuration", "Action", "300 feet", "V, S, M", "10 minutes",
+        SpellDef("insect_plague", "Insect Plague", 5, "Conjuration", "Action", "300 feet", "V, S, M (a locust)", "10 minutes",
             "Swarming locusts fill a 20-foot-radius Sphere centered on a point you choose within range. The " +
                 "Sphere remains for the duration, and its area is Lightly Obscured and Difficult Terrain. When " +
                 "the swarm appears, each creature in it makes a Constitution saving throw, taking 4d10 Piercing " +
@@ -2486,7 +2486,7 @@ object SpellData {
                 "damage and 5d6 Radiant or Necrotic damage (your choice) and has the Prone condition. On a " +
                 "successful save, a target takes half as much damage only.",
             setOf(PALADIN), damage = "5d6", damageType = "Thunder", saveAbility = Ability.CON),
-        SpellDef("creation", "Creation", 5, "Illusion", "1 minute", "30 feet", "V, S, M", "Special",
+        SpellDef("creation", "Creation", 5, "Illusion", "1 minute", "30 feet", "V, S, M (a paintbrush)", "Special",
             "You pull wisps of shadow material from the Shadowfell to create an object within range. It is " +
                 "either an object of vegetable matter (soft goods, rope, wood, and the like) or mineral matter " +
                 "(stone, crystal, metal, and the like). The object must be no larger than a 5-foot Cube, and the " +
@@ -2498,7 +2498,7 @@ object SpellData {
                 "1 minute Using a Higher-Level Spell Slot. The Cube increases by 5 feet for each spell slot level " +
                 "above 5.",
             setOf(SORCERER, WIZARD, ARTIFICER)),
-        SpellDef("awaken", "Awaken", 5, "Transmutation", "8 hours", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("awaken", "Awaken", 5, "Transmutation", "8 hours", "Touch", "V, S, M (an agate worth 1,000+ GP, which the spell consumes)", "Instantaneous",
             "You spend the casting time tracing magical pathways within a precious gemstone, and then touch " +
                 "the target. The target must be either a Beast or Plant creature with an Intelligence of 3 or " +
                 "less or a natural plant that isn't a creature. The target gains an Intelligence of 10 and the " +
@@ -2509,7 +2509,7 @@ object SpellData {
                 "awakened target has the Charmed condition for 30 days or until you or your allies deal damage to " +
                 "it. When that condition ends, the awakened creature chooses its attitude toward you.",
             setOf(BARD, DRUID)),
-        SpellDef("augury", "Augury", 2, "Divination", "1 minute", "Self", "V, S, M", "Instantaneous",
+        SpellDef("augury", "Augury", 2, "Divination", "1 minute", "Self", "V, S, M (specially marked sticks, bones, cards, or other divinatory tokens worth 25+ GP)", "Instantaneous",
             "You receive an omen from an otherworldly entity about the results of a course of action that you " +
                 "plan to take within the next 30 minutes. The DM chooses the omen from the Omens table. Omens " +
                 "Omen For Results That Will Be… Weal Good Woe Bad Weal and woe Good and bad Indifference Neither " +
@@ -2556,7 +2556,7 @@ object SpellData {
         // picker simply has one fewer row, and only the player who went looking for it knows.
 
         // ---- Level 1
-        SpellDef("color_spray", "Color Spray", 1, "Illusion", "Action", "Self (15-foot Cone)", "V, S, M", "Instantaneous",
+        SpellDef("color_spray", "Color Spray", 1, "Illusion", "Action", "Self (15-foot Cone)", "V, S, M (a pinch of colorful sand)", "Instantaneous",
             "You launch a dazzling array of flashing, colorful light. Each creature in a 15-foot Cone " +
                 "originating from you must succeed on a Constitution saving throw or have the Blinded condition " +
                 "until the end of your next turn.",
@@ -2576,7 +2576,7 @@ object SpellData {
                 "spell ends. Using a Higher-Level Spell Slot. All the damage increases by 1d6 for each spell slot " +
                 "level above 1.",
             setOf(PALADIN), damage = "1d6", damageType = "Fire", saveAbility = Ability.CON),
-        SpellDef("tensers_floating_disk", "Tenser's Floating Disk", 1, "Conjuration", "Action or Ritual", "30 feet", "V, S, M", "1 hour",
+        SpellDef("tensers_floating_disk", "Tenser's Floating Disk", 1, "Conjuration", "Action or Ritual", "30 feet", "V, S, M (a drop of mercury)", "1 hour",
             "This spell creates a circular, horizontal plane of force, 3 feet in diameter and 1 inch thick, " +
                 "that floats 3 feet above the ground in an unoccupied space of your choice that you can see " +
                 "within range. The disk remains for the duration and can hold up to 500 pounds. If more weight is " +
@@ -2588,7 +2588,7 @@ object SpellData {
                 "was created at the bottom. If you move more than 100 feet from the disk (typically because it " +
                 "can't move around an obstacle to follow you), the spell ends.",
             setOf(WIZARD), ritual = true),
-        SpellDef("illusory_script", "Illusory Script", 1, "Illusion", "1 minute or Ritual", "Touch", "S, M", "10 days",
+        SpellDef("illusory_script", "Illusory Script", 1, "Illusion", "1 minute or Ritual", "Touch", "S, M (ink worth 10+ GP, which the spell consumes)", "10 days",
             "You write on parchment, paper, or another suitable material and imbue it with an illusion that " +
                 "lasts for the duration. To you and any creatures you designate when you cast the spell, the " +
                 "writing appears normal, seems to be written in your hand, and conveys whatever meaning you " +
@@ -2600,7 +2600,7 @@ object SpellData {
             setOf(BARD, WARLOCK, WIZARD), ritual = true),
 
         // ---- Level 2
-        SpellDef("barkskin", "Barkskin", 2, "Transmutation", "Bonus Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("barkskin", "Barkskin", 2, "Transmutation", "Bonus Action", "Touch", "V, S, M (a handful of bark)", "1 hour",
             "You touch a willing creature. Until the spell ends, the target's skin assumes a bark-like " +
                 "appearance, and the target has an Armor Class of 17 if its AC is lower than that.",
             setOf(DRUID, RANGER)),
@@ -2626,7 +2626,7 @@ object SpellData {
                 "automatically succeeds on this save. On a failed save, a target has a -10 penalty to Wisdom " +
                 "(Perception) checks and Passive Perception until the spell ends.",
             setOf(BARD, WARLOCK), saveAbility = Ability.WIS, concentration = true),
-        SpellDef("cordon_of_arrows", "Cordon of Arrows", 2, "Transmutation", "Action", "Touch", "V, S, M", "8 hours",
+        SpellDef("cordon_of_arrows", "Cordon of Arrows", 2, "Transmutation", "Action", "Touch", "V, S, M (an ornamental braid)", "8 hours",
             "You touch up to four nonmagical Arrows or Bolts and plant them in the ground in your space. " +
                 "Until the spell ends, the ammunition can't be physically uprooted, and whenever a creature other " +
                 "than you enters a space within 30 feet of the ammunition for the first time on a turn or ends " +
@@ -2637,7 +2637,7 @@ object SpellData {
                 "Higher-Level Spell Slot. The amount of ammunition that can be affected increases by two for each " +
                 "spell slot level above 2.",
             setOf(RANGER), damage = "2d4", damageType = "Piercing", saveAbility = Ability.DEX),
-        SpellDef("nystuls_magic_aura", "Nystul's Magic Aura", 2, "Illusion", "1 minute", "Touch", "V, S, M", "24 hours",
+        SpellDef("nystuls_magic_aura", "Nystul's Magic Aura", 2, "Illusion", "Action", "Touch", "V, S, M (a small square of silk)", "24 hours",
             "With a touch, you place an illusion on a willing creature or an object that isn't being worn or " +
                 "carried. A creature gains the Mask effect below, and an object gains the False Aura effect " +
                 "below. The effect lasts for the duration. If you cast the spell on the same target every day for " +
@@ -2662,7 +2662,7 @@ object SpellData {
                 "only once per turn. Using a Higher-Level Spell Slot. The damage increases by 1d10 for each spell " +
                 "slot level above 3.",
             setOf(DRUID, RANGER), damage = "3d10", damageType = "Slashing", saveAbility = Ability.DEX, concentration = true),
-        SpellDef("magic_circle", "Magic Circle", 3, "Abjuration", "1 minute", "10 feet", "V, S, M", "1 hour",
+        SpellDef("magic_circle", "Magic Circle", 3, "Abjuration", "1 minute", "10 feet", "V, S, M (salt and powdered silver worth 100+ GP, which the spell consumes)", "1 hour",
             "You create a 10-foot-radius, 20-foot-tall Cylinder of magical energy centered on a point on the " +
                 "ground that you can see within range. Glowing runes appear wherever the Cylinder intersects with " +
                 "the floor or other surface. Choose one or more of the following types of creatures: Celestials, " +
@@ -2676,7 +2676,7 @@ object SpellData {
                 "and protecting targets outside it. Using a Higher-Level Spell Slot. The duration increases by 1 " +
                 "hour for each spell slot level above 3.",
             setOf(CLERIC, PALADIN, WARLOCK, WIZARD), saveAbility = Ability.CHA),
-        SpellDef("major_image", "Major Image", 3, "Illusion", "Action", "120 feet", "V, S, M", "10 minutes",
+        SpellDef("major_image", "Major Image", 3, "Illusion", "Action", "120 feet", "V, S, M (a bit of fleece)", "10 minutes",
             "You create the image of an object, a creature, or some other visible phenomenon that is no " +
                 "larger than a 20-foot Cube. The image appears at a spot that you can see within range and lasts " +
                 "for the duration. It seems real, including sounds, smells, and temperature appropriate to the " +
@@ -2693,7 +2693,7 @@ object SpellData {
                 "sensory qualities become faint to the creature. Using a Higher-Level Spell Slot. The spell lasts " +
                 "until dispelled, without requiring Concentration, if cast with a level 4+ spell slot.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true),
-        SpellDef("slow", "Slow", 3, "Transmutation", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("slow", "Slow", 3, "Transmutation", "Action", "120 feet", "V, S, M (a drop of molasses)", "1 minute",
             "You alter time around up to six creatures of your choice in a 40-foot Cube within range. Each " +
                 "target must succeed on a Wisdom saving throw or be affected by this spell for the duration. An " +
                 "affected target's Speed is halved, it takes a -2 penalty to AC and Dexterity saving throws, and " +
@@ -2723,7 +2723,7 @@ object SpellData {
                 "substance) expels you and deals 50 Force damage to you. If expelled, you move into an unoccupied " +
                 "space closest to where you first entered and have the Prone condition.",
             setOf(CLERIC, DRUID, RANGER), ritual = true),
-        SpellDef("feign_death", "Feign Death", 3, "Necromancy", "Action or Ritual", "Touch", "V, S, M", "1 hour",
+        SpellDef("feign_death", "Feign Death", 3, "Necromancy", "Action or Ritual", "Touch", "V, S, M (a pinch of graveyard dirt)", "1 hour",
             "You touch a willing creature and put it into a cataleptic state that is indistinguishable from " +
                 "death. For the duration, the target appears dead to outward inspection and to spells used to " +
                 "determine the target's status. The target has the Blinded and Incapacitated conditions, and its " +
@@ -2752,7 +2752,7 @@ object SpellData {
                 "Higher-Level Spell Slot. The number of creatures the vine can grapple increases by one for each " +
                 "spell slot level above 4.",
             setOf(DRUID, RANGER), damage = "4d8", damageType = "Bludgeoning", concentration = true, needsAttackRoll = true),
-        SpellDef("divination", "Divination", 4, "Divination", "Action or Ritual", "Self", "V, S, M", "Instantaneous",
+        SpellDef("divination", "Divination", 4, "Divination", "Action or Ritual", "Self", "V, S, M (incense worth 25+ GP, which the spell consumes)", "Instantaneous",
             "This spell puts you in contact with a god or a god's servants. You ask one question about a " +
                 "specific goal, event, or activity to occur within 7 days. The DM offers a truthful reply, which " +
                 "might be a short phrase or cryptic rhyme. The spell doesn't account for circumstances that might " +
@@ -2760,7 +2760,7 @@ object SpellData {
                 "before finishing a Long Rest, there is a cumulative 25 percent chance for each casting after the " +
                 "first that you get no answer.",
             setOf(CLERIC, DRUID, WIZARD), ritual = true),
-        SpellDef("evards_black_tentacles", "Evard's Black Tentacles", 4, "Conjuration", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("evards_black_tentacles", "Evard's Black Tentacles", 4, "Conjuration", "Action", "90 feet", "V, S, M (a tentacle)", "1 minute",
             "Squirming, ebony tentacles fill a 20-foot square on ground that you can see within range. For " +
                 "the duration, these tentacles turn the ground in that area into Difficult Terrain. Each creature " +
                 "in that area makes a Strength saving throw. On a failed save, it takes 3d6 Bludgeoning damage, " +
@@ -2783,7 +2783,7 @@ object SpellData {
                 "Slot. If you use a level 7 or 8 spell slot, the duration is 365 days. If you use a level 9 spell " +
                 "slot, the spell lasts until it is ended by one of the spells mentioned above.",
             setOf(BARD, CLERIC, DRUID, PALADIN, WIZARD), damage = "5d10", damageType = "Psychic", saveAbility = Ability.WIS),
-        SpellDef("planar_binding", "Planar Binding", 5, "Abjuration", "1 hour", "60 feet", "V, S, M", "24 hours",
+        SpellDef("planar_binding", "Planar Binding", 5, "Abjuration", "1 hour", "60 feet", "V, S, M (a jewel worth 1,000+ GP, which the spell consumes)", "24 hours",
             "You attempt to bind a Celestial, an Elemental, a Fey, or a Fiend to your service. The creature " +
                 "must be within range for the entire casting of the spell. (Typically, the creature is first " +
                 "summoned into the center of the inverted version of the Magic Circle spell to trap it while this " +
@@ -2799,21 +2799,21 @@ object SpellData {
                 "Slot. The duration increases with a spell slot of level 6 (10 days), 7 (30 days), 8 (180 days), " +
                 "and 9 (366 days).",
             setOf(BARD, CLERIC, DRUID, WARLOCK, WIZARD), saveAbility = Ability.CHA),
-        SpellDef("swift_quiver", "Swift Quiver", 5, "Transmutation", "Bonus Action", "Self", "V, S, M", "1 minute",
+        SpellDef("swift_quiver", "Swift Quiver", 5, "Transmutation", "Bonus Action", "Self", "V, S, M (a Quiver worth 1+ GP)", "1 minute",
             "When you cast the spell and as a Bonus Action until it ends, you can make two attacks with a " +
                 "weapon that fires Arrows or Bolts, such as a Longbow or a Light Crossbow. The spell magically " +
                 "creates the ammunition needed for each attack. Each Arrow or Bolt created by the spell deals " +
                 "damage like a nonmagical piece of ammunition of its kind and disintegrates immediately after it " +
                 "hits or misses.",
             setOf(RANGER), concentration = true),
-        SpellDef("conjure_volley", "Conjure Volley", 5, "Conjuration", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("conjure_volley", "Conjure Volley", 5, "Conjuration", "Action", "150 feet", "V, S, M (a Melee or Ranged weapon worth at least 1 CP)", "Instantaneous",
             "You brandish the weapon used to cast the spell and choose a point within range. Hundreds of " +
                 "similar spectral weapons (or ammunition appropriate to the weapon) fall in a volley and then " +
                 "disappear. Each creature of your choice that you can see in a 40-foot-radius, 20-foot-high " +
                 "Cylinder centered on that point makes a Dexterity saving throw. A creature takes 8d8 Force " +
                 "damage on a failed save or half as much damage on a successful one.",
             setOf(RANGER), damage = "8d8", damageType = "Force", saveAbility = Ability.DEX),
-        SpellDef("dream", "Dream", 5, "Illusion", "1 minute", "Special", "V, S, M", "8 hours",
+        SpellDef("dream", "Dream", 5, "Illusion", "1 minute", "Special", "V, S, M (a handful of sand)", "8 hours",
             "You target a creature you know on the same plane of existence. You or a willing creature you " +
                 "touch enters a trance state to act as a dream messenger. While in the trance, the messenger is " +
                 "Incapacitated and has a Speed of 0. If the target is asleep, the messenger appears in the " +
@@ -2827,7 +2827,7 @@ object SpellData {
                 "words, and then the target makes a Wisdom saving throw. On a failed save, the target gains no " +
                 "benefit from its rest, and it takes 3d6 Psychic damage when it wakes up.",
             setOf(BARD, WARLOCK, WIZARD), damage = "3d6", damageType = "Psychic", saveAbility = Ability.WIS),
-        SpellDef("reincarnate", "Reincarnate", 5, "Necromancy", "1 hour", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("reincarnate", "Reincarnate", 5, "Necromancy", "1 hour", "Touch", "V, S, M (rare oils worth 1,000+ GP, which the spell consumes)", "Instantaneous",
             "You touch a dead Humanoid or a piece of one. If the creature has been dead no longer than 10 " +
                 "days, the spell forms a new body for it and calls the soul to enter that body. Roll 1d10 and " +
                 "consult the table below to determine the body's species, or the DM chooses another playable " +
@@ -2839,7 +2839,7 @@ object SpellData {
             setOf(DRUID)),
 
         // ------------------------------------------------- Imported: Level 1
-        SpellDef("buzzing_bee", "Buzzing Bee", 1, "Conjuration", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("buzzing_bee", "Buzzing Bee", 1, "Conjuration", "Action", "120 feet", "V, S, M (a dab of honey)", "1 minute",
             "You call forth a noisy spectral bee. You target a creature that you can see within range. The " +
                 "bee hovers around the target, distracting it with loud buzzing. For the duration, the target has " +
                 "Disadvantage on Wisdom (Perception) checks, Dexterity (Stealth) checks, and Constitution saving " +
@@ -2848,7 +2848,7 @@ object SpellData {
                 "within 120 feet of you. The bee disappears when the spell ends or if the target moves out of " +
                 "range.",
             setOf(DRUID, RANGER, SORCERER, WIZARD), concentration = true, book = Sourcebook.DDB_DROPS, saveAbility = Ability.CON),
-        SpellDef("create_or_destroy_water", "Create or Destroy Water", 1, "Transmutation", "Action", "30 feet", "V, S, M", "Instantaneous",
+        SpellDef("create_or_destroy_water", "Create or Destroy Water", 1, "Transmutation", "Action", "30 feet", "V, S, M (a mix of water and sand)", "Instantaneous",
             "You do one of the following: Create Water. You create up to 10 gallons of clean water within " +
                 "range in an open container. Alternatively, the water falls as rain in a 30-foot Cube within " +
                 "range, extinguishing exposed flames there. Destroy Water. You destroy up to 10 gallons of water " +
@@ -2871,7 +2871,7 @@ object SpellData {
                 "additional blast for each spell slot level above 1. You can direct the blasts at the same target " +
                 "or at different ones. Make a separate attack roll for each blast.",
             setOf(SORCERER, WIZARD), book = Sourcebook.HEROES_OF_FAERUN, damage = "2d10", damageType = "Radiant", needsAttackRoll = true),
-        SpellDef("wardaway", "Wardaway", 1, "Abjuration", "Action", "60 feet", "V, S, M", "Instantaneous",
+        SpellDef("wardaway", "Wardaway", 1, "Abjuration", "Action", "60 feet", "V, S, M (a miniature clay hand)", "Instantaneous",
             "You hurl a disorienting magical force toward one creature within range. The target makes a " +
                 "Constitution saving throw; Constructs and Undead automatically succeed on this save. On a failed " +
                 "save, the target takes 2d4 Force damage, its Speed is halved until the start of your next turn, " +
@@ -2881,19 +2881,19 @@ object SpellData {
             setOf(BARD, CLERIC, PALADIN, WIZARD), book = Sourcebook.HEROES_OF_FAERUN, damage = "2d4", damageType = "Force", saveAbility = Ability.CON),
 
         // ------------------------------------------------- Imported: Level 2
-        SpellDef("cloud_of_daggers", "Cloud Of Daggers", 2, "Conjuration", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("cloud_of_daggers", "Cloud Of Daggers", 2, "Conjuration", "Action", "60 feet", "V, S, M (a sliver of glass)", "1 minute",
             "You conjure spinning daggers in a 5-foot Cube centered on a point within range. Each creature in " +
                 "that area takes 4d4 Slashing damage. A creature also takes this damage if it enters the Cube or " +
                 "ends its turn there or if the Cube moves into its space. A creature takes this damage only once " +
                 "per turn. On your later turns, you can take a Magic action to teleport the Cube up to 30 feet. " +
                 "Using a Higher-Level Spell Slot. The damage increases by 2d4 for each spell slot level above 2.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true),
-        SpellDef("death_armor", "Death Armor", 2, "Necromancy", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("death_armor", "Death Armor", 2, "Necromancy", "Action", "Touch", "V, S, M (an onyx worth 50+ GP, which the spell consumes)", "1 hour",
             "For the duration, an inky aura surrounds one creature you touch. The target has Advantage on " +
                 "Death Saving Throws, and once per turn, when a creature within 5 feet of the target hits it with " +
                 "a melee attack roll, the attacker takes 2d4 Necrotic damage.",
             setOf(SORCERER, WIZARD), book = Sourcebook.HEROES_OF_FAERUN, damage = "2d4", damageType = "Necrotic"),
-        SpellDef("deryan_s_helpful_homunculi", "Deryan's Helpful Homunculi", 2, "Conjuration", "Action or Ritual", "Self", "V, S, M", "8 hours",
+        SpellDef("deryan_s_helpful_homunculi", "Deryan's Helpful Homunculi", 2, "Conjuration", "Action or Ritual", "Self", "V, S, M (powdered gemstones worth 100+ GP, which the spell consumes, and one set of Artisan's Tools with which you have proficiency)", "8 hours",
             "You summon a group of helpful spirits, which lasts for the duration. The spirits appear as " +
                 "homunculi or as another Construct of your choice but are intangible and invulnerable, and they " +
                 "are considered to have proficiency in the Arcana skill and with the set of Artisan's Tools used " +
@@ -2913,7 +2913,7 @@ object SpellData {
                 "spell reveals that a trap is present but not its location. You do learn the general nature of " +
                 "the danger posed by a trap you sense.",
             setOf(CLERIC, DRUID, RANGER)),
-        SpellDef("flame_blade", "Flame Blade", 2, "Evocation", "Bonus Action", "Self", "V, S, M", "10 minutes",
+        SpellDef("flame_blade", "Flame Blade", 2, "Evocation", "Bonus Action", "Self", "V, S, M (a sumac leaf)", "10 minutes",
             "You evoke a fiery blade in your free hand. The blade is similar in size and shape to a scimitar, " +
                 "and it lasts for the duration. If you let go of the blade, it disappears, but you can evoke it " +
                 "again as a Bonus Action. As a Magic action, you can make a melee spell attack with the fiery " +
@@ -2922,12 +2922,12 @@ object SpellData {
                 "additional 10 feet. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each spell " +
                 "slot level above 2.",
             setOf(DRUID, SORCERER), concentration = true, needsAttackRoll = true),
-        SpellDef("locate_animals_or_plants", "Locate Animals or Plants", 2, "Divination", "Action or Ritual", "Self", "V, S, M", "Instantaneous",
+        SpellDef("locate_animals_or_plants", "Locate Animals or Plants", 2, "Divination", "Action or Ritual", "Self", "V, S, M (fur from a bloodhound)", "Instantaneous",
             "Describe or name a specific kind of Beast, Plant creature, or nonmagical plant. You learn the " +
                 "direction and distance to the closest creature or plant of that kind within 5 miles, if any are " +
                 "present.",
             setOf(BARD, DRUID, RANGER), ritual = true),
-        SpellDef("searing_orb", "Searing Orb", 2, "Evocation", "Action", "60 feet", "S, M", "Instantaneous",
+        SpellDef("searing_orb", "Searing Orb", 2, "Evocation", "Action", "60 feet", "S, M (Metallic flakes and a pinch of phosphorus)", "Instantaneous",
             "You create and hurl a pulsing orb of energy at one creature within range. Make a ranged spell " +
                 "attack against the target. On a hit, the target takes 3d4 Radiant damage. Hit or miss, the orb " +
                 "then explodes in a flash of light. The target and each creature within 10 feet of it make a " +
@@ -2943,7 +2943,7 @@ object SpellData {
             setOf(ARTIFICER, DRUID, RANGER), concentration = true, book = Sourcebook.DDB_DROPS),
 
         // ------------------------------------------------- Imported: Level 3
-        SpellDef("astral_flood", "Astral Flood", 3, "Evocation", "Action", "Self", "V, S, M", "Instantaneous",
+        SpellDef("astral_flood", "Astral Flood", 3, "Evocation", "Action", "Self", "V, S, M (a mixture of water and powdered silver)", "Instantaneous",
             "You channel energy from the Astral Sea to unleash a torrent of magic from yourself. Choose Cold " +
                 "or Radiant for the type of energy channeled. Each creature in a 30-foot Cone originating from " +
                 "you makes a Dexterity saving throw. On a failed save, the target takes 4d10 damage of the chosen " +
@@ -2964,7 +2964,7 @@ object SpellData {
                 "are made with Disadvantage. Using a Higher-Level Spell Slot. The damage increases by 1d6 for " +
                 "each spell slot level above 3.",
             setOf(BARD, SORCERER, WIZARD), concentration = true, book = Sourcebook.HEROES_OF_FAERUN, damage = "3d6", damageType = "Thunder", saveAbility = Ability.CON),
-        SpellDef("conjure_constructs", "Conjure Constructs", 3, "Conjuration", "Action", "60 feet", "V, S, M", "10 minutes",
+        SpellDef("conjure_constructs", "Conjure Constructs", 3, "Conjuration", "Action", "60 feet", "V, S, M (a brass cog)", "10 minutes",
             "You conjure a group of intangible, orderly spirits that appear as a Medium group of modrons or " +
                 "other Constructs in an unoccupied space you can see within range. The spirits last for the " +
                 "duration. When you cast this spell and as a Magic action on subsequent turns, you can command " +
@@ -2976,14 +2976,14 @@ object SpellData {
                 "see. Using a Higher-Level Spell Slot. The damage and Temporary Hit Points both increase by 1d6 " +
                 "for each spell slot level above 3.",
             setOf(WIZARD), concentration = true, book = Sourcebook.HEROES_OF_FAERUN, damage = "3d6", damageType = "Force", saveAbility = Ability.DEX),
-        SpellDef("laeral_s_silver_lance", "Laeral's Silver Lance", 3, "Evocation", "Action", "Self", "V, S, M", "Instantaneous",
+        SpellDef("laeral_s_silver_lance", "Laeral's Silver Lance", 3, "Evocation", "Action", "Self", "V, S, M (a silver pin worth 250+ GP)", "Instantaneous",
             "Silver energy bursts out from you in a 120-foot-long, 5-foot-wide Line. Each creature of your " +
                 "choice in the Line makes a Strength saving throw. On a failed save, a creature takes 3d10 Force " +
                 "damage and has the Prone condition. On a successful save, a creature takes half as much damage " +
                 "only. Using a Higher-Level Spell Slot. The damage increases by 1d10 for every spell slot level " +
                 "above 3.",
             setOf(CLERIC, SORCERER, WIZARD), book = Sourcebook.HEROES_OF_FAERUN, damage = "3d10", damageType = "Force", saveAbility = Ability.STR),
-        SpellDef("leomund_s_tiny_hut", "Leomund's Tiny Hut", 3, "Evocation", "1 minute or Ritual", "Self", "V, S, M", "8 hours",
+        SpellDef("leomund_s_tiny_hut", "Leomund's Tiny Hut", 3, "Evocation", "1 minute or Ritual", "Self", "V, S, M (a crystal bead)", "8 hours",
             "A 10-foot Emanation springs into existence around you and remains stationary for the duration. " +
                 "The spell fails when you cast it if the Emanation isn't big enough to fully encapsulate all " +
                 "creatures in its area. Creatures and objects within the Emanation when you cast the spell can " +
@@ -3015,7 +3015,7 @@ object SpellData {
                 "they can move their branches, tendrils, and stalks for you. If a Plant creature is in the area, " +
                 "you can communicate with it as if you shared a common language.",
             setOf(BARD, DRUID, RANGER)),
-        SpellDef("sylune_s_viper", "Sylune's Viper", 3, "Conjuration", "Bonus Action", "Self", "V, S, M", "1 hour",
+        SpellDef("sylune_s_viper", "Sylune's Viper", 3, "Conjuration", "Bonus Action", "Self", "V, S, M (a snake fang)", "1 hour",
             "A shimmering, spectral snake encircles your body for the duration. You gain 15 Temporary Hit " +
                 "Points; the spell ends early if you have no Temporary Hit Points left. While the spell is " +
                 "active, you gain the following benefits: Climbing. You gain a Climb Speed equal to your Speed. " +
@@ -3036,7 +3036,7 @@ object SpellData {
                 "The damage reduction and Force damage from this spell both increase by 1d6 for every spell slot " +
                 "level above 4.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), book = Sourcebook.HEROES_OF_FAERUN, damage = "4d6", damageType = "Force", saveAbility = Ability.CON),
-        SpellDef("doomtide", "Doomtide", 4, "Conjuration", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("doomtide", "Doomtide", 4, "Conjuration", "Action", "120 feet", "V, S, M (soot and a dried eel)", "1 minute",
             "You create a 20-foot-radius Sphere of inky fog within range. The fog is magical Darkness and " +
                 "lasts for the duration or until a strong wind (such as the one created by the Gust of Wind " +
                 "spell) disperses it, ending the spell. Each creature in the Sphere when it appears makes a " +
@@ -3082,7 +3082,7 @@ object SpellData {
                 "Effect Duration 1-3 40-foot-radius, 40-foot-high Cylinder 1 hour 4-6 60-foot-radius, " +
                 "60-foot-high Cylinder 8 hours 7+ 100-foot-radius, 100-foot-high Cylinder 24 hours",
             setOf(SORCERER, WIZARD), concentration = true, book = Sourcebook.HEROES_OF_FAERUN, damage = "4d10", damageType = "Radiant", saveAbility = Ability.CON),
-        SpellDef("sticks_to_snakes", "Sticks to Snakes", 4, "Transmutation", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("sticks_to_snakes", "Sticks to Snakes", 4, "Transmutation", "Action", "90 feet", "V, S, M (a small piece of bark and several snake scales)", "1 minute",
             "You can choose up to four nonmagical sticks no longer than a Quarterstaff (or similar pieces of " +
                 "nonmagical wood, such as Torches, Spears, etc.) that you can see within range to shape-shift " +
                 "into snakes. Creatures that are holding a targeted object can make a Charisma saving throw, " +
@@ -3099,7 +3099,7 @@ object SpellData {
             setOf(CLERIC, DRUID, RANGER), concentration = true, book = Sourcebook.DDB_DROPS, saveAbility = Ability.CHA),
 
         // ------------------------------------------------- Imported: Level 5
-        SpellDef("alustriel_s_mooncloak", "Alustriel's Mooncloak", 5, "Abjuration", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("alustriel_s_mooncloak", "Alustriel's Mooncloak", 5, "Abjuration", "Action", "Self", "V, S, M (a moonstone worth 50+ GP)", "1 minute",
             "For the duration, moonlight fills a 20-foot Emanation originating from you with Dim Light. While " +
                 "in that area, you and your allies have Half Cover and Resistance to Cold, Lightning, and Radiant " +
                 "damage. While the spell lasts, you can use one of the following options, ending the spell " +
@@ -3108,7 +3108,7 @@ object SpellData {
                 "Magic action, you or an ally within the area regains Hit Points equal to 4d10 plus your " +
                 "spellcasting ability modifier.",
             setOf(BARD, DRUID, RANGER, WIZARD), concentration = true, book = Sourcebook.HEROES_OF_FAERUN),
-        SpellDef("jallarzi_s_storm_of_radiance", "Jallarzi's Storm of Radiance", 5, "Evocation", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("jallarzi_s_storm_of_radiance", "Jallarzi's Storm of Radiance", 5, "Evocation", "Action", "120 feet", "V, S, M (a pinch of phosphorus)", "1 minute",
             "You unleash a storm of flashing light and raging thunder in a 10-foot-radius, 40-foot-high " +
                 "Cylinder centered on a point you can see within range. While in this area, creatures have the " +
                 "Blinded and Deafened conditions, and they can't cast spells with a Verbal component. When the " +
@@ -3118,7 +3118,7 @@ object SpellData {
                 "turn there. A creature makes this save only once per turn. Using a Higher-Level Spell Slot. The " +
                 "Radiant and Thunder damage increase by 1d10 for each spell slot level above 5.",
             setOf(WARLOCK, WIZARD), concentration = true, damage = "2d10", damageType = "Radiant", saveAbility = Ability.CON),
-        SpellDef("rary_s_telepathic_bond", "Rary's Telepathic Bond", 5, "Divination", "Action or Ritual", "30 feet", "V, S, M", "1 hour",
+        SpellDef("rary_s_telepathic_bond", "Rary's Telepathic Bond", 5, "Divination", "Action or Ritual", "30 feet", "V, S, M (two eggs)", "1 hour",
             "You forge a telepathic link among up to eight willing creatures of your choice within range, " +
                 "psychically linking each creature to all the others for the duration. Creatures that can't " +
                 "communicate in any languages aren't affected by this spell. Until the spell ends, the targets " +
@@ -3126,7 +3126,7 @@ object SpellData {
                 "communication is possible over any distance, though it can't extend to other planes of " +
                 "existence.",
             setOf(BARD, WIZARD), ritual = true),
-        SpellDef("songal_s_elemental_suffusion", "Songal's Elemental Suffusion", 5, "Transmutation", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("songal_s_elemental_suffusion", "Songal's Elemental Suffusion", 5, "Transmutation", "Action", "Self", "V, S, M (a pearl worth 100+ GP)", "1 minute",
             "You imbue yourself with the elemental power of genies. You gain the following benefits until the " +
                 "spell ends: Elemental Immunity. When you cast this spell, choose one of the following damage " +
                 "types: Acid, Cold, Fire, Lightning, or Thunder. You have Resistance to the chosen damage type. " +
@@ -3142,7 +3142,7 @@ object SpellData {
                 "creatures also gain the benefits of the spell for its duration. When the spell is cast, each " +
                 "secondary caster must expend a level 2+ spell slot; otherwise, the spell fails.",
             setOf(DRUID, SORCERER, WIZARD), concentration = true, book = Sourcebook.HEROES_OF_FAERUN, saveAbility = Ability.DEX),
-        SpellDef("yolande_s_regal_presence", "Yolande's Regal Presence", 5, "Enchantment", "Action", "Self", "Component: V, S, M", "1 minute",
+        SpellDef("yolande_s_regal_presence", "Yolande's Regal Presence", 5, "Enchantment", "Action", "Self", "Component: V, S, M (a miniature tiara)", "1 minute",
             "You surround yourself with unearthly majesty in a 10-foot Emanation. Whenever the Emanation " +
                 "enters the space of a creature you can see and whenever a creature you can see enters the " +
                 "Emanation or ends its turn there, you can force that creature to make a Wisdom saving throw. On " +
@@ -3170,7 +3170,7 @@ object SpellData {
                 "damage on a successful one. A creature also makes that save if it enters the wall's space or " +
                 "ends it turn there. A creature makes that save only once per turn.",
             setOf(CLERIC), concentration = true, damage = "6d10", damageType = "Force", saveAbility = Ability.DEX),
-        SpellDef("chain_lightning", "Chain Lightning", 6, "Evocation", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("chain_lightning", "Chain Lightning", 6, "Evocation", "Action", "150 feet", "V, S, M (three silver pins)", "Instantaneous",
             "You launch a lightning bolt toward a target you can see within range. Three bolts then leap from " +
                 "that target to as many as three other targets of your choice, each of which must be within 30 " +
                 "feet of the first target. A target can be a creature or an object and can be targeted by only " +
@@ -3178,7 +3178,7 @@ object SpellData {
                 "failed save or half as much damage on a successful one. Using a Higher-Level Spell Slot. One " +
                 "additional bolt leaps from the first target to another target for each spell slot level above 6.",
             setOf(SORCERER, WIZARD), damage = "10d8", damageType = "Lightning", saveAbility = Ability.DEX),
-        SpellDef("circle_of_death", "Circle Of Death", 6, "Necromancy", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("circle_of_death", "Circle Of Death", 6, "Necromancy", "Action", "150 feet", "V, S, M (the powder of a crushed black pearl worth 500+ GP)", "Instantaneous",
             "Negative energy ripples out in a 60-foot-radius Sphere from a point you choose within range. " +
                 "Each creature in that area makes a Constitution saving throw, taking 8d8 Necrotic damage on a " +
                 "failed save or half as much damage on a successful one. Using a Higher-Level Spell Slot. The " +
@@ -3195,7 +3195,7 @@ object SpellData {
                 "attack against a creature within 5 feet of it. Using a Higher-Level Spell Slot. The damage " +
                 "increases by 1d12 for each spell slot level above 6.",
             setOf(DRUID), concentration = true, needsAttackRoll = true),
-        SpellDef("contingency", "Contingency", 6, "Abjuration", "10 minutes", "Self", "V, S, M", "10 days",
+        SpellDef("contingency", "Contingency", 6, "Abjuration", "10 minutes", "Self", "V, S, M (a gem-encrusted statuette of yourself worth 1,500+ GP)", "10 days",
             "Choose a spell of level 5 or lower that you can cast, that has a casting time of an action, and " +
                 "that can target you. You cast that spell-called the contingent spell-as part of casting " +
                 "Contingency, expending spell slots for both, but the contingent spell doesn't come into effect. " +
@@ -3208,7 +3208,7 @@ object SpellData {
                 "spell again, the effect of another Contingency spell on you ends. Also, Contingency ends on you " +
                 "if its material component is ever not on your person.",
             setOf(WIZARD)),
-        SpellDef("create_undead", "Create Undead", 6, "Necromancy", "1 minute", "10 feet", "V, S, M", "Instantaneous",
+        SpellDef("create_undead", "Create Undead", 6, "Necromancy", "1 minute", "10 feet", "V, S, M (one 150+ GP black onyx stone for each corpse)", "Instantaneous",
             "You can cast this spell only at night. Choose up to three corpses of Medium or Small Humanoids " +
                 "within range. Each one becomes a Ghoul under your control (see the Monster Manual for its stat " +
                 "block). As a Bonus Action on each of your turns, you can mentally command any creature you " +
@@ -3242,7 +3242,7 @@ object SpellData {
                 "level. When the spell is cast, each secondary caster must expend a level 4+ spell slot; " +
                 "otherwise, the spell fails.",
             setOf(BARD, CLERIC), concentration = true, book = Sourcebook.HEROES_OF_FAERUN, damage = "3d10", damageType = "Necrotic", saveAbility = Ability.CON),
-        SpellDef("disintegrate", "Disintegrate", 6, "Transmutation", "Action", "60 feet", "V, S, M", "Instantaneous",
+        SpellDef("disintegrate", "Disintegrate", 6, "Transmutation", "Action", "60 feet", "V, S, M (a lodestone and dust)", "Instantaneous",
             "You launch a green ray at a target you can see within range. The target can be a creature, a " +
                 "nonmagical object, or a creation of magical force, such as the wall created by Wall of Force . A " +
                 "creature targeted by this spell makes a Dexterity saving throw. On a failed save, the target " +
@@ -3253,7 +3253,7 @@ object SpellData {
                 "larger, this spell disintegrates a 10-foot-Cube portion of it. Using a Higher-Level Spell Slot. " +
                 "The damage increases by 3d6 for each spell slot level above 6.",
             setOf(SORCERER, WIZARD), saveAbility = Ability.DEX),
-        SpellDef("drawmij_s_instant_summons", "Drawmij's Instant Summons", 6, "Conjuration", "1 minute or Ritual", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("drawmij_s_instant_summons", "Drawmij's Instant Summons", 6, "Conjuration", "1 minute or Ritual", "Touch", "V, S, M (a sapphire worth 1,000+ GP)", "Until dispelled",
             "You touch the sapphire used in the casting and an object weighing 10 pounds or less whose " +
                 "longest dimension is 6 feet or less. The spell leaves an Invisible mark on that object and " +
                 "invisibly inscribes the object's name on the sapphire. Each time you cast this spell, you must " +
@@ -3263,7 +3263,7 @@ object SpellData {
                 "the sapphire doesn't transport it, but instead you learn who that creature is and where that " +
                 "creature is currently located.",
             setOf(WIZARD), ritual = true),
-        SpellDef("elminster_s_effulgent_spheres", "Elminster's Effulgent Spheres", 6, "Evocation", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("elminster_s_effulgent_spheres", "Elminster's Effulgent Spheres", 6, "Evocation", "Action", "Self", "V, S, M (an opal worth 1,000 GP+)", "1 hour",
             "Six chromatic spheres orbit you for the duration. While the spheres are present, you can expend " +
                 "spheres to create the following effects: Absorb Energy. When you take Acid, Cold, Fire, " +
                 "Lightning, or Thunder damage, you can take a Reaction to expend one sphere and give yourself " +
@@ -3286,7 +3286,7 @@ object SpellData {
                 "route available. If the target moves to a space at least 60 feet away from you where it can't " +
                 "see you, this effect ends. Sickened. The target has the Poisoned condition.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("find_the_path", "Find the Path", 6, "Divination", "1 minute", "Self", "V, S, M", "1 day",
+        SpellDef("find_the_path", "Find the Path", 6, "Divination", "1 minute", "Self", "V, S, M (a set of divination tools - such as cards or runes - worth 100+ GP)", "1 day",
             "You magically sense the most direct physical route to a location you name. You must be familiar " +
                 "with the location, and the spell fails if you name a destination on another plane of existence, " +
                 "a moving destination (such as a mobile fortress), or an unspecific destination (such as \"a green " +
@@ -3294,7 +3294,7 @@ object SpellData {
                 "destination, you know how far it is and in what direction it lies. Whenever you face a choice of " +
                 "paths along the way there, you know which path is the most direct.",
             setOf(BARD, CLERIC, DRUID), concentration = true),
-        SpellDef("flesh_to_stone", "Flesh to Stone", 6, "Transmutation", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("flesh_to_stone", "Flesh to Stone", 6, "Transmutation", "Action", "60 feet", "V, S, M (a cockatrice feather)", "1 minute",
             "You attempt to turn one creature that you can see within range into stone. The target makes a " +
                 "Constitution saving throw. On a failed save, it has the Restrained condition for the duration. " +
                 "On a successful save, its Speed is 0 until the start of your next turn. Constructs automatically " +
@@ -3326,7 +3326,7 @@ object SpellData {
                 "do. General Wikidot.com documentation and help section. Wikidot.com Terms of Service - what you " +
                 "can, what you should not etc. Wikidot.com Privacy Policy.",
             setOf(DRUID, SORCERER, WIZARD), concentration = true, saveAbility = Ability.CON),
-        SpellDef("forbiddance", "Forbiddance", 6, "Abjuration", "10 minutes or Ritual", "Touch", "V, S, M", "1 day",
+        SpellDef("forbiddance", "Forbiddance", 6, "Abjuration", "10 minutes or Ritual", "Touch", "V, S, M (ruby dust worth 1,000+ GP)", "1 day",
             "You create a ward against magical travel that protects up to 40,000 square feet of floor space " +
                 "to a height of 30 feet above the floor. For the duration, creatures can't teleport into the area " +
                 "or use portals, such as those created by the Gate spell, to enter the area. The spell proofs the " +
@@ -3342,7 +3342,7 @@ object SpellData {
                 "same location, the spell lasts until it is dispelled, and the Material components are consumed " +
                 "on the last casting.",
             setOf(CLERIC), ritual = true),
-        SpellDef("globe_of_invulnerability", "Globe of Invulnerability", 6, "Abjuration", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("globe_of_invulnerability", "Globe of Invulnerability", 6, "Abjuration", "Action", "Self", "V, S, M (a glass bead)", "1 minute",
             "An immobile, shimmering barrier appears in a 10-foot Emanation around you and remains for the " +
                 "duration. Any spell of level 5 or lower cast from outside the barrier can't affect anything " +
                 "within it. Such a spell can target creatures and objects within the barrier, but the spell has " +
@@ -3350,7 +3350,7 @@ object SpellData {
                 "created by such spells. Using a Higher-Level Spell Slot. The barrier blocks spells of 1 level " +
                 "higher for each spell slot level above 6.",
             setOf(SORCERER, WIZARD), concentration = true),
-        SpellDef("guards_and_wards", "Guards and Wards", 6, "Abjuration", "1 hour", "Touch", "V, S, M", "24 hours",
+        SpellDef("guards_and_wards", "Guards and Wards", 6, "Abjuration", "1 hour", "Touch", "V, S, M (a silver rod worth 10+ GP)", "24 hours",
             "You create a ward that protects up to 2,500 square feet of floor space. The warded area can be " +
                 "up to 20 feet tall, and you shape it as one 50-foot square, one hundred 5-foot squares that are " +
                 "contiguous, or twenty-five 10-foot squares that are contiguous. When you cast this spell, you " +
@@ -3386,7 +3386,7 @@ object SpellData {
                 "the target. Using a Higher-Level Spell Slot. The healing increases by 10 for each spell slot " +
                 "level above 6.",
             setOf(CLERIC, DRUID)),
-        SpellDef("heroes_feast", "Heroes' Feast", 6, "Conjuration", "10 minutes", "Self", "V, S, M", "Instantaneous",
+        SpellDef("heroes_feast", "Heroes' Feast", 6, "Conjuration", "10 minutes", "Self", "V, S, M (a gem-encrusted bowl worth 1,000+ GP, which the spell consumes)", "Instantaneous",
             "You conjure a feast that appears on a surface in an unoccupied 10-foot Cube next to you. The " +
                 "feast takes 1 hour to consume and disappears at the end of that time, and the beneficial effects " +
                 "don't set in until this hour is over. Up to twelve creatures can partake of the feast. A " +
@@ -3405,7 +3405,7 @@ object SpellData {
                 "other targets affected by this spell. At the end of each of its turns, the target repeats the " +
                 "save, ending the spell on itself on a success.",
             setOf(BARD, SORCERER, WIZARD), book = Sourcebook.DDB_DROPS, saveAbility = Ability.INT),
-        SpellDef("magic_jar", "Magic Jar", 6, "Necromancy", "1 minute", "Self", "V, S, M", "Until dispelled",
+        SpellDef("magic_jar", "Magic Jar", 6, "Necromancy", "1 minute", "Self", "V, S, M (a gem, crystal, or reliquary worth 500+ GP)", "Until dispelled",
             "Your body falls into a catatonic state as your soul leaves it and enters the container you used " +
                 "for the spell's Material component. While your soul inhabits the container, you are aware of " +
                 "your surroundings as if you were in the container's space. You can't move or take Reactions. The " +
@@ -3430,7 +3430,7 @@ object SpellData {
                 "and within 100 feet. Otherwise, that creature dies. When the spell ends, the container is " +
                 "destroyed.",
             setOf(WIZARD), saveAbility = Ability.CHA),
-        SpellDef("mass_suggestion", "Mass Suggestion", 6, "Enchantment", "Action", "60 feet", "V, M", "24 hours",
+        SpellDef("mass_suggestion", "Mass Suggestion", 6, "Enchantment", "Action", "60 feet", "V, M (a snake's tongue)", "24 hours",
             "You suggest a course of activity-described in no more than 25 words-to twelve or fewer creatures " +
                 "you can see within range that can hear and understand you. The suggestion must sound achievable " +
                 "and not involve anything that would obviously deal damage to any of the targets or their allies. " +
@@ -3443,7 +3443,7 @@ object SpellData {
                 "shorter time, the spell ends for a target upon completing it. Using a Higher-Level Spell Slot. " +
                 "The duration is longer with a spell slot of level 7 (10 days), 8 (30 days), or 9 (366 days).",
             setOf(BARD, SORCERER, WIZARD), saveAbility = Ability.WIS),
-        SpellDef("move_earth", "Move Earth", 6, "Transmutation", "Action", "120 feet", "V, S, M", "2 hours",
+        SpellDef("move_earth", "Move Earth", 6, "Transmutation", "Action", "120 feet", "V, S, M (a miniature shovel)", "2 hours",
             "Choose an area of terrain no larger than 40 feet on a side within range. You can reshape dirt, " +
                 "sand, or clay in the area in any manner you choose for the duration. You can raise or lower the " +
                 "area's elevation, create or fill in a trench, erect or flatten a wall, or form a pillar. The " +
@@ -3458,7 +3458,7 @@ object SpellData {
                 "structure unstable, it might collapse. Similarly, this spell doesn't directly affect plant " +
                 "growth. The moved earth carries any plants along with it.",
             setOf(DRUID, SORCERER, WIZARD), concentration = true),
-        SpellDef("otiluke_s_freezing_sphere", "Otiluke's Freezing Sphere", 6, "Evocation", "Action", "300 feet", "V, S, M", "Instantaneous",
+        SpellDef("otiluke_s_freezing_sphere", "Otiluke's Freezing Sphere", 6, "Evocation", "Action", "300 feet", "V, S, M (a miniature crystal sphere)", "Instantaneous",
             "A frigid globe streaks from you to a point of your choice within range, where it explodes in a " +
                 "60-foot-radius Sphere. Each creature in that area makes a Constitution saving throw, taking 10d6 " +
                 "Cold damage on failed save or half as much damage on a successful one. If the globe strikes a " +
@@ -3474,7 +3474,7 @@ object SpellData {
                 "shattered, it explodes. Using a Higher-Level Spell Slot. The damage increases by 1d6 for each " +
                 "spell slot level above 6.",
             setOf(SORCERER, WIZARD), damage = "10d6", damageType = "Cold", saveAbility = Ability.CON),
-        SpellDef("programmed_illusion", "Programmed Illusion", 6, "Illusion", "Action", "120 feet", "V, S, M", "Until dispelled",
+        SpellDef("programmed_illusion", "Programmed Illusion", 6, "Illusion", "Action", "120 feet", "V, S, M (jade dust worth 25+ GP)", "Until dispelled",
             "You create an illusion of an object, a creature, or some other visible phenomenon within range " +
                 "that activates when a specific trigger occurs. The illusion is imperceptible until then. It must " +
                 "be no larger than a 30-foot Cube, and you decide when you cast the spell how the illusion " +
@@ -3490,7 +3490,7 @@ object SpellData {
                 "check against your spell save DC. If a creature discerns the illusion for what it is, the " +
                 "creature can see through the image, and any noise it makes sounds hollow to the creature.",
             setOf(BARD, WIZARD)),
-        SpellDef("summon_fiend", "Summon Fiend", 6, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_fiend", "Summon Fiend", 6, "Conjuration", "Action", "90 feet", "V, S, M (a bloody vial worth 600+ GP)", "1 hour",
             "You call forth a fiendish spirit. It manifests in an unoccupied space that you can see within " +
                 "range and uses the Fiendish Spirit stat block. When you cast the spell, choose Demon, Devil, or " +
                 "Yugoloth. The creature resembles a Fiend of the chosen type, which determines certain details in " +
@@ -3520,7 +3520,7 @@ object SpellData {
                 "Roll: Bonus equals your spell attack modifier, reach 5 ft. or range 150 ft. Hit: 2d6 + 3 + the " +
                 "spell's level Fire damage.",
             setOf(WARLOCK, WIZARD), concentration = true),
-        SpellDef("sunbeam", "Sunbeam", 6, "Evocation", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("sunbeam", "Sunbeam", 6, "Evocation", "Action", "Self", "V, S, M (a magnifying glass)", "1 minute",
             "You launch a sunbeam in a 5-foot-wide, 60-foot-long Line. Each creature in the Line makes a " +
                 "Constitution saving throw. On a failed save, a creature takes 6d8 Radiant damage and has the " +
                 "Blinded condition until the start of your next turn. On a successful save, it takes half as much " +
@@ -3528,7 +3528,7 @@ object SpellData {
                 "For the duration, a mote of brilliant radiance shines above you. It sheds Bright Light in a " +
                 "30-foot radius and Dim Light for an additional 30 feet. This light is sunlight.",
             setOf(CLERIC, DRUID, SORCERER, WIZARD), concentration = true, damage = "6d8", damageType = "Radiant", saveAbility = Ability.CON),
-        SpellDef("tasha_s_bubbling_cauldron", "Tasha's Bubbling Cauldron", 6, "Conjuration", "Action", "5 feet", "V, S, M", "10 minutes",
+        SpellDef("tasha_s_bubbling_cauldron", "Tasha's Bubbling Cauldron", 6, "Conjuration", "Action", "5 feet", "V, S, M (a gilded ladle worth 500+ GP)", "10 minutes",
             "You conjure a claw-footed cauldron filled with bubbling liquid. The cauldron appears in an " +
                 "unoccupied space on the ground within 5 feet of you and lasts for the duration. The cauldron " +
                 "can't be moved and disappears when the spell ends, along with the bubbling liquid inside it. The " +
@@ -3546,10 +3546,10 @@ object SpellData {
                 "the destination plant at least once before. For the duration, any creature can step into the " +
                 "target plant and exit from the destination plant by using 5 feet of movement.",
             setOf(DRUID)),
-        SpellDef("true_seeing", "True Seeing", 6, "Divination", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("true_seeing", "True Seeing", 6, "Divination", "Action", "Touch", "V, S, M (mushroom powder worth 25+ GP, which the spell consumes)", "1 hour",
             "For the duration, the willing creature you touch has Truesight with a range of 120 feet.",
             setOf(BARD, CLERIC, SORCERER, WARLOCK, WIZARD)),
-        SpellDef("wall_of_ice", "Wall of Ice", 6, "Evocation", "Action", "120 feet", "V, S, M", "10 minutes",
+        SpellDef("wall_of_ice", "Wall of Ice", 6, "Evocation", "Action", "120 feet", "V, S, M (a piece of quartz)", "10 minutes",
             "You create a wall of ice on a solid surface within range. You can form it into a hemispherical " +
                 "dome or a globe with a radius of up to 10 feet, or you can shape a flat surface made up of ten " +
                 "10-foot-square panels. Each panel must be contiguous with another panel. In any form, the wall " +
@@ -3566,7 +3566,7 @@ object SpellData {
                 "damage from passing through the sheet of frigid air increases by 1d6 for each spell slot level " +
                 "above 6.",
             setOf(WIZARD), concentration = true, damage = "10d6", damageType = "Cold", saveAbility = Ability.DEX),
-        SpellDef("wall_of_thorns", "Wall of Thorns", 6, "Conjuration", "Action", "120 feet", "V, S, M", "10 minutes",
+        SpellDef("wall_of_thorns", "Wall of Thorns", 6, "Conjuration", "Action", "120 feet", "V, S, M (a handful of thorns)", "10 minutes",
             "You create a wall of tangled brush bristling with needle-sharp thorns. The wall appears within " +
                 "range on a solid surface and lasts for the duration. You choose to make the wall up to 60 feet " +
                 "long, 10 feet high, and 5 feet thick or a circle that has a 20-foot diameter and is up to 20 " +
@@ -3580,7 +3580,7 @@ object SpellData {
                 "a Higher-Level Spell Slot. Both types of damage increase by 1d8 for each spell slot level above " +
                 "6.",
             setOf(DRUID), concentration = true, damage = "7d8", damageType = "Piercing", saveAbility = Ability.DEX),
-        SpellDef("wind_walk", "Wind Walk", 6, "Transmutation", "1 minute", "30 feet", "V, S, M", "8 hours",
+        SpellDef("wind_walk", "Wind Walk", 6, "Transmutation", "1 minute", "30 feet", "V, S, M (a candle)", "8 hours",
             "You and up to ten willing creatures of your choice within range assume gaseous forms for the " +
                 "duration, appearing as wisps of cloud. While in this cloud form, a target has a Fly Speed of 300 " +
                 "feet and can hover; it has Immunity to the Prone condition; and it has Resistance to " +
@@ -3614,7 +3614,7 @@ object SpellData {
                 "this spell only once per turn. Using a Higher-Level Spell Slot. The healing and damage increase " +
                 "by 1d12 for each spell slot level above 7.",
             setOf(CLERIC), concentration = true, damage = "6d12", damageType = "Radiant", saveAbility = Ability.DEX),
-        SpellDef("delayed_blast_fireball", "Delayed Blast Fireball", 7, "Evocation", "Action", "150 feet", "V, S, M", "1 minute",
+        SpellDef("delayed_blast_fireball", "Delayed Blast Fireball", 7, "Evocation", "Action", "150 feet", "V, S, M (a ball of bat guano and sulfur)", "1 minute",
             "A beam of yellow light flashes from you, then condenses at a chosen point within range as a " +
                 "glowing bead for the duration. When the spell ends, the bead explodes, and each creature in a " +
                 "20-foot-radius Sphere centered on that point makes a Dexterity saving throw. A creature takes " +
@@ -3668,7 +3668,7 @@ object SpellData {
                 "half as much damage on a successful one. Flammable objects in the area that aren't being worn or " +
                 "carried start burning.",
             setOf(CLERIC, DRUID, SORCERER), damage = "7d10", damageType = "Fire", saveAbility = Ability.DEX),
-        SpellDef("forcecage", "Forcecage", 7, "Evocation", "Action", "100 feet", "V, S, M", "1 hour",
+        SpellDef("forcecage", "Forcecage", 7, "Evocation", "Action", "100 feet", "V, S, M (ruby dust worth 1,500+ GP, which the spell consumes)", "1 hour",
             "An immobile, Invisible, Cube-shaped prison composed of magical force springs into existence " +
                 "around an area you choose within range. The prison can be a cage or a solid box, as you choose. " +
                 "A prison in the shape of a cage can be up to 20 feet on a side and is made from 1/2-inch " +
@@ -3697,7 +3697,7 @@ object SpellData {
                 "illusion remain, so while the creature is aware of the illusion's presence, the creature can " +
                 "still physically interact with the illusion.",
             setOf(BARD, DRUID, WIZARD)),
-        SpellDef("mordenkainen_s_magnificent_mansion", "Mordenkainen's Magnificent Mansion", 7, "Conjuration", "1 minute", "300 feet", "V, S, M", "24 hours",
+        SpellDef("mordenkainen_s_magnificent_mansion", "Mordenkainen's Magnificent Mansion", 7, "Conjuration", "1 minute", "300 feet", "V, S, M (a miniature door worth 15+ GP)", "24 hours",
             "You conjure a shimmering door in range that lasts for the duration. The door leads to an " +
                 "extradimensional dwelling and is 5 feet wide and 10 feet tall. You and any creature you " +
                 "designate when you cast the spell can enter the extradimensional dwelling as long as the door " +
@@ -3715,14 +3715,14 @@ object SpellData {
                 "leave the dwelling. When the spell ends, any creatures or objects left inside the " +
                 "extradimensional space are expelled into the unoccupied spaces nearest to the entrance.",
             setOf(BARD, WIZARD)),
-        SpellDef("mordenkainen_s_sword", "Mordenkainen's Sword", 7, "Evocation", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("mordenkainen_s_sword", "Mordenkainen's Sword", 7, "Evocation", "Action", "90 feet", "V, S, M (a miniature sword worth 250+ GP)", "1 minute",
             "You create a spectral sword that hovers within range. It lasts for the duration. When the sword " +
                 "appears, you make a melee spell attack against a target within 5 feet of the sword. On a hit, " +
                 "the target takes Force damage equal to 4d12 plus your spellcasting ability modifier. On your " +
                 "later turns, you can take a Bonus Action to move the sword up to 30 feet to a spot you can see " +
                 "and repeat the attack against the same target or a different one.",
             setOf(BARD, WIZARD), concentration = true, needsAttackRoll = true),
-        SpellDef("plane_shift", "Plane Shift", 7, "Conjuration", "Action", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("plane_shift", "Plane Shift", 7, "Conjuration", "Action", "Touch", "V, S, M (a forked, metal rod worth 250+ GP and attuned to a plane of existence)", "Instantaneous",
             "You and up to eight willing creatures who link hands in a circle are transported to a different " +
                 "plane of existence. You can specify a target destination in general terms, such as the City of " +
                 "Brass on the Elemental Plane of Fire or the palace of Dispater on the second level of the Nine " +
@@ -3753,7 +3753,7 @@ object SpellData {
                 "plane of existence (DM's choice). 8 Special. The target is struck by two rays. Roll twice, " +
                 "rerolling any 8.",
             setOf(BARD, SORCERER, WIZARD), saveAbility = Ability.DEX),
-        SpellDef("project_image", "Project Image", 7, "Illusion", "Action", "500 miles", "V, S, M", "1 day",
+        SpellDef("project_image", "Project Image", 7, "Illusion", "Action", "500 miles", "V, S, M (a statuette of yourself worth 5+ GP)", "1 day",
             "You create an illusory copy of yourself that lasts for the duration. The copy can appear at any " +
                 "location within range that you have seen before, regardless of intervening obstacles. The " +
                 "illusion looks and sounds like you, but it is intangible. If the illusion takes any damage, it " +
@@ -3766,11 +3766,11 @@ object SpellData {
                 "discerns the illusion for what it is, the creature can see through the image, and any noise it " +
                 "makes sounds hollow to the creature.",
             setOf(BARD, WIZARD), concentration = true),
-        SpellDef("regenerate", "Regenerate", 7, "Transmutation", "1 minute", "Touch", "V, S, M", "1 hour",
+        SpellDef("regenerate", "Regenerate", 7, "Transmutation", "1 minute", "Touch", "V, S, M (a prayer wheel)", "1 hour",
             "A creature you touch regains 4d8 + 15 Hit Points. For the duration, the target regains 1 Hit " +
                 "Point at the start of each of its turns, and any severed body parts regrow after 2 minutes.",
             setOf(BARD, CLERIC, DRUID)),
-        SpellDef("resurrection", "Resurrection", 7, "Necromancy", "1 hour", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("resurrection", "Resurrection", 7, "Necromancy", "1 hour", "Touch", "V, S, M (a diamond worth 1,000+ GP, which the spell consumes)", "Instantaneous",
             "With a touch, you revive a dead creature that has been dead for no more than a century, didn't " +
                 "die of old age, and wasn't Undead when it died. The creature returns to life with all its Hit " +
                 "Points. This spell also neutralizes any poisons that affected the creature at the time of death. " +
@@ -3780,7 +3780,7 @@ object SpellData {
                 "creature that has been dead for 365 days or longer taxes you. Until you finish a Long Rest, you " +
                 "can't cast spells again, and you have Disadvantage on D20 Tests.",
             setOf(BARD, CLERIC)),
-        SpellDef("reverse_gravity", "Reverse Gravity", 7, "Transmutation", "Action", "100 feet", "V, S, M", "1 minute",
+        SpellDef("reverse_gravity", "Reverse Gravity", 7, "Transmutation", "Action", "100 feet", "V, S, M (a lodestone and iron filings)", "1 minute",
             "This spell reverses gravity in a 50-foot-radius, 100-foot high Cylinder centered on a point " +
                 "within range. All creatures and objects in that area that aren't anchored to the ground fall " +
                 "upward and reach the top of the Cylinder. A creature can make a Dexterity saving throw to grab a " +
@@ -3790,7 +3790,7 @@ object SpellData {
                 "anything, it hovers there for the duration. When the spell ends, affected objects and creatures " +
                 "fall downward.",
             setOf(DRUID, SORCERER, WIZARD), concentration = true, saveAbility = Ability.DEX),
-        SpellDef("sequester", "Sequester", 7, "Transmutation", "Action", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("sequester", "Sequester", 7, "Transmutation", "Action", "Touch", "V, S, M (gem dust worth 5,000+ GP, which the spell consumes)", "Until dispelled",
             "With a touch, you magically sequester an object or a willing creature. For the duration, the " +
                 "target has the Invisible condition and can't be targeted by Divination spells, detected by " +
                 "magic, or viewed remotely with magic. If the target is a creature, it enters a state of " +
@@ -3806,7 +3806,7 @@ object SpellData {
                 "Hit Point Dice equal to the spell slot's level and regain Hit Points equal to the roll's total " +
                 "plus your spellcasting ability modifier; those dice are then expended.",
             setOf(SORCERER, WIZARD), book = Sourcebook.HEROES_OF_FAERUN),
-        SpellDef("simulacrum", "Simulacrum", 7, "Illusion", "12 hours", "Touch", "V, S, M", "Until dispelled",
+        SpellDef("simulacrum", "Simulacrum", 7, "Illusion", "12 hours", "Touch", "V, S, M (powdered ruby worth 1,500+ GP, which the spell consumes)", "Until dispelled",
             "You create a simulacrum of one Beast or Humanoid that is within 10 feet of you for the entire " +
                 "casting of the spell. You finish the casting by touching both the creature and a pile of ice or " +
                 "snow that is the same size as that creature, and the pile turns into the simulacrum, which is a " +
@@ -3820,7 +3820,7 @@ object SpellData {
                 "0 Hit Points, at which point it reverts to snow and melts away. If you cast this spell again, " +
                 "any simulacrum you created with this spell is instantly destroyed.",
             setOf(WIZARD)),
-        SpellDef("symbol", "Symbol", 7, "Abjuration", "1 minute", "Touch", "V, S, M", "Until dispelled or triggered",
+        SpellDef("symbol", "Symbol", 7, "Abjuration", "1 minute", "Touch", "V, S, M (powdered diamond worth 1,000+ GP, which the spell consumes)", "Until dispelled or triggered",
             "You inscribe a harmful glyph either on a surface (such as a section of floor or wall) or within " +
                 "an object that can be closed (such as a book or chest). The glyph can cover an area no larger " +
                 "than 10 feet in diameter. If you choose an object, it must remain in place; if it is moved more " +
@@ -3881,7 +3881,7 @@ object SpellData {
                 "south; 4 , southwest; 5 , west; 6 , northwest; 7 , north; or 8 , northeast. On Target. You and " +
                 "your group (or the target object) appear where you intended.",
             setOf(BARD, SORCERER, WIZARD)),
-        SpellDef("void_star", "Void Star", 7, "Necromancy", "Action", "120 feet", "V, S, M", "Instantaneous",
+        SpellDef("void_star", "Void Star", 7, "Necromancy", "Action", "120 feet", "V, S, M (a fragment of a meteor)", "Instantaneous",
             "You conjure forth a fragment of a dark star and launch it at one creature that you can see " +
                 "within range. Make a ranged spell attack against the target. On a hit, the target takes 6d12 " +
                 "Necrotic damage. Hit or miss, the target takes 3d12 Necrotic damage at the end of its next turn, " +
@@ -3903,7 +3903,7 @@ object SpellData {
                 "shape-shifts. These Temporary Hit Points vanish if any remain when the spell ends. The " +
                 "transformation lasts for the duration or until the target ends it as a Bonus Action.",
             setOf(DRUID)),
-        SpellDef("antimagic_field", "Antimagic Field", 8, "Abjuration", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("antimagic_field", "Antimagic Field", 8, "Abjuration", "Action", "Self", "V, S, M (iron filings)", "1 hour",
             "An aura of antimagic surrounds you in 10-foot Emanation. No one can cast spells, take Magic " +
                 "actions, or create other magical effects inside the aura, and those things can't target or " +
                 "otherwise affect anything inside it. Magical properties of magic items don't work inside the " +
@@ -3914,7 +3914,7 @@ object SpellData {
                 "time it spends suppressed counts against its duration. Dispel Magic has no effect on the aura, " +
                 "and the auras created by different Antimagic Field spells don't nullify each other.",
             setOf(CLERIC, WIZARD), concentration = true),
-        SpellDef("antipathy_sympathy", "Antipathy/Sympathy", 8, "Enchantment", "1 Hour", "60 Feet", "V, S, M", "10 Days",
+        SpellDef("antipathy_sympathy", "Antipathy/Sympathy", 8, "Enchantment", "1 Hour", "60 Feet", "V, S, M (a mix of vinegar and honey)", "10 Days",
             "As you cast the spell, choose whether it creates antipathy or sympathy, and target one creature " +
                 "or object that is Huge or smaller. Then specify a kind of creature, such as red dragons, " +
                 "goblins, or vampires. A creature of the chosen kind makes a Wisdom saving throw when it comes " +
@@ -3931,14 +3931,14 @@ object SpellData {
                 "creature that successfully saves against this effect is immune to it for 1 minute, after which " +
                 "it can be affected again.",
             setOf(BARD, DRUID, WIZARD), saveAbility = Ability.WIS),
-        SpellDef("befuddlement", "Befuddlement", 8, "Enchantment", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("befuddlement", "Befuddlement", 8, "Enchantment", "Action", "150 feet", "V, S, M (a key ring with no keys)", "Instantaneous",
             "You blast the mind of a creature that you can see within range. The target makes an Intelligence " +
                 "saving throw. On a failed save, the target takes 10d12 Psychic damage and can't cast spells or " +
                 "take the Magic action. At the end of every 30 days, the target repeats the save, ending the " +
                 "effect on a success. The effect can also be ended by the Greater Restoration , Heal , or Wish " +
                 "spell. On a successful save, the target takes half as much damage only.",
             setOf(BARD, DRUID, WARLOCK, WIZARD), damage = "10d12", damageType = "Psychic", saveAbility = Ability.INT),
-        SpellDef("clone", "Clone", 8, "Necromancy", "1 hour", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("clone", "Clone", 8, "Necromancy", "1 hour", "Touch", "V, S, M (a diamond worth 1,000+ GP, which the spell consumes, and a sealable vessel worth 2,000+ GP that is large enough to hold the creature being cloned)", "Instantaneous",
             "You touch a creature or at least 1 cubic inch of its flesh. An inert duplicate of that creature " +
                 "forms inside the vessel used in the spell's casting and finishes growing after 120 days; you " +
                 "choose whether the finished clone is the same age as the creature or younger. The clone remains " +
@@ -3949,7 +3949,7 @@ object SpellData {
                 "original remains, if any, become inert and can't be revived, since the creature's soul is " +
                 "elsewhere.",
             setOf(WIZARD)),
-        SpellDef("control_weather", "Control Weather", 8, "Transmutation", "10 minutes", "Self", "V, S, M", "8 hours",
+        SpellDef("control_weather", "Control Weather", 8, "Transmutation", "10 minutes", "Self", "V, S, M (burning incense)", "8 hours",
             "You take control of the weather within 5 miles of you for the duration. You must be outdoors to " +
                 "cast this spell, and it ends early if you go indoors. When you cast the spell, you change the " +
                 "current weather conditions, which are determined by the DM. You can change precipitation, " +
@@ -3986,7 +3986,7 @@ object SpellData {
                 "Higher-Level Spell Slot. Your Concentration can last longer with a level 9 spell slot (up to 8 " +
                 "hours).",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("earthquake", "Earthquake", 8, "Transmutation", "Action", "500 feet", "V, S, M", "1 minute",
+        SpellDef("earthquake", "Earthquake", 8, "Transmutation", "Action", "500 feet", "V, S, M (a fractured rock)", "1 minute",
             "Choose a point on the ground that you can see within range. For the duration, an intense tremor " +
                 "rips through the ground in a 100-foot-radius circle centered on that point. The ground there is " +
                 "Difficult Terrain. When you cast this spell and at the end of each of your turns for the " +
@@ -4010,7 +4010,7 @@ object SpellData {
                 "15. Additionally, no matter what you say, magic that would determine if you are telling the " +
                 "truth indicates that you are being truthful.",
             setOf(BARD, WARLOCK)),
-        SpellDef("holy_aura", "Holy Aura", 8, "Abjuration", "Action", "Self", "V, S, M", "1 minute",
+        SpellDef("holy_aura", "Holy Aura", 8, "Abjuration", "Action", "Self", "V, S, M (a reliquary worth 1,000+ GP)", "1 minute",
             "For the duration, you emit an aura in a 30-foot Emanation. While in the aura, creatures of your " +
                 "choice have Advantage on all saving throws, and other creatures have Disadvantage on attack " +
                 "rolls against them. In addition, when a Fiend or an Undead hits an affected creature with a " +
@@ -4057,7 +4057,7 @@ object SpellData {
                 "next turn. The Stunned target makes a Constitution saving throw at the end of each of its turns, " +
                 "ending the condition on itself on a success.",
             setOf(BARD, SORCERER, WARLOCK, WIZARD), saveAbility = Ability.CON),
-        SpellDef("sunburst", "Sunburst", 8, "Evocation", "Action", "150 feet", "V, S, M", "Instantaneous",
+        SpellDef("sunburst", "Sunburst", 8, "Evocation", "Action", "150 feet", "V, S, M (a piece of sunstone)", "Instantaneous",
             "Brilliant sunlight flashes in a 60-foot-radius Sphere centered on a point you choose within " +
                 "range. Each creature in the Sphere makes a Constitution saving throw. On a failed save, a " +
                 "creature takes 12d6 Radiant damage and has the Blinded condition for 1 minute. On a successful " +
@@ -4065,7 +4065,7 @@ object SpellData {
                 "Constitution saving throw at the end of each of its turns, ending the effect on itself on a " +
                 "success. This spell dispels Darkness in its area that was created by any spell.",
             setOf(CLERIC, DRUID, SORCERER, WIZARD), damage = "12d6", damageType = "Radiant", saveAbility = Ability.CON),
-        SpellDef("telepathy", "Telepathy", 8, "Divination", "Action", "Unlimited", "V, S, M", "24 hours",
+        SpellDef("telepathy", "Telepathy", 8, "Divination", "Action", "Unlimited", "V, S, M (a pair of linked silver rings)", "24 hours",
             "You create a telepathic link between yourself and a willing creature with which you are " +
                 "familiar. The creature can be anywhere on the same plane of existence as you. The spell ends if " +
                 "you or the target are no longer on the same plane. Until the spell ends, you and the target can " +
@@ -4090,7 +4090,7 @@ object SpellData {
             setOf(DRUID), concentration = true, damage = "6d10", damageType = "Bludgeoning", saveAbility = Ability.STR),
 
         // ------------------------------------------------- Imported: Level 9
-        SpellDef("astral_projection", "Astral Projection", 9, "Necromancy", "1 hour", "10 feet", "V, S, M", "Until dispelled",
+        SpellDef("astral_projection", "Astral Projection", 9, "Necromancy", "1 hour", "10 feet", "V, S, M (for each of the spell's targets, one jacinth worth 1,000+ GP and one silver bar worth 100+ GP, all of which the spell consumes)", "Until dispelled",
             "You and up to eight willing creatures within range project your astral bodies into the Astral " +
                 "Plane (the spell ends instantly if you are already on that plane). Each target's body is left " +
                 "behind in a state of suspended animation; it has the Unconscious condition, doesn't need food or " +
@@ -4117,12 +4117,12 @@ object SpellData {
                 "at the same target or at different ones. The blade can harmlessly pass through any barrier, " +
                 "including ones created by spells like Wall of Force .",
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true, book = Sourcebook.HEROES_OF_FAERUN, damage = "10d6", damageType = "Force", needsAttackRoll = true),
-        SpellDef("foresight", "Foresight", 9, "Divination", "1 minute", "Touch", "V, S, M", "8 hours",
+        SpellDef("foresight", "Foresight", 9, "Divination", "1 minute", "Touch", "V, S, M (a hummingbird feather)", "8 hours",
             "You touch a willing creature and bestow a limited ability to see into the immediate future. For " +
                 "the duration, the target has Advantage on D20 Tests, and other creatures have Disadvantage on " +
                 "attack rolls against it. The spell ends early if you cast it again.",
             setOf(BARD, DRUID, WARLOCK, WIZARD)),
-        SpellDef("gate", "Gate", 9, "Conjuration", "Action", "60 feet", "V, S, M", "1 minute",
+        SpellDef("gate", "Gate", 9, "Conjuration", "Action", "60 feet", "V, S, M(a diamond worth 5,000+ GP)", "1 minute",
             "You conjure a portal linking an unoccupied space you can see within range to a precise location " +
                 "on a different plane of existence. The portal is a circular opening, which you can make 5 to 20 " +
                 "feet in diameter. You can orient the portal in any direction you choose. The portal lasts for " +
@@ -4137,7 +4137,7 @@ object SpellData {
                 "of the portal. You gain no special power over the creature, and it is free to act as the DM " +
                 "deems appropriate. It might leave, attack you, or help you.",
             setOf(CLERIC, SORCERER, WARLOCK, WIZARD), concentration = true),
-        SpellDef("imprisonment", "Imprisonment", 9, "Abjuration", "1 minute", "30 feet", "V, S, M", "Until dispelled",
+        SpellDef("imprisonment", "Imprisonment", 9, "Abjuration", "1 minute", "30 feet", "V, S, M(a statuette of the target worth 5,000+ GP)", "Until dispelled",
             "You create a magical restraint to hold a creature that you can see within range. The target must " +
                 "make a Wisdom saving throw. On a successful save, the target is unaffected, and it is immune to " +
                 "this spell for the next 24 hours. On a failed save, the target is imprisoned. While imprisoned, " +
@@ -4242,7 +4242,7 @@ object SpellData {
                 "the condition ends. On a failed save, the condition ends, and the creature teleports to another " +
                 "plane of existence (DM's choice). Additional Effects: This layer is destroyed by Dispel Magic .",
             setOf(BARD, WIZARD), saveAbility = Ability.CON),
-        SpellDef("shapechange", "Shapechange", 9, "Transmutation", "Action", "Self", "V, S, M", "1 hour",
+        SpellDef("shapechange", "Shapechange", 9, "Transmutation", "Action", "Self", "V, S, M (a jade circlet worth 1,500+ GP)", "1 hour",
             "You shape-shift into another creature for the duration or until you take a Magic action to " +
                 "shape-shift into a different eligible form. The new form must be of a creature that has a " +
                 "Challenge Rating no higher than your level or Challenge Rating. You must have seen the sort of " +
@@ -4277,7 +4277,7 @@ object SpellData {
                 "than you. In addition, the spell ends if you move to a place more than 1,000 feet from the " +
                 "location where you cast it.",
             setOf(SORCERER, WIZARD)),
-        SpellDef("true_polymorph", "True Polymorph", 9, "Transmutation", "Action", "30 feet", "V, S, M", "1 hour",
+        SpellDef("true_polymorph", "True Polymorph", 9, "Transmutation", "Action", "30 feet", "V, S, M (a drop of mercury, a dollop of gum arabic, and a wisp of smoke)", "1 hour",
             "Choose one creature or nonmagical object that you can see within range. The creature " +
                 "shape-shifts into a different creature or a nonmagical object, or the object shape-shifts into a " +
                 "creature (the object must be neither worn nor carried). The transformation lasts for the " +
@@ -4302,7 +4302,7 @@ object SpellData {
                 "creature's statistics become those of the object, and the creature has no memory of time spent " +
                 "in this form after the spell ends and it returns to normal.",
             setOf(BARD, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.WIS),
-        SpellDef("true_resurrection", "True Resurrection", 9, "Necromancy", "1 hour", "Touch", "V, S, M", "Instantaneous",
+        SpellDef("true_resurrection", "True Resurrection", 9, "Necromancy", "1 hour", "Touch", "V, S, M (diamonds worth 25,000+ GP, which the spell consumes)", "Instantaneous",
             "You touch a creature that has been dead for no longer than 200 years and that died for any " +
                 "reason except old age. The creature is revived with all its Hit Points. This spell closes all " +
                 "wounds, neutralizes any poison, cures all magical contagions, and lifts any curses affecting the " +
@@ -4374,7 +4374,7 @@ object SpellData {
                 "spell save DC. If a creature discerns the illusion for what it is, they see your " +
                 "true demeanor.",
             setOf(WIZARD), book = Sourcebook.DDB_DROPS),
-        SpellDef("quick_clothier", "Quick Clothier", 1, "Transmutation", "Action", "Touch", "V, S, M", "24 hours",
+        SpellDef("quick_clothier", "Quick Clothier", 1, "Transmutation", "Action", "Touch", "V, S, M (a set of clothing)", "24 hours",
             "You alter the appearance of a set of nonmagical clothing that isn't being worn by " +
                 "someone else. You determine the color, styling, decoration, and form the clothing " +
                 "takes, though you can't generate clothes worth more than 15 GP. For example, you " +
@@ -4382,7 +4382,7 @@ object SpellData {
                 "spell's duration, the altered clothing returns to its original form.",
             setOf(ARTIFICER, BARD, WIZARD), book = Sourcebook.DDB_DROPS),
         // ---- Level 2
-        SpellDef("battle_familiar", "Battle Familiar", 2, "Conjuration", "Action", "10 feet", "V, S, M", "1 hour",
+        SpellDef("battle_familiar", "Battle Familiar", 2, "Conjuration", "Action", "10 feet", "V, S, M (a diamond worth 25+ GP)", "1 hour",
             "You conjure a familiar imbued with magical might. The familiar appears in an " +
                 "unoccupied space within range; resembles an animal of your choice but is a " +
                 "Celestial, Fey, or Fiend (your choice); and uses the Battle Familiar stat block. " +
@@ -4422,7 +4422,7 @@ object SpellData {
                 "throw. On a failed save, a target loses Concentration, and it has Disadvantage on " +
                 "Constitution saving throws to maintain Concentration for the spell's duration.",
             setOf(BARD, SORCERER, WIZARD), concentration = true, saveAbility = Ability.CON, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("dueling_ground", "Dueling Ground", 2, "Abjuration", "10 minutes or Ritual", "Touch", "V, S, M", "1 hour",
+        SpellDef("dueling_ground", "Dueling Ground", 2, "Abjuration", "10 minutes or Ritual", "Touch", "V, S, M (a silk flag worth 100+ GP)", "1 hour",
             "You create a magical dueling ground bounded by a glowing, rune-scribed circle in a " +
                 "15-foot-radius Sphere centered on a point on the ground you touch. As part of " +
                 "creating the dueling ground, you designate two willing creatures within the Sphere " +
@@ -4445,14 +4445,14 @@ object SpellData {
                 "taking 1 Fire damage at the start of each of your turns instead of the normal " +
                 "burning damage.",
             setOf(BARD, PALADIN, WIZARD), book = Sourcebook.DDB_DROPS),
-        SpellDef("uncertain_footing", "Uncertain Footing", 2, "Illusion", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("uncertain_footing", "Uncertain Footing", 2, "Illusion", "Action", "120 feet", "V, S, M (a distorted lens)", "1 minute",
             "You create illusory obstacles such as rocks or spikes in an attempt to confuse up to " +
                 "three creatures you can see within range, affecting their ability to move. Each " +
                 "target makes an Intelligence saving throw. On a failed save, a target's Speed is " +
                 "halved, and it can't take the Dash action. A hampered target repeats the save at the " +
                 "end of each of its turns, ending the spell on itself on a success.",
             setOf(ARTIFICER, BARD, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.INT, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("wither_and_bloom", "Wither and Bloom", 2, "Necromancy", "Action", "60 feet", "V, S, M", "Instantaneous",
+        SpellDef("wither_and_bloom", "Wither and Bloom", 2, "Necromancy", "Action", "60 feet", "V, S, M (a withered vine twisted into a loop)", "Instantaneous",
             "You invoke both death and life in a 10-foot-radius Sphere centered on a point within " +
                 "range. Each creature of your choice in that area makes a Constitution saving throw, " +
                 "taking 3d6 Necrotic damage on a failed save or half as much damage on a successful " +
@@ -4467,7 +4467,7 @@ object SpellData {
                 "rolled and expended.",
             setOf(DRUID, SORCERER, WIZARD), damage = "3d6", damageType = "Necrotic", saveAbility = Ability.CON, book = Sourcebook.ARCANA_UNLEASHED),
         // ---- Level 3
-        SpellDef("catnap", "Catnap", 3, "Enchantment", "Action", "30 feet", "S, M", "10 minutes",
+        SpellDef("catnap", "Catnap", 3, "Enchantment", "Action", "30 feet", "S, M (a pinch of sand)", "10 minutes",
             "You make a calming gesture, and up to three willing creatures of your choice that " +
                 "you can see within range have the Unconscious condition for the spell's duration. " +
                 "The spell ends on a target if it takes damage or another creature takes an action to " +
@@ -4521,7 +4521,7 @@ object SpellData {
                 "half the amount of Necrotic damage dealt. Using a Higher-Level Spell Slot. The " +
                 "initial damage increases by 1d8 for each spell slot level above 5.",
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true, damage = "6d8", damageType = "Necrotic", saveAbility = Ability.DEX, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("grave_ground", "Grave Ground", 5, "Necromancy", "Action", "120 feet", "V, S, M", "1 minute",
+        SpellDef("grave_ground", "Grave Ground", 5, "Necromancy", "Action", "120 feet", "V, S, M (a handful of grave dirt)", "1 minute",
             "Skeletal hands burst from an area on the ground within range. The area consists of " +
                 "up to four 10-foot squares, which you arrange as you like. Each square must be " +
                 "contiguous with at least one other square. That area is Difficult Terrain for your " +
@@ -4538,7 +4538,7 @@ object SpellData {
                 "(if cast with a level 6-7 spell slot) or level 4 (if cast with a level 8+ spell " +
                 "slot).",
             setOf(WIZARD), book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("negative_energy_flood", "Negative Energy Flood", 5, "Necromancy", "Action", "60 feet", "V, M", "Instantaneous",
+        SpellDef("negative_energy_flood", "Negative Energy Flood", 5, "Necromancy", "Action", "60 feet", "V, M (a broken bone and a square of black silk)", "Instantaneous",
             "You send ribbons of negative energy at one creature you can see within range. If the " +
                 "target isn't Undead, it makes a Constitution saving throw, taking 3d10 + 25 Necrotic " +
                 "damage on a failed save or half as much damage on a successful one. A Humanoid " +
@@ -4547,7 +4547,7 @@ object SpellData {
                 "target is Undead, it gains 3d10 Temporary Hit Points. Using a Higher-Level Spell " +
                 "Slot. The damage increases by 1d10 for each spell slot level above 5.",
             setOf(WARLOCK, WIZARD), damage = "3d10", damageType = "Necrotic", saveAbility = Ability.CON, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("spirit_lantern", "Spirit Lantern", 5, "Necromancy", "Action", "Self", "V, S, M", "10 minutes",
+        SpellDef("spirit_lantern", "Spirit Lantern", 5, "Necromancy", "Action", "Self", "V, S, M (a black lantern)", "10 minutes",
             "You conjure a floating, ghostly black lantern that hovers above you and sheds Dim " +
                 "Light in a 60-foot radius. When an enemy dies within this Dim Light, a fragment of " +
                 "the creature's soul flies into the lantern. The lantern can hold a number of soul " +
@@ -4564,7 +4564,7 @@ object SpellData {
                 "Disadvantage on attack rolls against the chosen creature until the start of your " +
                 "next turn.",
             setOf(ARTIFICER, CLERIC, WARLOCK, WIZARD), saveAbility = Ability.CON, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("summon_plant", "Summon Plant", 5, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_plant", "Summon Plant", 5, "Conjuration", "Action", "90 feet", "V, S, M (herbs worth 500+ GP)", "1 hour",
             "You call forth the spirit of an animated plant. It manifests in an unoccupied space " +
                 "that you can see within range and uses the Plant Spirit stat block. When you cast " +
                 "the spell, choose Fungus, Tree, or Vine. The creature resembles a plant of the " +
@@ -4576,7 +4576,7 @@ object SpellData {
                 "its movement to avoid danger. Using a Higher-Level Spell Slot. Use the spell slot's " +
                 "level for the spell's level in the stat block.",
             setOf(DRUID, RANGER), concentration = true, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("waves_of_exhaustion", "Waves of Exhaustion", 5, "Necromancy", "Bonus Action", "Self", "V, S, M", "1 minute",
+        SpellDef("waves_of_exhaustion", "Waves of Exhaustion", 5, "Necromancy", "Bonus Action", "Self", "V, S, M (a piece of dried meat)", "1 minute",
             "You evoke a nimbus of flickering gray light around your body. For the duration, you " +
                 "can take a Magic action to emit a wave of gray light in a 60-foot Cone. Creatures in " +
                 "that area must succeed on a Constitution saving throw or gain 1 Exhaustion level. " +
@@ -4584,7 +4584,7 @@ object SpellData {
                 "gained from this spell are removed when the spell ends.",
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true, saveAbility = Ability.CON, book = Sourcebook.ARCANA_UNLEASHED),
         // ---- Level 6
-        SpellDef("summon_dinosaur", "Summon Dinosaur", 6, "Conjuration", "Action", "90 feet", "V, S, M", "1 hour",
+        SpellDef("summon_dinosaur", "Summon Dinosaur", 6, "Conjuration", "Action", "90 feet", "V, S, M (polished scale worth 600+ GP)", "1 hour",
             "You call forth the spirit of a primeval dinosaur. It manifests in an unoccupied " +
                 "space that you can see within range and uses the Dinosaur Spirit stat block. When " +
                 "you cast the spell, choose Ankylosaur, Triceratops, or Tyrannosaur. The creature " +
@@ -4648,7 +4648,7 @@ object SpellData {
                 "slot level above 7.",
             setOf(BARD, WARLOCK, WIZARD), concentration = true, damage = "4d8", damageType = "Psychic", saveAbility = Ability.CHA, book = Sourcebook.ARCANA_UNLEASHED),
         // ---- Level 8
-        SpellDef("entrancing_mirrors", "Entrancing Mirrors", 8, "Illusion", "Action", "90 feet", "V, S, M", "1 minute",
+        SpellDef("entrancing_mirrors", "Entrancing Mirrors", 8, "Illusion", "Action", "90 feet", "V, S, M (a mirror shard)", "1 minute",
             "You create dozens of illusory mirrors to confuse up to three creatures of your " +
                 "choice that you can see within range. Each target makes an Intelligence saving " +
                 "throw. On a failed save, a target takes 7d6 Psychic damage and has the Stunned " +
@@ -4678,7 +4678,7 @@ object SpellData {
                 "is, the creature can see through the image and has Advantage on saving throws to end " +
                 "the Frightened condition it caused and to resist its exhalation.",
             setOf(WIZARD), concentration = true, saveAbility = Ability.WIS, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("iron_body", "Iron Body", 8, "Transmutation", "Action", "Touch", "V, S, M", "1 hour",
+        SpellDef("iron_body", "Iron Body", 8, "Transmutation", "Action", "Touch", "V, S, M (diamond dust worth 250+ GP, which the spell consumes)", "1 hour",
             "One willing creature you touch transforms into living metal. Until the spell ends, " +
                 "the target's Exhaustion level can't increase; the target has Resistance to " +
                 "Bludgeoning, Fire, Piercing, and Slashing damage; and it has Immunity to Poison " +
@@ -4686,7 +4686,7 @@ object SpellData {
                 "Paralyzed, Petrified, or Poisoned when you cast the spell, those conditions " +
                 "immediately end for the target.",
             setOf(SORCERER, WARLOCK, WIZARD), concentration = true, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("lightning_ring", "Lightning Ring", 8, "Evocation", "Bonus Action", "Self", "V, S, M", "10 minutes",
+        SpellDef("lightning_ring", "Lightning Ring", 8, "Evocation", "Bonus Action", "Self", "V, S, M (a bit of fur and a glass ring)", "10 minutes",
             "A ring of crackling electricity fills a 10-foot Emanation originating from you. " +
                 "Whenever the Emanation enters a creature's space and whenever a creature enters the " +
                 "Emanation or ends its turn there, you can force that creature to make a Constitution " +
@@ -4703,7 +4703,7 @@ object SpellData {
                 "roll into a 1.",
             setOf(WIZARD), book = Sourcebook.ARCANA_UNLEASHED),
         // ---- Level 9
-        SpellDef("detonate", "Detonate", 9, "Evocation", "Action", "500 feet", "V, S, M", "Instantaneous",
+        SpellDef("detonate", "Detonate", 9, "Evocation", "Action", "500 feet", "V, S, M (a piece of tinder)", "Instantaneous",
             "You create a magical, explosive seed inside a creature you can see within range. The " +
                 "target makes a Constitution saving throw, taking 10d10 Fire damage on a failed save " +
                 "or half as much damage on a successful one. An explosion then originates from the " +
@@ -4714,13 +4714,13 @@ object SpellData {
                 "isn't being worn or carried also takes the damage if it's in the Emanation, and the " +
                 "object starts burning if it's flammable.",
             setOf(SORCERER, WARLOCK, WIZARD), damage = "10d10", damageType = "Fire", saveAbility = Ability.CON, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("hindsight", "Hindsight", 9, "Divination", "10 minutes", "500 feet", "V, S, M", "1 hour",
+        SpellDef("hindsight", "Hindsight", 9, "Divination", "10 minutes", "500 feet", "V, S, M (a tiny hourglass worth 500+ GP, which the spell consumes)", "1 hour",
             "You peer backward through the fabric of time. You see visions of events that " +
                 "occurred within range throughout the past 10 years, racing by at approximately 1 day " +
                 "per second. Throughout the spell's duration, you can freely slow down, pause, " +
                 "rewind, or fast-forward through these visions.",
             setOf(WIZARD), concentration = true, book = Sourcebook.ARCANA_UNLEASHED),
-        SpellDef("invulnerability", "Invulnerability", 9, "Abjuration", "Action", "Self", "V, S, M", "10 minutes",
+        SpellDef("invulnerability", "Invulnerability", 9, "Abjuration", "Action", "Self", "V, S, M (a piece of adamantine worth 500+ GP, which the spell consumes)", "10 minutes",
             "You have Immunity to all damage until the spell ends.",
             setOf(WIZARD), concentration = true, book = Sourcebook.ARCANA_UNLEASHED),
         SpellDef("vision_of_elapsing_eons", "Vision of Elapsing Eons", 9, "Illusion", "Action", "120 feet", "V, S", "1 minute",

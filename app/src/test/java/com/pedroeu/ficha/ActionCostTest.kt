@@ -119,8 +119,13 @@ class ActionCostTest {
     fun `a free casting costs whatever the spell costs`() {
         assertEquals(ActionCost.BONUS_ACTION, ActionCost.of(pool(spellId = "divine_smite")))
         assertEquals(ActionCost.ACTION, ActionCost.of(pool(spellId = "polymorph")))
-        // Find Steed takes ten minutes, which is no action in any round.
-        assertEquals(ActionCost.OTHER, ActionCost.of(pool(spellId = "find_steed")))
+        // Find Familiar takes an hour, which is no action in any round.
+        //
+        // This case used to name Find Steed, on the strength of a ten-minute casting time the
+        // app had and the 2024 book does not — the sweep against the reference caught it, and
+        // the assertion had been quietly certifying the wrong number ever since.
+        assertEquals(ActionCost.OTHER, ActionCost.of(pool(spellId = "find_familiar")))
+        assertEquals(ActionCost.ACTION, ActionCost.of(pool(spellId = "find_steed")))
     }
 
     @Test

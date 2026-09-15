@@ -827,15 +827,40 @@ object SubclassData {
         Subclass("arcane_archer", "fighter", "Arcane Archer",
             "Weave magic into your ammunition to produce supernatural effects.",
             listOf(
-                f(3, "Arcane Archer Lore", "You learn magical theory and secrets of nature, gaining a cantrip and the Arcana and Nature skills.",
+                f(3, "Arcane Archer Lore", "You learn magical theory and secrets of nature, granting you the following benefits. Cantrip. " +
+                    "You know either the Druidcraft or the Prestidigitation cantrip. Intelligence is your " +
+                    "spellcasting ability for it. Skills. You gain proficiency in the Arcana and Nature skills. If " +
+                    "you already have one of these proficiencies, you instead gain proficiency in a different skill " +
+                    "of your choice from the skills available to Fighters at level 1 (or in two skills available to " +
+                    "Fighters at level 1 if you have both).",
                     Choice("aa_cantrip", "Arcane Archer Cantrip", "Choose a cantrip. Intelligence is your spellcasting ability for it.", 1, ChoiceKind.SPELL, listOf(
                         ChoiceOption("druidcraft", "Druidcraft", "A small, harmless nature effect.", "Cantrip • Transmutation"),
                         ChoiceOption("prestidigitation", "Prestidigitation", "A minor magical trick.", "Cantrip • Transmutation"),
                     ), "Level 3")),
                 f(3, "Arcane Shot", "Learn two Arcane Shot options, usable a number of times equal to your Intelligence modifier per Short or Long Rest. Your Arcane Shot Die is a d6, growing to d8 at level 10, d10 at 15, and d12 at 18.",
                     arcaneShotChoice("arcane_shot_3", 2, 3)),
-                f(7, "Curving Shot", "When you miss with an Ammunition weapon, use a Bonus Action to ricochet the shot at a new target within 60 feet."),
-                f(7, "Magical Ammunition", "As a Magic action, imbue ammunition with a Darkening, Unlocking, or Vine Shot effect, once per Short or Long Rest."),
+                f(7, "Curving Shot", "You learn how to direct an errant shot toward a new target. If you make a ranged attack roll " +
+                    "with a weapon with the Ammunition property and miss, you can cause the shot to ricochet toward a " +
+                    "new target as a Bonus Action immediately after the attack misses. The new target must be a " +
+                    "creature you can see within the weapon's range and within 60 feet of the attack's original " +
+                    "target. Make an attack roll against the new target."),
+                f(7, "Magical Ammunition", "You learn to imbue your ammunition with magical properties. As a Magic action, you can imbue a " +
+                    "piece of nonmagical ammunition with one of the following magical properties and fire it at a " +
+                    "solid surface you can see within the weapon's range. When the ammunition hits the surface, the " +
+                    "ammunition's effect activates, and the ammunition attaches to the surface it hit for the " +
+                    "duration of the effect; you can remove an attached piece of ammunition as a Magic action, ending " +
+                    "the effect early. When the effect ends, the ammunition is destroyed. Once you use this feature, " +
+                    "you can't do so again until you finish a Short or Long Rest. You can also restore your use of " +
+                    "this feature by expending a use of your Second Wind (no action required). Darkening Ammunition. " +
+                    "Magical shadows fill a 15-foot Emanation originating from the ammunition for 1 minute. " +
+                    "Nonmagical flames in the Emanation are extinguished, and creatures in the Emanation have a −5 " +
+                    "penalty to Wisdom (Perception) checks and Passive Perception. Unlocking Ammunition. A burst of " +
+                    "magic fills a 15-foot Emanation originating from the ammunition. The ammunition also emits a " +
+                    "loud knocking sound, audible up to 300 feet away. Any object in the Emanation that is held shut " +
+                    "by a nonmagical lock or that is stuck or barred becomes unlocked, unstuck, or unbarred. If such " +
+                    "an object has multiple locks, only one of them is unlocked. Vine Ammunition. A 120-foot-long " +
+                    "vine grows from the ammunition. You and other creatures can then climb it. The vine withers away " +
+                    "after 10 minutes."),
                 f(7, "Additional Arcane Shot", "Learn one more Arcane Shot option.",
                     arcaneShotChoice("arcane_shot_7", 1, 7)),
                 f(10, "Ever-Ready Shot", "When you roll Initiative, you regain one expended use of Arcane Shot."),
@@ -844,7 +869,10 @@ object SubclassData {
                 f(15, "Indomitable Teleport", "When you use your Indomitable feature and succeed on the saving throw, you can teleport up to 60 feet to an unoccupied space you can see."),
                 f(15, "Additional Arcane Shot", "Learn one more Arcane Shot option.",
                     arcaneShotChoice("arcane_shot_15", 1, 15)),
-                f(18, "Masterful Shots", "When a creature misses you, take a Reaction to move half your Speed away and shoot back."),
+                f(18, "Masterful Shots", "You employ agility in your sharpshooting. When a creature you can see misses you with an attack " +
+                    "roll, you can take a Reaction to move up to half your Speed away from the attacker without " +
+                    "provoking Opportunity Attacks. You can then make a ranged attack roll against the attacker as " +
+                    "part of this Reaction if the attacker is within the weapon's range."),
                 f(18, "Additional Arcane Shot", "Learn one more Arcane Shot option.",
                     arcaneShotChoice("arcane_shot_18", 1, 18)),
             ),
@@ -1262,53 +1290,190 @@ object SubclassData {
         Subclass("conjurer", "wizard", "Conjurer",
             "Step across space and call creatures from thin air.",
             listOf(
-                f(3, "Benign Transposition", "As a Bonus Action, teleport up to 30 feet or swap places with a willing Medium or smaller creature. Uses equal your Intelligence modifier per Long Rest."),
-                f(3, "Conjuration Savant", "Add two Conjuration spells of level 2 or lower to your spellbook free, and one more at each new spell level."),
-                f(6, "Distant Transposition", "Benign Transposition reaches 60 feet and recharges on a Short or Long Rest."),
-                f(6, "Durable Summons", "Creatures you summon gain Temporary Hit Points equal to twice your Wizard level and broad damage Resistance."),
+                f(3, "Benign Transposition", "As a Bonus Action, you teleport up to 30 feet to an unoccupied space that you can see. " +
+                    "Alternatively, you can choose a space within range that is occupied by a Medium or smaller " +
+                    "creature. If that creature is willing, you both teleport, swapping places. You can use this " +
+                    "feature a number of times equal to your Intelligence modifier (minimum of once), and you regain " +
+                    "all expended uses when you finish a Long Rest."),
+                f(3, "Conjuration Savant", "Choose two Wizard spells from the Conjuration school, each of which must be no higher than level " +
+                    "2, and add them to your spellbook for free. In addition, whenever you gain access to a new level " +
+                    "of spell slots in this class, you can add one Wizard spell from the Conjuration school to your " +
+                    "spellbook for free. The chosen spell must be of a level for which you have spell slots.",
+                    savantChoice("conjurer", "Conjuration", "Conjuration Savant")),
+                f(6, "Distant Transposition", "The range of your Benign Transposition feature increases to 60 feet. Additionally, you can " +
+                    "restore one use of it by expending a level 3+ spell slot (no action required)."),
+                f(6, "Durable Summons", "When you cast a Conjuration spell to summon or create a creature using a spell slot, that " +
+                    "creature gains Temporary Hit Points equal to twice your Wizard level when it first appears. " +
+                    "While it has these Temporary Hit Points, the creature has Resistance to every damage type except " +
+                    "Force, Necrotic, Psychic, and Radiant."),
                 f(10, "Focused Conjuration", "Taking damage can't break your Concentration on Conjuration spells."),
-                f(14, "Splintered Summons", "Summon Aberration, Construct, Dragon, Elemental, or Fey spells summon two creatures instead of one."),
+                f(14, "Splintered Summons", "When you use a spell slot to cast a Conjuration spell that summons a spirit whose stat block is " +
+                    "included in the spell description, such as Summon Aberration, you can modify the spell to summon " +
+                    "two creatures with the spell instead of one. Each creature is of the same kind, uses the stat " +
+                    "block and rules denoted by the spell, and manifests in a different unoccupied space of your " +
+                    "choice within the spell's range, but the summoned creatures' Hit Point maximums and current Hit " +
+                    "Points are halved. If you lose Concentration on the spell, both creatures disappear. Once you " +
+                    "use this feature to modify a spell in this way, you must finish a Long Rest before you can do so " +
+                    "again. You can also restore your use of it by expending a level 5+ spell slot (no action " +
+                    "required)."),
             ),
             book = ARCANA),
         Subclass("enchanter", "wizard", "Enchanter",
             "Entrance and beguile others with magic that clouds the mind.",
             listOf(
-                f(3, "Enchanting Conversationalist", "Gain a social skill proficiency and add your Intelligence modifier to checks with it.",
+                f(3, "Enchanting Conversationalist", "You gain proficiency in one of the following skills of your choice: Deception, Intimidation, or " +
+                    "Persuasion. In addition, when you make an ability check with the chosen skill, you gain a bonus " +
+                    "to the check equal to your Intelligence modifier (minimum of +1).",
                     Choice("enchanting_skill", "Enchanting Conversationalist", "Choose a social skill.", 1, ChoiceKind.SKILL,
                         ChoiceOptions.fromSkills(listOf(Skill.DECEPTION, Skill.INTIMIDATION, Skill.PERSUASION)), "Level 3")),
-                f(3, "Enchantment Savant", "Add two Enchantment spells of level 2 or lower to your spellbook free, and one more at each new spell level."),
-                f(3, "Hypnotic Presence", "As a Magic action, Charm a creature within 10 feet, leaving it Incapacitated with a Speed of 0."),
-                f(6, "Split Enchantment", "Raise an Enchantment spell's effective level by 1 to target an additional creature."),
-                f(10, "Instinctive Charm", "As a Reaction, force an attacker to miss and possibly redirect the attack at another creature."),
-                f(14, "Alter Memories", "You always have Modify Memory prepared and can target a second creature with it."),
+                f(3, "Enchantment Savant", "Choose two Wizard spells from the Enchantment school, each of which must be no higher than level " +
+                    "2, and add them to your spellbook for free. In addition, whenever you gain access to a new level " +
+                    "of spell slots in this class, you can add one Wizard spell from the Enchantment school to your " +
+                    "spellbook for free. The chosen spell must be of a level for which you have spell slots.",
+                    savantChoice("enchanter", "Enchantment", "Enchantment Savant")),
+                f(3, "Hypnotic Presence", "Your charming words and enchanting gaze can enthrall another creature. As a Magic action, choose " +
+                    "one creature that you can see within 10 feet of yourself. If the target can see or hear you, it " +
+                    "must succeed on a Wisdom saving throw against your spell save DC or have the Charmed condition " +
+                    "for 1 minute or until the target is more than 10 feet away from you, the target can neither see " +
+                    "nor hear you, or the target takes damage. While Charmed, the target has the Incapacitated " +
+                    "condition and a Speed of 0. You can use this feature a number of times equal to your " +
+                    "Intelligence modifier (minimum of once), and you regain all expended uses when you finish a Long " +
+                    "Rest."),
+                f(6, "Split Enchantment", "When you use a spell slot to cast an Enchantment spell, such as Charm Person, that can be cast " +
+                    "with a higher-level spell slot to target an additional creature, you can increase the spell's " +
+                    "effective level by 1. You can use this feature a number of times equal to your Intelligence " +
+                    "modifier, and you regain all expended uses when you finish a Long Rest."),
+                f(10, "Instinctive Charm", "When a creature within 30 feet of you that you can see hits you with an attack roll, you can " +
+                    "take a Reaction to force the attacker to make a Wisdom saving throw against your spell save DC. " +
+                    "On a failed save, the attack misses instead, and if there is another creature within range of " +
+                    "the attack other than the attacker, the attacker targets that creature with the triggering " +
+                    "attack, using the same attack roll. If multiple creatures are within the attack's range, you " +
+                    "choose which one to target. Once you take this Reaction, you can't do so again until you finish " +
+                    "a Long Rest. You can also restore your use of it by casting an Enchantment spell with a spell " +
+                    "slot."),
+                f(14, "Alter Memories", "You can make a creature unaware of your magical influence. When you cast an Enchantment spell " +
+                    "that imposes the Charmed condition using a spell slot, you can choose one creature targeted by " +
+                    "the spell. That creature remains unaware of being Charmed by you. In addition, once before the " +
+                    "spell ends, you can take a Magic action to force the chosen creature to make an Intelligence " +
+                    "saving throw against your spell save DC. On a failed save, you can make the creature lose a " +
+                    "number of hours of its memories equal to 1 plus your Intelligence modifier (minimum of 1 hour " +
+                    "lost). You can make the creature forget less time, and the amount of time can't exceed the " +
+                    "duration of your Enchantment spell."),
             ),
             book = ARCANA),
         Subclass("necromancer", "wizard", "Necromancer",
             "Command the powers of death and undeath.",
             listOf(
-                f(3, "Necromancy Savant", "Add two Necromancy spells of level 2 or lower to your spellbook free, and one more at each new spell level."),
-                f(3, "Necromancy Spellbook", "You gain Resistance to Necrotic damage, Grim Harvest healing for your Undead, and an Undead Familiar option."),
-                f(6, "Grave Power", "Arcane Recovery also reduces your Exhaustion, and your spell damage ignores Necrotic Resistance."),
-                f(6, "Undead Thralls", "You always have Animate Dead prepared, cast it free once, and your Undead gain bonus hit points and Necrotic strikes."),
-                f(10, "Harvest Undead", "When you become Bloodied, take a Reaction to destroy an Undead you control and regain hit points."),
-                f(14, "Death's Master", "Bolster your Undead with Temporary Hit Points, and make dying Undead explode with necrotic energy."),
+                f(3, "Necromancy Savant", "Choose two Wizard spells from the Necromancy school, each of which must be no higher than level " +
+                    "2, and add them to your spellbook for free. In addition, whenever you gain access to a new level " +
+                    "of spell slots in this class, you can add one Wizard spell from the Necromancy school to your " +
+                    "spellbook for free. The chosen spell must be of a level for which you have spell slots.",
+                    savantChoice("necromancer", "Necromancy", "Necromancy Savant")),
+                f(3, "Necromancy Spellbook", "Your spellbook's necromantic secrets grant you additional powers. You gain the following " +
+                    "benefits. Necrotic Resistance. You have Resistance to Necrotic damage. Undead Familiar. The Find " +
+                    "Familiar spell appears in your spellbook. When you cast the spell, you choose one of the normal " +
+                    "forms for your familiar or one of the following special forms: Skeleton or Zombie (see appendix " +
+                    "B of the Player's Handbook for the familiar's stat block). When you choose one of the normal " +
+                    "forms, you can choose Undead as its creature type. Additionally, when you take the Attack " +
+                    "action, you can forgo one of your own attacks to allow your familiar to make one attack of its " +
+                    "own with its Reaction. Undead Vitality. When you cast a Necromancy spell using a spell slot, you " +
+                    "can choose an Undead creature you can see within 60 feet of yourself to regain a number of Hit " +
+                    "Points equal to the level of the spell slot expended plus your Wizard level."),
+                f(6, "Grave Power", "You have discovered more necromantic insights and inscribed them in your spellbook. While " +
+                    "holding your spellbook, you gain the following benefits. Grave Resilience. When you use Arcane " +
+                    "Recovery, your Exhaustion level, if any, decreases by 1. Overwhelming Necrosis. Damage from your " +
+                    "Wizard spells and Wizard features ignores Resistance to Necrotic damage."),
+                f(6, "Undead Thralls", "You always have Animate Dead prepared and can cast it without expending a spell slot, but you " +
+                    "must finish a Long Rest before you can cast it in this way again. Whenever you start casting the " +
+                    "spell, you can increase the spell's effective level by 1. In addition, while holding your " +
+                    "spellbook, you gain the following benefits. Undead Fortitude. Whenever you cast a Necromancy " +
+                    "spell that creates or summons an Undead, the Undead's Hit Point maximum and current Hit Points " +
+                    "increase by a number equal to your Intelligence modifier plus half your Wizard level (round " +
+                    "down). Withering Strike. Whenever an Undead you control within 60 feet of you hits a creature " +
+                    "with an attack roll, the Undead deals extra Necrotic damage equal to your Intelligence modifier " +
+                    "(minimum of 1 Necrotic damage)."),
+                f(10, "Harvest Undead", "You have learned more secrets about the nuances of life and death. Immediately after you become " +
+                    "Bloodied but aren't reduced to 0 Hit Points from taking damage, you can take a Reaction to " +
+                    "reduce an Undead creature under your control that you can see to 0 Hit Points. You then " +
+                    "immediately regain a number of Hit Points equal to your Wizard level."),
+                f(14, "Death's Master", "Abstruse rituals within your spellbook allow you mastery over undeath. While holding your " +
+                    "spellbook, you gain the following benefits. Bolster Undead. As a Bonus Action, choose any number " +
+                    "of Undead you have created or summoned with a Necromancy spell that are within 60 feet of you. " +
+                    "Those Undead each gain Temporary Hit Points equal to your Wizard level. Once you use this Bonus " +
+                    "Action, you can't do so again until you finish a Long Rest. Extinguish Undead. When an Undead " +
+                    "creature you can see is reduced to 0 Hit Points, you can cause it to explode with necrotic " +
+                    "energy. Roll a number of d6s equal to half the creature's unexpended Hit Dice (round up, minimum " +
+                    "of 1d6), and add them together. Each creature in a 10-foot Emanation originating from the Undead " +
+                    "makes a Dexterity saving throw. On a failed save, a target takes Necrotic damage equal to the " +
+                    "number rolled and can't take Reactions until the start of its next turn. On a successful save, a " +
+                    "target takes half as much damage only. When you use this feature to explode an Undead creature " +
+                    "you don't control, you must take a Reaction and expend a level 5+ spell slot to do so."),
             ),
             book = ARCANA),
         Subclass("transmuter", "wizard", "Transmuter",
             "Transform energy and matter at reality's forge.",
             listOf(
-                f(3, "Transmutation Savant", "Add two Transmutation spells of level 2 or lower to your spellbook free, and one more at each new spell level."),
-                f(3, "Transmuter's Stone", "Create a stone that grants Constitution save proficiency plus a benefit you choose. Whenever you finish a Long Rest, you can change the benefit the stone grants.",
+                f(3, "Transmutation Savant", "Choose two Wizard spells from the Transmutation school, each of which must be no higher than " +
+                    "level 2, and add them to your spellbook for free. In addition, whenever you gain access to a new " +
+                    "level of spell slots in this class, you can add one Wizard spell from the Transmutation school " +
+                    "to your spellbook for free. The chosen spell must be of a level for which you have spell slots.",
+                    savantChoice("transmuter", "Transmutation", "Transmutation Savant")),
+                f(3, "Transmuter's Stone", "When you finish a Long Rest, you can create a magic stone that lasts until you use this feature " +
+                    "again. The stone is a Tiny object, and you can use it as a Spellcasting Focus for your Wizard " +
+                    "spells. A creature with the stone in its possession gains proficiency in Constitution saving " +
+                    "throws and one of the following benefits, which you choose when you create the stone. You can " +
+                    "change the stone's benefit when you cast a Transmutation spell using a spell slot. Darkvision. " +
+                    "The bearer gains Darkvision with a range of 60 feet or increases the range of its Darkvision by " +
+                    "60 feet. Resistance. The bearer gains Resistance to Acid, Cold, Fire, Lightning, Poison, or " +
+                    "Thunder damage (your choice each time you choose this benefit). Speed. The bearer's Speed " +
+                    "increases by 10 feet.",
                     Choice("transmuters_stone", "Transmuter's Stone", "Choose the stone's benefit.", 1, ChoiceKind.OPTION, listOf(
                         ChoiceOption("darkvision", "Darkvision", "The bearer gains or extends Darkvision by 60 feet."),
                         ChoiceOption("speed", "Speed", "The bearer's Speed increases by 10 feet."),
                         ChoiceOption("resistance", "Resistance", "Resistance to Acid, Cold, Fire, Lightning, Poison, or Thunder damage."),
                     ), "Level 3", changeableOnRest = true)),
-                f(3, "Wondrous Alteration", "You always have Alter Self prepared, cast it free once per Long Rest, and each of its options gains a bonus."),
-                f(6, "Empowered Transmutation", "Cast a non-damaging Transmutation spell as if using a slot one level higher."),
-                f(10, "Potent Stone", "Your Transmuter's Stone grants two benefits, adding Mighty Build and Tremorsense as options."),
-                f(10, "Shape-Shifter", "You always have Polymorph prepared, cast it free once per Long Rest, and keep your mind and spells when targeting yourself."),
-                f(14, "Master Transmuter", "Consume the stone for Major Transformation, Panacea, Restore Life, or Restore Youth."),
+                f(3, "Wondrous Alteration", "You always have the Alter Self spell prepared and can cast it once without expending a spell " +
+                    "slot. You regain the ability to cast it in this way when you finish a Long Rest. While under the " +
+                    "effects of Alter Self, you gain an additional benefit for each of its options. Aquatic " +
+                    "Adaptation. While underwater, you can take the Dash action as a Bonus Action. Change Appearance. " +
+                    "You have Advantage on Charisma (Deception) checks. Natural Weapons. The damage of your new " +
+                    "growth increases to 2d6 damage of the type associated with the growth. You also have Advantage " +
+                    "on Constitution saving throws to maintain Concentration."),
+                f(6, "Empowered Transmutation", "When you use a spell slot to cast a Transmutation spell that doesn't make an attack roll or " +
+                    "force a saving throw, such as Fly or Magic Weapon, you can increase the spell's effective level " +
+                    "by 1. You can use this feature a number of times equal to your Intelligence modifier (minimum of " +
+                    "once), and you regain all expended uses when you finish a Long Rest."),
+                f(10, "Potent Stone", "Your Transmuter's Stone is more versatile. When you create your Transmuter's Stone, you can " +
+                    "choose up to two benefits. You can choose each option other than Resistance only once. If you " +
+                    "choose Resistance twice, you must choose different damage types. You can change either or both " +
+                    "benefits when you cast a Transmutation spell using a spell slot. In addition, the following are " +
+                    "now among your benefit options for Transmuter's Stone. Mighty Build. The bearer has Advantage on " +
+                    "Strength saving throws. The bearer also counts as one size larger when determining its carrying " +
+                    "capacity. Tremorsense. The bearer gains Tremorsense with a range of 30 feet."),
+                f(10, "Shape-Shifter", "You always have the Polymorph spell prepared and can cast it once without expending a spell " +
+                    "slot. You regain the ability to cast it in this way when you finish a Long Rest. In addition, " +
+                    "when you target yourself with the spell, you can modify the spell to gain the benefits below. " +
+                    "Once you modify the spell using this feature, you can't do so again until you finish a Long " +
+                    "Rest. Game Statistics. In addition to retaining the features specified in the spell, you retain " +
+                    "your memories and ability to communicate. You also retain your Intelligence, Wisdom, and " +
+                    "Charisma scores; proficiencies; class features; and feats. Transmute Spells. While " +
+                    "shape-shifted, you can cast spells, but only Transmutation spells that don't have a Material " +
+                    "component that has a specified cost or that is consumed by the spell."),
+                f(14, "Master Transmuter", "While you carry your Transmuter's Stone, you can take a Magic action to consume the reserve of " +
+                    "transmutation magic stored inside and choose one of the following benefits. After you use the " +
+                    "stone in this way, it crumbles to dust. You can prevent the stone from crumbling by expending a " +
+                    "level 7+ spell slot as part of the Magic action you take using this feature. Major " +
+                    "Transformation. You can transmute one nonmagical object - no larger than a 10-foot Cube or eight " +
+                    "connected 5-foot Cubes - into another nonmagical object of similar size and mass and of equal or " +
+                    "lesser value. You must spend 10 minutes handling the object to transform it. Panacea. You touch " +
+                    "a creature as part of this Magic action, and the target regains a number of Hit Points equal to " +
+                    "half its Hit Point maximum (round down). The target is cured of all magical contagions, and any " +
+                    "curses affecting the target are lifted, including the target's Attunement to a cursed item. If " +
+                    "the target has the Poisoned or Petrified condition, those conditions end. Restore Life. You cast " +
+                    "the Raise Dead spell without expending a spell slot, using the stone in place of the required " +
+                    "Material components. Restore Youth. You touch one willing creature as part of this Magic action, " +
+                    "and the target's Exhaustion level, if any, decreases to 0, and it permanently appears 3d10 years " +
+                    "younger, to a minimum of young adulthood."),
             ),
             book = ARCANA),
 

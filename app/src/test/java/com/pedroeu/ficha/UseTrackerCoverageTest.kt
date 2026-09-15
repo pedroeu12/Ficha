@@ -58,6 +58,9 @@ class UseTrackerCoverageTest {
         "Refined Reanimation" to "facilitated_revival",
         "Reanimated Companion" to "companion",
         "Hexblade Manifest" to "curse",
+        // Death's Master grants two things; only Bolster Undead is rationed, so that is what
+        // the tracker is named after — the counter says what it counts, not what granted it.
+        "Death's Master" to "bolster_undead",
         "Combat Superiority" to "superiority",
         "Hand of Ultimate Mercy" to "ultimate_mercy",
         "Celestial Revelation" to "celestial_revelation",

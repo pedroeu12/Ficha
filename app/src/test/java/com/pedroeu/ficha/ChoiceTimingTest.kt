@@ -59,6 +59,10 @@ class ChoiceTimingTest {
         "Fast Hands" to "a list of what the Bonus Action can do, not a mode to keep",
         "Rallying Surge" to "each ally chooses their own Reaction, not the Fighter",
         "Spirits from Beyond" to "a rolled result; the condition ended is the target's",
+        "Necromancy Spellbook" to
+            "the familiar's form is chosen when Find Familiar is cast, by the summon picker",
+        "Alter Memories" to
+            "the creature is one the spell is already targeting, chosen as it is cast",
     )
 
     private data class Feature(val owner: String, val name: String, val text: String,

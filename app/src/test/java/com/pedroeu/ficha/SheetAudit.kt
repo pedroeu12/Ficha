@@ -79,6 +79,26 @@ object SheetAudit {
                 say("$id is used by ${rows.map { it.choice.label }.distinct()}")
             }
 
+        // -------------------------------------------------- What the player wrote themselves
+        //
+        // A written option that no question offers is invisible: the player typed it, the
+        // sheet kept it, and it appears in no list — which reads as the app having thrown it
+        // away. The question it names has to be one this character is actually asked.
+        val asked = resolved.associateBy { it.choice.id }
+        character.customOptions.forEach { own ->
+            if (own.name.isBlank()) {
+                say("a written option for ${own.choiceId} has no name, so nothing can show it")
+            }
+            val row = asked[own.choiceId]
+            if (row == null) {
+                say("${own.name} was written for ${own.choiceId}, a question this character is never asked")
+                return@forEach
+            }
+            if (row.choice.options.none { it.id == own.id }) {
+                say("${own.name} was written for ${own.choiceId} but is not in its list of options")
+            }
+        }
+
         // -------------------------------------------------- Spells
         val spells = CharacterSpells.all(character)
         spells.groupBy { it.id }.filterValues { it.size > 1 }.keys.forEach {

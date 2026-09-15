@@ -11,6 +11,13 @@ on:
 permissions:
   contents: write
 
+# One publisher at a time. The release below is deleted and recreated rather than edited, so
+# two runs finishing together could leave the tag pointing at the older of the two builds.
+# Queued rather than cancelled: a build that has already passed its tests is worth publishing.
+concurrency:
+  group: publish-latest
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -80,13 +87,21 @@ jobs:
       # A rolling "latest" release, so the phone always has one stable link to a raw .apk.
       # Artifacts arrive as a ZIP, which is painful to unpack on a phone; this is a direct
       # download that taps straight into the Android installer.
+      #
+      # Every branch publishes. This used to name one branch, and when work moved to another
+      # the step simply stopped running: three builds in a row went green, built a signed APK,
+      # uploaded it as an artifact — and published nothing, while the download link kept
+      # offering a version from days earlier. Nothing failed, so nothing said so, which is the
+      # worst way for a release to break. A condition that has to be remembered when the work
+      # moves is a condition that will be forgotten; the release notes name the branch and the
+      # commit instead, so the build can always say where it came from.
       - name: Publish the APK to the latest release
-        if: github.ref_name == 'claude/dnd-character-sheet-android-mvkrja'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete latest --yes --cleanup-tag || true
           gh release create latest out/*.apk \
+            --target "$GITHUB_SHA" \
             --title "Latest build — v${{ steps.apk.outputs.version }} (build ${{ steps.apk.outputs.build }})" \
             --notes "Debug build of \`${{ steps.apk.outputs.sha }}\`.
 
@@ -96,7 +111,7 @@ jobs:
 
           **Back up your characters before uninstalling.** Uninstalling deletes them along with the app. On the home screen, tap the ⋮ menu and choose **Back up characters**, then **Restore from backup** once the new build is installed. Installing over the top keeps everything; only uninstalling loses it.
 
-          Built and tested automatically from [${{ steps.apk.outputs.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})."
+          Built and tested automatically from [${{ steps.apk.outputs.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) on \`${{ github.ref_name }}\`."
           # Deliberately not a prerelease: GitHub's /releases/latest skips those, and that
           # URL is the whole point of publishing here — one stable link to bookmark.
           gh release view latest --json isPrerelease --jq '.isPrerelease'

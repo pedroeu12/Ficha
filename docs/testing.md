@@ -63,6 +63,7 @@ Each rule here is a bug that shipped, was fixed where it was reported, and came 
 3. every picker greys out what the character cannot take (`disabledOptionIds`)
 4. a dialog never offers to reset a number to the value already pinned on it
 5. the phone and the tablet do not keep their own copies of the same editor
+6. every picker lets the player write their own option (`onWriteOwn`)
 
 Adding a rule here is the cheapest thing in the repository.
 

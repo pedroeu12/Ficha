@@ -150,6 +150,33 @@ class UiInvariantTest {
         )
     }
 
+    /**
+     * Every picker lets the player write their own answer.
+     *
+     * The books are a starting point. A table running a homebrew invocation, a third-party
+     * feat, a Fighting Style the DM invented had to pick the closest printed thing and keep
+     * the difference in somebody's head — which is the one job a character sheet has.
+     *
+     * The reason this is a rule rather than a note is that "everywhere" is the whole point:
+     * a question that offers it during creation and not at a level up, or on the phone and
+     * not on the tablet, is a question the player cannot answer honestly in the place they
+     * happen to be standing. Pass [onWriteOwn] or explain, here, why this one cannot.
+     */
+    @Test
+    fun `every picker lets the player write their own option`() {
+        val offenders = sources.flatMap { source ->
+            callsTo(source.text, "ChoiceSection")
+                .filterNot { it.contains("onWriteOwn") }
+                .map { "${source.name} renders a choice with no way to write your own answer" }
+        }
+
+        fail(
+            "A picker that does not pass onWriteOwn can only offer what the books contain, " +
+                "and a table that plays anything else cannot write it down.",
+            offenders,
+        )
+    }
+
     // ================================================================ What a number claims
 
     /**

@@ -308,6 +308,9 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                 viewModel.addFeat(featId, selections)
                 addingFeat = false
             },
+            onWriteOwnFeat = viewModel::addOwnFeat,
+            onWriteOwn = viewModel::writeOwnOption,
+            onEraseOwn = viewModel::eraseOwnOption,
         )
     }
 
@@ -339,6 +342,8 @@ fun FeaturesTab(character: PlayerCharacter, viewModel: SheetViewModel, editMode:
                 resolved = live,
                 onDismiss = { editingChoiceId = null },
                 onToggle = { optionId -> viewModel.toggleChoice(live.choice, live.level, optionId) },
+                onWriteOwn = viewModel::writeOwnOption,
+                onEraseOwn = viewModel::eraseOwnOption,
             )
         }
     }

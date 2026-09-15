@@ -102,6 +102,13 @@ internal object CharacterBuilder {
             weaponProficiencies = charClass?.weaponProficiencies.orEmpty(),
             classChoiceSelections = state.classSelections,
             originChoiceSelections = state.originSelections,
+            // Anything the player wrote for themselves in the wizard travels with them, so a
+            // homebrew invocation picked at level 1 is still in the list at level 5.
+            customOptions = state.customOptions,
+            // A species, class or origin the player named as their own, plus whatever they
+            // wrote about it — the same two places the finished sheet keeps them.
+            textOverrides = state.textOverrides,
+            customFeatures = state.customFeatures,
             // Level 1 feature picks are keyed by the level that granted them, matching how
             // every later level records its own, so the sheet reads them all the same way.
             // The Rogue's Expertise is answered through its own picker, so it's recorded

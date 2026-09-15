@@ -61,6 +61,23 @@ fun ClassStep(state: CreationState, viewModel: CreationViewModel) {
             item { NoSearchResults(query) }
         }
 
+        // Everything in this list is a starting point. A table that runs its own class can
+        // take whichever entry is closest and give it the name it actually has — the rules
+        // underneath stay real, and the character stops being described as something it is not.
+        item {
+            MakeItYourOwn(
+                label = tr("class"),
+                baseName = state.charClass?.name,
+                written = state.textOverrides["bio:class"],
+                writtenDescription = state.customFeatures
+                    .find { it.id == "identity:bio:class" }?.description.orEmpty(),
+                onWrite = { name, description ->
+                    viewModel.writeOwnIdentity("bio:class", tr("Class"), name, description)
+                },
+                onClear = { viewModel.clearOwnIdentity("bio:class") },
+            )
+        }
+
         // A search is already a filter; grouping its results as well buries the matches.
         val sections =
             if (grouped && query.isBlank()) SourceGrouping.byBook(matching) { it.book }

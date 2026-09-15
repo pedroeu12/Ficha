@@ -292,6 +292,9 @@ fun FeaturesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 selected = state.selections[choice.id].orEmpty(),
                 onToggle = { viewModel.toggleSelection(choice.id, it, choice.count) },
                 disabledOptionIds = disabled,
+                written = state.character.customOptions,
+                onWriteOwn = viewModel::writeOwnOption,
+                onEraseOwn = viewModel::eraseOwnOption,
             )
         }
     }
@@ -337,6 +340,9 @@ fun FeatChoicesStep(state: LevelUpState, viewModel: LevelUpViewModel) {
                 selected = state.selections[choice.id].orEmpty(),
                 onToggle = { viewModel.toggleSelection(choice.id, it, choice.count) },
                 disabledOptionIds = disabled,
+                written = state.character.customOptions,
+                onWriteOwn = viewModel::writeOwnOption,
+                onEraseOwn = viewModel::eraseOwnOption,
             )
         }
     }

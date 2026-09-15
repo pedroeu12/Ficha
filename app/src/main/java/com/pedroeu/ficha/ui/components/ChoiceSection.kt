@@ -20,15 +20,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.data.model.Choice
 import com.pedroeu.ficha.data.model.ChoiceKind
+import com.pedroeu.ficha.domain.CustomOption
+import com.pedroeu.ficha.domain.CustomOptions
 
 /**
  * Renders one [Choice] as a titled card. Short-labelled kinds become chips; anything with
  * real explanatory text becomes a list of selectable cards so the player can read before
  * committing.
+ *
+ * Every question in the app is drawn by this one composable, which is why "let me write my
+ * own" is a parameter here rather than a feature of any screen: pass [onWriteOwn] and the
+ * question gains a way to answer it with something the books do not contain — during
+ * creation, at a level up, from Edit Mode, on the phone and on the tablet, all at once.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -39,7 +47,18 @@ fun ChoiceSection(
     modifier: Modifier = Modifier,
     /** Options that are unavailable, e.g. a skill the character already has. */
     disabledOptionIds: Set<String> = emptySet(),
+    /** What the player has already written for this question, so it can be edited again. */
+    written: List<CustomOption> = emptyList(),
+    /** Given, the question offers to be answered with something written by hand. */
+    onWriteOwn: ((CustomOption) -> Unit)? = null,
+    /** Given, a written option can be taken back — a rewrite reset, an addition deleted. */
+    onEraseOwn: ((CustomOption) -> Unit)? = null,
 ) {
+    // Which option's wording is being written, if any. The id alone: the dialog re-reads the
+    // option from the list on every pass, so saving one and opening the next cannot show the
+    // previous one's text.
+    var writing by remember { mutableStateOf<String?>(null) }
+    val mine = written.filter { it.choiceId == choice.id }.associateBy { it.id }
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = Corner.card,
@@ -150,6 +169,22 @@ fun ChoiceSection(
                                 onDismiss = { showFullText = false },
                             )
                         }
+                        // Writing over an option the books already have. The character still
+                        // takes that option, with its level requirement and everything it
+                        // depends on; only what it says changes. A table running a homebrew
+                        // invocation in the slot of a printed one used to have no way to say
+                        // so, and the sheet quietly described a character nobody was playing.
+                        if (onWriteOwn != null) {
+                            Text(
+                                text = if (option.id in mine) tr("Edit your wording")
+                                else tr("Rewrite this"),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier
+                                    .clickable { writing = option.id }
+                                    .padding(start = 12.dp, top = 2.dp, bottom = 2.dp),
+                            )
+                        }
                     }
 
                     when {
@@ -176,9 +211,78 @@ fun ChoiceSection(
                     }
                 }
             }
+
+            if (onWriteOwn != null) {
+                WriteYourOwn(
+                    written = mine.values.filterNot { it.isRewrite },
+                    onNew = { writing = NEW },
+                    onEdit = { writing = it.id },
+                )
+            }
+        }
+    }
+
+    writing?.let { id ->
+        val book = choice.options.find { it.id == id }
+        CustomOptionDialog(
+            choiceId = choice.id,
+            existing = mine[id],
+            // A rewrite starts from the book's own wording, so the player edits rather than
+            // retypes; a new option starts blank.
+            startingName = book?.name.orEmpty(),
+            startingDescription = book?.description.orEmpty(),
+            onDismiss = { writing = null },
+            onSave = {
+                onWriteOwn?.invoke(it)
+                writing = null
+            },
+            onErase = onEraseOwn?.let { erase ->
+                { option: CustomOption ->
+                    erase(option)
+                    writing = null
+                }
+            },
+        )
+    }
+}
+
+/** The way in: one button to write something new, and a way back to anything already written. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun WriteYourOwn(
+    written: List<CustomOption>,
+    onNew: () -> Unit,
+    onEdit: (CustomOption) -> Unit,
+) {
+    Column(
+        Modifier.padding(top = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = tr("+ Write your own"),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickable(onClick = onNew).padding(vertical = 4.dp),
+        )
+        if (written.isNotEmpty()) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                written.forEach { option ->
+                    Text(
+                        text = "✎ ${option.name}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                            .clickable { onEdit(option) }
+                            .padding(vertical = 2.dp),
+                    )
+                }
+            }
         }
     }
 }
+
+/** The id the editor is opened with for something that does not exist yet. */
+private const val NEW = ""
 
 private fun ChoiceKind.usesChips(): Boolean = when (this) {
     ChoiceKind.SKILL, ChoiceKind.EXPERTISE, ChoiceKind.TOOL,
@@ -187,3 +291,4 @@ private fun ChoiceKind.usesChips(): Boolean = when (this) {
 
     ChoiceKind.OPTION, ChoiceKind.SPELL, ChoiceKind.FEAT, ChoiceKind.SUBCLASS -> false
 }
+

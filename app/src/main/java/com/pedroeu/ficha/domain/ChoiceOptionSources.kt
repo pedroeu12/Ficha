@@ -21,10 +21,17 @@ import com.pedroeu.ficha.data.model.Skill
  */
 object ChoiceOptionSources {
 
-    /** The same choice with its options read from the character, where that is what it says. */
+    /**
+     * The same choice with its options read from the character, where that is what it says,
+     * and with anything the player wrote for it folded in.
+     *
+     * Both halves belong here for the same reason: this is the one point every picker in the
+     * app passes through, so a list that depends on the character is worked out once and a
+     * homebrew option appears everywhere without a single screen being told about it.
+     */
     fun resolve(choice: Choice, character: PlayerCharacter): Choice {
         val resolved = when (val source = choice.optionsFrom) {
-            OptionSource.Declared -> return choice
+            OptionSource.Declared -> return CustomOptions.into(choice, character)
 
             OptionSource.ProficientSkills -> ChoiceOptions.fromSkills(
                 Skill.ALL.filter { it.name in character.skillProficiencies }
@@ -37,7 +44,8 @@ object ChoiceOptionSources {
         // Keeping the declared list is too generous by the rules and the lesser fault: a
         // flow that cannot be finished is worse than a list that offers too much. In practice
         // this never fires, because the rules gate these features behind having the thing.
-        return if (resolved.isEmpty()) choice else choice.copy(options = resolved)
+        val withOptions = if (resolved.isEmpty()) choice else choice.copy(options = resolved)
+        return CustomOptions.into(withOptions, character)
     }
 
     fun resolveAll(choices: List<Choice>, character: PlayerCharacter): List<Choice> =

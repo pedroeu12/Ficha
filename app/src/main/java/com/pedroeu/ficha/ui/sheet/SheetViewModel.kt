@@ -18,6 +18,8 @@ import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.Coins
 import com.pedroeu.ficha.domain.CustomAttack
 import com.pedroeu.ficha.domain.CustomFeature
+import com.pedroeu.ficha.domain.CustomOption
+import com.pedroeu.ficha.domain.CustomOptions
 import com.pedroeu.ficha.domain.CustomResource
 import com.pedroeu.ficha.domain.DeathSaves
 import com.pedroeu.ficha.domain.FeatEdits
@@ -631,6 +633,38 @@ class SheetViewModel(
      */
     fun toggleChoice(choice: Choice, level: Int, optionId: String, unbounded: Boolean = false) =
         update { ChoiceGrants.toggle(it, choice, level, optionId, unbounded) }
+
+    /**
+     * Records an option the player wrote for one of the sheet's questions, or rewrote.
+     *
+     * Kept on the character rather than anywhere screen-shaped, so it survives a rest, a
+     * level up, a backup and a restore, and so every picker that asks the same question
+     * offers it — which is the whole point of writing it down once.
+     */
+    fun writeOwnOption(option: CustomOption) = update { CustomOptions.write(it, option) }
+
+    /** Takes one back: a rewrite reverts to the book, an addition is unpicked and deleted. */
+    fun eraseOwnOption(option: CustomOption) = update { CustomOptions.erase(it, option) }
+
+    /**
+     * A feat of the player's own, sitting in the Feats card beside the printed ones.
+     *
+     * It is an id in [PlayerCharacter.featIds] with its name and text in the sheet's own
+     * override map — the same map Edit Mode already writes when you rewrite a printed feat.
+     * Nothing new had to understand it: every reader of a feat id already falls back to the
+     * id when the books do not know it, and the card already prefers the override to the
+     * book. So a written feat and a rewritten one are the same thing on the sheet, which is
+     * exactly how it should read — "just the structure, and I write what I want".
+     */
+    fun addOwnFeat(name: String, description: String) = update { character ->
+        val id = CustomOptions.newId()
+        character.copy(
+            featIds = character.featIds + id,
+            textOverrides = character.textOverrides +
+                ("feat:$id:name" to name.trim()) +
+                ("feat:$id:description" to description.trim()),
+        )
+    }
 
     // ------------------------------------------------------------------ Free text
 

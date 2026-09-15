@@ -308,6 +308,9 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
                 viewModel.addFeat(featId, selections)
                 onDismiss()
             },
+            onWriteOwnFeat = viewModel::addOwnFeat,
+            onWriteOwn = viewModel::writeOwnOption,
+            onEraseOwn = viewModel::eraseOwnOption,
         )
 
         SheetOverlay.AddTool -> TextEditDialog(
@@ -347,6 +350,8 @@ private fun Overlays(overlay: SheetOverlay?, handle: SheetHandle, onDismiss: () 
                         onToggle = { optionId ->
                             viewModel.toggleChoice(resolved.choice, resolved.level, optionId)
                         },
+                        onWriteOwn = viewModel::writeOwnOption,
+                        onEraseOwn = viewModel::eraseOwnOption,
                     )
                 }
         }

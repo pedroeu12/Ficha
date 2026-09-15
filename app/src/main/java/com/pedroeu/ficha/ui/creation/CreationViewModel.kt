@@ -9,6 +9,9 @@ import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.data.model.ClassChoice
 import com.pedroeu.ficha.data.model.Skill
 import com.pedroeu.ficha.data.model.Sourcebook
+import com.pedroeu.ficha.domain.CustomFeature
+import com.pedroeu.ficha.domain.CustomOption
+import com.pedroeu.ficha.domain.CustomOptions
 import com.pedroeu.ficha.domain.AbilityScoreGeneration
 import com.pedroeu.ficha.domain.ScoreMethod
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -184,6 +187,69 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
             else -> selected.drop(1) + optionId
         }
         current.copy(originSelections = current.originSelections + (choiceId to next))
+    }
+
+    /**
+     * Records an option the player wrote during creation, or rewrote.
+     *
+     * Every list the wizard shows is rebuilt from this state, so the new option is in the
+     * picker underneath as soon as it is saved, and [CharacterBuilder] carries the lot onto
+     * the finished character — where the sheet and every later level up read the same list.
+     */
+    fun writeOwnOption(option: CustomOption) = _state.update { current ->
+        current.copy(customOptions = CustomOptions.write(current.customOptions, option))
+    }
+
+    /** Takes one back, and unpicks it wherever the wizard had it ticked. */
+    fun eraseOwnOption(option: CustomOption) = _state.update { current ->
+        current.copy(
+            customOptions = current.customOptions.filterNot {
+                it.id == option.id && it.choiceId == option.choiceId
+            },
+            originSelections = current.originSelections.mapValues { (_, ids) -> ids - option.id },
+            classFeatureSelections = current.classFeatureSelections
+                .mapValues { (_, ids) -> ids - option.id },
+            classSelections = current.classSelections.mapValues { (_, ids) -> ids - option.id },
+        )
+    }
+
+    /**
+     * Names one of the three things a character is, and says what it means.
+     *
+     * The rules still come from the entry underneath — this is the name on the page and the
+     * paragraph that explains it, which is the part of a homebrew species a sheet can honestly
+     * hold. Written as a feature so it is readable at the table rather than only in the wizard.
+     */
+    fun writeOwnIdentity(
+        key: String,
+        featureSource: String,
+        name: String,
+        description: String,
+    ) = _state.update { current ->
+        val featureId = "identity:$key"
+        current.copy(
+            textOverrides = if (name.isBlank()) current.textOverrides - key
+            else current.textOverrides + (key to name.trim()),
+            customFeatures = current.customFeatures.filterNot { it.id == featureId } +
+                listOfNotNull(
+                    description.takeIf { it.isNotBlank() }?.let {
+                        CustomFeature(
+                            id = featureId,
+                            name = name.trim().ifBlank { featureSource },
+                            description = it.trim(),
+                            source = featureSource,
+                        )
+                    }
+                ),
+        )
+    }
+
+    /** Puts the book's own name back. */
+    fun clearOwnIdentity(key: String) = _state.update { current ->
+        current.copy(
+            textOverrides = current.textOverrides - key,
+            customFeatures = current.customFeatures.filterNot { it.id == "identity:$key" },
+        )
     }
 
     fun setBonusSpread(spread: BonusSpread) = _state.update { current ->

@@ -7,6 +7,8 @@ import com.pedroeu.ficha.data.CharacterRepository
 import com.pedroeu.ficha.data.model.Ability
 import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.ChoiceResolver
+import com.pedroeu.ficha.domain.CustomOption
+import com.pedroeu.ficha.domain.CustomOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -109,6 +111,26 @@ class LevelUpViewModel(
         val selected = current.selections[choiceId].orEmpty()
         val next = ChoiceGrants.nextSelection(selected, optionId, max)
         current.copy(selections = current.selections + (choiceId to next))
+    }
+
+    /**
+     * Writes an option of the player's own into the character being levelled.
+     *
+     * Onto the character rather than beside it, because the level-up flow reads its lists
+     * from the character — so the new option appears in the list underneath the moment it is
+     * saved, and is still there on the finished sheet without anything having to carry it
+     * across.
+     */
+    fun writeOwnOption(option: CustomOption) = edit { current ->
+        current.copy(character = CustomOptions.write(current.character, option))
+    }
+
+    fun eraseOwnOption(option: CustomOption) = edit { current ->
+        current.copy(
+            character = CustomOptions.erase(current.character, option),
+            // An option that no longer exists cannot stay ticked in this level's answers.
+            selections = current.selections.mapValues { (_, ids) -> ids - option.id },
+        )
     }
 
     // ------------------------------------------------------------------ ASI and feats

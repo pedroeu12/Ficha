@@ -153,6 +153,35 @@ class ScreenInvariantTest {
         compose.onAllNodesWithText(gated.prerequisite).onFirst().assertExists()
     }
 
+    /**
+     * And the way to write your own is reachable, at the bottom of twenty-eight invocations.
+     *
+     * It is the last thing in the longest list in the editor, which makes it the first thing
+     * a clipped dialog loses. A "write your own" that only exists on short lists is exactly
+     * the feature a player would never find on the list where they need it most.
+     */
+    @Test
+    fun `the way to write your own answer can be reached at the end of a long list`() {
+        val resolved = resolvedInvocations()
+        val written = mutableListOf<com.pedroeu.ficha.domain.CustomOption>()
+
+        compose.setContent {
+            FichaTheme {
+                ChoiceEditDialog(
+                    character = warlock,
+                    resolved = resolved,
+                    onDismiss = {},
+                    onToggle = {},
+                    onWriteOwn = { written += it },
+                )
+            }
+        }
+
+        compose.onAllNodesWithText(tr("+ Write your own")).onFirst()
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
     // ================================================================ The whole game
 
     /**

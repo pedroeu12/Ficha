@@ -202,6 +202,9 @@ fun ClassChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                 selected = state.classFeatureSelections[choice.id].orEmpty(),
                 onToggle = { viewModel.toggleClassFeatureChoice(choice.id, it, choice.count) },
                 disabledOptionIds = disabled,
+                written = state.customOptions,
+                onWriteOwn = viewModel::writeOwnOption,
+                onEraseOwn = viewModel::eraseOwnOption,
             )
         }
     }

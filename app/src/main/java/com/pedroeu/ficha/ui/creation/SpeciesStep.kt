@@ -68,6 +68,23 @@ fun SpeciesStep(state: CreationState, viewModel: CreationViewModel) {
             item { NoSearchResults(query) }
         }
 
+        // Everything in this list is a starting point. A table that runs its own species can
+        // take whichever entry is closest and give it the name it actually has — the rules
+        // underneath stay real, and the character stops being described as something it is not.
+        item {
+            MakeItYourOwn(
+                label = tr("species"),
+                baseName = state.species?.name,
+                written = state.textOverrides["bio:species"],
+                writtenDescription = state.customFeatures
+                    .find { it.id == "identity:bio:species" }?.description.orEmpty(),
+                onWrite = { name, description ->
+                    viewModel.writeOwnIdentity("bio:species", tr("Species"), name, description)
+                },
+                onClear = { viewModel.clearOwnIdentity("bio:species") },
+            )
+        }
+
         // A search is already a filter; grouping its results as well buries the matches.
         val sections =
             if (grouped && query.isBlank()) SourceGrouping.byBook(matching) { it.book }

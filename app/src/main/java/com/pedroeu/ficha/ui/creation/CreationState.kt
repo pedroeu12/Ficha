@@ -8,6 +8,9 @@ import com.pedroeu.ficha.data.content.SpellData
 import com.pedroeu.ficha.data.content.OriginChoices
 import com.pedroeu.ficha.data.content.ProgressionData
 import com.pedroeu.ficha.domain.ChoiceGraph
+import com.pedroeu.ficha.domain.CustomFeature
+import com.pedroeu.ficha.domain.CustomOption
+import com.pedroeu.ficha.domain.CustomOptions
 import com.pedroeu.ficha.data.content.SpeciesData
 import com.pedroeu.ficha.data.content.ToolData
 import com.pedroeu.ficha.data.model.Ability
@@ -97,6 +100,25 @@ data class CreationState(
     val directScores: Map<Ability, Int> = Ability.ALL.associateWith { 8 },
     val rolledPool: List<Int> = emptyList(),
 
+    /**
+     * Options the player wrote during creation — see [com.pedroeu.ficha.domain.CustomOption].
+     *
+     * Held here and folded into every list this state builds, so "write your own" works in
+     * the wizard exactly as it does on a finished sheet, and travels onto the character.
+     */
+    val customOptions: List<CustomOption> = emptyList(),
+
+    /**
+     * Names the player gave their species, class or origin, under the sheet's own keys.
+     *
+     * The same map the finished sheet writes when Edit Mode renames one of these, so a
+     * character named in the wizard and one renamed later are the same character.
+     */
+    val textOverrides: Map<String, String> = emptyMap(),
+
+    /** What the player wrote about their own species, class or origin, kept as features. */
+    val customFeatures: List<CustomFeature> = emptyList(),
+
     val name: String = "",
     val alignment: String = "",
     val appearance: String = "",
@@ -138,6 +160,7 @@ data class CreationState(
             // five spells that pact wants are asked in this same step rather than left for
             // the player to discover unanswered on the finished sheet.
             return ChoiceGraph.expand(roots, classFeatureSelections, enabledSources)
+                .map { CustomOptions.into(it, customOptions) }
         }
 
     /**
@@ -182,7 +205,7 @@ data class CreationState(
             ),
             answers = originSelections,
             books = enabledSources,
-        )
+        ).map { CustomOptions.into(it, customOptions) }
 
     /** Skills picked through an origin choice, such as the Skilled feat. */
     private val originSkillChoices: Set<Skill>

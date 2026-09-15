@@ -70,6 +70,23 @@ fun BackgroundStep(state: CreationState, viewModel: CreationViewModel) {
             item { NoSearchResults(query) }
         }
 
+        // Everything in this list is a starting point. A table that runs its own origin can
+        // take whichever entry is closest and give it the name it actually has — the rules
+        // underneath stay real, and the character stops being described as something it is not.
+        item {
+            MakeItYourOwn(
+                label = tr("origin"),
+                baseName = state.background?.name,
+                written = state.textOverrides["bio:origin"],
+                writtenDescription = state.customFeatures
+                    .find { it.id == "identity:bio:origin" }?.description.orEmpty(),
+                onWrite = { name, description ->
+                    viewModel.writeOwnIdentity("bio:origin", tr("Origin"), name, description)
+                },
+                onClear = { viewModel.clearOwnIdentity("bio:origin") },
+            )
+        }
+
         // A search is already a filter; grouping its results as well buries the matches.
         val sections =
             if (grouped && query.isBlank()) SourceGrouping.byBook(matching) { it.book }

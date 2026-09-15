@@ -77,3 +77,35 @@ If the test fails on something you added, do one of these — in this order of p
 3. **Name it in `DECIDED_AT_THE_TABLE` or `ASKED_ELSEWHERE`**, with a sentence saying why.
 
 Reaching for 3 first is how the app got here. Prefer 1.
+
+## Answers the books do not contain
+
+Every question above draws its options from a book. A table that plays anything else — a
+homebrew invocation, a third-party feat, a Fighting Style the DM made up between sessions —
+had to pick the closest printed option and keep the difference in somebody's head, which is
+the one job a character sheet exists to do.
+
+So any question can also be answered with something written by hand. One record covers both
+things a player wants, and the only difference is the id:
+
+| `CustomOption.id` | What it means |
+| --- | --- |
+| `custom:<uuid>` | **a new option**, appended to that question's list |
+| an option id from a book | **a rewrite** of that option: same place in the list, same level requirement, same dependencies, different wording |
+
+The fold-in happens in `ChoiceOptionSources.resolve`, the single point every picker in the app
+already passes through. That is why writing your own works during creation, at a level up, in
+Edit Mode, on the phone and on the tablet, without any screen having been told about it — it
+is a property of the question, not a feature of a screen. `UiInvariantTest` has a rule that
+every `ChoiceSection` passes `onWriteOwn`, so a new picker cannot quietly leave it out.
+
+Three things are not `Choice`s and are handled in their own way:
+
+- **A feat of your own** is an id in `featIds` that no book knows, with its name and text in
+  the sheet's `textOverrides` — the same map Edit Mode already writes when you rewrite a
+  printed feat, so a written feat and a rewritten one are the same thing on the sheet.
+- **Species, class and origin** keep the rules of whichever entry is closest and take a name
+  and description of your own (`MakeItYourOwn` in the creation wizard). A homebrew class is a
+  table of features at twenty levels, a Hit Die and a spell list; a sheet that let you invent
+  one from nothing would be a sheet that could not add anything up.
+- **Attacks, items, resources and features** were already free text and stay that way.

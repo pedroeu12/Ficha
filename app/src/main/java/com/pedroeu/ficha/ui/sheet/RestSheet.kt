@@ -281,6 +281,9 @@ fun RestSheet(
                                 currentSelection = resolved.selectedIds.toSet(),
                                 classLevels = ClassLevels.levelMap(character),
                             ),
+                            written = character.customOptions,
+                            onWriteOwn = viewModel::writeOwnOption,
+                            onEraseOwn = viewModel::eraseOwnOption,
                         )
                     }
                 }

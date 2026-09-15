@@ -50,6 +50,7 @@ import com.pedroeu.ficha.data.model.Recharge
 import com.pedroeu.ficha.data.model.SpellDef
 import com.pedroeu.ficha.domain.ChoiceGrants
 import com.pedroeu.ficha.domain.CustomAttack
+import com.pedroeu.ficha.domain.CustomOption
 import com.pedroeu.ficha.domain.FeatPrerequisites
 import com.pedroeu.ficha.domain.KnownSpell
 import com.pedroeu.ficha.domain.CharacterSpells
@@ -58,6 +59,7 @@ import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.ui.components.ChoiceChip
 import com.pedroeu.ficha.ui.components.ChoiceSection
+import com.pedroeu.ficha.ui.components.CustomOptionDialog
 import com.pedroeu.ficha.ui.components.SectionHeader
 import com.pedroeu.ficha.ui.components.SelectableCard
 import java.util.UUID
@@ -75,7 +77,13 @@ fun FeatPickerSheet(
     character: PlayerCharacter,
     onDismiss: () -> Unit,
     onAdd: (featId: String, selections: Map<String, List<String>>) -> Unit,
+    /** Given, the list also offers a blank feat for the player to fill in themselves. */
+    onWriteOwnFeat: ((name: String, description: String) -> Unit)? = null,
+    /** Given, a sub-question of the chosen feat can be answered with something written. */
+    onWriteOwn: ((CustomOption) -> Unit)? = null,
+    onEraseOwn: ((CustomOption) -> Unit)? = null,
 ) {
+    var writingOwnFeat by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var query by remember { mutableStateOf("") }
     var selectedFeatId by remember { mutableStateOf<String?>(null) }
@@ -187,6 +195,9 @@ fun FeatPickerSheet(
                                             currentSelection = selections[choice.id].orEmpty().toSet(),
                                             classLevels = classLevels,
                                         ),
+                                        written = character.customOptions,
+                                        onWriteOwn = onWriteOwn,
+                                        onEraseOwn = onEraseOwn,
                                     )
                                 }
                                 Button(
@@ -210,7 +221,34 @@ fun FeatPickerSheet(
                 }
                 }
             }
+
+            // A feat the books do not have. It lands in the Feats card as an ordinary entry
+            // with its own wording, which is the same thing a rewritten printed feat is —
+            // there is no second kind of feat to maintain.
+            if (onWriteOwnFeat != null) {
+                Text(
+                    text = tr("+ Write your own feat"),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clickable { writingOwnFeat = true }
+                        .padding(vertical = 6.dp),
+                )
+            }
         }
+    }
+
+    if (writingOwnFeat && onWriteOwnFeat != null) {
+        CustomOptionDialog(
+            choiceId = "feat",
+            existing = null,
+            onDismiss = { writingOwnFeat = false },
+            onSave = { written ->
+                onWriteOwnFeat(written.name, written.description)
+                writingOwnFeat = false
+                onDismiss()
+            },
+        )
     }
 }
 

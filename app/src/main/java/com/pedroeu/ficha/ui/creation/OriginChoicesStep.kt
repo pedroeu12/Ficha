@@ -70,6 +70,9 @@ fun OriginChoicesStep(state: CreationState, viewModel: CreationViewModel) {
                     viewModel.toggleOriginChoice(choice.id, optionId, choice.count)
                 },
                 disabledOptionIds = disabled,
+                written = state.customOptions,
+                onWriteOwn = viewModel::writeOwnOption,
+                onEraseOwn = viewModel::eraseOwnOption,
             )
         }
     }

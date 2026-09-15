@@ -84,6 +84,36 @@ data class CustomResource(
     val notes: String = "",
 )
 
+/**
+ * An option the player wrote themselves, offered by one of the sheet's questions.
+ *
+ * The rulebook is a starting point, not a fence. A table runs a homebrew Eldritch Invocation,
+ * a feat from a third-party book, a Fighting Style the DM made up on the spot — and until this
+ * existed, any of those meant the sheet could not describe the character being played. The
+ * answer was always "pick the closest thing and remember the difference", which is exactly
+ * what a character sheet is for not having to do.
+ *
+ * One shape covers both things a player wants here, and the difference is only [id]:
+ *
+ *  - an id of its own (`custom:…`) is **a new option**, appended to that question's list
+ *  - the id of an option the books already have is **a rewrite** of that option, keeping its
+ *    place in the list and its prerequisites, and replacing what it says
+ *
+ * That second form is what "let me write over Agonizing Blast" means, and making it the same
+ * record as the first is why every picker in the app understands both without being told.
+ */
+@Serializable
+data class CustomOption(
+    val id: String,
+    /** The question this answers — [com.pedroeu.ficha.data.model.Choice.id]. */
+    val choiceId: String,
+    val name: String,
+    val description: String = "",
+) {
+    /** True when this writes over an option the books already offer, rather than adding one. */
+    val isRewrite: Boolean get() = !id.startsWith(CustomOptions.PREFIX)
+}
+
 /** A feature the player wrote themselves, shown on the Features tab. */
 @Serializable
 data class CustomFeature(
@@ -240,6 +270,14 @@ data class PlayerCharacter(
     val attackOrder: List<String> = emptyList(),
     /** Extra features written by the player. */
     val customFeatures: List<CustomFeature> = emptyList(),
+    /**
+     * Options the player wrote for the sheet's own questions — see [CustomOption].
+     *
+     * Kept on the character rather than in a table of content, because a homebrew invocation
+     * belongs to the character who has it, travels with them through a backup, and should not
+     * appear in the next character's list uninvited.
+     */
+    val customOptions: List<CustomOption> = emptyList(),
     /** Limited-use resources written by the player. */
     val customResources: List<CustomResource> = emptyList(),
     /** Resource id -> uses spent so far. */

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pedroeu.ficha.domain.ClassLevels
+import com.pedroeu.ficha.domain.CustomOption
 import com.pedroeu.ficha.domain.OwnedOptions
 import com.pedroeu.ficha.domain.PlayerCharacter
 import com.pedroeu.ficha.domain.ResolvedChoice
@@ -36,6 +37,9 @@ fun ChoiceEditDialog(
     resolved: ResolvedChoice,
     onDismiss: () -> Unit,
     onToggle: (String) -> Unit,
+    /** Given, the question can also be answered with something the player writes here. */
+    onWriteOwn: ((CustomOption) -> Unit)? = null,
+    onEraseOwn: ((CustomOption) -> Unit)? = null,
 ) {
     // The same eligibility every other picker applies: what is already held, the level in the
     // class that gates it, and an option another option requires.
@@ -60,6 +64,9 @@ fun ChoiceEditDialog(
                     selected = resolved.selectedIds,
                     onToggle = onToggle,
                     disabledOptionIds = disabled,
+                    written = character.customOptions,
+                    onWriteOwn = onWriteOwn,
+                    onEraseOwn = onEraseOwn,
                 )
             }
         },

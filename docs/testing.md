@@ -92,6 +92,29 @@ here, which is why page navigation in `SheetScreenTest` uses a tab's own click a
 than a tap aimed at a rectangle that exists on no phone. Where geometry *is* the point, as in
 a list too long for its dialog, `ScreenInvariantTest` scrolls and taps for real.
 
+## Layer 5 — against the books: `ReferenceParityTest`
+
+The four layers above check that the app agrees with *itself*. This one checks that it agrees
+with the rules it claims to implement.
+
+A scraper reads dnd2024.wikidot.com and a differ compares it entry by entry against a JSON dump
+of everything the app ships (`ContentDumpTest`). Three kinds of finding, in descending order of
+how much they matter: an entry missing on either side; a stated value that disagrees (a casting
+time, a rarity, a category — exact comparisons, where a mismatch is always real); and a number
+the books state that the app's text does not contain. The third is what catches the damage
+nobody updated and the sentence cut off mid-rule.
+
+That sweep needs the network, so it does not run in CI. What does run is its residue:
+`reference-digest.json` holds the numbers each entry states — a die, a distance, a duration, a
+save DC, a price — and `ReferenceParityTest` checks the app still contains every one of them,
+offline, in half a second. Prose is deliberately not frozen: the app paraphrases, and a test
+demanding identical wording would fail constantly and be switched off within a week. Numbers
+have no second correct spelling.
+
+Regenerate the digest when the books change. An entry in its `ALLOWED` list needs a written
+reason — one unexplained exception becomes twenty, and then the test passes because nobody is
+looking rather than because the app is right.
+
 ## Running it
 
 ```

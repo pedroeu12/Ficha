@@ -188,8 +188,25 @@ private fun BackgroundDetails(
                 )
             }
         }
-        DetailLine(tr("Equipment"), background.equipment.joinToString())
-        DetailLine(tr("Starting Gold"), "${background.startingGold} gp")
+        // "Choose A or B" is how every 2024 background words its gear, and the wizard used to
+        // answer A on the player's behalf. Asked as two cards rather than a switch, because
+        // the two halves are a real comparison — a list of things against a sum of money —
+        // and a player deciding between them wants to see both.
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        SectionHeader(tr("Starting Equipment"))
+        SelectableCard(
+            title = tr("A: the gear"),
+            subtitle = background.equipment.joinToString() +
+                trf(" — and {0} gp", background.startingGold),
+            selected = !state.takeCoinsInstead,
+            onClick = { viewModel.setTakeCoinsInstead(false) },
+        )
+        SelectableCard(
+            title = trf("B: {0} gp", background.coinsInstead),
+            subtitle = tr("Buy your own equipment instead."),
+            selected = state.takeCoinsInstead,
+            onClick = { viewModel.setTakeCoinsInstead(true) },
+        )
     }
 }
 

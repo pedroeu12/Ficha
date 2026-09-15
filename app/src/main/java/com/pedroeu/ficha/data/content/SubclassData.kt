@@ -387,75 +387,75 @@ object SubclassData {
     private val ARCANE_SHOT_OPTIONS = listOf(
         ChoiceOption(
             "banishing", "Banishing Shot",
-            "You weave banishing magic into your shot. The target takes an extra 2d6 Force " +
-                "damage, and it must succeed on a Charisma saving throw or have the Incapacitated " +
-                "condition and be transported to a harmless demiplane until the start of your " +
-                "next turn. At the end of that turn, the target reappears in the space it left " +
-                "or in the nearest unoccupied space if that space is occupied.",
+            "Your ammunition temporarily sequesters your target in a harmless demiplane. The creature you hit " +
+                             "takes extra Psychic damage equal to one roll of your Arcane Shot Die and must succeed on a " +
+                             "Charisma saving throw or be banished. While banished, the creature has the Incapacitated " +
+                             "condition and a Speed of 0. At the end of its next turn, the target reappears in the space it " +
+                             "left or, if that space is occupied, in the nearest unoccupied space.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "beguiling", "Beguiling Shot",
-            "Your enchantment magic causes this shot to temporarily beguile its target. The " +
-                "target takes an extra 2d6 Psychic damage, and it must succeed on a Wisdom " +
-                "saving throw or have the Charmed condition until the start of your next turn. " +
-                "While Charmed in this way, the target is Charmed by a creature of your choice " +
-                "that you can see, and the condition ends early if that creature attacks the " +
-                "target or deals damage to it.",
+            "Your ammunition beguiles your target. The creature you hit takes extra Psychic damage equal to " +
+                             "two rolls of your Arcane Shot Die and must succeed on a Wisdom saving throw or have the Charmed " +
+                             "condition until the start of your next turn, treating either you or one of your allies within 30 " +
+                             "feet of the target (your choice) as the charmer. The Charmed condition ends early if the charmer " +
+                             "attacks the target, deals damage to it, or forces it to make a saving throw.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "bursting", "Bursting Shot",
-            "You imbue your shot with force energy drawn from the school of evocation. The " +
-                "target and each creature within 10 feet of it take 2d6 Force damage each.",
+            "You imbue your ammunition with explosive magical energy. Immediately after you deal damage to " +
+                            "the creature, your target and each creature within a 10-foot Emanation originating from the " +
+                            "target take Force damage equal to two rolls of your Arcane Shot Die.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "enfeebling", "Enfeebling Shot",
-            "You weave necromantic magic into your shot. The target takes an extra 2d6 Necrotic " +
-                "damage, and it must succeed on a Constitution saving throw or have the Poisoned " +
-                "condition until the start of your next turn. While Poisoned in this way, the " +
-                "damage of the target's attacks is halved (round down).",
+            "Your ammunition saps your target's strength. The creature you hit takes extra Necrotic damage " +
+                              "equal to two rolls of your Arcane Shot Die. The target must also succeed on a Constitution " +
+                              "saving throw or have the Poisoned condition until the end of its next turn. Whenever a target " +
+                              "Poisoned in this way hits with an attack roll, it subtracts an amount equal to one roll of your " +
+                              "Arcane Shot Die from the total damage of that attack.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "grasping", "Grasping Shot",
-            "When this shot strikes its target, conjuration magic creates grasping, poisonous " +
-                "brambles which wrap around the target. The target takes an extra 2d6 Slashing " +
-                "damage, and it must succeed on a Strength saving throw or have the Restrained " +
-                "condition and its Speed reduced to 0. The target repeats the save at the end of " +
-                "each of its turns, ending the effect on itself on a success; it takes 2d6 " +
-                "Slashing damage each time it fails.",
+            "Your ammunition creates clutching brambles around your target. The creature you hit takes extra " +
+                            "Slashing damage equal to one roll of your Arcane Shot Die and must succeed on a Strength saving " +
+                            "throw or have the Restrained condition for 1 minute or until you use this option again. The " +
+                            "target or a creature within reach of it can take an action to make a Strength (Athletics) check " +
+                            "against your Arcane Shot saving throw DC, removing the brambles and ending the Restrained " +
+                            "condition on the target on a successful check.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "piercing", "Piercing Shot",
-            "You use transmutation magic to give your shot an ethereal quality. When you use " +
-                "this option, you don't make an attack roll. Instead, the shot travels in a " +
-                "30-foot-long, 1-foot-wide Line, passing through creatures and objects and " +
-                "ignoring Cover. Each creature in the Line makes a Dexterity saving throw, " +
-                "taking the weapon's damage plus an extra 1d6 Force damage on a failed save, or " +
-                "half as much damage on a successful one.",
+            "You give your ammunition an ethereal quality. When you use this option, you don't make an attack " +
+                            "roll for the attack. Instead, the ammunition shoots forward in a 30-foot-long, 1-foot-wide Line " +
+                            "originating from you, then vanishes. The Line ignores cover, as the ammunition phases through " +
+                            "solid objects. Each creature in the Line makes a Dexterity saving throw. On a failed save, a " +
+                            "creature takes damage as if it were hit plus extra Piercing damage equal to two rolls of your " +
+                            "Arcane Shot Die. On a successful save, a creature takes half as much damage.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "seeking", "Seeking Shot",
-            "Using divination magic, you grant your shot the ability to seek out a target. When " +
-                "you use this option, you don't make an attack roll. Instead, choose one " +
-                "creature you have seen in the past minute. The shot flies toward that creature, " +
-                "moving around corners if necessary and ignoring Cover. If the target is within " +
-                "the weapon's range and there is a path large enough for the shot to travel, the " +
-                "target must make a Dexterity saving throw, taking the weapon's damage plus an " +
-                "extra 2d6 Force damage on a failed save, or half as much damage on a successful " +
-                "one. You then learn the target's current location.",
+            "Your ammunition can seek out a target. When you use this option, you don't make an attack roll " +
+                           "for the attack. Instead, choose one creature you have seen in the last minute. The ammunition " +
+                           "flies toward that creature, moving around corners if necessary and ignoring Half Cover and " +
+                           "Three-Quarters Cover. If the target is within your weapon's long range, the target makes a " +
+                           "Dexterity saving throw. On a failed save, the target takes damage as if it were hit plus extra " +
+                           "Force damage equal to two rolls of your Arcane Shot Die, and you learn the target's current " +
+                           "location. On a successful save, the target takes half as much damage only. If the target is " +
+                           "beyond your weapon's long range, the ammunition disappears after traveling as far as it can.",
             "1 Arcane Shot use",
         ),
         ChoiceOption(
             "shadow", "Shadow Shot",
-            "You weave illusion magic into your shot, causing it to occlude your foe's vision " +
-                "with shadows. The target takes an extra 2d6 Psychic damage, and it must succeed " +
-                "on a Wisdom saving throw or have the Blinded condition until the start of your " +
-                "next turn.",
+            "Your ammunition occludes your foe's vision with shadows. The creature you hit takes extra " +
+                          "Psychic damage equal to one roll of your Arcane Shot Die, and it must succeed on a Wisdom saving " +
+                          "throw or have the Blinded condition until the end of its next turn.",
             "1 Arcane Shot use",
         ),
     )

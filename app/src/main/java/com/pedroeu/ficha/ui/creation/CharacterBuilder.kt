@@ -130,8 +130,13 @@ internal object CharacterBuilder {
             knownSpells = spells,
             inventory = buildInventory(state),
             coins = Coins(
-                gp = (background?.startingGold ?: 0) +
-                    (EquipmentData.STARTING_KITS[state.classId]?.goldPieces ?: 0)
+                // Option B replaces the background's whole package — its gear and its few
+                // coins — with one sum. The class's own starting kit is untouched: that is a
+                // separate grant, and the rules do not trade it away.
+                gp = (
+                    if (state.takeCoinsInstead) background?.coinsInstead ?: 0
+                    else background?.startingGold ?: 0
+                    ) + (EquipmentData.STARTING_KITS[state.classId]?.goldPieces ?: 0)
             ),
             alignment = state.alignment,
             appearance = state.appearance,
@@ -175,7 +180,9 @@ internal object CharacterBuilder {
             )
         }
         kit?.otherGear?.forEach { items += InventoryItem(name = it) }
-        state.background?.equipment?.forEach { items += InventoryItem(name = it) }
+        if (!state.takeCoinsInstead) {
+            state.background?.equipment?.forEach { items += InventoryItem(name = it) }
+        }
 
         return items
     }

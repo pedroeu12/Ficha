@@ -252,6 +252,9 @@ class CreationViewModel(private val repository: CharacterRepository) : ViewModel
         )
     }
 
+    /** Takes the background's gear, or the coins the rules offer in its place. */
+    fun setTakeCoinsInstead(coins: Boolean) = _state.update { it.copy(takeCoinsInstead = coins) }
+
     fun setBonusSpread(spread: BonusSpread) = _state.update { current ->
         if (current.bonusSpread == spread) current
         else current.copy(bonusSpread = spread, backgroundBonuses = emptyMap())

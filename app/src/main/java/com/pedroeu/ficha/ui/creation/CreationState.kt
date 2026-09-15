@@ -86,6 +86,13 @@ data class CreationState(
     val expertiseChoices: Set<Skill> = emptySet(),
 
     val backgroundId: String? = null,
+    /**
+     * True when the player took the coins rather than the background's equipment.
+     *
+     * "Choose A or B" is how every 2024 background words its gear, and the wizard used to
+     * choose A on the player's behalf without saying so.
+     */
+    val takeCoinsInstead: Boolean = false,
     val bonusSpread: BonusSpread = BonusSpread.TWO_ONE,
     /** Ability -> +2 or +1 granted by the background. */
     val backgroundBonuses: Map<Ability, Int> = emptyMap(),

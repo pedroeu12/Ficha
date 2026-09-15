@@ -29,6 +29,14 @@ data class Background(
     val featId: String,
     val equipment: List<String>,
     val startingGold: Int,
+    /**
+     * What the whole package is worth if you would rather buy your own gear.
+     *
+     * Every 2024 background offers the same bargain — "Choose A or B: (A) this equipment and
+     * a few coins; or (B) 50 GP" — and the app only ever offered A, so a player who wanted to
+     * kit themselves out had no way to say so and had to delete ten items by hand.
+     */
+    val coinsInstead: Int = 50,
     /** The book this comes from; the character's chosen books decide whether it is offered. */
     override val book: Sourcebook = Sourcebook.PHB,
     /**
